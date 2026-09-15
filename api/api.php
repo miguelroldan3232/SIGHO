@@ -38,6 +38,16 @@ function fail(string $message, int $status = 400): never {
     respond(['ok' => false, 'message' => $message], $status);
 }
 
+function capitalizarNombre(string $valor): string {
+    $valor = trim(preg_replace('/\s+/u', ' ', $valor));
+    if ($valor === '') return '';
+    $palabras = explode(' ', mb_strtolower($valor, 'UTF-8'));
+    foreach ($palabras as &$palabra) {
+        if ($palabra !== '') $palabra = mb_strtoupper(mb_substr($palabra, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($palabra, 1, null, 'UTF-8');
+    }
+    return implode(' ', $palabras);
+}
+
 
 function institutional_domain(): string {
     return 'iejosejoaquinflorezhernandez.edu.co';
@@ -85,15 +95,31 @@ function user_payload(array $row): array {
         'studentId' => null,
     ];
     if ($row['role_code'] === 'estudiante') {
-        $st = db()->prepare('SELECT id, grade, modality, technical_program, target_hours FROM students WHERE user_id = ?');
+        $st = db()->prepare('SELECT id, grade, modality, technical_program, target_hours FROM students WHERE user_id = ? LIMIT 1');
         $st->execute([$row['id']]);
         $s = $st->fetch();
         if ($s) {
             $payload['studentId'] = (int)$s['id'];
-            $payload['grado'] = $s['grade'] ?? '';
+            $payload['grado'] = trim((string)($s['grade'] ?? ''));
+            // Algunas cuentas antiguas guardan el grado en la solicitud y no en students.
+            if ($payload['grado'] === '') {
+                $stGrade = db()->prepare("SELECT grade FROM student_applications WHERE student_id = ? AND grade IS NOT NULL AND TRIM(grade) <> '' ORDER BY id DESC LIMIT 1");
+                $stGrade->execute([(int)$s['id']]);
+                $payload['grado'] = trim((string)($stGrade->fetchColumn() ?: ''));
+            }
+            if ($payload['grado'] === '') {
+                $stGrade = db()->prepare("SELECT grade FROM access_requests WHERE (email = ? OR identification = ?) AND grade IS NOT NULL AND TRIM(grade) <> '' ORDER BY id DESC LIMIT 1");
+                $stGrade->execute([$row['email'], $row['identification']]);
+                $payload['grado'] = trim((string)($stGrade->fetchColumn() ?: ''));
+            }
             $payload['esTecnico'] = $s['modality'] === 'tecnico';
             $payload['programaTecnico'] = $s['technical_program'] ?? '';
             $payload['metaHoras'] = (float)$s['target_hours'];
+        } else {
+            // Fallback para estudiantes antiguos sin fila en students.
+            $stGrade = db()->prepare("SELECT grade FROM access_requests WHERE (email = ? OR identification = ?) AND grade IS NOT NULL AND TRIM(grade) <> '' ORDER BY id DESC LIMIT 1");
+            $stGrade->execute([$row['email'], $row['identification']]);
+            $payload['grado'] = trim((string)($stGrade->fetchColumn() ?: ''));
         }
     } else {
         ensure_optional_columns(db());
@@ -154,7 +180,8 @@ function ensure_optional_columns(PDO $pdo): void {
         ['staff', 'service_site', "ALTER TABLE staff ADD COLUMN service_site VARCHAR(150) NULL AFTER position"],
         ['staff', 'service_project', "ALTER TABLE staff ADD COLUMN service_project VARCHAR(200) NULL AFTER service_site"],
         ['staff', 'phone', "ALTER TABLE staff ADD COLUMN phone VARCHAR(30) NULL AFTER service_project"],
-        ['access_requests', 'service_project', "ALTER TABLE access_requests ADD COLUMN service_project VARCHAR(200) NULL AFTER service_site"]
+        ['access_requests', 'service_project', "ALTER TABLE access_requests ADD COLUMN service_project VARCHAR(200) NULL AFTER service_site"],
+        ['access_requests', 'phone', "ALTER TABLE access_requests ADD COLUMN phone VARCHAR(30) NULL AFTER service_project"]
     ];
     foreach ($checks as [$table, $column, $alter]) {
         $exists = $pdo->prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?");
@@ -199,7 +226,15 @@ function get_records(?int $studentId = null, bool $all = true, ?int $teacherStaf
                    su.email AS student_email,
                    pu.email AS reviewer_email,
                    CONCAT(pu.first_name, ' ', pu.last_name) AS reviewer_name,
-                   s.grade AS grade
+                   COALESCE(NULLIF(TRIM(s.grade), ''), (
+                       SELECT sa.grade
+                       FROM student_applications sa
+                       WHERE sa.student_id = s.id
+                         AND sa.grade IS NOT NULL
+                         AND TRIM(sa.grade) <> ''
+                       ORDER BY sa.id DESC
+                       LIMIT 1
+                   )) AS grade
             FROM hour_records hr
             JOIN students s ON s.id = hr.student_id
             JOIN users su ON su.id = s.user_id
@@ -258,7 +293,8 @@ function pending_requests(string $roleFilter = ''): array {
                    sa.service_days,
                    sa.service_shift,
                    ar.service_site AS request_service_site,
-                   ar.service_project AS request_service_project
+                   ar.service_project AS request_service_project,
+                   ar.phone AS request_phone
             FROM access_requests ar
             JOIN roles r ON r.id = ar.requested_role_id
             LEFT JOIN student_applications sa ON sa.access_request_id = ar.id
@@ -309,7 +345,8 @@ function pending_requests(string $roleFilter = ''): array {
             'diasServicio' => $r['service_days'] ? (json_decode($r['service_days'], true) ?: []) : [],
             'jornada' => $r['service_shift'] ?? '',
             'sedeProfesor' => $r['request_service_site'] ?? '',
-            'proyectoProfesor' => $r['request_service_project'] ?? ''
+            'proyectoProfesor' => $r['request_service_project'] ?? '',
+            'telefonoProfesor' => $r['request_phone'] ?? ''
         ];
     }
     return $out;
@@ -390,6 +427,7 @@ try {
             $grado = trim((string)($d['grado'] ?? '')) ?: null;
             $sedeProfesor = trim((string)($d['sede'] ?? ''));
             $proyectoProfesor = trim((string)($d['proyecto'] ?? ''));
+            $telefonoProfesor = trim((string)($d['telefono'] ?? ''));
 
             if (!$rol || !$nombre || !$apellido || !$ident || !$correo || !$clave) {
                 fail('Completa todos los campos.');
@@ -397,8 +435,14 @@ try {
             if (!in_array($rol, ['estudiante','profesor'], true)) {
                 fail('En las solicitudes solo se permite el rol Estudiante o Profesor.');
             }
-            if (strlen($clave) < 6) {
-                fail('La contraseña debe tener mínimo 6 caracteres.');
+            if ($rol === 'estudiante') {
+                if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/', $clave)) {
+                    fail('La contraseña del estudiante debe tener mínimo 8 caracteres, sin espacios, con mayúscula, minúscula y número.');
+                }
+            } else {
+                if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/', $clave)) {
+                    fail('La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con mayúscula, minúscula y número.');
+                }
             }
             if ($rol === 'profesor' && !is_institutional_email($correo)) {
                  fail('El profesor debe usar un correo @' . institutional_domain() . '.');
@@ -434,10 +478,10 @@ try {
 
                 $anioServicio = (int)($d['anioServicio'] ?? 0);
                 $actualYear = (int)date('Y');
-                $primerApellido = trim((string)($d['primerApellido'] ?? ''));
-                $segundoApellido = trim((string)($d['segundoApellido'] ?? ''));
-                $primerNombre = trim((string)($d['primerNombre'] ?? ''));
-                $segundoNombre = trim((string)($d['segundoNombre'] ?? ''));
+                $primerApellido = capitalizarNombre((string)($d['primerApellido'] ?? ''));
+                $segundoApellido = capitalizarNombre((string)($d['segundoApellido'] ?? ''));
+                $primerNombre = capitalizarNombre((string)($d['primerNombre'] ?? ''));
+                $segundoNombre = capitalizarNombre((string)($d['segundoNombre'] ?? ''));
                 $tipoDocumento = trim((string)($d['tipoDocumento'] ?? ''));
                 $numeroDocumento = trim((string)($d['numeroDocumento'] ?? ''));
                 $gradoEstudiante = trim((string)($d['grado'] ?? ''));
@@ -445,7 +489,7 @@ try {
                 $direccion = trim((string)($d['direccion'] ?? ''));
                 $telefono = trim((string)($d['telefono'] ?? ''));
                 $eps = trim((string)($d['eps'] ?? ''));
-                $nombreAcudiente = trim((string)($d['nombreAcudiente'] ?? ''));
+                $nombreAcudiente = capitalizarNombre((string)($d['nombreAcudiente'] ?? ''));
                 $telefonoAcudiente = trim((string)($d['telefonoAcudiente'] ?? ''));
                 $sede = trim((string)($d['sede'] ?? ''));
                 $proyecto = trim((string)($d['proyecto'] ?? ''));
@@ -485,6 +529,65 @@ try {
                     count($diasServicio) === 0) {
                     fail('Completa todos los campos obligatorios del estudiante.');
                 }
+
+                $regexNombre = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+                foreach ([
+                    'Primer apellido' => [$primerApellido, true, 30],
+                    'Segundo apellido' => [$segundoApellido, false, 30],
+                    'Primer nombre' => [$primerNombre, true, 30],
+                    'Segundo nombre' => [$segundoNombre, false, 30],
+                    'Nombre del acudiente' => [$nombreAcudiente, true, 60]
+                ] as $etiqueta => [$valor, $obligatorio, $maximo]) {
+                    if (!$valor && !$obligatorio) continue;
+                    if (mb_strlen($valor, 'UTF-8') < 2 || mb_strlen($valor, 'UTF-8') > $maximo || !preg_match($regexNombre, $valor)) {
+                        fail($etiqueta . " debe contener solo letras y espacios sencillos, entre 2 y {$maximo} caracteres.");
+                    }
+                }
+                if (!preg_match('/^\d{8,10}$/', $numeroDocumento)) {
+                    fail('El documento debe contener únicamente entre 8 y 10 dígitos.');
+                }
+                if (mb_strlen($direccion, 'UTF-8') > 100) {
+                    fail('La dirección puede tener máximo 100 caracteres.');
+                }
+                $telefonoSoloDigitos = preg_replace('/\D+/', '', $telefono);
+                if (!preg_match('/^3\d{9}$/', $telefonoSoloDigitos)) {
+                    fail('El celular del estudiante debe tener exactamente 10 dígitos y comenzar por 3.');
+                }
+                if (preg_match('/^(\d)\1{9}$/', $telefonoSoloDigitos) || $telefonoSoloDigitos === '1234567890') {
+                    fail('El celular del estudiante no puede tener todos sus dígitos iguales ni ser la secuencia 1234567890.');
+                }
+                $telefonoAcudienteSoloDigitos = preg_replace('/\D+/', '', $telefonoAcudiente);
+                if (!preg_match('/^\d{7,10}$/', $telefonoAcudienteSoloDigitos)) {
+                    fail('El teléfono del acudiente debe tener entre 7 y 10 dígitos.');
+                }
+                if ($telefonoAcudienteSoloDigitos[0] === '0') {
+                    fail('El teléfono del acudiente no puede comenzar por 0.');
+                }
+                if (preg_match('/^(\d)\1+$/', $telefonoAcudienteSoloDigitos)) {
+                    fail('El teléfono del acudiente no puede tener todos sus dígitos iguales.');
+                }
+                $secuencias = ['1234567','2345678','3456789','4567890','12345678','23456789','34567890','123456789','234567890','1234567890','9876543','8765432','7654321','6543210','98765432','87654321','76543210','987654321','876543210','9876543210'];
+                if (in_array($telefonoAcudienteSoloDigitos, $secuencias, true)) {
+                    fail('El teléfono del acudiente no puede ser una secuencia consecutiva.');
+                }
+                if (mb_strlen($eps, 'UTF-8') > 60) {
+                    fail('El nombre de la EPS puede tener máximo 60 caracteres.');
+                }
+                if ($gradoEstudiante === 'Ciclo V' && $modalidad === 'tecnico') {
+                    fail('Ciclo V no puede seleccionar la modalidad Técnica.');
+                }
+                if (!in_array($modalidad, ['academico','tecnico'], true)) {
+                    fail('La modalidad seleccionada no es válida.');
+                }
+                if ($gradoEstudiante === 'Ciclo V' && $jornada !== 'JN') {
+                    fail('Ciclo V debe tener jornada JN.');
+                }
+                if (in_array($gradoEstudiante, ['10°','11°'], true) && $jornada !== 'JM') {
+                    fail('10° y 11° deben tener jornada JM.');
+                }
+                if ($anioServicio < 2026 || $anioServicio > 2100) {
+                    fail('El año del servicio social debe ser 2026 o un año posterior.');
+                }
                 if (!in_array($tipoDocumento, ['Tarjeta de identidad','Cédula de ciudadanía'], true)) {
                     fail('Tipo de documento no válido.');
                 }
@@ -507,8 +610,17 @@ try {
                 if (!in_array($proyecto, $proyectosPermitidos, true)) {
                     fail('El proyecto seleccionado no es válido.');
                 }
-                if ($proyecto === 'Otro' && !$proyectoOtro) {
-                    fail('Debes especificar el proyecto.');
+                $regexTextoOtro = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+                if ($proyecto === 'Otro') {
+                    if (!$proyectoOtro || mb_strlen($proyectoOtro, 'UTF-8') < 2 || mb_strlen($proyectoOtro, 'UTF-8') > 60 || !preg_match($regexTextoOtro, $proyectoOtro)) {
+                        fail("El proyecto de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
+                    }
+                }
+                $epsSeleccionada = trim((string)($d['epsSeleccionada'] ?? ''));
+                if ($epsSeleccionada === 'Otro') {
+                    if (!$eps || mb_strlen($eps, 'UTF-8') < 2 || mb_strlen($eps, 'UTF-8') > 60 || !preg_match($regexTextoOtro, $eps)) {
+                        fail("La EPS de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
+                    }
                 }
                 $diasServicio = array_values(array_unique(array_filter(
                     array_map('trim', $diasServicio),
@@ -524,6 +636,27 @@ try {
                 }
                 if ($dateObj > new DateTime('today')) {
                     fail('La fecha de nacimiento no puede ser futura.');
+                }
+                $anioNacimiento = (int)$dateObj->format('Y');
+                $hoy = new DateTime('today');
+                $edad = $hoy->diff($dateObj)->y;
+
+                if ($gradoEstudiante === 'Ciclo V') {
+                    // Ciclo V: rango dinámico de 18 a 40 años cumplidos.
+                    if ($edad < 18 || $edad > 40) {
+                        fail('Para Ciclo V la edad del estudiante debe estar entre 18 y 40 años.');
+                    }
+                } else {
+                    // 10° y 11°: rango dinámico de 14 a 21 años cumplidos.
+                    if ($edad < 14 || $edad > 21) {
+                        fail('Para 10° y 11° la edad del estudiante debe estar entre 14 y 21 años.');
+                    }
+                }
+
+                // Regla documental: menor de 18 = TI, 18 o más = CC.
+                $tipoDocumentoEsperado = $edad >= 18 ? 'Cédula de ciudadanía' : 'Tarjeta de identidad';
+                if ($tipoDocumento !== $tipoDocumentoEsperado) {
+                    fail("Por la edad del estudiante debe seleccionar {$tipoDocumentoEsperado}.");
                 }
 
                 // El número de documento es la identificación principal de la cuenta.
@@ -547,6 +680,34 @@ try {
             }
 
             if ($rol === 'profesor') {
+                $nombre = capitalizarNombre($nombre);
+                $apellido = capitalizarNombre($apellido);
+                $ident = trim($ident);
+                $correo = strtolower(trim($correo));
+
+                $regexNombreProfesor = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+                if (mb_strlen($nombre, 'UTF-8') < 2 || mb_strlen($nombre, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $nombre)) {
+                    fail('Los nombres del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+                }
+                if (mb_strlen($apellido, 'UTF-8') < 2 || mb_strlen($apellido, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $apellido)) {
+                    fail('Los apellidos del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+                }
+                if ($ident === '') {
+                    fail('La identificación o código institucional del profesor es obligatorio.');
+                }
+                if (!preg_match('/^3\d{9}$/', $telefonoProfesor)
+                    || preg_match('/^(\d)\1{9}$/', $telefonoProfesor)
+                    || in_array($telefonoProfesor, ['0123456789','1234567890','9876543210','123456789','234567890','987654321','876543210'], true)) {
+                    fail('El teléfono de contacto del profesor debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.');
+                }
+                // La identificación/código se conserva libre para no romper formatos existentes como EST-100.
+                if (preg_match('/[<>\"\']/u', $ident)) {
+                    fail('La identificación o código institucional contiene caracteres no permitidos.');
+                }
+                if (preg_match('/\s/u', $correo) || !preg_match('/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i', $correo)) {
+                    fail('El correo del profesor debe ser institucional, sin espacios, y usar @iejosejoaquinflorezhernandez.edu.co.');
+                }
+
                 $proyectosPermitidosProfesor = ['Educación Física / Tiempo Libre','Proyecto Ambiental','Logística y Vigilancia','Secretaría y/o Archivo','Acompañamiento a un docente de transición o primaria','Otro'];
                 if (!$proyectoProfesor || !in_array($proyectoProfesor, $proyectosPermitidosProfesor, true)) {
                     fail('Selecciona un proyecto válido para el profesor.');
@@ -558,7 +719,7 @@ try {
             ensure_optional_columns($pdo);
             $pdo->beginTransaction();
             try {
-                $st = $pdo->prepare('INSERT INTO access_requests (identification, first_name, last_name, email, password_hash, requested_role_id, modality, technical_program, grade, service_site, service_project) VALUES (?,?,?,?,?,?,?,?,?,?,?)');
+                $st = $pdo->prepare('INSERT INTO access_requests (identification, first_name, last_name, email, password_hash, requested_role_id, modality, technical_program, grade, service_site, service_project, phone) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
                 $st->execute([
                     $ident,
                     $nombre,
@@ -570,7 +731,8 @@ try {
                     $rol === 'estudiante' && $modalidad === 'tecnico' ? ($programa ?: 'Técnica') : null,
                     $rol === 'estudiante' ? $gradoEstudiante : $grado,
                     $rol === 'profesor' ? $sedeProfesor : null,
-                    $rol === 'profesor' ? $proyectoProfesor : null
+                    $rol === 'profesor' ? $proyectoProfesor : null,
+                    $rol === 'profesor' ? $telefonoProfesor : null
                 ]);
                 $accessRequestId = (int)$pdo->lastInsertId();
 
@@ -594,10 +756,10 @@ try {
                         $gradoEstudiante,
                         $fechaNacimiento,
                         $direccion,
-                        $telefono,
+                        $telefonoSoloDigitos,
                         $eps,
                         $nombreAcudiente,
-                        $telefonoAcudiente,
+                        $telefonoAcudienteSoloDigitos,
                         $sede,
                         $proyecto,
                         $proyecto === 'Otro' ? $proyectoOtro : null,
@@ -619,7 +781,7 @@ try {
             $user = require_roles(['profesor']);
             ensure_optional_columns(db());
             $pdo = db();
-            $st = $pdo->prepare("SELECT u.first_name, u.last_name, u.email, u.identification, s.phone, s.service_site, s.service_project FROM users u LEFT JOIN staff s ON s.user_id=u.id WHERE u.id=? LIMIT 1");
+            $st = $pdo->prepare("SELECT u.first_name, u.last_name, u.email, u.identification, s.phone, s.service_site, s.service_project, (SELECT ar.status FROM access_requests ar JOIN roles rr ON rr.id=ar.requested_role_id WHERE rr.code='administrador' AND ar.email=u.email ORDER BY ar.id DESC LIMIT 1) AS admin_request_status FROM users u LEFT JOIN staff s ON s.user_id=u.id WHERE u.id=? LIMIT 1");
             $st->execute([(int)$user['id']]);
             $p = $st->fetch() ?: [];
             respond(['ok'=>true,'profile'=>[
@@ -630,7 +792,8 @@ try {
                 'rol'=>'Profesor',
                 'identificacion'=>$p['identification'] ?? $user['identificacion'] ?? '',
                 'sede'=>$p['service_site'] ?? '',
-                'proyecto'=>$p['service_project'] ?? ''
+                'proyecto'=>$p['service_project'] ?? '',
+                'solicitudAdminEstado'=>$p['admin_request_status'] ?? ''
             ]]);
 
         case 'update_professor_profile':
@@ -647,7 +810,16 @@ try {
             if (!filter_var($correo, FILTER_VALIDATE_EMAIL) || !is_institutional_email($correo)) {
                 fail('El correo del profesor debe utilizar el dominio institucional @' . institutional_domain() . '.');
             }
-            if (mb_strlen($nombres) < 2 || mb_strlen($apellidos) < 2) fail('Escribe nombres y apellidos válidos.');
+            $regexNombreProfesor = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+            $nombres = capitalizarNombre($nombres);
+            $apellidos = capitalizarNombre($apellidos);
+            if (mb_strlen($nombres, 'UTF-8') < 2 || mb_strlen($nombres, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $nombres)) fail('Los nombres del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+            if (mb_strlen($apellidos, 'UTF-8') < 2 || mb_strlen($apellidos, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $apellidos)) fail('Los apellidos del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+            if (!preg_match('/^3\d{9}$/', $telefono)
+                || preg_match('/^(\d)\1{9}$/', $telefono)
+                || in_array($telefono, ['0123456789','1234567890','9876543210','123456789','234567890','987654321','876543210'], true)) {
+                fail('El teléfono debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.');
+            }
             $pdo = db();
             $st = $pdo->prepare('SELECT id FROM users WHERE LOWER(email)=? AND id<>?');
             $st->execute([$correo, (int)$user['id']]);
@@ -676,7 +848,7 @@ try {
             $nueva = (string)($d['nuevaClave'] ?? '');
             $confirmar = (string)($d['confirmarClave'] ?? '');
             if ($actual === '' || $nueva === '' || $confirmar === '') fail('Completa todos los campos de contraseña.');
-            if (strlen($nueva) < 6) fail('La nueva contraseña debe tener mínimo 6 caracteres.');
+            if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/', $nueva)) fail('La nueva contraseña debe tener mínimo 8 caracteres, con mayúscula, minúscula y número.');
             if ($nueva !== $confirmar) fail('La confirmación de la nueva contraseña no coincide.');
             $st = db()->prepare('SELECT password_hash FROM users WHERE id=? AND status=\'activo\'');
             $st->execute([(int)$user['id']]);
@@ -691,11 +863,27 @@ try {
             $user = require_roles(['estudiante']);
             $pdo = db();
             ensure_student_application_table($pdo);
-            $st = $pdo->prepare('SELECT u.email, sa.phone, sa.residence_address, sa.eps, sa.guardian_name, sa.guardian_phone FROM users u LEFT JOIN student_applications sa ON sa.user_id = u.id WHERE u.id = ? ORDER BY sa.id DESC LIMIT 1');
+            $st = $pdo->prepare('SELECT u.email, u.first_name, u.last_name, u.identification, s.id AS student_id, s.grade AS student_grade, s.modality, s.target_hours, sa.grade AS application_grade, sa.service_shift AS application_shift, sa.phone, sa.residence_address, sa.eps, sa.guardian_name, sa.guardian_phone FROM users u LEFT JOIN students s ON s.user_id = u.id LEFT JOIN student_applications sa ON sa.id = (SELECT MAX(sa2.id) FROM student_applications sa2 WHERE sa2.student_id = s.id OR sa2.user_id = u.id) WHERE u.id = ? LIMIT 1');
             $st->execute([(int)$user['id']]);
             $p = $st->fetch() ?: [];
+            $gradoPerfil = trim((string)($p['student_grade'] ?? ''));
+            if ($gradoPerfil === '') $gradoPerfil = trim((string)($p['application_grade'] ?? ''));
+            if ($gradoPerfil === '') {
+                $stGrade = $pdo->prepare("SELECT grade FROM access_requests WHERE (email = ? OR identification = ?) AND grade IS NOT NULL AND TRIM(grade) <> '' ORDER BY id DESC LIMIT 1");
+                $stGrade->execute([$user['correo'], $user['identificacion']]);
+                $gradoPerfil = trim((string)($stGrade->fetchColumn() ?: ''));
+            }
             respond(['ok'=>true,'profile'=>[
-                'correo'=>$p['email'] ?? $user['correo'], 'telefono'=>$p['phone'] ?? '', 'direccion'=>$p['residence_address'] ?? '',
+                'correo'=>$p['email'] ?? $user['correo'],
+                'nombre'=>trim(($p['first_name'] ?? '') . ' ' . ($p['last_name'] ?? '')),
+                'identificacion'=>$p['identification'] ?? $user['identificacion'],
+                'grado'=>$gradoPerfil,
+                'Grado'=>$gradoPerfil,
+                'jornada'=>$p['application_shift'] ?? '',
+                'Jornada'=>$p['application_shift'] ?? '',
+                'modalidad'=>$p['modality'] ?? '',
+                'metaHoras'=>$p['target_hours'] ?? null,
+                'telefono'=>$p['phone'] ?? '', 'direccion'=>$p['residence_address'] ?? '',
                 'eps'=>$p['eps'] ?? '', 'nombreAcudiente'=>$p['guardian_name'] ?? '', 'telefonoAcudiente'=>$p['guardian_phone'] ?? ''
             ]]);
 
@@ -706,24 +894,60 @@ try {
             $telefono = trim((string)($d['telefono'] ?? ''));
             $direccion = trim((string)($d['direccion'] ?? ''));
             $eps = trim((string)($d['eps'] ?? ''));
-            $acudiente = trim((string)($d['nombreAcudiente'] ?? ''));
+            $acudiente = capitalizarNombre((string)($d['nombreAcudiente'] ?? ''));
             $telAcudiente = trim((string)($d['telefonoAcudiente'] ?? ''));
+            $epsSeleccionada = trim((string)($d['epsSeleccionada'] ?? ''));
             if (!$correo || !filter_var($correo, FILTER_VALIDATE_EMAIL)) fail('Escribe un correo electrónico válido.');
             if (!$telefono || !$direccion || !$eps || !$acudiente || !$telAcudiente) fail('Completa todos los datos editables.');
+            $telefono = preg_replace('/\D+/', '', $telefono);
+            $telAcudiente = preg_replace('/\D+/', '', $telAcudiente);
+            if (!preg_match('/^\d{10}$/', $telefono)) fail('El celular debe tener exactamente 10 dígitos.');
+            if (mb_strlen($direccion, 'UTF-8') > 100) fail('La dirección puede tener máximo 100 caracteres.');
+            if (mb_strlen($eps, 'UTF-8') > 60) fail('La EPS puede tener máximo 60 caracteres.');
+            if ($epsSeleccionada === 'Otro' && !preg_match('/^[\p{L}]+(?: [\p{L}]+)*$/u', $eps)) fail('La EPS de "Otro" solo puede contener letras y espacios sencillos.');
+            if (!preg_match('/^[\p{L}]+(?: [\p{L}]+)*$/u', $acudiente) || mb_strlen($acudiente, 'UTF-8') > 60) fail('El nombre del acudiente debe contener solo letras y espacios sencillos, máximo 60 caracteres.');
+            if (!preg_match('/^\d{7,10}$/', $telAcudiente)) fail('El teléfono del acudiente debe tener entre 7 y 10 dígitos.');
             $pdo = db();
-            $st = $pdo->prepare('SELECT id FROM users WHERE LOWER(email)=? AND id<>?'); $st->execute([$correo,(int)$user['id']]);
+            $st = $pdo->prepare('SELECT id FROM users WHERE LOWER(email)=? AND id<>?');
+            $st->execute([$correo,(int)$user['id']]);
             if ($st->fetchColumn()) fail('Ese correo ya está asociado a otra cuenta.');
-            $pdo->beginTransaction();
+
+            ensure_student_application_table($pdo);
+            // Algunas cuentas antiguas tienen user_id vacío en student_applications.
+            // Buscamos primero por user_id y, si hace falta, por student_id.
+            $st = $pdo->prepare('SELECT id FROM student_applications WHERE user_id = ? OR student_id = (SELECT id FROM students WHERE user_id = ? LIMIT 1) ORDER BY id DESC LIMIT 1');
+            $st->execute([(int)$user['id'], (int)$user['id']]);
+            $applicationId = (int)($st->fetchColumn() ?: 0);
+            if (!$applicationId) fail('No se encontró la solicitud de estudiante asociada a esta cuenta.');
+
             try {
-                $st=$pdo->prepare('UPDATE users SET email=? WHERE id=?'); $st->execute([$correo,(int)$user['id']]);
-                ensure_student_application_table($pdo);
-                $st=$pdo->prepare('UPDATE student_applications SET phone=?, residence_address=?, eps=?, guardian_name=?, guardian_phone=?, updated_at=CURRENT_TIMESTAMP WHERE user_id=?');
-                $st->execute([$telefono,$direccion,$eps,$acudiente,$telAcudiente,(int)$user['id']]);
+                $pdo->beginTransaction();
+                $st = $pdo->prepare('UPDATE users SET email=? WHERE id=?');
+                $st->execute([$correo,(int)$user['id']]);
+
+                // Compatibilidad con instalaciones donde updated_at todavía no existe.
+                $st = $pdo->prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='student_applications' AND COLUMN_NAME='updated_at'");
+                $st->execute();
+                $tieneUpdatedAt = (int)$st->fetchColumn() > 0;
+                if ($tieneUpdatedAt) {
+                    $st = $pdo->prepare('UPDATE student_applications SET phone=?, residence_address=?, eps=?, guardian_name=?, guardian_phone=?, updated_at=CURRENT_TIMESTAMP WHERE id=?');
+                } else {
+                    $st = $pdo->prepare('UPDATE student_applications SET phone=?, residence_address=?, eps=?, guardian_name=?, guardian_phone=? WHERE id=?');
+                }
+                $st->execute([$telefono,$direccion,$eps,$acudiente,$telAcudiente,$applicationId]);
                 $pdo->commit();
-            } catch(Throwable $e) { if($pdo->inTransaction())$pdo->rollBack(); throw $e; }
+            } catch (PDOException $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                error_log('SIGHO update_student_profile: '.$e->getMessage());
+                fail('No se pudieron guardar los datos. MySQL rechazó la actualización: '.$e->getMessage(), 500);
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                error_log('SIGHO update_student_profile: '.$e->getMessage());
+                fail('No se pudieron guardar los datos. '.$e->getMessage(), 500);
+            }
             $row=find_user_by_id((int)$user['id']);
             $payload=user_payload($row); $_SESSION['user']=$payload;
-            respond(['ok'=>true,'user'=>$payload]);
+            respond(['ok'=>true,'user'=>$payload,'message'=>'Datos actualizados correctamente.']);
 
         case 'my_records':
             $user = require_roles(['estudiante']);
@@ -762,40 +986,138 @@ try {
 
         case 'create_record':
             $user = require_roles(['estudiante']);
-            $fecha = $_POST['fecha'] ?? '';
-            $entrada = $_POST['entrada'] ?? '';
-            $salida = $_POST['salida'] ?? '';
-            $descripcion = trim($_POST['descripcion'] ?? '');
-            if (!$fecha || !$entrada || !$salida || !$descripcion) fail('Faltan datos del registro.');
-            $start = strtotime($fecha . ' ' . $entrada);
-            $end = strtotime($fecha . ' ' . $salida);
-            $hours = ($end - $start) / 3600;
-            if ($hours <= 0) fail('La hora de salida debe ser posterior a la entrada.');
-            if (empty($_FILES['evidencia']) || $_FILES['evidencia']['error'] !== UPLOAD_ERR_OK) fail('Debes adjuntar una evidencia.');
+
+            // Solo una cuenta de estudiante aceptada y autenticada puede registrar horas.
+            $studentId = (int)($user['studentId'] ?? 0);
+            if ($studentId <= 0) fail('La cuenta de estudiante no está habilitada para registrar horas.', 403);
+
+            $fecha = trim((string)($_POST['fecha'] ?? ''));
+            $entrada = trim((string)($_POST['entrada'] ?? ''));
+            $salida = trim((string)($_POST['salida'] ?? ''));
+            $descripcion = trim((string)($_POST['descripcion'] ?? ''));
+
+            if (!$fecha || !$entrada || !$salida || !$descripcion) {
+                fail('Faltan datos del registro.');
+            }
+
+            // A. Fecha: únicamente días del año actual y nunca una fecha futura.
+            $hoy = new DateTime('today');
+            $anioActual = (int)$hoy->format('Y');
+            $fechaObj = DateTime::createFromFormat('!Y-m-d', $fecha);
+            $erroresFecha = DateTime::getLastErrors();
+            $fechaValida = $fechaObj && (!$erroresFecha || ($erroresFecha['warning_count'] === 0 && $erroresFecha['error_count'] === 0)) && $fechaObj->format('Y-m-d') === $fecha;
+
+            if (!$fechaValida) fail('La fecha seleccionada no es válida.');
+            if ((int)$fechaObj->format('Y') !== $anioActual || $fecha < $anioActual . '-01-01' || $fecha > $hoy->format('Y-m-d')) {
+                fail("La fecha debe pertenecer al año {$anioActual} y no puede ser posterior a hoy.");
+            }
+
+            // B. Horas: formato HH:MM, intervalos exactos de 15 minutos y salida posterior.
+            $validarHora = static function (string $hora): ?int {
+                if (!preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $hora)) return null;
+                [$h, $m] = array_map('intval', explode(':', $hora));
+                if ($m % 15 !== 0) return null;
+                return $h * 60 + $m;
+            };
+
+            $minEntrada = $validarHora($entrada);
+            $minSalida = $validarHora($salida);
+            if ($minEntrada === null || $minSalida === null) {
+                fail('Las horas de entrada y salida deben estar en intervalos exactos de 15 minutos.');
+            }
+            if ($minSalida <= $minEntrada) {
+                fail('La hora de salida debe ser estrictamente posterior a la hora de entrada.');
+            }
+
+            // C. Restricción por grado. Ciclo V mantiene horario flexible.
+            $st = db()->prepare('SELECT grade FROM students WHERE id = ? AND user_id = ? LIMIT 1');
+            $st->execute([$studentId, (int)$user['id']]);
+            $grado = trim((string)($st->fetchColumn() ?: ($user['grado'] ?? '')));
+            if (!$grado) fail('No fue posible determinar el grado del estudiante.', 409);
+
+            // Normalizamos pequeñas variaciones antiguas del grado (10, 10°, Grado 10, etc.).
+            $gradoTexto = mb_strtolower(trim($grado), 'UTF-8');
+            if (strpos($gradoTexto, 'ciclo v') !== false) {
+                $grado = 'Ciclo V';
+            } elseif (preg_match('/(^|\D)11(\D|$)/u', $gradoTexto)) {
+                $grado = '11°';
+            } elseif (preg_match('/(^|\D)10(\D|$)/u', $gradoTexto)) {
+                $grado = '10°';
+            }
+
+            if (in_array($grado, ['10°', '11°'], true)) {
+                // 05:00 <= entrada/salida <= 21:00.
+                if ($minEntrada < 5 * 60 || $minEntrada > 21 * 60 || $minSalida < 5 * 60 || $minSalida > 21 * 60) {
+                    fail('Para grados 10° y 11° el horario debe estar entre las 05:00 y las 21:00.');
+                }
+            } elseif ($grado !== 'Ciclo V') {
+                fail('El grado del estudiante no es válido para registrar horas.', 409);
+            }
+
+            $hours = ($minSalida - $minEntrada) / 60;
+            if ($hours <= 0) fail('La hora de salida debe ser posterior a la hora de entrada.');
+            if (mb_strlen($descripcion, 'UTF-8') > 1000) fail('La descripción puede tener máximo 1000 caracteres.');
+
+            // Evidencia obligatoria. El servidor valida MIME real, no solo la extensión.
+            if (empty($_FILES['evidencia']) || $_FILES['evidencia']['error'] !== UPLOAD_ERR_OK) {
+                fail('Debes adjuntar una evidencia.');
+            }
             $file = $_FILES['evidencia'];
-            if ($file['size'] > 5 * 1024 * 1024) fail('La evidencia debe pesar máximo 5 MB.');
+            if ((int)$file['size'] <= 0) fail('La evidencia está vacía.');
+            if ((int)$file['size'] > 5 * 1024 * 1024) fail('La evidencia debe pesar máximo 5 MB.');
+
             $finfo = new finfo(FILEINFO_MIME_TYPE);
             $mime = $finfo->file($file['tmp_name']);
-            $allowed = ['image/jpeg','image/png','image/webp','image/gif','application/pdf'];
-            if (!in_array($mime, $allowed, true)) fail('Solo se permiten imágenes o PDF.');
-            if (!is_dir(EVIDENCE_DIR)) mkdir(EVIDENCE_DIR, 0775, true);
-            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-            $stored = bin2hex(random_bytes(16)) . ($ext ? '.' . preg_replace('/[^a-zA-Z0-9]/', '', $ext) : '');
+            $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
+            if (!in_array($mime, $allowed, true)) fail('Solo se permiten imágenes JPG, PNG, WEBP, GIF o archivos PDF.');
+
+            if (!is_dir(EVIDENCE_DIR) && !mkdir(EVIDENCE_DIR, 0775, true) && !is_dir(EVIDENCE_DIR)) {
+                fail('No fue posible preparar el almacenamiento de la evidencia.', 500);
+            }
+
+            $extPorMime = [
+                'image/jpeg' => 'jpg',
+                'image/png' => 'png',
+                'image/webp' => 'webp',
+                'image/gif' => 'gif',
+                'application/pdf' => 'pdf'
+            ];
+            $stored = bin2hex(random_bytes(16)) . '.' . $extPorMime[$mime];
             $target = EVIDENCE_DIR . DIRECTORY_SEPARATOR . $stored;
-            if (!move_uploaded_file($file['tmp_name'], $target)) fail('No fue posible guardar la evidencia.', 500);
+            if (!move_uploaded_file($file['tmp_name'], $target)) {
+                fail('No fue posible guardar la evidencia.', 500);
+            }
             $relative = 'uploads/evidence/' . $stored;
 
             $pdo = db();
-            $st = $pdo->prepare('INSERT INTO hour_records (student_id, record_date, entry_time, exit_time, hours, activity_description, evidence_original_name, evidence_path, evidence_mime) VALUES (?,?,?,?,?,?,?,?,?)');
             try {
-                $st->execute([(int)$user['studentId'], $fecha, $entrada, $salida, $hours, $descripcion, $file['name'], $relative, $mime]);
+                $st = $pdo->prepare('INSERT INTO hour_records (student_id, record_date, entry_time, exit_time, hours, activity_description, evidence_original_name, evidence_path, evidence_mime) VALUES (?,?,?,?,?,?,?,?,?)');
+                $st->execute([
+                    $studentId,
+                    $fecha,
+                    $entrada,
+                    $salida,
+                    $hours,
+                    $descripcion,
+                    basename((string)$file['name']),
+                    $relative,
+                    $mime
+                ]);
             } catch (Throwable $e) {
-                @unlink($target); throw $e;
+                @unlink($target);
+                throw $e;
             }
+
             $id = (int)$pdo->lastInsertId();
-            $records = get_records((int)$user['studentId']);
+            $records = get_records($studentId);
             $record = array_values(array_filter($records, fn($r) => (int)$r['id'] === $id))[0] ?? null;
-            respond(['ok' => true, 'record' => $record]);
+            if (!$record) fail('La jornada fue guardada, pero no fue posible recuperar su información.', 500);
+
+            respond([
+                'ok' => true,
+                'message' => 'Jornada registrada correctamente. Quedó pendiente de revisión por el profesor.',
+                'record' => $record
+            ]);
 
         case 'review_record':
             $user = require_roles(['profesor','administrador']);
@@ -842,16 +1164,14 @@ try {
             $d = json_input();
             $staffId = (int)($d['staffId'] ?? 0);
             $sede = trim((string)($d['sede'] ?? ''));
-            $proyecto = trim((string)($d['proyecto'] ?? ''));
             $sedes = ['Central JT','San Francisco Club','Picaleña','Central J.N.','Secundino Porras Cruz','San Martín','Central JM','Bello Horizonte'];
-            $proyectos = ['Educación Física / Tiempo Libre','Proyecto Ambiental','Logística y Vigilancia','Secretaría y/o Archivo','Acompañamiento a un docente de transición o primaria','Otro'];
-            if (!$staffId || !in_array($sede,$sedes,true) || !in_array($proyecto,$proyectos,true)) fail('Sede o proyecto inválido.');
+            if (!$staffId || !in_array($sede,$sedes,true)) fail('Sede inválida.');
             ensure_optional_columns(db());
             $st=db()->prepare("SELECT s.id FROM staff s JOIN users u ON u.id=s.user_id JOIN roles r ON r.id=u.role_id WHERE s.id=? AND r.code='profesor' AND u.status='activo'");
             $st->execute([$staffId]); if(!$st->fetchColumn()) fail('Profesor no encontrado.',404);
-            $st=db()->prepare('UPDATE staff SET service_site=?, service_project=? WHERE id=?');
-            $st->execute([$sede,$proyecto,$staffId]);
-            respond(['ok'=>true,'message'=>'Sede y proyecto asignados correctamente.']);
+            $st=db()->prepare('UPDATE staff SET service_site=? WHERE id=?');
+            $st->execute([$sede,$staffId]);
+            respond(['ok'=>true,'message'=>'Sede asignada correctamente.']);
 
         case 'request_admin_permission':
             $user = require_roles(['profesor']);
@@ -916,6 +1236,10 @@ try {
             $status = (string)($d['estado'] ?? '');
             if (!$id || !in_array($status, ['aceptada','rechazada'], true)) fail('Solicitud inválida.');
             $pdo = db();
+            // Las operaciones de creación/alteración de tablas deben hacerse
+            // fuera de la transacción porque MySQL puede hacer COMMIT implícito.
+            ensure_student_application_table($pdo);
+            ensure_optional_columns($pdo);
             $pdo->beginTransaction();
             try {
                 $st = $pdo->prepare("SELECT ar.*, r.code AS role_code FROM access_requests ar JOIN roles r ON r.id=ar.requested_role_id WHERE ar.id=? AND ar.status='pendiente' FOR UPDATE");
@@ -934,13 +1258,11 @@ try {
                         $st->execute([$userId,$r['identification'],$r['grade'],$r['modality'],$r['technical_program'],$target]);
                         $studentId = (int)$pdo->lastInsertId();
 
-                        ensure_student_application_table($pdo);
                         $st = $pdo->prepare('UPDATE student_applications SET user_id = ?, student_id = ?, updated_at = CURRENT_TIMESTAMP WHERE access_request_id = ?');
                         $st->execute([$userId, $studentId, $id]);
                     } else {
-                        $st = $pdo->prepare('INSERT INTO staff (user_id, staff_code, position) VALUES (?,?,\'Docente\')');
-                        $st->execute([$userId,$r['identification']]);
-                        ensure_optional_columns($pdo);
+                        $st = $pdo->prepare('INSERT INTO staff (user_id, staff_code, position, phone) VALUES (?,?,\'Docente\',?)');
+                        $st->execute([$userId,$r['identification'],$r['phone'] ?? null]);
                         $st = $pdo->prepare('UPDATE staff SET service_site = NULL, service_project = ? WHERE user_id = ?');
                         $st->execute([$r['service_project'] ?? null, $userId]);
                     }
