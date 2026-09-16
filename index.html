@@ -189,6 +189,21 @@
             color: #52646a;
         }
 
+        .required-mark,
+        .required {
+            color: #d93025;
+            font-weight: 800;
+            margin-left: 3px;
+        }
+
+        .campo-error {
+            border: 2px solid #d93025 !important;
+            box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.08) !important;
+        }
+        .campo-error:focus {
+            border-color: #d93025 !important;
+        }
+
         input,
         select,
         textarea {
@@ -282,6 +297,42 @@
             font-size: 13px;
             display: none;
         }
+
+        .message.error-message, .auth-error-message {
+            background:#fff0f0;
+            border:1px solid #efb3b3;
+            border-left:4px solid #d83a3a;
+            color:#a52d2d;
+            font-weight:700;
+            box-shadow:0 8px 20px rgba(190,40,40,.08);
+        }
+        .campo-error { border:2px solid #e23b3b !important; box-shadow:0 0 0 2px rgba(226,59,59,.08) !important; }
+        .evidence-preview { margin-top:12px; display:none; align-items:center; gap:12px; padding:10px; border:1px solid #dbe7eb; border-radius:12px; background:#f8fbfc; }
+        .evidence-preview.show { display:flex; }
+        .evidence-preview img { width:110px; height:80px; object-fit:cover; border-radius:9px; border:1px solid #d4e0e4; }
+        .evidence-preview span { font-size:12px; color:#63767c; overflow-wrap:anywhere; }
+        .notification-wrap { position:relative; }
+        #estudiante .notification-button { position:relative; border:1px solid #d8e5ea; background:#fff; border-radius:11px; width:44px; height:44px; cursor:pointer; font-size:18px; }
+        #estudiante .notification-button b { position:absolute; right:-4px; top:-5px; min-width:19px; height:19px; padding:0 5px; border-radius:20px; background:#d83a3a; color:#fff; font-size:10px; display:none; align-items:center; justify-content:center; }
+        #estudiante .notification-panel { position:absolute; top:52px; right:0; width:330px; max-width:min(330px,calc(100vw - 30px)); background:#fff; border:1px solid #dce7eb; border-radius:14px; box-shadow:0 14px 35px rgba(8,43,76,.16); opacity:0; visibility:hidden; transform:translateY(-6px); pointer-events:none; transition:.2s; z-index:300; overflow:hidden; }
+        #estudiante .notification-panel.show { opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto; }
+        #estudiante .notification-panel-head { display:flex; justify-content:space-between; gap:10px; padding:13px 14px; border-bottom:1px solid #edf2f4; }
+        #estudiante .notification-panel-head strong,#estudiante .notification-panel-head span { display:block; }
+        #estudiante .notification-panel-head span { font-size:11px; color:#7a8b91; margin-top:3px; }
+        #estudiante .notification-panel-head button { border:0; background:none; color:#1769aa; font-size:11px; cursor:pointer; }
+        #estudiante .notification-list { max-height:320px; overflow:auto; }
+        #estudiante .notification-item { width:100%; display:flex; gap:10px; text-align:left; border:0; border-bottom:1px solid #eef2f4; background:#fff; padding:12px 14px; cursor:pointer; }
+        #estudiante .notification-item:hover { background:#f7fafb; }
+        #estudiante .notification-item.unread { background:#f4f9fc; }
+        #estudiante .notification-dot { color:#d83a3a; font-weight:900; }
+        #estudiante .notification-copy strong,#estudiante .notification-copy small { display:block; }
+        #estudiante .notification-copy strong { font-size:12px; color:#254b5f; }
+        #estudiante .notification-copy small { margin-top:3px; font-size:11px; color:#7b8b91; }
+        #estudiante .notification-empty { padding:25px 15px; text-align:center; color:#74868c; }
+        #estudiante .notification-empty strong,#estudiante .notification-empty span { display:block; }
+        #estudiante .notification-empty strong { margin:7px 0 3px; color:#4f666f; }
+        #estudiante .notification-empty span { font-size:12px; }
+        .teacher-admin-card select:disabled, #profesor #profesorPerfilProyectoEditable:disabled { background:#edf0f1; color:#7c888c; cursor:not-allowed; opacity:1; }
 
         .back {
             border: none;
@@ -1937,6 +1988,89 @@
     cursor: text;
 }
 
+
+/* ===== FIX DEFINITIVO: VISTA PREVIA DE EVIDENCIA ===== */
+#visorEvidenciaHora {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+#visorEvidenciaHora .evidence-select-button {
+    align-self: flex-start !important;
+}
+#visorEvidenciaHora .evidence-file-name {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+#visorEvidenciaHora .evidence-preview,
+#previewEvidenciaHora {
+    position: static !important;
+    float: none !important;
+    right: auto !important;
+    left: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    display: none !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 12px 0 0 !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+#visorEvidenciaHora .evidence-preview.show,
+#previewEvidenciaHora.show {
+    display: flex !important;
+}
+#visorEvidenciaHora #imagenPreviewEvidenciaHora,
+#previewEvidenciaHora img {
+    position: static !important;
+    float: none !important;
+    right: auto !important;
+    left: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 200px !important;
+    object-fit: contain !important;
+    margin: 0 auto !important;
+    align-self: center !important;
+}
+#visorEvidenciaHora #textoPreviewEvidenciaHora,
+#previewEvidenciaHora span {
+    position: static !important;
+    float: none !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 8px 0 0 !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    box-sizing: border-box !important;
+}
+
 </style>
 
 <style>
@@ -3260,6 +3394,37 @@ body:has(.dashboard-screen.active) .container {
 @keyframes registroCheck { from { opacity:0; transform:scale(.7); } to { opacity:1; transform:scale(1); } }
 @media (max-width:560px) { .registro-hora-resumen { grid-template-columns:1fr; } .registro-hora-exito-body { padding:25px 20px; } }
 </style>
+
+<style id="ajustes-finales-sigho">
+#telefonoAcudiente:disabled {
+    background-color: #e9ecef !important;
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+    opacity: 1;
+}
+#telefonoAcudiente:not(:disabled) {
+    background-color: #fff !important;
+    color: inherit;
+    cursor: text;
+}
+.evidencia-preview,
+#vistaPreviaEvidencia,
+.preview-evidencia {
+    overflow: hidden !important;
+}
+.evidencia-preview img,
+#vistaPreviaEvidencia img,
+.preview-evidencia img {
+    display: block !important;
+    max-width: 100% !important;
+    max-height: 250px !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    margin: 0 auto !important;
+}
+</style>
+
 </head>
 
 <body>
@@ -3460,7 +3625,7 @@ body:has(.dashboard-screen.active) .container {
 
             <div class="form-group">
                 <label>Tipo de usuario</label>
-                <select id="rolSolicitud" required onchange="actualizarCamposSolicitud()">
+                <select id="rolSolicitud" required onchange="limpiarSolicitudAlCambiarRol(this.value)">
                     <option value="" disabled selected>Seleccionar rol</option>
                     <option value="estudiante">Estudiante</option>
                     <option value="profesor">Profesor</option>
@@ -3472,8 +3637,8 @@ body:has(.dashboard-screen.active) .container {
 
                 <div class="form-group">
                     <label>Año del servicio social</label>
-                    <input type="number" id="anioServicio" min="2026" max="2100" value="2026" inputmode="numeric" required aria-describedby="ayudaAnioServicio" onkeydown="bloquearEntradaAnioServicio(event)" onpaste="return false" ondrop="return false">
-                    <small class="field-help" id="ayudaAnioServicio">Usa las flechas del control para elegir 2026 o un año futuro. No se permite escribir el año directamente.</small>
+                    <input type="number" id="anioServicio" min="2026" max="2029" value="2026" inputmode="numeric" required aria-describedby="ayudaAnioServicio" onkeydown="bloquearEntradaAnioServicio(event)" onpaste="return false" ondrop="return false">
+                    <small class="field-help" id="ayudaAnioServicio">Usa las flechas del control para elegir el año. No se permite escribirlo directamente.</small>
                 </div>
 
                 <div class="section">
@@ -3482,7 +3647,7 @@ body:has(.dashboard-screen.active) .container {
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Primer apellido</label>
+                        <label>Primer apellido <span class="required">*</span></label>
                         <input type="text" id="primerApellido" placeholder="Ej. Roldán" minlength="2" maxlength="30" autocomplete="family-name" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" required>
                         <small class="field-help">Escribe tu primer apellido tal como aparece en tu documento.</small>
                     </div>
@@ -3492,7 +3657,7 @@ body:has(.dashboard-screen.active) .container {
                         <small class="field-help">Si tienes segundo apellido, escríbelo aquí.</small>
                     </div>
                     <div class="form-group">
-                        <label>Primer nombre</label>
+                        <label>Primer nombre <span class="required">*</span></label>
                         <input type="text" id="primerNombre" placeholder="Ej. Miguel" minlength="2" maxlength="30" autocomplete="given-name" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" required>
                         <small class="field-help">Escribe tu primer nombre.</small>
                     </div>
@@ -3505,15 +3670,16 @@ body:has(.dashboard-screen.active) .container {
                         <small class="field-help">Si tienes segundo nombre, escríbelo aquí.</small>
                     </div>
                     <div class="form-group">
-                        <label>Tipo de documento</label>
+                        <label>Tipo de documento <span class="required">*</span></label>
                         <select id="tipoDocumento" required>
                             <option value="" disabled selected hidden>Seleccionar</option>
                             <option value="Tarjeta de identidad">Tarjeta de identidad</option>
                             <option value="Cédula de ciudadanía">Cédula de ciudadanía</option>
+                            <option value="PPT">PPT (Permiso de Permanencia Temporal)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Número de documento</label>
+                        <label>Número de documento <span class="required">*</span></label>
                         <input type="text" id="numeroDocumento" placeholder="Ej. 123456789" minlength="8" maxlength="10" inputmode="numeric" pattern="\d{8,10}" required>
                         <small class="field-help">Escribe el número sin puntos ni espacios.</small>
                     </div>
@@ -3521,7 +3687,7 @@ body:has(.dashboard-screen.active) .container {
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Grado</label>
+                        <label>Grado <span class="required">*</span></label>
                         <select id="gradoSolicitud" required>
                             <option value="" disabled selected hidden>Seleccionar</option>
                             <option value="10°">10°</option>
@@ -3530,25 +3696,25 @@ body:has(.dashboard-screen.active) .container {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Fecha de nacimiento</label>
+                        <label>Fecha de nacimiento <span class="required">*</span></label>
                         <input type="date" id="fechaNacimiento" required disabled aria-describedby="ayudaFechaNacimiento">
                         <small class="field-help" id="ayudaFechaNacimiento">Selecciona primero el grado para conocer el rango permitido.</small>
                     </div>
                     <div class="form-group">
-                        <label>Número celular</label>
+                        <label>Número celular <span class="required">*</span></label>
                         <input type="tel" id="telefonoSolicitud" placeholder="300 123 4567" maxlength="12" inputmode="numeric" autocomplete="tel" required aria-describedby="ayudaTelefonoSolicitud">
                         <small class="field-help" id="ayudaTelefonoSolicitud">10 dígitos. Debe iniciar en 3. No se permiten ceros iniciales, números repetidos ni la secuencia 1234567890.</small>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Dirección completa de residencia</label>
+                    <label>Dirección completa de residencia <span class="required">*</span></label>
                     <input type="text" id="direccionSolicitud" placeholder="Ej. Calle 10 # 20-30" maxlength="100" required>
                     <small class="field-help">Escribe la dirección completa de tu residencia.</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="epsSolicitud">EPS</label>
+                    <label for="epsSolicitud">EPS <span class="required">*</span></label>
                     <select id="epsSolicitud" required>
                         <option value="" disabled selected>Seleccionar EPS</option>
                         <optgroup label="Régimen Contributivo y Mixtas">
@@ -3597,7 +3763,7 @@ body:has(.dashboard-screen.active) .container {
                 </div>
 
                 <div class="form-group">
-                    <label>Correo para acceder a SIGHO</label>
+                    <label>Correo para acceder a SIGHO <span class="required">*</span></label>
                     <input type="email" id="correoSolicitudEstudiante" placeholder="Correo para acceder a SIGHO" required>
                     <small class="field-help">El correo debe llevar tu nombre completo y tu grado. Ejemplo: miguelangelroldandevia116@gmail.com. Para tu foto de perfil, utiliza una foto relacionada con la Institución Educativa JJFH.</small>
                 </div>
@@ -3608,7 +3774,7 @@ body:has(.dashboard-screen.active) .container {
 
                 <div class="form-row two-columns">
                     <div class="form-group">
-                        <label>Modalidad</label>
+                        <label>Modalidad <span class="required">*</span></label>
                         <select id="modalidadSolicitud" required>
                             <option value="" disabled selected>Seleccionar modalidad</option>
                             <option value="academico">Estudiante académico · 120 horas</option>
@@ -3633,14 +3799,23 @@ body:has(.dashboard-screen.active) .container {
 
                 <div class="form-row two-columns">
                     <div class="form-group">
-                        <label>Nombre del acudiente</label>
+                        <label>Nombre completo del acudiente <span class="required">*</span></label>
                         <input type="text" id="nombreAcudiente" placeholder="Nombre completo del acudiente" maxlength="60" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" required>
                         <small class="field-help">Escribe el nombre completo de tu acudiente.</small>
                     </div>
                     <div class="form-group">
-                        <label>Teléfono fijo o celular</label>
-                        <input type="tel" id="telefonoAcudiente" placeholder="7 a 10 dígitos" maxlength="10" inputmode="numeric" pattern="[1-9]\d{6,9}" required aria-describedby="ayudaTelefonoAcudiente">
-                        <small class="field-help" id="ayudaTelefonoAcudiente">Número de 7 a 10 dígitos. No puede comenzar en 0 ni ser una secuencia repetida o consecutiva.</small>
+                        <label>Tipo de línea <span class="required">*</span></label>
+                        <select id="tipoTelefonoAcudiente" required aria-describedby="ayudaTipoTelefonoAcudiente">
+                            <option value="" disabled selected>Seleccionar tipo de línea</option>
+                            <option value="fijo">Teléfono fijo</option>
+                            <option value="celular">Número celular</option>
+                        </select>
+                        <small class="field-help" id="ayudaTipoTelefonoAcudiente">Selecciona si el número del acudiente es fijo o celular.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de contacto del acudiente <span class="required">*</span></label>
+                        <input type="tel" id="telefonoAcudiente" placeholder="Selecciona el tipo de línea" maxlength="12" inputmode="numeric" autocomplete="tel" required aria-describedby="ayudaTelefonoAcudiente" disabled disabled>
+                        <small class="field-help" id="ayudaTelefonoAcudiente">Primero selecciona el tipo de línea.</small>
                     </div>
                 </div>
 
@@ -3649,7 +3824,7 @@ body:has(.dashboard-screen.active) .container {
                 </div>
 
                 <div class="form-group">
-                    <label>Sede donde realizará el servicio social</label>
+                    <label>Sede donde realizará el servicio social <span class="required">*</span></label>
                     <select id="sedeSolicitud" required>
                         <option value="" disabled selected>Seleccionar sede</option>
                         <option value="Central JT">Central JT</option>
@@ -3664,7 +3839,7 @@ body:has(.dashboard-screen.active) .container {
                 </div>
 
                 <div class="form-group">
-                    <label>Proyecto</label>
+                    <label>Proyecto <span class="required">*</span></label>
                     <select id="proyectoSolicitud" onchange="actualizarProyectoOtro()">
                         <option value="" disabled selected>Seleccionar proyecto</option>
                         <option value="Educación Física / Tiempo Libre">Educación Física / Tiempo Libre</option>
@@ -3672,6 +3847,7 @@ body:has(.dashboard-screen.active) .container {
                         <option value="Logística y Vigilancia">Logística y Vigilancia</option>
                         <option value="Secretaría y/o Archivo">Secretaría y/o Archivo</option>
                         <option value="Acompañamiento a un docente de transición o primaria">Acompañamiento a un docente de transición o primaria</option>
+                        <option value="Eventos especiales">Eventos especiales</option>
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
@@ -3681,8 +3857,8 @@ body:has(.dashboard-screen.active) .container {
                     <input type="text" id="proyectoOtro" maxlength="60" pattern="[\p{L}]+(?: [\p{L}]+)*" inputmode="text" placeholder="Escribe el proyecto" disabled>
                 </div>
 
-                <div class="form-group">
-                    <label>Días en los que realizará el servicio social</label>
+                <div class="form-group" id="grupoDiasServicio">
+                    <label>Días en los que realizará el servicio social <span class="required">*</span></label>
                     <div class="checkbox-grid">
                         <label class="check-option"><input type="checkbox" name="diasServicio" value="Lunes"> Lunes</label>
                         <label class="check-option"><input type="checkbox" name="diasServicio" value="Martes"> Martes</label>
@@ -3704,17 +3880,17 @@ body:has(.dashboard-screen.active) .container {
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Nombres</label>
+                        <label>Nombres <span class="required">*</span></label>
                         <input type="text" id="nombre" placeholder="Ej. Juan Carlos" maxlength="60" autocomplete="given-name" required>
                         <small class="field-help">Escribe tus nombres completos.</small>
                     </div>
                     <div class="form-group">
-                        <label>Apellidos</label>
+                        <label>Apellidos <span class="required">*</span></label>
                         <input type="text" id="apellido" placeholder="Ej. Pérez Gómez" maxlength="60" autocomplete="family-name" required>
                         <small class="field-help">Escribe tus apellidos completos.</small>
                     </div>
                     <div class="form-group">
-                        <label>Identificación / código institucional</label>
+                        <label>Identificación / código institucional <span class="required">*</span></label>
                         <input type="text" id="identificacionSolicitud" placeholder="Código o identificación institucional" required>
                         <small class="field-help">Escribe tu identificación o código institucional.</small>
                     </div>
@@ -3726,30 +3902,20 @@ body:has(.dashboard-screen.active) .container {
 
                 <div class="form-row two-columns">
                     <div class="form-group">
-                        <label>Correo para acceder a SIGHO</label>
+                        <label>Correo para acceder a SIGHO <span class="required">*</span></label>
                         <input type="email" id="correoSolicitud" placeholder="ejemplo@iejosejoaquinflorezhernandez.edu.co" autocomplete="email" required>
                         <small class="field-help">Debe ser un correo institucional y utilizar exactamente el dominio <strong>@iejosejoaquinflorezhernandez.edu.co</strong>. No se permiten espacios.</small>
                     </div>
 
                     <div class="form-group">
-                        <label>Teléfono de contacto</label>
+                        <label>Teléfono de contacto <span class="required">*</span></label>
                         <input type="tel" id="telefonoProfesorSolicitud" placeholder="300 123 4567" maxlength="12" inputmode="numeric" autocomplete="tel" pattern="3\d{9}" required aria-describedby="ayudaTelefonoProfesorSolicitud">
 <small class="field-help" id="ayudaTelefonoProfesorSolicitud">Celular de 10 dígitos que comienza en 3. No se permiten números repetidos ni secuencias consecutivas.</small>
                         <small class="field-help">Número de celular de 10 dígitos.</small>
                     </div>
 
-                    <div class="form-group">
-                        <label>Proyecto al que estás asignado</label>
-                        <select id="proyectoProfesorSolicitud" required>
-                            <option value="" disabled selected>Seleccionar proyecto</option>
-                            <option value="Educación Física / Tiempo Libre">Educación Física / Tiempo Libre</option>
-                            <option value="Proyecto Ambiental">Proyecto Ambiental</option>
-                            <option value="Logística y Vigilancia">Logística y Vigilancia</option>
-                            <option value="Secretaría y/o Archivo">Secretaría y/o Archivo</option>
-                            <option value="Acompañamiento a un docente de transición o primaria">Acompañamiento a un docente de transición o primaria</option>
-                            <option value="Otro">Otro</option>
-                        </select>
-                        <small class="field-help">El proyecto puede mantenerse o actualizarse semanalmente desde «Mis datos».</small>
+                    <div class="form-group" style="grid-column:1 / -1;">
+                        <div class="security-box" style="margin:0;">El proyecto y la sede serán asignados posteriormente por el Administrador desde «Gestión de profesores».</div>
                     </div>
                 </div>
 
@@ -3763,13 +3929,13 @@ body:has(.dashboard-screen.active) .container {
 
                 <div class="form-row two-columns">
                     <div id="accesoSolicitudEstudiante" class="form-group clave-solicitud-estudiante">
-                        <label>Contraseña para SIGHO</label>
+                        <label>Contraseña para SIGHO <span class="required">*</span></label>
                         <input type="password" id="claveSolicitud" placeholder="Crea una contraseña" minlength="8" autocomplete="new-password" required>
                         <small class="field-help">Mínimo 8 caracteres, sin espacios, con mayúscula, minúscula y número.</small>
                     </div>
 
                     <div id="accesoSolicitudProfesor" class="form-group clave-solicitud-profesor">
-                        <label>Contraseña para SIGHO</label>
+                        <label>Contraseña para SIGHO <span class="required">*</span></label>
                         <input type="password" id="claveSolicitudProfesor" placeholder="Crea una contraseña" minlength="8" autocomplete="new-password" required>
                         <small class="field-help">Mínimo 8 caracteres, debe incluir mayúscula, minúscula y número.</small>
                     </div>
@@ -3822,7 +3988,7 @@ body:has(.dashboard-screen.active) .container {
                     Rol
                 </label>
 
-                <select id="rolLogin" onchange="actualizarCamposLogin()">
+                <select id="rolLogin" onchange="limpiarLoginAlCambiarRol(this.value)">
 
                     <option value="" disabled selected>
                         Seleccionar rol
@@ -3886,7 +4052,7 @@ body:has(.dashboard-screen.active) .container {
 
                 </button>
 
-                <div id="mensajeLogin" class="message"></div>
+                <div id="mensajeLogin" class="message auth-error-message"></div>
 
             </div>
 
@@ -3923,17 +4089,11 @@ body:has(.dashboard-screen.active) .container {
                     <button id="sidebarRegistrosEstudiante" type="button" data-estudiante-seccion="registros">
                         <span class="sidebar-icon">📜</span><span>Mis registros</span>
                     </button>
-                    <button id="sidebarDatosEstudiante" type="button" data-estudiante-seccion="datos">
-                        <span class="sidebar-icon">⚙️</span><span>Mis datos</span>
-                    </button>
                     <button id="sidebarAyudaEstudiante" type="button" data-estudiante-seccion="ayuda">
                         <span class="sidebar-icon">💡</span><span>Ayuda</span>
                     </button>
                 </nav>
 
-                <button class="sidebar-logout" onclick="cerrarSesion()">
-                    <span class="sidebar-icon">↪</span><span>Cerrar sesión</span>
-                </button>
             </aside>
 
             <main class="role-main">
@@ -3943,6 +4103,13 @@ body:has(.dashboard-screen.active) .container {
                         <p id="modalidadEstudiante">Consulta y registra el avance de tu servicio social.</p>
                     </div>
                     <div class="dashboard-tools user-topbar">
+                        <div class="notification-wrap">
+                            <button class="notification-button" onclick="toggleNotificacionesEstudiante(event)" aria-label="Notificaciones" title="Notificaciones recientes" aria-expanded="false">🔔<b id="badgeNotificacionesEstudiante">0</b></button>
+                            <div id="panelNotificacionesEstudiante" class="notification-panel" role="dialog" aria-label="Notificaciones recientes">
+                                <div class="notification-panel-head"><div><strong>Notificaciones</strong><span>Avisos de tus jornadas</span></div><button type="button" onclick="marcarNotificacionesEstudianteLeidas()">Marcar leídas</button></div>
+                                <div id="listaNotificacionesEstudiante" class="notification-list"></div>
+                            </div>
+                        </div>
                         <button class="profile-button student-profile-button" onclick="toggleUserMenu(this)" aria-label="Abrir menú del usuario" aria-expanded="false">
                             <span class="profile-avatar">👤</span>
                             <span class="profile-user-name" id="nombrePerfilEstudianteHeader">Estudiante</span>
@@ -3951,7 +4118,6 @@ body:has(.dashboard-screen.active) .container {
                         </button>
                         <div class="more-menu-dropdown user-dropdown">
                             <button onclick="mostrarSeccionEstudiante('datos'); cerrarMenuUsuarioEstudiante();">👤 Mis datos</button>
-                            <button onclick="mostrarSeccionEstudiante('ayuda'); cerrarMenuUsuarioEstudiante();">💡 Ayuda</button>
                             <button onclick="cerrarSesion()">↪ Cerrar sesión</button>
                         </div>
                     </div>
@@ -4013,20 +4179,12 @@ body:has(.dashboard-screen.active) .container {
                         </div>
 
                         <div class="form-group">
-                            <label for="horaEntrada">Hora de entrada</label>
-                            <select id="horaEntrada" required aria-describedby="ayudaHorarioHora">
-                                <option value="" disabled selected>Seleccionar hora</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="horaSalida">Hora de salida</label>
-                            <select id="horaSalida" required aria-describedby="ayudaHorarioHora">
-                                <option value="" disabled selected>Seleccionar hora</option>
-                            </select>
+                            <label for="horasRealizadas">Horas realizadas</label>
+                            <input type="number" id="horasRealizadas" min="1" max="50" step="1" inputmode="numeric" placeholder="Ej. 4" required aria-describedby="ayudaHorasRealizadas">
+                            <small class="field-help" id="ayudaHorasRealizadas">Ingresa las horas realizadas (números enteros del 1 al 50).</small>
                         </div>
                     </div>
-                    <small class="field-help" id="ayudaHorarioHora">Grados 10° y 11°: de 05:00 a 21:00. Ciclo V: horario flexible. Las horas deben estar en intervalos de 15 minutos.</small>
+
 
                     <div class="form-group">
                         <label>Descripción de la actividad</label>
@@ -4036,9 +4194,10 @@ body:has(.dashboard-screen.active) .container {
                     <div class="form-group">
                         <label>Evidencia</label>
                         <div id="visorEvidenciaHora" class="evidence-uploader" aria-live="polite">
-                            <label class="evidence-select-button" for="evidenciaHora">📎 Seleccionar archivo</label>
-                            <input type="file" id="evidenciaHora" accept="image/*,.pdf" hidden>
-                            <span id="nombreEvidenciaHora" class="evidence-file-name">Ningún archivo seleccionado</span>
+                            <label class="evidence-select-button" for="evidenciaHora">📎 Seleccionar imagen JPG/JPEG</label>
+                            <input type="file" id="evidenciaHora" accept=".jpg,.jpeg,image/jpeg" hidden>
+                            <span id="nombreEvidenciaHora" class="evidence-file-name">Ninguna imagen seleccionada</span>
+                            <div id="previewEvidenciaHora" class="evidence-preview"><img id="imagenPreviewEvidenciaHora" alt="Vista previa de la evidencia"><span id="textoPreviewEvidenciaHora"></span></div>
                             <button id="quitarEvidenciaHora" type="button" class="remove-evidence-button" aria-label="Quitar archivo" title="Quitar archivo" disabled>✕</button>
                         </div>
                         <small class="field-help">Puedes adjuntar una imagen o un archivo PDF.</small>
@@ -4092,7 +4251,7 @@ body:has(.dashboard-screen.active) .container {
                             <div class="profile-card-head">
                                 <div><strong>Datos de contacto</strong><span>Puedes corregir estos datos cuando sea necesario.</span></div>
                             </div>
-                            <div class="form-group"><label>Correo para acceder a SIGHO</label><input type="email" id="perfilCorreo" placeholder="Correo para acceder a SIGHO" disabled><small class="field-help">Debe ser el correo asociado a tu cuenta.</small></div>
+                            <div class="form-group"><label>Correo para acceder a SIGHO <span class="required">*</span></label><input type="email" id="perfilCorreo" placeholder="Correo para acceder a SIGHO" disabled><small class="field-help">Debe ser el correo asociado a tu cuenta.</small></div>
                             <div class="form-group"><label>Número celular</label><input type="tel" id="perfilTelefono" disabled placeholder="300 123 4567" maxlength="12" inputmode="numeric" pattern="\d{3} \d{3} \d{4}"></div>
                             <div class="form-group"><label>Dirección de residencia</label><input type="text" id="perfilDireccion" disabled placeholder="Dirección completa" maxlength="100"></div>
                             <div class="form-group">
@@ -4176,11 +4335,11 @@ body:has(.dashboard-screen.active) .container {
                         <div class="faq-list two-columns">
                             <details class="faq-card" data-faq>
                                 <summary>¿Cómo registro una jornada?</summary>
-                                <div class="faq-answer"><p>Entra a <strong>Registrar horas</strong>, selecciona la fecha, hora de entrada y salida, describe la actividad y adjunta la evidencia. Después pulsa «Registrar horas».</p></div>
+                                <div class="faq-answer"><p>Entra a <strong>Registrar horas</strong>, selecciona la fecha, indica las <strong>horas realizadas</strong>, describe la actividad y adjunta la evidencia. Después pulsa «Registrar horas».</p></div>
                             </details>
                             <details class="faq-card" data-faq>
                                 <summary>¿Qué evidencia puedo adjuntar?</summary>
-                                <div class="faq-answer"><p>Puedes adjuntar una imagen o un archivo PDF que sirva como evidencia de la actividad realizada.</p></div>
+                                <div class="faq-answer"><p>Puedes adjuntar únicamente una imagen en formato <strong>JPG o JPEG</strong> como evidencia de la actividad realizada.</p></div>
                             </details>
                             <details class="faq-card" data-faq>
                                 <summary>¿Por qué mi registro aparece pendiente?</summary>
@@ -4194,7 +4353,7 @@ body:has(.dashboard-screen.active) .container {
                         <div class="faq-list two-columns">
                             <details class="faq-card" data-faq>
                                 <summary>¿Cómo se calculan mis horas?</summary>
-                                <div class="faq-answer"><p>Las horas se calculan a partir de la hora de entrada y la hora de salida de cada jornada. Solo las jornadas aprobadas se suman a tu progreso.</p></div>
+                                <div class="faq-answer"><p>Las horas corresponden al valor de <strong>Horas realizadas</strong> que indicaste en cada jornada. Solo las jornadas aprobadas se suman a tu progreso.</p></div>
                             </details>
                             <details class="faq-card" data-faq>
                                 <summary>¿Qué significa «horas faltantes»?</summary>
@@ -4261,17 +4420,11 @@ body:has(.dashboard-screen.active) .container {
                     <button id="sidebarEstudiantesProfesor" onclick="mostrarSeccionProfesor('estudiantes')">
                         <span class="sidebar-icon">👥</span><span>Mis estudiantes</span>
                     </button>
-                    <button id="sidebarDatosProfesor" onclick="mostrarSeccionProfesor('datos')">
-                        <span class="sidebar-icon">⚙️</span><span>Mis datos</span>
-                    </button>
                     <button id="sidebarAyudaProfesor" onclick="mostrarSeccionProfesor('ayuda')">
                         <span class="sidebar-icon">💡</span><span>Ayuda</span>
                     </button>
                 </nav>
 
-                <button class="sidebar-logout" onclick="cerrarSesion()">
-                    <span class="sidebar-icon">↪</span><span>Cerrar sesión</span>
-                </button>
             </aside>
 
             <main class="role-main">
@@ -4308,7 +4461,6 @@ body:has(.dashboard-screen.active) .container {
 
                         <div class="more-menu-dropdown user-dropdown">
                             <button onclick="mostrarSeccionProfesor('datos'); cerrarMenuUsuarioProfesor();">👤 Mis datos</button>
-                            <button onclick="mostrarSeccionProfesor('ayuda'); cerrarMenuUsuarioProfesor();">💡 Ayuda</button>
                             <button onclick="cerrarSesion()">↪ Cerrar sesión</button>
                         </div>
                     </div>
@@ -4423,16 +4575,8 @@ body:has(.dashboard-screen.active) .container {
                             <div class="form-row two-columns">
                                 <div class="form-group">
                                     <label for="profesorPerfilProyectoEditable">Proyecto asignado</label>
-                                    <select id="profesorPerfilProyectoEditable" disabled>
-                                        <option value="" disabled>Seleccionar proyecto</option>
-                                        <option value="Educación Física / Tiempo Libre">Educación Física / Tiempo Libre</option>
-                                        <option value="Proyecto Ambiental">Proyecto Ambiental</option>
-                                        <option value="Logística y Vigilancia">Logística y Vigilancia</option>
-                                        <option value="Secretaría y/o Archivo">Secretaría y/o Archivo</option>
-                                        <option value="Acompañamiento a un docente de transición o primaria">Acompañamiento a un docente de transición o primaria</option>
-                                        <option value="Otro">Otro</option>
-                                    </select>
-                                    <small class="field-help">Puedes mantenerlo o actualizarlo cuando cambie tu asignación semanal.</small>
+                                    <input id="profesorPerfilProyectoEditable" disabled readonly value="Sin asignar">
+                                    <small class="field-help">La asignación del proyecto corresponde al Administrador.</small>
                                 </div>
                                 <div class="form-group">
                                     <label for="profesorPerfilCorreo">Correo institucional</label>
@@ -4607,7 +4751,7 @@ body:has(.dashboard-screen.active) .container {
 
                 <nav class="sidebar-nav" aria-label="Navegación del administrador">
                     <button id="sidebarInicioAdministrador" type="button" data-admin-seccion="inicio">
-                        <span class="sidebar-icon">📊</span><span>Inicio / Resumen</span>
+                        <span class="sidebar-icon">📊</span><span>Inicio</span>
                     </button>
                     <button id="sidebarProfesoresAdministrador" type="button" data-admin-seccion="profesores">
                         <span class="sidebar-icon">👥</span><span>Gestión de profesores</span>
@@ -4629,15 +4773,12 @@ body:has(.dashboard-screen.active) .container {
                     </button>
                 </nav>
 
-                <button class="sidebar-logout" type="button" onclick="cerrarSesion()">
-                    <span class="sidebar-icon">↪</span><span>Cerrar sesión</span>
-                </button>
             </aside>
 
             <main class="role-main">
                 <header class="dashboard-header">
                     <div>
-                        <h2 id="tituloVistaAdministrador">Inicio / Resumen</h2>
+                        <h2 id="tituloVistaAdministrador">Inicio</h2>
                         <p id="subtituloVistaAdministrador">Vista general del sistema de servicio social.</p>
                     </div>
 
@@ -4650,7 +4791,6 @@ body:has(.dashboard-screen.active) .container {
                         </button>
                         <div class="more-menu-dropdown user-dropdown">
                             <button onclick="mostrarSeccionAdministrador('validaciones'); cerrarMenuUsuarioAdministrador();">🛠️ Sistema</button>
-                            <button onclick="abrirAyuda();">💡 Ayuda</button>
                             <button onclick="cerrarSesion()">↪ Cerrar sesión</button>
                         </div>
                     </div>
@@ -4682,7 +4822,7 @@ body:has(.dashboard-screen.active) .container {
 
                     <div class="admin-quick-grid">
                         <button type="button" class="admin-quick-card" onclick="mostrarSeccionAdministrador('profesores')">
-                            <span>👥</span><div><strong>Gestionar profesores</strong><small>Asigna sede y proyecto a cada docente.</small></div><b>→</b>
+                            <span>👥</span><div><strong>Gestionar profesores</strong><small>Asigna la sede y el proyecto de cada docente.</small></div><b>→</b>
                         </button>
                         <button type="button" class="admin-quick-card" onclick="mostrarSeccionAdministrador('progreso')">
                             <span>🎓</span><div><strong>Ver progreso</strong><small>Consulta las horas y el avance de cada estudiante.</small></div><b>→</b>
@@ -4698,7 +4838,7 @@ body:has(.dashboard-screen.active) .container {
                         <div>
                             <span class="page-eyebrow">GESTIÓN</span>
                             <h3>Gestión de profesores</h3>
-                            <p class="section-description">Asigna o cambia únicamente la sede de cada profesor. El proyecto lo define el propio docente.</p>
+                            <p class="section-description">Asigna la sede y el proyecto de cada profesor desde este panel.</p>
                         </div>
                     </div>
                     <div id="tablaProfesoresAdmin"></div>
@@ -4928,9 +5068,7 @@ body:has(.dashboard-screen.active) .container {
             <p class="registro-hora-exito-subtitle">Tu jornada fue enviada y quedó pendiente de revisión.</p>
             <div class="registro-hora-resumen">
                 <div><span>Fecha</span><strong id="resumenRegistroFecha">—</strong></div>
-                <div><span>Hora de entrada</span><strong id="resumenRegistroEntrada">—</strong></div>
-                <div><span>Hora de salida</span><strong id="resumenRegistroSalida">—</strong></div>
-                <div><span>Total de horas</span><strong id="resumenRegistroHoras">—</strong></div>
+                <div><span>Horas realizadas</span><strong id="resumenRegistroHoras">—</strong></div>
             </div>
             <button type="button" class="solicitud-exito-button" onclick="confirmarRegistroHoraExito()">Aceptar</button>
         </div>
@@ -5098,35 +5236,60 @@ body:has(.dashboard-screen.active) .container {
 
 
     function mostrarSolicitud() {
-
+        restablecerFormulariosAcceso();
+        cerrarModales();
         ocultarPantallas();
-
-        document
-            .getElementById("solicitud")
-            .classList.add("active");
-
+        document.getElementById("solicitud")?.classList.add("active");
+        actualizarIndicadoresObligatorios(document.getElementById("solicitud"));
     }
-
 
     function mostrarLogin() {
-
+        restablecerFormulariosAcceso();
+        cerrarModales();
         ocultarPantallas();
-
-        document
-            .getElementById("login")
-            .classList.add("active");
-
+        document.getElementById("login")?.classList.add("active");
+        actualizarCamposLogin();
+        actualizarIndicadoresObligatorios(document.getElementById("login"));
     }
 
 
+    function restablecerFormulariosAcceso() {
+        const solicitud = document.getElementById("solicitud");
+        solicitud?.querySelectorAll("input, select, textarea").forEach(el => {
+            el.classList.remove("campo-error");
+            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+            else if (!el.disabled) el.value = "";
+        });
+        const rolSolicitud=document.getElementById("rolSolicitud"); if(rolSolicitud) rolSolicitud.value="";
+        ["camposSolicitudEstudiante","camposSolicitudPersonal","camposSolicitudComunes"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="none";});
+        const grupoEps=document.getElementById("grupoEpsOtroSolicitud"); if(grupoEps) grupoEps.style.display="none";
+        const epsOtro=document.getElementById("epsOtroSolicitud"); if(epsOtro){epsOtro.value="";epsOtro.disabled=true;epsOtro.required=false;}
+        const proyectoOtro=document.getElementById("proyectoOtro"); if(proyectoOtro){proyectoOtro.value="";proyectoOtro.disabled=true;proyectoOtro.required=false;}
+        document.querySelectorAll('input[name="diasServicio"]').forEach(el=>el.checked=false);
+        const jornada=document.getElementById("jornadaSolicitud"); if(jornada){jornada.value="";jornada.disabled=true;}
+        const fecha=document.getElementById("fechaNacimiento"); if(fecha){fecha.value="";fecha.disabled=true;fecha.removeAttribute("min");fecha.removeAttribute("max");}
+        const msg=document.getElementById("mensajeSolicitud"); if(msg){msg.textContent="";msg.style.display="none";}
+        const login=document.getElementById("login");
+        login?.querySelectorAll("input, select, textarea").forEach(el => {
+            el.classList.remove("campo-error");
+            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+            else el.value = "";
+            el.setCustomValidity("");
+        });
+        const rolLogin=document.getElementById("rolLogin"); if(rolLogin) rolLogin.value="";
+        const camposLogin=document.getElementById("camposLogin"); if(camposLogin) camposLogin.style.display="none";
+        const msgLogin=document.getElementById("mensajeLogin"); if(msgLogin){msgLogin.textContent="";msgLogin.style.display="none";}
+        llenarAniosServicio();
+        configurarSelectorEvidencia();
+        reiniciarSelectorEvidencia();
+        actualizarCamposSolicitud();
+    }
+
     function volverInicio() {
-
+        restablecerFormulariosAcceso();
+        cerrarModales();
         ocultarPantallas();
-
-        document
-            .getElementById("home")
-            .classList.add("active");
-
+        document.getElementById("home")?.classList.add("active");
     }
 
 
@@ -5134,146 +5297,111 @@ body:has(.dashboard-screen.active) .container {
        SOLICITUD
     ====================================================== */
 
-    function llenarAniosServicio() {
-        const input = document.getElementById("anioServicio");
-        if (!input) return;
-        input.min = "2026";
-        input.max = "2100";
-        const valor = Number(input.value);
-        if (!Number.isFinite(valor) || valor < 2026) input.value = "2026";
+    function actualizarIndicadoresObligatorios(contenedor = document) {
+        if (!contenedor) return;
+
+        const esSolicitudEstudiante = contenedor.id === "solicitud" ||
+            !!contenedor.querySelector("#camposSolicitudEstudiante");
+        const camposObligatoriosEstudiante = new Set([
+            "primerApellido", "primerNombre", "tipoDocumento", "numeroDocumento",
+            "gradoSolicitud", "fechaNacimiento", "telefonoSolicitud",
+            "direccionSolicitud", "epsSolicitud", "correoSolicitudEstudiante",
+            "modalidadSolicitud", "nombreAcudiente", "telefonoAcudiente",
+            "sedeSolicitud", "proyectoSolicitud", "claveSolicitud"
+        ]);
+
+        contenedor.querySelectorAll("label").forEach(label => {
+            const forId = label.getAttribute("for");
+            let control = null;
+            if (forId) control = document.getElementById(forId);
+            if (!control) control = label.querySelector("input, select, textarea");
+
+            const existente = label.querySelector(":scope > .required-mark");
+            if (existente) existente.remove();
+
+            // La sección de días usa su propio <span class="required">*.
+            if (label.querySelector('span.required')) return;
+
+            if (esSolicitudEstudiante && control) {
+                const id = control.id;
+                if (id && camposObligatoriosEstudiante.has(id)) {
+                    const marca = document.createElement("span");
+                    marca.className = "required-mark";
+                    marca.textContent = "*";
+                    marca.setAttribute("aria-hidden", "true");
+                    label.appendChild(marca);
+                }
+                return;
+            }
+
+            if (control?.required) {
+                const marca = document.createElement("span");
+                marca.className = "required-mark";
+                marca.textContent = "*";
+                marca.setAttribute("aria-hidden", "true");
+                label.appendChild(marca);
+            }
+        });
     }
 
     function bloquearEntradaAnioServicio(evento) {
-        const teclasPermitidas = ["ArrowUp", "ArrowDown", "Tab", "Shift", "Escape"];
-        if (!teclasPermitidas.includes(evento.key)) evento.preventDefault();
+        const teclasPermitidas = ["ArrowUp", "ArrowDown", "Tab", "Shift", "Escape", "Enter", "Home", "End"];
+        if (teclasPermitidas.includes(evento.key) || evento.ctrlKey || evento.metaKey || evento.altKey) return;
+        evento.preventDefault();
     }
 
-    function configurarValidacionSolicitudProfesor() {
-        const nombres = document.getElementById("nombre");
-        const apellidos = document.getElementById("apellido");
-        const identificacion = document.getElementById("identificacionSolicitud");
-        const correo = document.getElementById("correoSolicitud");
-        const telefono = document.getElementById("telefonoProfesorSolicitud");
-        const clave = document.getElementById("claveSolicitudProfesor");
-        if (!nombres || !apellidos || !identificacion || !correo || !telefono || !clave) return;
+    function llenarAniosServicio() {
+        const input = document.getElementById("anioServicio");
+        if (!input) return;
+        const actual = new Date().getFullYear();
+        const maximo = actual + 3;
+        input.min = String(actual);
+        input.max = String(maximo);
+        let valor = Number(input.value);
+        if (!Number.isInteger(valor) || valor < actual || valor > maximo) {
+            input.value = String(actual);
+        }
+        const ayuda = document.getElementById("ayudaAnioServicio");
+        if (ayuda) ayuda.textContent = `Puedes elegir desde ${actual} hasta ${maximo}.`;
+    }
 
-        const regexNombreProfesor = /^[\p{L}]+(?: [\p{L}]+)*$/u;
-        const limpiarNombre = (input) => {
-            const anterior = input.value;
-            const limpio = anterior
-                .replace(/[^\p{L} ]/gu, "")
-                .replace(/ {2,}/g, " ")
-                .replace(/^ +/g, "")
-                .slice(0, 60);
-            input.value = limpio;
-        };
+    function limpiarSolicitudAlCambiarRol(nuevoRol) {
+        const solicitud = document.getElementById("solicitud");
+        const rol = document.getElementById("rolSolicitud");
+        if (!solicitud || !rol) return;
 
-        [nombres, apellidos].forEach(input => {
-            if (input.dataset.validacionProfesor === "1") return;
-            input.dataset.validacionProfesor = "1";
-            input.addEventListener("input", () => limpiarNombre(input));
-            input.addEventListener("blur", () => {
-                input.value = capitalizarNombreCompleto(input.value).slice(0, 60);
-            });
+        solicitud.querySelectorAll("input, select, textarea").forEach(el => {
+            if (el === rol) return;
+            el.classList.remove("campo-error");
+            el.setCustomValidity("");
+            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+            else el.value = "";
         });
 
-        if (identificacion.dataset.validacionProfesor !== "1") {
-            identificacion.dataset.validacionProfesor = "1";
-            identificacion.addEventListener("input", () => {
-                identificacion.value = identificacion.value.trimStart();
-            });
-            identificacion.addEventListener("blur", () => {
-                identificacion.value = identificacion.value.trim();
-            });
+        // Restablecer estados dependientes para que el nuevo rol comience limpio.
+        const tipoTelefono = document.getElementById("tipoTelefonoAcudiente");
+        if (tipoTelefono) tipoTelefono.value = "";
+        const telAcudiente = document.getElementById("telefonoAcudiente");
+        if (telAcudiente) {
+            telAcudiente.value = "";
+            telAcudiente.disabled = true;
+            telAcudiente.setCustomValidity("");
         }
+        const grupoEps = document.getElementById("grupoEpsOtroSolicitud");
+        if (grupoEps) grupoEps.style.display = "none";
+        ["epsOtroSolicitud", "proyectoOtro"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.value = ""; el.disabled = true; el.required = false; el.setCustomValidity(""); }
+        });
+        const jornada = document.getElementById("jornadaSolicitud");
+        if (jornada) jornada.disabled = true;
+        const fecha = document.getElementById("fechaNacimiento");
+        if (fecha) { fecha.disabled = true; fecha.removeAttribute("min"); fecha.removeAttribute("max"); }
 
-        if (correo.dataset.validacionProfesor !== "1") {
-            correo.dataset.validacionProfesor = "1";
-            correo.addEventListener("input", () => {
-                correo.value = correo.value.replace(/\s/g, "").toLowerCase();
-            });
-            correo.addEventListener("blur", () => {
-                correo.value = correo.value.replace(/\s/g, "").trim().toLowerCase();
-            });
-        }
-
-        if (telefono.dataset.validacionProfesor !== "1") {
-            telefono.dataset.validacionProfesor = "1";
-            const validarTelefonoProfesorSolicitud = () => {
-                const numero = telefono.value.replace(/\D/g, "").slice(0, 10);
-                const todosIguales = /^(\d)\1{9}$/.test(numero);
-                const secuencias = ["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
-                const consecutivo = secuencias.includes(numero);
-                const valido = /^3\d{9}$/.test(numero) && !todosIguales && !consecutivo;
-                telefono.value = numero.length > 6 ? `${numero.slice(0,3)} ${numero.slice(3,6)} ${numero.slice(6)}` : numero.length > 3 ? `${numero.slice(0,3)} ${numero.slice(3)}` : numero;
-                telefono.setCustomValidity(numero.length === 0 ? "" : !valido ? "Escribe un celular válido de 10 dígitos que inicie en 3. No se permiten números repetidos ni secuencias consecutivas." : "");
-            };
-            telefono.addEventListener("input", validarTelefonoProfesorSolicitud);
-            telefono.addEventListener("blur", validarTelefonoProfesorSolicitud);
-            validarTelefonoProfesorSolicitud();
-        }
-
-        if (clave.dataset.validacionProfesor !== "1") {
-            clave.dataset.validacionProfesor = "1";
-            clave.setAttribute("minlength", "8");
-        }
-
-        if (document.body.dataset.validacionSolicitudProfesorSubmit !== "1") {
-            document.body.dataset.validacionSolicitudProfesorSubmit = "1";
-            const validarAntesDeEnviar = (evento) => {
-                if (document.getElementById("rolSolicitud")?.value !== "profesor") return;
-
-                nombres.value = capitalizarNombreCompleto(nombres.value).slice(0, 60);
-                apellidos.value = capitalizarNombreCompleto(apellidos.value).slice(0, 60);
-                identificacion.value = identificacion.value.trim();
-                correo.value = correo.value.replace(/\s/g, "").trim().toLowerCase();
-
-                if (!nombres.value || !regexNombreProfesor.test(nombres.value)) {
-                    evento.preventDefault();
-                    alert("Los nombres solo pueden contener letras y un espacio sencillo entre palabras.");
-                    nombres.focus();
-                    return false;
-                }
-                if (!apellidos.value || !regexNombreProfesor.test(apellidos.value)) {
-                    evento.preventDefault();
-                    alert("Los apellidos solo pueden contener letras y un espacio sencillo entre palabras.");
-                    apellidos.focus();
-                    return false;
-                }
-                if (!identificacion.value) {
-                    evento.preventDefault();
-                    alert("Completa la identificación o código institucional.");
-                    identificacion.focus();
-                    return false;
-                }
-                const regexCorreoInstitucional = /^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
-                if (!regexCorreoInstitucional.test(correo.value)) {
-                    evento.preventDefault();
-                    alert("El correo debe ser institucional, sin espacios, y terminar en @iejosejoaquinflorezhernandez.edu.co.");
-                    correo.focus();
-                    return false;
-                }
-                const telefonoProfesor = telefono.value.replace(/\D/g, "").slice(0, 10);
-                const todosIgualesTelefono = /^(\d)\1{9}$/.test(telefonoProfesor);
-                const secuenciasTelefono = ["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
-                if (!/^3\d{9}$/.test(telefonoProfesor) || todosIgualesTelefono || secuenciasTelefono.includes(telefonoProfesor)) {
-                    evento.preventDefault();
-                    alert("El teléfono de contacto debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.");
-                    telefono.focus();
-                    return false;
-                }
-                telefono.value = `${telefonoProfesor.slice(0,3)} ${telefonoProfesor.slice(3,6)} ${telefonoProfesor.slice(6)}`;
-                if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(clave.value)) {
-                    evento.preventDefault();
-                    alert("La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
-                    clave.focus();
-                    return false;
-                }
-                return true;
-            };
-            const formulario = document.getElementById("formSolicitud");
-            if (formulario) formulario.addEventListener("submit", validarAntesDeEnviar);
-        }
+        rol.value = nuevoRol || "";
+        actualizarCamposSolicitud();
+        if (typeof configurarTelefonoAcudiente === "function") configurarTelefonoAcudiente();
+        actualizarIndicadoresObligatorios(solicitud);
     }
 
     function actualizarCamposSolicitud() {
@@ -5294,7 +5422,8 @@ body:has(.dashboard-screen.active) .container {
         if (accesoProfesor) accesoProfesor.classList.toggle("visible", rol === "profesor");
 
         if (estudiante) estudiante.querySelectorAll("input, select").forEach(el => {
-            el.required = rol === "estudiante";
+            el.required = rol === "estudiante" &&
+                !["segundoNombre", "segundoApellido"].includes(el.id);
         });
         if (personal) personal.querySelectorAll("input, select").forEach(el => {
             el.required = rol === "profesor";
@@ -5309,11 +5438,28 @@ body:has(.dashboard-screen.active) .container {
             if (rol !== "profesor") claveProfesor.value = "";
         }
 
-        const proyectoProfesor = document.getElementById("proyectoProfesorSolicitud");
-        if (proyectoProfesor) proyectoProfesor.required = rol === "profesor";
-
         llenarAniosServicio();
         configurarJornadaPorGrado();
+        actualizarIndicadoresObligatorios(document.getElementById("solicitud"));
+    }
+
+    function limpiarLoginAlCambiarRol(nuevoRol) {
+        const login = document.getElementById("login");
+        const rol = document.getElementById("rolLogin");
+        if (!login || !rol) return;
+
+        login.querySelectorAll("input, textarea").forEach(el => {
+            el.classList.remove("campo-error");
+            el.setCustomValidity("");
+            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+            else el.value = "";
+        });
+
+        const mensaje = document.getElementById("mensajeLogin");
+        if (mensaje) { mensaje.textContent = ""; mensaje.style.display = "none"; }
+
+        rol.value = nuevoRol || "";
+        actualizarCamposLogin();
     }
 
     function actualizarCamposLogin() {
@@ -5335,6 +5481,7 @@ body:has(.dashboard-screen.active) .container {
                 mensaje.innerText = "";
             }
         }
+        actualizarIndicadoresObligatorios(document.getElementById("login"));
     }
 
     // Mantiene los campos "Otro" únicamente con letras y espacios sencillos.
@@ -5451,7 +5598,14 @@ async function iniciarSesion() {
     const clave = document.getElementById("clave").value;
     const mensaje = document.getElementById("mensajeLogin");
 
-    if (!rol || !correo || !clave) { alert("Completa todos los campos."); return; }
+    document.getElementById("correoLogin")?.classList.toggle("campo-error", !correo);
+    document.getElementById("clave")?.classList.toggle("campo-error", !clave);
+    if (!rol || !correo || !clave) {
+        mensaje.className = "message auth-error-message";
+        mensaje.style.display = "block";
+        mensaje.innerText = "Completa el rol, correo y contraseña.";
+        return;
+    }
 
     try {
         const data = await api("login", { method: "POST", body: { rol, correo, clave } });
@@ -5468,12 +5622,55 @@ async function iniciarSesion() {
     }
 }
 
+function limpiarErroresFormulario(contenedor) {
+    if (!contenedor) return;
+    contenedor.querySelectorAll(".campo-error").forEach(el=>el.classList.remove("campo-error"));
+}
+function marcarCamposSolicitudInvalidos(rol) {
+    const contenedor = rol === "estudiante" ? document.getElementById("camposSolicitudEstudiante") : document.getElementById("camposSolicitudPersonal");
+    if (!contenedor) return false;
+    let hayError=false;
+    contenedor.querySelectorAll("input, select, textarea").forEach(el=>{
+        if (el.disabled || el.offsetParent===null) return;
+        const invalido = !el.checkValidity();
+        el.classList.toggle("campo-error", invalido);
+        if (invalido) hayError=true;
+    });
+    return hayError;
+}
+function validarDiasServicio() {
+    const grupo = document.getElementById("grupoDiasServicio");
+    const dias = document.querySelectorAll('input[name="diasServicio"]:checked');
+    const invalido = dias.length === 0;
+    if (grupo) grupo.classList.toggle("campo-error", invalido);
+    return !invalido;
+}
+
+function configurarErroresCamposSolicitud() {
+    const contenedor=document.getElementById("solicitud"); if(!contenedor || contenedor.dataset.erroresConfigurados==="1") return;
+    contenedor.dataset.erroresConfigurados="1";
+    contenedor.addEventListener("input", e=>{
+        if(e.target.matches("input,select,textarea")) e.target.classList.remove("campo-error");
+    });
+    contenedor.addEventListener("change", e=>{
+        if(e.target.matches("input,select,textarea")) e.target.classList.remove("campo-error");
+        if(e.target.matches('input[name="diasServicio"]')) validarDiasServicio();
+    });
+    contenedor.addEventListener("blur", e=>{
+        if(e.target.matches("input,select,textarea") && !e.target.disabled)
+            e.target.classList.toggle("campo-error",!e.target.checkValidity());
+    },true);
+}
+
 async function enviarSolicitud() {
     const rol = document.getElementById("rolSolicitud").value;
     const mensaje = document.getElementById("mensajeSolicitud");
     const claveEstudiante = document.getElementById("claveSolicitud")?.value || "";
     const claveProfesor = document.getElementById("claveSolicitudProfesor")?.value || "";
     const clave = rol === "estudiante" ? claveEstudiante : claveProfesor;
+    limpiarErroresFormulario(rol === "estudiante" ? document.getElementById("camposSolicitudEstudiante") : document.getElementById("camposSolicitudPersonal"));
+    configurarErroresCamposSolicitud();
+    marcarCamposSolicitudInvalidos(rol);
 
     if (!rol || !["estudiante", "profesor"].includes(rol)) {
         alert("Debes seleccionar Estudiante o Profesor.");
@@ -5512,6 +5709,7 @@ async function enviarSolicitud() {
         const epsOtro = document.getElementById("epsOtroSolicitud")?.value.trim() || "";
         const eps = epsSeleccionada === "Otro" ? epsOtro : epsSeleccionada;
         const nombreAcudiente = capitalizarNombreCompleto(document.getElementById("nombreAcudiente").value);
+        const tipoTelefonoAcudiente = document.getElementById("tipoTelefonoAcudiente").value;
         const telefonoAcudiente = document.getElementById("telefonoAcudiente").value.trim();
         const sede = document.getElementById("sedeSolicitud").value;
         const proyecto = document.getElementById("proyectoSolicitud").value;
@@ -5527,11 +5725,18 @@ async function enviarSolicitud() {
             !anioServicio || !primerApellido || !primerNombre || !tipoDocumento ||
             !numeroDocumento || !grado || !fechaNacimiento || !direccion ||
             !telefono || !eps || !nombreAcudiente || !telefonoAcudiente ||
-            !sede || !proyecto || !modalidad || !jornada || diasServicio.length === 0
+            !sede || !proyecto || !modalidad || !jornada
         ) {
             alert("Completa todos los campos obligatorios de la solicitud del estudiante.");
             return;
         }
+
+        if (diasServicio.length === 0) {
+            validarDiasServicio();
+            alert("Selecciona al menos un día en el que realizarás el servicio social.");
+            return;
+        }
+        validarDiasServicio();
 
         const regexNombre = /^[\p{L}]+(?: [\p{L}]+)*$/u;
         const validarNombre = (valor, etiqueta, obligatorio = true, maximo = 30) => {
@@ -5553,8 +5758,9 @@ async function enviarSolicitud() {
         }
 
         const anioNumerico = Number(anioServicio);
-        if (!Number.isInteger(anioNumerico) || anioNumerico < 2026 || anioNumerico > 2100) {
-            alert("El año de servicio social debe ser 2026 o un año posterior.");
+        const anioActualSolicitud = new Date().getFullYear();
+        if (!Number.isInteger(anioNumerico) || anioNumerico < anioActualSolicitud || anioNumerico > anioActualSolicitud + 3) {
+            alert(`El año de servicio social debe estar entre ${anioActualSolicitud} y ${anioActualSolicitud + 3}.`);
             return;
         }
 
@@ -5577,24 +5783,23 @@ async function enviarSolicitud() {
             return;
         }
 
-        // 14–17 años: únicamente TI.
-        if (edad < 18 && tipoDocumento !== "Tarjeta de identidad") {
-            alert("Para estudiantes menores de 18 años se requiere Tarjeta de identidad.");
-            return;
-        }
-
-        // 18 años: TI o CC.
-        if (edad === 18 &&
-            tipoDocumento !== "Tarjeta de identidad" &&
-            tipoDocumento !== "Cédula de ciudadanía") {
-            alert("A los 18 años puedes seleccionar Tarjeta de identidad o Cédula de ciudadanía.");
-            return;
-        }
-
-        // 19 años: únicamente CC.
-        if (edad === 19 && tipoDocumento !== "Cédula de ciudadanía") {
-            alert("A los 19 años se requiere Cédula de ciudadanía.");
-            return;
+        // PPT es una excepción documental válida dentro del rango de edad permitido.
+        if (tipoDocumento !== "PPT") {
+            // 14–17 años: TI obligatoria.
+            if (edad < 18 && tipoDocumento !== "Tarjeta de identidad") {
+                alert("Para estudiantes menores de 18 años se requiere Tarjeta de identidad.");
+                return;
+            }
+            // 18 años: TI o CC.
+            if (edad === 18 && tipoDocumento !== "Tarjeta de identidad" && tipoDocumento !== "Cédula de ciudadanía") {
+                alert("A los 18 años puedes seleccionar Tarjeta de identidad o Cédula de ciudadanía.");
+                return;
+            }
+            // 19 años: únicamente CC.
+            if (edad === 19 && tipoDocumento !== "Cédula de ciudadanía") {
+                alert("A los 19 años se requiere Cédula de ciudadanía.");
+                return;
+            }
         }
 
         if (!/^\d{10}$/.test(telefono.replace(/\D/g, ""))) {
@@ -5605,12 +5810,19 @@ async function enviarSolicitud() {
             alert("La dirección puede tener máximo 100 caracteres.");
             return;
         }
-        if (!validarNombre(nombreAcudiente, "El nombre del acudiente", true, 60)) return;
-        if (!/^\d{7,10}$/.test(telefonoAcudiente) ||
-            /^0/.test(telefonoAcudiente) ||
-            /^(\d)\1+$/.test(telefonoAcudiente) ||
-            /^(?:0123456789|1234567890|9876543210|876543210|765432109|654321098|543210987|432109876|321098765|210987654|109876543|987654321|87654321|76543210|65432109|54321098|43210987|32109876|21098765|10987654|1234567|2345678|3456789|4567890|12345678|23456789|34567890|123456789|234567890)$/.test(telefonoAcudiente)) {
-            alert("El teléfono del acudiente debe tener entre 7 y 10 dígitos, no comenzar en 0 y no ser una secuencia repetida o consecutiva.");
+        if (!validarNombre(nombreAcudiente, "El nombre completo del acudiente", true, 60)) return;
+        if (!tipoTelefonoAcudiente) {
+            alert("Selecciona el tipo de línea del acudiente.");
+            return;
+        }
+
+        const telefonoAcudienteElemento = document.getElementById("telefonoAcudiente");
+        const telefonoAcudienteValido = tipoTelefonoAcudiente === "fijo"
+            ? validarTelefonoFijoAcudiente(telefonoAcudienteElemento)
+            : validarCelularSIGHO(telefonoAcudienteElemento);
+
+        if (!telefonoAcudienteValido) {
+            alert(telefonoAcudienteElemento.validationMessage || "El número de contacto del acudiente no es válido.");
             return;
         }
         if (grado === "Ciclo V" && modalidad === "tecnico") {
@@ -5682,6 +5894,7 @@ async function enviarSolicitud() {
             eps,
             epsSeleccionada,
             nombreAcudiente,
+            tipoTelefonoAcudiente,
             telefonoAcudiente: telefonoAcudiente.replace(/\D/g, ""),
             sede,
             jornada,
@@ -5695,11 +5908,10 @@ async function enviarSolicitud() {
         const identificacion = document.getElementById("identificacionSolicitud").value.trim();
         const correo = document.getElementById("correoSolicitud").value.replace(/\s/g, "").trim().toLowerCase();
         const telefono = document.getElementById("telefonoProfesorSolicitud")?.value.replace(/\D/g, "").slice(0, 10) || "";
-        const proyecto = document.getElementById("proyectoProfesorSolicitud")?.value || "";
         const regexNombreProfesor = /^[\p{L}]+(?: [\p{L}]+)*$/u;
         const regexCorreoInstitucional = /^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
 
-        if (!nombre || !apellido || !identificacion || !correo || !telefono || !proyecto) {
+        if (!nombre || !apellido || !identificacion || !correo || !telefono) {
             alert("Completa todos los campos obligatorios del profesor.");
             return;
         }
@@ -5715,12 +5927,19 @@ async function enviarSolicitud() {
             alert("El correo del profesor debe ser institucional, sin espacios, y terminar en @iejosejoaquinflorezhernandez.edu.co.");
             return;
         }
+
+        const telefonoProfesorElemento = document.getElementById("telefonoProfesorSolicitud");
+        if (!validarCelularSIGHO(telefonoProfesorElemento)) {
+            alert(telefonoProfesorElemento.validationMessage || "El celular del profesor no es válido.");
+            return;
+        }
+
         if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(clave)) {
             alert("La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
             return;
         }
 
-        body = { rol, nombre, apellido, identificacion, correo, telefono, clave, proyecto };
+        body = { rol, nombre, apellido, identificacion, correo, telefono, clave };
     }
 
     try {
@@ -5829,213 +6048,103 @@ async function sincronizarDatosRegistroHoras() {
     return grado;
 }
 
-function formatearHoraRegistro(minutos) {
-    const horas = Math.floor(minutos / 60);
-    const mins = minutos % 60;
-    const sufijo = horas < 12 ? "a. m." : "p. m.";
-    let hora12 = horas % 12;
-    if (hora12 === 0) hora12 = 12;
-    return `${String(hora12).padStart(2, "0")}:${String(mins).padStart(2, "0")} ${sufijo}`;
-}
-
-function llenarSelectHorasRegistro(select, inicio, fin) {
-    if (!select) return;
-    const valorAnterior = select.value;
-    select.innerHTML = '<option value="" disabled>Seleccionar hora</option>';
-
-    for (let minutos = inicio; minutos <= fin; minutos += 15) {
-        const horas = Math.floor(minutos / 60);
-        const mins = minutos % 60;
-        const valor = `${String(horas).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
-        const opcion = document.createElement("option");
-        opcion.value = valor;
-        opcion.textContent = formatearHoraRegistro(minutos);
-        select.appendChild(opcion);
-    }
-
-    // Conserva la hora elegida si sigue siendo válida para el nuevo grado.
-    if ([...select.options].some(o => o.value === valorAnterior)) {
-        select.value = valorAnterior;
-    } else {
-        select.value = "";
-    }
-}
-
 function configurarRestriccionesRegistroHoras(gradoForzado = "") {
     const fecha = document.getElementById("fechaHora");
-    const entrada = document.getElementById("horaEntrada");
-    const salida = document.getElementById("horaSalida");
-    if (!fecha || !entrada || !salida) return;
+    const horas = document.getElementById("horasRealizadas");
+    if (!fecha || !horas) return;
 
-    const actualizar = (gradoRecibido = gradoForzado) => {
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-        const anio = hoy.getFullYear();
-        const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-        const inicioAnio = `${anio}-01-01`;
-        const hoyISO = iso(hoy);
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+    const anio = hoy.getFullYear();
+    const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 
-        fecha.min = inicioAnio;
-        fecha.max = hoyISO;
-        fecha.setAttribute("min", inicioAnio);
-        fecha.setAttribute("max", hoyISO);
+    fecha.min = `${anio}-01-01`;
+    fecha.max = iso(hoy);
+    if (fecha.value && (fecha.value < fecha.min || fecha.value > fecha.max)) fecha.value = "";
 
-        const grado = normalizarGradoRegistro(gradoRecibido || usuarioActual?.grado || usuarioActual?.Grado);
-        const restringido = grado === "10°" || grado === "11°";
+    // Las horas son enteros de 1 a 50. No modificar el valor mientras se escribe.
+    horas.min = "1";
+    horas.max = "50";
+    horas.step = "1";
+    horas.inputMode = "numeric";
+}
 
-        // Ya no usamos <input type="time">. Los horarios se crean como una lista
-        // real de opciones, así el navegador nunca muestra horas prohibidas.
-        if (restringido) {
-            llenarSelectHorasRegistro(entrada, 5 * 60, 21 * 60);
-            llenarSelectHorasRegistro(salida, 5 * 60, 21 * 60);
-        } else if (grado === "Ciclo V") {
-            llenarSelectHorasRegistro(entrada, 0, 23 * 60 + 45);
-            llenarSelectHorasRegistro(salida, 0, 23 * 60 + 45);
-        } else {
-            entrada.innerHTML = '<option value="" disabled selected>Seleccionar hora</option>';
-            salida.innerHTML = '<option value="" disabled selected>Seleccionar hora</option>';
-        }
-
-        const ayuda = document.getElementById("ayudaHorarioHora");
-        if (ayuda) {
-            ayuda.textContent = restringido
-                ? `Grado ${grado}: selecciona una hora entre 05:00 a. m. y 09:00 p. m. Las opciones avanzan de 15 en 15 minutos.`
-                : grado === "Ciclo V"
-                    ? "Ciclo V: horario flexible durante todo el día. Las opciones avanzan de 15 en 15 minutos y la salida debe ser posterior a la entrada."
-                    : "Selecciona un grado válido para aplicar las restricciones de horario.";
-        }
-
-        if (fecha.value && (fecha.value < fecha.min || fecha.value > fecha.max || fecha.value.slice(0,4) !== String(anio))) {
-            fecha.value = "";
-        }
+function configurarSelectorEvidencia() {
+    const input=document.getElementById("evidenciaHora");
+    const nombre=document.getElementById("nombreEvidenciaHora");
+    const quitar=document.getElementById("quitarEvidenciaHora");
+    const preview=document.getElementById("previewEvidenciaHora");
+    const imagen=document.getElementById("imagenPreviewEvidenciaHora");
+    const texto=document.getElementById("textoPreviewEvidenciaHora");
+    if(!input || !nombre || !quitar || input.dataset.configurado==="1") return;
+    input.dataset.configurado="1";
+    const actualizar=()=>{
+        const archivo=input.files?.[0];
+        const esJpg=archivo && (archivo.type==="image/jpeg" || /\.jpe?g$/i.test(archivo.name));
+        if(archivo && !esJpg){ input.value=""; nombre.textContent="Ninguna imagen seleccionada"; quitar.hidden=true; if(preview) preview.classList.remove("show"); alert("Solo puedes seleccionar imágenes JPG o JPEG."); return; }
+        nombre.textContent=archivo ? archivo.name : "Ninguna imagen seleccionada";
+        quitar.hidden=!archivo;
+        if(archivo && preview && imagen){
+            const url=URL.createObjectURL(archivo);
+            imagen.onload=()=>URL.revokeObjectURL(url);
+            imagen.src=url;
+            if(texto) texto.textContent=`Vista previa: ${archivo.name}`;
+            preview.classList.add("show");
+        } else if(preview){ preview.classList.remove("show"); if(imagen) imagen.removeAttribute("src"); }
     };
-
-    if (fecha.dataset.restriccionesConfiguradas !== "1") {
-        fecha.dataset.restriccionesConfiguradas = "1";
-        fecha.addEventListener("change", () => actualizar());
-        fecha.addEventListener("input", () => actualizar());
-        entrada.addEventListener("change", () => actualizar());
-        salida.addEventListener("change", () => actualizar());
-    }
-    actualizar(gradoForzado);
+    input.addEventListener("change",actualizar);
+    quitar.addEventListener("click",()=>{ input.value=""; actualizar(); });
+    actualizar();
+}
+function reiniciarSelectorEvidencia(){
+    const input=document.getElementById("evidenciaHora");
+    const nombre=document.getElementById("nombreEvidenciaHora");
+    const quitar=document.getElementById("quitarEvidenciaHora");
+    const preview=document.getElementById("previewEvidenciaHora");
+    const imagen=document.getElementById("imagenPreviewEvidenciaHora");
+    if(input) input.value="";
+    if(nombre) nombre.textContent="Ninguna imagen seleccionada";
+    if(quitar) quitar.hidden=true;
+    if(preview) preview.classList.remove("show");
+    if(imagen) imagen.removeAttribute("src");
 }
 
 async function registrarHoras() {
     const fechaEl = document.getElementById("fechaHora");
-    const entradaEl = document.getElementById("horaEntrada");
-    const salidaEl = document.getElementById("horaSalida");
+    const horasEl = document.getElementById("horasRealizadas");
     const descripcionEl = document.getElementById("descripcionHora");
     const evidenciaEl = document.getElementById("evidenciaHora");
     const boton = document.getElementById("registrarHorasBtn");
     const mensaje = document.getElementById("mensajeHoras");
-
-    // Antes de validar, sincronizamos el grado real del usuario con Mis datos.
-    const grado = await sincronizarDatosRegistroHoras();
-    configurarRestriccionesRegistroHoras(grado);
-
-    const fecha = fechaEl?.value || "";
-    const entrada = entradaEl?.value || "";
-    const salida = salidaEl?.value || "";
-    const descripcion = descripcionEl?.value.trim() || "";
-    const archivo = evidenciaEl?.files?.[0];
-
-    if (!fecha || !entrada || !salida || !descripcion || !archivo) {
-        alert("Completa todos los campos y selecciona una evidencia.");
-        return;
-    }
-
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    const anio = hoy.getFullYear();
-    const hoyISO = `${anio}-${String(hoy.getMonth()+1).padStart(2,"0")}-${String(hoy.getDate()).padStart(2,"0")}`;
-    if (fecha < `${anio}-01-01` || fecha > hoyISO || fecha.slice(0,4) !== String(anio)) {
-        alert(`La fecha debe pertenecer únicamente al año ${anio} y no puede ser posterior a hoy.`);
-        return;
-    }
-
-    const minutos = valor => {
-        if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(valor)) return NaN;
-        const [h, m] = valor.split(":").map(Number);
-        return h * 60 + m;
-    };
-    const mi = minutos(entrada);
-    const ms = minutos(salida);
-
-    if (!Number.isInteger(mi) || !Number.isInteger(ms) || mi % 15 !== 0 || ms % 15 !== 0) {
-        alert("Las horas de entrada y salida deben estar exactamente en :00, :15, :30 o :45.");
-        return;
-    }
-    if (ms <= mi) {
-        alert("La hora de salida debe ser estrictamente posterior a la hora de entrada.");
-        return;
-    }
-
-    const gradoNormalizado = normalizarGradoRegistro(grado || usuarioActual?.grado || usuarioActual?.Grado);
-    if (gradoNormalizado === "10°" || gradoNormalizado === "11°") {
-        if (mi < 300 || mi > 1260 || ms < 300 || ms > 1260) {
-            alert(`Grado ${gradoNormalizado}: solo se permiten horarios entre 05:00 a. m. y 09:00 p. m.`);
-            return;
-        }
-    } else if (gradoNormalizado !== "Ciclo V") {
-        alert("No fue posible determinar correctamente el grado del estudiante.");
-        return;
-    }
-
-    const horas = calcularHoras(entrada, salida);
-    if (horas <= 0) {
-        alert("La hora de salida debe ser estrictamente posterior a la hora de entrada.");
-        return;
-    }
-    if (archivo.size > 5 * 1024 * 1024) {
-        alert("La evidencia debe pesar máximo 5 MB.");
-        return;
-    }
-
-    const form = new FormData();
-    form.append("fecha", fecha);
-    form.append("entrada", entrada);
-    form.append("salida", salida);
-    form.append("descripcion", descripcion);
-    form.append("evidencia", archivo);
-
-    if (boton) {
-        boton.disabled = true;
-        boton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Registrando jornada...';
-    }
-    if (mensaje) {
-        mensaje.style.display = "none";
-        mensaje.innerText = "";
-    }
-
-    try {
-        const data = await api("create_record", { method: "POST", body: form });
-        if (data.record) registros.unshift(normalizarRegistro(data.record));
+    await sincronizarDatosRegistroHoras();
+    configurarRestriccionesRegistroHoras(usuarioActual?.grado || "");
+    const fecha=fechaEl?.value||"", horasTexto=horasEl?.value||"", descripcion=descripcionEl?.value.trim()||"", archivo=evidenciaEl?.files?.[0];
+    const horas=Number(horasTexto);
+    if(!fecha || !horasTexto || !descripcion || !archivo){ alert("Completa todos los campos y selecciona una imagen JPG/JPEG."); return; }
+    if(!Number.isInteger(horas) || horas < 1 || horas > 50){ alert("Las horas realizadas deben ser números enteros del 1 al 50."); return; }
+    const hoy=new Date(); hoy.setHours(0,0,0,0); const anio=hoy.getFullYear(); const hoyISO=`${anio}-${String(hoy.getMonth()+1).padStart(2,"0")}-${String(hoy.getDate()).padStart(2,"0")}`;
+    if(fecha<`${anio}-01-01` || fecha>hoyISO || fecha.slice(0,4)!==String(anio)){ alert(`La fecha debe pertenecer únicamente al año ${anio} y no puede ser posterior a hoy.`); return; }
+    const gradoNormalizado=normalizarGradoRegistro(usuarioActual?.grado||usuarioActual?.Grado||"");
+    if(!["10°","11°","Ciclo V"].includes(gradoNormalizado)){ alert("No fue posible determinar correctamente el grado del estudiante."); return; }
+    if(archivo.type!=="image/jpeg" && !/\.jpe?g$/i.test(archivo.name)){ alert("La evidencia debe ser una imagen JPG o JPEG."); return; }
+    if(archivo.size>5*1024*1024){ alert("La evidencia debe pesar máximo 5 MB."); return; }
+    const form=new FormData(); form.append("fecha",fecha); form.append("horas",String(horas)); form.append("descripcion",descripcion); form.append("evidencia",archivo);
+    if(boton){boton.disabled=true;boton.innerHTML='<span class="button-spinner" aria-hidden="true"></span> Registrando jornada...';}
+    if(mensaje){mensaje.style.display="none";mensaje.innerText="";}
+    try{
+        const data=await api("create_record",{method:"POST",body:form});
+        if(data.record) registros.unshift(normalizarRegistro(data.record));
         actualizarEstudiante();
-
-        // El formulario solo se limpia cuando el usuario cierre la confirmación.
-        await mostrarConfirmacionRegistroHora({ fecha, entrada, salida, horas });
-        ["fechaHora", "horaEntrada", "horaSalida", "descripcionHora"].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = "";
-        });
+        await mostrarConfirmacionRegistroHora({fecha,horas});
+        ["fechaHora","horasRealizadas","descripcionHora"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
         reiniciarSelectorEvidencia();
-        if (mensaje) {
-            mensaje.style.display = "block";
-            mensaje.innerText = "Jornada registrada correctamente.";
-        }
-    } catch (error) {
-        alert(error.message || "No fue posible registrar la jornada.");
-    } finally {
-        if (boton) {
-            boton.disabled = false;
-            boton.textContent = "Registrar Jornada";
-        }
-        configurarRestriccionesRegistroHoras(grado);
-    }
+        if(mensaje){mensaje.style.display="block";mensaje.innerText="Jornada registrada correctamente.";}
+    }catch(error){alert(error.message||"No fue posible registrar la jornada.");}
+    finally{if(boton){boton.disabled=false;boton.textContent="Registrar Jornada";}configurarRestriccionesRegistroHoras(usuarioActual?.grado||"");}
 }
 
 let resolverRegistroHoraExito=null;
-function mostrarConfirmacionRegistroHora(datos){return new Promise(resolve=>{resolverRegistroHoraExito=resolve;document.getElementById("resumenRegistroFecha").textContent=datos.fecha;document.getElementById("resumenRegistroEntrada").textContent=datos.entrada;document.getElementById("resumenRegistroSalida").textContent=datos.salida;document.getElementById("resumenRegistroHoras").textContent=`${Number(datos.horas).toFixed(2)} h`;document.getElementById("modalRegistroHoraExito")?.classList.add("show");});}
+function mostrarConfirmacionRegistroHora(datos){return new Promise(resolve=>{resolverRegistroHoraExito=resolve;document.getElementById("resumenRegistroFecha").textContent=datos.fecha;document.getElementById("resumenRegistroHoras").textContent=`${Number(datos.horas).toFixed(2)} h`;document.getElementById("modalRegistroHoraExito")?.classList.add("show");});}
 function confirmarRegistroHoraExito(){document.getElementById("modalRegistroHoraExito")?.classList.remove("show");if(resolverRegistroHoraExito){const resolver=resolverRegistroHoraExito;resolverRegistroHoraExito=null;resolver();}}
 
 function renderizarEvidencia(r) {
@@ -6194,7 +6303,7 @@ async function abrirEstudiante() {
 
 async function actualizarEstudiante() {
     if (!usuarioActual) return;
-    try { const data = await api("my_records"); registros = (data.records || []).map(normalizarRegistro); } catch (e) { alert(e.message); return; }
+    try { const data = await api("my_records"); registros = (data.records || []).map(normalizarRegistro); actualizarNotificacionesEstudiante(); } catch (e) { alert(e.message); return; }
 
     const meta = Number(usuarioActual.metaHoras || (usuarioActual.esTecnico ? 100 : 120));
     const modalidad = usuarioActual.esTecnico ? "Técnica · Meta: 100 horas" : "Académico · Meta: 120 horas";
@@ -6414,6 +6523,23 @@ async function validarSolicitudSuper(id, estado) {
         alert(estado === "aceptada" ? "Administrador aprobado correctamente." : "Solicitud rechazada.");
     } catch (e) { alert(e.message); }
 }
+
+/* =====================================================
+   NOTIFICACIONES DEL ESTUDIANTE
+====================================================== */
+function obtenerIdsNotificacionesEstudianteLeidas(){try{return JSON.parse(localStorage.getItem("sigho_notificaciones_estudiante_leidas")||"[]");}catch(_){return [];}}
+function guardarIdsNotificacionesEstudianteLeidas(ids){try{localStorage.setItem("sigho_notificaciones_estudiante_leidas",JSON.stringify(ids.slice(-100)));}catch(_){} }
+function actualizarNotificacionesEstudiante(){
+    const lista=document.getElementById("listaNotificacionesEstudiante"),badge=document.getElementById("badgeNotificacionesEstudiante"); if(!lista||!badge)return;
+    const eventos=(registros||[]).slice().sort((a,b)=>String(b.fechaRegistro||b.fecha||"").localeCompare(String(a.fechaRegistro||a.fecha||""))).slice(0,12);
+    const leidas=obtenerIdsNotificacionesEstudianteLeidas();
+    const nuevas=eventos.filter(r=>!leidas.includes(String(r.id))); badge.textContent=String(nuevas.length); badge.style.display=nuevas.length?"flex":"none";
+    if(!eventos.length){lista.innerHTML='<div class="notification-empty">🔔<strong>No hay avisos recientes</strong><span>Cuando haya novedades sobre tus jornadas aparecerán aquí.</span></div>';return;}
+    lista.innerHTML=eventos.map(r=>{const estado=r.estado||"pendiente";const titulo=estado==="aprobada"?"Tu jornada fue aprobada":estado==="rechazada"?"Tu jornada fue rechazada":"Tu jornada está pendiente";const extra=estado==="rechazada"?(r.observacion||r.motivoRechazo||"Revisa la observación del profesor."):estado==="aprobada"?"El profesor revisó y aprobó este registro.":"El profesor aún debe revisar este registro.";return `<button type="button" class="notification-item ${!leidas.includes(String(r.id))?"unread":""}" onclick="abrirNotificacionEstudiante(${Number(r.id)})"><span class="notification-dot">${!leidas.includes(String(r.id))?"•":"✓"}</span><span class="notification-copy"><strong>${escapeHtml(titulo)}</strong><small>${escapeHtml(r.fecha||"")} · ${formatearHoras(r.horas)} h · ${escapeHtml(extra)}</small></span></button>`;}).join("");
+}
+function toggleNotificacionesEstudiante(evento){evento?.stopPropagation();const panel=document.getElementById("panelNotificacionesEstudiante"),boton=document.querySelector("#estudiante .notification-button");if(!panel)return;const abrir=!panel.classList.contains("show");document.querySelectorAll(".more-menu-dropdown.show, .notification-panel.show").forEach(el=>{if(el!==panel)el.classList.remove("show")});panel.classList.toggle("show",abrir);boton?.setAttribute("aria-expanded",abrir?"true":"false");if(abrir){actualizarNotificacionesEstudiante();}}
+function marcarNotificacionesEstudianteLeidas(){guardarIdsNotificacionesEstudianteLeidas((registros||[]).map(r=>String(r.id)));actualizarNotificacionesEstudiante();}
+function abrirNotificacionEstudiante(id){guardarIdsNotificacionesEstudianteLeidas(Array.from(new Set([...obtenerIdsNotificacionesEstudianteLeidas(),String(id)])));actualizarNotificacionesEstudiante();mostrarSeccionEstudiante("registros");document.getElementById("panelNotificacionesEstudiante")?.classList.remove("show");}
 
 /* =====================================================
    NOTIFICACIONES DEL PROFESOR
@@ -6685,7 +6811,7 @@ function abrirAyuda() {
                     Gestiona profesores, revisa solicitudes, consulta el progreso de los estudiantes y controla las funciones generales del sistema.
                 </div>
                 <div class="help-admin-grid">
-                    <article class="help-admin-card"><div class="help-admin-icon">👥</div><h4>Gestión de profesores</h4><p>Administra la información de los docentes y asigna la sede en la que trabajarán.</p><ul><li>Selecciona o actualiza la <strong>sede asignada</strong>.</li><li>El <strong>proyecto</strong> lo define el propio profesor.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">👥</div><h4>Gestión de profesores</h4><p>Administra la información de los docentes y define su área de trabajo.</p><ul><li>Selecciona o actualiza la <strong>sede asignada</strong>.</li><li>Selecciona o actualiza el <strong>proyecto asignado</strong>.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">📊</div><h4>Progreso de estudiantes</h4><p>Consulta cómo avanza cada estudiante con sus horas de servicio social.</p><ul><li>Revisa horas aprobadas y horas faltantes.</li><li>Consulta el porcentaje de avance y utiliza los filtros por grado.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">📩</div><h4>Solicitudes de profesores / Admin</h4><p>Aquí se reúnen las solicitudes relacionadas con el personal docente.</p><ul><li>Aprueba o rechaza nuevos registros de profesores.</li><li>Revisa las solicitudes de profesores que desean el rol de Administrador.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">🎓</div><h4>Solicitudes de estudiantes</h4><p>Este módulo es independiente de las solicitudes de profesores.</p><ul><li>Revisa los datos de cada estudiante.</li><li>Acepta o rechaza su solicitud de registro.</li></ul></article>
@@ -6777,7 +6903,7 @@ function establecerEdicionPerfilProfesor(editar) {
 }
 function activarEdicionPerfilProfesor(){ establecerEdicionPerfilProfesor(true); }
 function configurarEdicionPerfilProfesor(){
-    const campos=["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono","profesorPerfilProyectoEditable"];
+    const campos=["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono"];
     campos.forEach(id=>{
         const el=document.getElementById(id);
         if(el && el.dataset.edicionConfigurada!=="1"){
@@ -6810,7 +6936,6 @@ function obtenerDatosPerfilProfesor() {
         apellidos: capitalizarNombreCompleto(document.getElementById("profesorPerfilApellidos")?.value || "").slice(0, 60),
         correo: document.getElementById("profesorPerfilCorreo")?.value.trim().toLowerCase() || "",
         telefono: document.getElementById("profesorPerfilTelefono")?.value.trim() || "",
-        proyecto: document.getElementById("profesorPerfilProyectoEditable")?.value || ""
     };
 }
 function guardarSnapshotPerfilProfesor() {
@@ -6829,7 +6954,7 @@ async function guardarPerfilProfesor() {
     const datos=obtenerDatosPerfilProfesor();
     const regexNombreProfesor=/^[\p{L}]+(?: [\p{L}]+)*$/u;
     const regexCorreoInstitucional=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
-    if(!datos.nombres || !datos.apellidos || !datos.correo || !datos.telefono || !datos.proyecto){ mostrarToastProfesor("Completa todos los campos editables.", true); return; }
+    if(!datos.nombres || !datos.apellidos || !datos.correo || !datos.telefono){ mostrarToastProfesor("Completa todos los campos editables.", true); return; }
     if(!regexNombreProfesor.test(datos.nombres) || !regexNombreProfesor.test(datos.apellidos)){ mostrarToastProfesor("Nombres y apellidos solo pueden contener letras y espacios sencillos.", true); return; }
     if(!regexCorreoInstitucional.test(datos.correo)){ mostrarToastProfesor("El correo debe usar el dominio institucional y no contener espacios.", true); return; }
     const telefonoProfesor = datos.telefono.replace(/\D/g, "");
@@ -6930,110 +7055,27 @@ function capitalizarNombreCompleto(valor) {
         .join(" ");
 }
 
-function configurarValidacionesFormularioEstudiante() {
-    // Primer y segundo nombre: no permiten espacios.
-    const nombresSinEspacios = ["primerNombre", "segundoNombre"];
-    nombresSinEspacios.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el || el.dataset.validacionConfigurada === "1") return;
-        el.dataset.validacionConfigurada = "1";
-        el.addEventListener("keydown", evento => {
-            if (evento.key === " ") evento.preventDefault();
-        });
-        el.addEventListener("input", () => {
-            el.value = capitalizarNombreCompleto(
-                el.value.replace(/[^\p{L}]/gu, "")
-            ).slice(0, Number(el.maxLength) || 30);
-        });
-        el.addEventListener("blur", () => { el.value = el.value.trim(); });
-    });
+function configurarValidacionSolicitudProfesor() {
+    const correo = document.getElementById("correoSolicitud");
+    const telefono = document.getElementById("telefonoProfesorSolicitud");
+    const identificacion = document.getElementById("identificacionSolicitud");
+    const clave = document.getElementById("claveSolicitudProfesor");
 
-    // Primer y segundo apellido: permiten apellidos compuestos como "De Luque",
-    // pero no espacios al inicio, al final ni espacios dobles.
-    const apellidosConEspacios = ["primerApellido", "segundoApellido"];
-    apellidosConEspacios.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el || el.dataset.validacionConfigurada === "1") return;
-        el.dataset.validacionConfigurada = "1";
-        el.addEventListener("keydown", evento => {
-            if (evento.key !== " ") return;
-            if (el.selectionStart === 0 || el.value.charAt(el.selectionStart - 1) === " ") {
-                evento.preventDefault();
-            }
+    if (correo && correo.dataset.validacionProfesorConfigurada !== "1") {
+        correo.dataset.validacionProfesorConfigurada = "1";
+        correo.addEventListener("input", () => {
+            correo.value = correo.value.replace(/\s/g, "").toLowerCase();
         });
-        el.addEventListener("input", () => {
-            el.value = capitalizarNombreCompleto(
-                el.value.replace(/[^\p{L}\s]/gu, "").replace(/\s+/g, " ").replace(/^ /, "")
-            ).slice(0, Number(el.maxLength) || 30);
+        correo.addEventListener("blur", () => {
+            correo.value = correo.value.replace(/\s/g, "").trim().toLowerCase();
         });
-        el.addEventListener("blur", () => { el.value = el.value.trim(); });
-    });
-
-    // Nombre del acudiente: letras y espacios sencillos.
-    const nombreAcudiente = document.getElementById("nombreAcudiente");
-    if (nombreAcudiente && nombreAcudiente.dataset.validacionConfigurada !== "1") {
-        nombreAcudiente.dataset.validacionConfigurada = "1";
-        nombreAcudiente.addEventListener("input", () => {
-            const valor = nombreAcudiente.value
-                .replace(/[^\p{L}\s]/gu, "")
-                .replace(/\s+/g, " ")
-                .replace(/^ /, "");
-            nombreAcudiente.value = capitalizarNombreCompleto(valor).slice(0, Number(nombreAcudiente.maxLength) || 60);
-        });
-        nombreAcudiente.addEventListener("blur", () => { nombreAcudiente.value = nombreAcudiente.value.trim(); });
     }
 
-    const documento = document.getElementById("numeroDocumento");
-    if (documento && documento.dataset.validacionConfigurada !== "1") {
-        documento.dataset.validacionConfigurada = "1";
-        documento.addEventListener("input", () => { documento.value = documento.value.replace(/\D/g, "").slice(0, 10); });
-    }
-
-    const telefono = document.getElementById("telefonoSolicitud");
-    if (telefono && telefono.dataset.validacionConfigurada !== "1") {
-        telefono.dataset.validacionConfigurada = "1";
-
-        const validarCelularEstudiante = () => {
+    if (telefono && telefono.dataset.validacionProfesorConfigurada !== "1") {
+        telefono.dataset.validacionProfesorConfigurada = "1";
+        telefono.addEventListener("input", () => {
             const digitos = telefono.value.replace(/\D/g, "").slice(0, 10);
-            let limpio = digitos;
-
-            // Un celular colombiano de 10 dígitos debe comenzar en 3.
-            if (limpio.length > 0 && limpio.charAt(0) !== "3") {
-                limpio = "";
-            }
-
-            telefono.value = limpio.length > 6
-                ? `${limpio.slice(0,3)} ${limpio.slice(3,6)} ${limpio.slice(6)}`
-                : limpio.length > 3
-                    ? `${limpio.slice(0,3)} ${limpio.slice(3)}`
-                    : limpio;
-
-            const numero = limpio;
-            const todosIguales = /^(\d)\1{9}$/.test(numero);
-            const secuenciaFalsa = numero === "1234567890";
-            const valido = /^3\d{9}$/.test(numero) && !todosIguales && !secuenciaFalsa;
-
-            telefono.setCustomValidity(
-                numero.length === 0
-                    ? "El celular debe iniciar con el número 3."
-                    : !valido
-                        ? "Escribe un celular válido de 10 dígitos que inicie en 3. No se permiten números repetidos ni la secuencia 1234567890."
-                        : ""
-            );
-        };
-
-        telefono.addEventListener("input", validarCelularEstudiante);
-        telefono.addEventListener("blur", validarCelularEstudiante);
-        validarCelularEstudiante();
-    }
-
-    const perfilTelefono = document.getElementById("perfilTelefono");
-    if (perfilTelefono && perfilTelefono.dataset.validacionConfigurada !== "1") {
-        perfilTelefono.dataset.validacionConfigurada = "1";
-        perfilTelefono.maxLength = 12;
-        perfilTelefono.addEventListener("input", () => {
-            const digitos = perfilTelefono.value.replace(/\D/g, "").slice(0, 10);
-            perfilTelefono.value = digitos.length > 6
+            telefono.value = digitos.length > 6
                 ? `${digitos.slice(0,3)} ${digitos.slice(3,6)} ${digitos.slice(6)}`
                 : digitos.length > 3
                     ? `${digitos.slice(0,3)} ${digitos.slice(3)}`
@@ -7041,21 +7083,214 @@ function configurarValidacionesFormularioEstudiante() {
         });
     }
 
+    if (identificacion && identificacion.dataset.validacionProfesorConfigurada !== "1") {
+        identificacion.dataset.validacionProfesorConfigurada = "1";
+        identificacion.addEventListener("input", () => {
+            identificacion.value = identificacion.value.replace(/[<>"']/g, "").slice(0, 60);
+        });
+    }
+
+    if (clave && clave.dataset.validacionProfesorConfigurada !== "1") {
+        clave.dataset.validacionProfesorConfigurada = "1";
+        clave.addEventListener("input", () => {
+            clave.value = clave.value.replace(/\s/g, "");
+        });
+    }
+}
+
+function configurarValidacionesFormularioEstudiante() {
+    // Todos los nombres y apellidos usan la misma regla: letras, espacios sencillos
+    // y capitalización automática. Los campos opcionales pueden permanecer vacíos.
+    const idsNombres = [
+        "primerNombre", "segundoNombre", "primerApellido", "segundoApellido",
+        "nombreAcudiente", "profesorPerfilNombres", "profesorPerfilApellidos", "perfilAcudiente",
+        "nombre", "apellido"
+    ];
+
+    idsNombres.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el || el.dataset.validacionNombreConfigurada === "1") return;
+        el.dataset.validacionNombreConfigurada = "1";
+
+        el.addEventListener("keydown", evento => {
+            if (evento.key === " " && (el.selectionStart === 0 || el.value.charAt(el.selectionStart - 1) === " ")) {
+                evento.preventDefault();
+            }
+        });
+
+        el.addEventListener("input", () => {
+            const max = Number(el.maxLength) > 0 ? Number(el.maxLength) : 60;
+            el.value = capitalizarNombreCompleto(
+                el.value
+                    .replace(/[^\p{L}\s]/gu, "")
+                    .replace(/\s+/g, " ")
+                    .replace(/^ /, "")
+                    .slice(0, max)
+            );
+            if (!el.value) el.setCustomValidity("");
+            else el.setCustomValidity(/^[\p{L}]+(?: [\p{L}]+)*$/u.test(el.value) ? "" : "Usa solo letras y un espacio entre palabras.");
+        });
+
+        el.addEventListener("blur", () => {
+            el.value = capitalizarNombreCompleto(el.value).slice(0, Number(el.maxLength) > 0 ? Number(el.maxLength) : 60);
+            if (!el.value) el.setCustomValidity("");
+        });
+    });
+
+    // Los campos de segundo nombre/apellido son opcionales: vacíos nunca se consideran error.
+    ["segundoNombre", "segundoApellido"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.required = false;
+    });
+
+    const documento = document.getElementById("numeroDocumento");
+    if (documento && documento.dataset.validacionConfigurada !== "1") {
+        documento.dataset.validacionConfigurada = "1";
+        documento.addEventListener("input", () => { documento.value = documento.value.replace(/\D/g, "").slice(0, 10); });
+    }
+
+    // ============================================================
+    // VALIDACIÓN GLOBAL DE CELULARES SIGHO
+    // Se reutiliza la misma lógica en estudiante, profesor y
+    // acudiente cuando este último selecciona "Número celular".
+    // ============================================================
+    function formatearCelularSIGHO(valor) {
+        const digitos = String(valor || "").replace(/\D/g, "").slice(0, 10);
+        if (!digitos) return "";
+        if (digitos.length <= 3) return digitos;
+        if (digitos.length <= 6) return `${digitos.slice(0,3)} ${digitos.slice(3)}`;
+        return `${digitos.slice(0,3)} ${digitos.slice(3,6)} ${digitos.slice(6)}`;
+    }
+
+    function validarCelularSIGHO(elemento) {
+        if (!elemento) return false;
+
+        let numero = elemento.value.replace(/\D/g, "").slice(0, 10);
+
+        // El mismo comportamiento usado por el celular del estudiante:
+        // si el primer dígito existe y no es 3, se limpia el valor.
+        if (numero.length > 0 && numero.charAt(0) !== "3") {
+            numero = "";
+        }
+
+        elemento.value = formatearCelularSIGHO(numero);
+
+        const todosIguales = /^(\d)\1{9}$/.test(numero);
+        const secuenciaFalsa = numero === "1234567890";
+        const valido = /^3\d{9}$/.test(numero) && !todosIguales && !secuenciaFalsa;
+
+        elemento.setCustomValidity(
+            numero.length === 0
+                ? "El celular debe iniciar con el número 3."
+                : !valido
+                    ? "Escribe un celular válido de 10 dígitos que inicie en 3. No se permiten números repetidos ni la secuencia 1234567890."
+                    : ""
+        );
+
+        return valido;
+    }
+
+    function configurarCelularSIGHO(id) {
+        const elemento = document.getElementById(id);
+        if (!elemento || elemento.dataset.validacionConfigurada === "1") return;
+
+        elemento.dataset.validacionConfigurada = "1";
+        elemento.maxLength = 12;
+        elemento.addEventListener("input", () => validarCelularSIGHO(elemento));
+        elemento.addEventListener("blur", () => validarCelularSIGHO(elemento));
+        validarCelularSIGHO(elemento);
+    }
+
+    configurarCelularSIGHO("telefonoSolicitud");
+    configurarCelularSIGHO("telefonoProfesorSolicitud");
+    configurarCelularSIGHO("perfilTelefono");
+    configurarCelularSIGHO("profesorPerfilTelefono");
+
+    // ============================================================
+    // TELÉFONO DEL ACUDIENTE: FIJO O CELULAR
+    // ============================================================
+    const tipoTelefonoAcudiente = document.getElementById("tipoTelefonoAcudiente");
     const telAcudiente = document.getElementById("telefonoAcudiente");
-    if (telAcudiente && telAcudiente.dataset.validacionConfigurada !== "1") {
-        telAcudiente.dataset.validacionConfigurada = "1";
-        const validarTelefonoAcudiente = () => {
-            let numero = telAcudiente.value.replace(/\D/g, "").slice(0, 10);
-            if (numero.startsWith("0")) numero = numero.replace(/^0+/, "");
-            telAcudiente.value = numero;
-            const todosIguales = /^(\d)\1+$/.test(numero);
-            const consecutivo = ["1234567", "12345678", "123456789", "1234567890"].includes(numero);
-            const valido = /^[1-9]\d{6,9}$/.test(numero) && !todosIguales && !consecutivo;
-            telAcudiente.setCustomValidity(numero.length === 0 ? "" : valido ? "" : "El teléfono del acudiente debe tener de 7 a 10 dígitos, no comenzar en 0 y no ser una secuencia repetida o consecutiva.");
-        };
-        telAcudiente.addEventListener("input", validarTelefonoAcudiente);
-        telAcudiente.addEventListener("blur", validarTelefonoAcudiente);
-        validarTelefonoAcudiente();
+    const ayudaTelAcudiente = document.getElementById("ayudaTelefonoAcudiente");
+
+    function validarTelefonoFijoAcudiente(elemento) {
+        if (!elemento) return false;
+
+        const numero = elemento.value.replace(/\D/g, "").slice(0, 10);
+        elemento.value = numero.length > 3
+            ? `${numero.slice(0,3)} ${numero.slice(3)}`
+            : numero;
+
+        // 10 dígitos: 608 + 7 dígitos.
+        // Los 7 restantes no pueden iniciar por 0, 1 o 9
+        // y no pueden ser los mismos 7 dígitos repetidos.
+        const resto = numero.slice(3);
+        const sieteRepetidos = /^([0-9])\1{6}$/.test(resto);
+        const valido = /^608[2-8]\d{6}$/.test(numero) && !sieteRepetidos;
+
+        elemento.setCustomValidity(
+            numero.length === 0
+                ? ""
+                : !valido
+                    ? "El teléfono fijo debe tener el formato 608 123 4567. Después de 608 debe iniciar entre 2 y 8 y no puede repetir el mismo dígito siete veces."
+                    : ""
+        );
+
+        return valido;
+    }
+
+    function configurarTelefonoAcudiente() {
+        if (!tipoTelefonoAcudiente || !telAcudiente) return;
+
+        const tipo = tipoTelefonoAcudiente.value;
+
+        telAcudiente.value = "";
+        telAcudiente.setCustomValidity("");
+
+        if (!tipo) {
+            telAcudiente.disabled = true;
+            telAcudiente.placeholder = "Selecciona el tipo de línea";
+            telAcudiente.maxLength = 12;
+            if (ayudaTelAcudiente) ayudaTelAcudiente.textContent = "Primero selecciona el tipo de línea.";
+            return;
+        }
+
+        telAcudiente.disabled = false;
+
+        if (tipo === "fijo") {
+            telAcudiente.placeholder = "608 123 4567";
+            telAcudiente.maxLength = 12;
+            telAcudiente.pattern = "608 [2-8]\\d{6}";
+            if (ayudaTelAcudiente) {
+                ayudaTelAcudiente.textContent = "Formato: 608 123 4567. Debe comenzar por 608; los 7 dígitos restantes no pueden iniciar en 0, 1 o 9 ni ser siete dígitos iguales.";
+            }
+            telAcudiente.removeEventListener("input", validarCelularAcudienteTemporal);
+            telAcudiente.addEventListener("input", validarFijoAcudienteTemporal);
+            telAcudiente.addEventListener("blur", validarFijoAcudienteTemporal);
+        } else {
+            telAcudiente.placeholder = "300 123 4567";
+            telAcudiente.maxLength = 12;
+            telAcudiente.pattern = "3\\d{2} \\d{3} \\d{4}";
+            if (ayudaTelAcudiente) {
+                ayudaTelAcudiente.textContent = "Celular de 10 dígitos que comienza en 3. No se permiten números repetidos ni la secuencia 1234567890.";
+            }
+            telAcudiente.removeEventListener("input", validarFijoAcudienteTemporal);
+            telAcudiente.addEventListener("input", validarCelularAcudienteTemporal);
+            telAcudiente.addEventListener("blur", validarCelularAcudienteTemporal);
+        }
+    }
+
+    function validarFijoAcudienteTemporal() {
+        validarTelefonoFijoAcudiente(telAcudiente);
+    }
+
+    function validarCelularAcudienteTemporal() {
+        validarCelularSIGHO(telAcudiente);
+    }
+
+    if (tipoTelefonoAcudiente && telAcudiente) {
+        tipoTelefonoAcudiente.addEventListener("change", configurarTelefonoAcudiente);
+        configurarTelefonoAcudiente();
     }
 
     const perfilTelAcudiente = document.getElementById("perfilTelefonoAcudiente");
@@ -7066,7 +7301,13 @@ function configurarValidacionesFormularioEstudiante() {
     const perfilDireccion = document.getElementById("perfilDireccion");
     if (perfilDireccion) perfilDireccion.addEventListener("input", () => { perfilDireccion.value = perfilDireccion.value.slice(0, 100); });
     const perfilAcudiente = document.getElementById("perfilAcudiente");
-    if (perfilAcudiente) perfilAcudiente.addEventListener("input", () => { perfilAcudiente.value = perfilAcudiente.value.replace(/[^\p{L}\s]/gu, "").replace(/\s+/g, " ").replace(/^ /, "").slice(0, 60); });
+    if (perfilAcudiente && perfilAcudiente.dataset.validacionNombreConfigurada !== "1") {
+        perfilAcudiente.dataset.validacionNombreConfigurada = "1";
+        perfilAcudiente.addEventListener("input", () => {
+            perfilAcudiente.value = capitalizarNombreCompleto(perfilAcudiente.value.replace(/[^\p{L}\s]/gu, "").replace(/\s+/g, " ").replace(/^ /, "")).slice(0, 60);
+        });
+        perfilAcudiente.addEventListener("blur", () => { perfilAcudiente.value = capitalizarNombreCompleto(perfilAcudiente.value).slice(0, 60); });
+    }
 
     const direccion = document.getElementById("direccionSolicitud");
     if (direccion) direccion.addEventListener("input", () => { direccion.value = direccion.value.slice(0, 100); });
@@ -7075,6 +7316,14 @@ function configurarValidacionesFormularioEstudiante() {
     if (clave && clave.dataset.validacionConfigurada !== "1") {
         clave.dataset.validacionConfigurada = "1";
         clave.addEventListener("input", () => { clave.value = clave.value.replace(/\s/g, ""); });
+    }
+
+    const loginContenedor=document.getElementById("camposLogin");
+    if(loginContenedor && loginContenedor.dataset.erroresConfigurados!=="1"){
+        loginContenedor.dataset.erroresConfigurados="1";
+        loginContenedor.addEventListener("input",e=>{if(e.target.matches("input,select"))e.target.classList.remove("campo-error");});
+        loginContenedor.addEventListener("change",e=>{if(e.target.matches("input,select"))e.target.classList.remove("campo-error");});
+        loginContenedor.addEventListener("blur",e=>{if(e.target.matches("input,select")&&!e.target.disabled)e.target.classList.toggle("campo-error",!e.target.checkValidity());},true);
     }
 
     const fecha = document.getElementById("fechaNacimiento");
@@ -7114,13 +7363,15 @@ function configurarValidacionesFormularioEstudiante() {
 
         const opcionTI = [...tipoDocumento.options].find(op => op.value === "Tarjeta de identidad");
         const opcionCC = [...tipoDocumento.options].find(op => op.value === "Cédula de ciudadanía");
-        if (!opcionTI || !opcionCC) return;
+        const opcionPPT = [...tipoDocumento.options].find(op => op.value === "PPT");
+        if (!opcionTI || !opcionCC || !opcionPPT) return;
 
         // CICLO V: Cédula obligatoria.
         if (grado.value === "Ciclo V") {
             opcionTI.disabled = true;
             opcionCC.disabled = false;
-            tipoDocumento.value = "Cédula de ciudadanía";
+            opcionPPT.disabled = false;
+            if (tipoDocumento.value !== "PPT") tipoDocumento.value = "Cédula de ciudadanía";
             return;
         }
 
@@ -7128,6 +7379,7 @@ function configurarValidacionesFormularioEstudiante() {
         if (grado.value === "10°" || grado.value === "11°") {
             opcionTI.disabled = false;
             opcionCC.disabled = false;
+            opcionPPT.disabled = false;
 
             // Sin fecha: conservar lo que haya elegido el usuario.
             if (!fecha || !fecha.value) return;
@@ -7137,6 +7389,14 @@ function configurarValidacionesFormularioEstudiante() {
             let edad = hoy.getFullYear() - nacimiento.getFullYear();
             const cumple = new Date(hoy.getFullYear(), nacimiento.getMonth(), nacimiento.getDate());
             if (hoy < cumple) edad--;
+
+            // PPT puede mantenerse a cualquier edad dentro del rango del grado.
+            if (tipoDocumento.value === "PPT") {
+                opcionPPT.disabled = false;
+                opcionTI.disabled = false;
+                opcionCC.disabled = false;
+                return;
+            }
 
             // 14 a 17 años: TI obligatoria.
             if (edad < 18) {
@@ -7191,6 +7451,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     configurarSelectorEvidencia();
     configurarSelectoresEPS();
     configurarEdicionPerfilProfesor();
+    configurarValidacionesFormularioEstudiante();
+    configurarErroresCamposSolicitud();
+    actualizarIndicadoresObligatorios(document);
     configurarAyudaEstudiante();
     actualizarCamposSolicitud();
     configurarJornadaPorGrado();
@@ -7540,7 +7803,6 @@ function activarSidebarEstudiante(activo) {
         inicio: "sidebarInicioEstudiante",
         registrar: "sidebarRegistrarEstudiante",
         registros: "sidebarRegistrosEstudiante",
-        datos: "sidebarDatosEstudiante",
         ayuda: "sidebarAyudaEstudiante"
     };
 
@@ -8124,7 +8386,7 @@ function mostrarSeccionAdministrador(nombre) {
     activarSidebarAdministrador(mapa[nombre] ? nombre : "inicio");
 
     const titulos = {
-        inicio: ["Inicio / Resumen", "Vista general del sistema de servicio social."],
+        inicio: ["Inicio", "Vista general del sistema de servicio social."],
         profesores: ["Gestión de profesores", "Administra las sedes y proyectos asignados a cada docente."],
         progreso: ["Progreso de estudiantes", "Consulta las horas aprobadas, faltantes y el avance de cada estudiante."],
         historial: ["Historial de revisiones", "Consulta los registros revisados por los profesores."],
@@ -8229,10 +8491,11 @@ async function cargarProfesoresAdmin() {
 
                         <div>
                             <label>Proyecto asignado</label>
-                            <select id="proyectoProf_${p.id}" disabled title="El proyecto lo define el profesor.">
-                                <option value="${escapeHtml(p.proyecto || "")}" selected>${escapeHtml(p.proyecto || "Sin proyecto")}</option>
+                            <select id="proyectoProf_${p.id}">
+                                <option value="" disabled ${!p.proyecto ? "selected" : ""}>Seleccionar proyecto</option>
+                                ${["Educación Física / Tiempo Libre","Proyecto Ambiental","Logística y Vigilancia","Secretaría y/o Archivo","Acompañamiento a un docente de transición o primaria","Eventos especiales","Otro"].map(x => `<option value="${escapeHtml(x)}" ${x === p.proyecto ? "selected" : ""}>${escapeHtml(x)}</option>`).join("")}
                             </select>
-                            <small class="field-help">El proyecto lo define el profesor y no puede ser modificado por el Administrador.</small>
+                            <small class="field-help">El Administrador asigna el proyecto.</small>
                         </div>
 
                         <button class="assignment-save" onclick="asignarProfesor(${p.id})">Guardar asignación</button>
@@ -8247,23 +8510,71 @@ async function cargarProfesoresAdmin() {
 
 async function asignarProfesor(id) {
     const sede = document.getElementById(`sedeProf_${id}`)?.value;
+    const proyecto = document.getElementById(`proyectoProf_${id}`)?.value;
 
-    if (!sede) {
-        alert("Selecciona la sede.");
+    if (!sede || !proyecto) {
+        alert("Selecciona la sede y el proyecto.");
         return;
     }
 
     try {
         await api("assign_teacher", {
             method: "POST",
-            body: { staffId: id, sede }
+            body: { staffId: id, sede, proyecto }
         });
-        alert("Sede guardada correctamente.");
+        alert("Sede y proyecto guardados correctamente.");
         await cargarProfesoresAdmin();
     } catch (e) {
         alert(e.message);
     }
 }
+
+// Ajustes finales de interfaz y validaciones
+document.addEventListener("DOMContentLoaded",()=>{
+    llenarAniosServicio();
+    configurarErroresCamposSolicitud();
+    configurarSelectorEvidencia();
+});
+</script>
+
+
+
+
+<script id="fix-definitivo-horas">
+document.addEventListener("DOMContentLoaded", function () {
+    const horas = document.getElementById("horasRealizadas");
+    if (!horas || horas.dataset.fixDefinitivo === "1") return;
+    horas.dataset.fixDefinitivo = "1";
+
+    horas.min = "1";
+    horas.max = "50";
+    horas.step = "1";
+    horas.inputMode = "numeric";
+
+    // Bloquea un tercer dígito. No corrige ni reemplaza el valor durante la escritura.
+    horas.addEventListener("keydown", function (event) {
+        const teclasPermitidas = [
+            "Backspace", "Delete", "Tab", "Escape",
+            "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
+            "Home", "End"
+        ];
+        if (teclasPermitidas.includes(event.key) || event.ctrlKey || event.metaKey) return;
+
+        if (/^\d$/.test(event.key)) {
+            const seleccion = this.selectionEnd - this.selectionStart;
+            const cantidadActual = this.value.length - seleccion;
+            if (cantidadActual >= 2) {
+                event.preventDefault();
+            }
+        }
+    });
+
+    // También cubre pegado: conserva solo los dos primeros dígitos, sin cambiar 30 por 50.
+    horas.addEventListener("input", function () {
+        const limpio = this.value.replace(/\D/g, "").slice(0, 2);
+        if (this.value !== limpio) this.value = limpio;
+    });
+});
 </script>
 
 </body>
