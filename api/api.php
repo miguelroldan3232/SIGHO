@@ -386,14 +386,20 @@ try {
             $rol = trim((string)($d['rol'] ?? ''));
             $correo = strtolower(trim((string)($d['correo'] ?? '')));
             $clave = (string)($d['clave'] ?? '');
-            if (!$rol || !$correo || !$clave) fail('Completa todos los campos.');
+            if (!$correo || !$clave) fail('Completa todos los campos.');
 
             $st = db()->prepare("SELECT u.*, r.code AS role_code FROM users u JOIN roles r ON r.id = u.role_id WHERE LOWER(u.email) = ? AND u.status = 'activo'");
             $st->execute([$correo]);
             $u = $st->fetch();
-            if (!$u || $u['role_code'] !== $rol || !password_verify($clave, $u['password_hash'])) {
+            if (!$u || !password_verify($clave, $u['password_hash'])) {
+                fail('Correo o clave incorrectos.', 401);
+            }
+
+            $rol = $rol ?: $u['role_code'];
+            if ($u['role_code'] !== $rol) {
                 fail('Correo, clave o rol incorrectos.', 401);
             }
+
             if ($rol === 'profesor' && !is_institutional_email($correo)) {
                 fail('Los docentes deben usar el correo institucional @' . institutional_domain() . '.');
             }
@@ -479,7 +485,7 @@ try {
             if ($rol === 'estudiante') {
                 ensure_student_application_table($pdo);
 
-                $anioServicio = (int)($d['anioServicio'] ?? 0);
+                $anioServicio = (int)date('Y');
                 $actualYear = (int)date('Y');
                 $primerApellido = capitalizarNombre((string)($d['primerApellido'] ?? ''));
                 $segundoApellido = capitalizarNombre((string)($d['segundoApellido'] ?? ''));
@@ -548,8 +554,19 @@ try {
                         fail($etiqueta . " debe contener solo letras y espacios sencillos, entre 2 y {$maximo} caracteres.");
                     }
                 }
-                if (!preg_match('/^\d{8,10}$/', $numeroDocumento)) {
-                    fail('El documento debe contener únicamente entre 8 y 10 dígitos.');
+                $patronDocumento = match ($tipoDocumento) {
+                    'Tarjeta de identidad' => '/^\d{10}$/',
+                    'Cédula de ciudadanía' => '/^\d{7,10}$/',
+                    'PPT' => '/^\d{6,8}$/',
+                    default => '/^$/',
+                };
+                if (!preg_match($patronDocumento, $numeroDocumento)) {
+                    fail(match ($tipoDocumento) {
+                        'Tarjeta de identidad' => 'La tarjeta de identidad debe tener exactamente 10 dígitos.',
+                        'Cédula de ciudadanía' => 'La cédula debe tener entre 7 y 10 dígitos.',
+                        'PPT' => 'El PPT debe tener entre 6 y 8 dígitos.',
+                        default => 'Tipo de documento no válido.',
+                    });
                 }
                 if (mb_strlen($direccion, 'UTF-8') > 100) {
                     fail('La dirección puede tener máximo 100 caracteres.');
@@ -575,12 +592,12 @@ try {
                         fail('El celular del acudiente no puede tener todos sus dígitos iguales ni ser la secuencia 1234567890.');
                     }
                 } else {
-                    if (!preg_match('/^608[2-8]\d{6}$/', $telefonoAcudienteSoloDigitos)) {
-                        fail('El teléfono fijo del acudiente debe tener 10 dígitos, comenzar por 608 y tener un cuarto dígito entre 2 y 8.');
+                    if (!preg_match('/^60[1-8][2-8]\d{6}$/', $telefonoAcudienteSoloDigitos)) {
+                        fail('El teléfono fijo del acudiente debe iniciar con 60, incluir un indicativo regional del 1 al 8 y tener 7 dígitos finales cuyo primero esté entre 2 y 8.');
                     }
                     $restoFijo = substr($telefonoAcudienteSoloDigitos, 3);
                     if (preg_match('/^(\d)\1{6}$/', $restoFijo)) {
-                        fail('Los 7 dígitos posteriores a 608 no pueden ser todos iguales.');
+                        fail('Los 7 dígitos finales del teléfono fijo no pueden ser todos iguales.');
                     }
                 }
                 if (mb_strlen($eps, 'UTF-8') > 60) {
