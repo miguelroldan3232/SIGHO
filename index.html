@@ -204,6 +204,21 @@
             border-color: #d93025 !important;
         }
 
+        .field-error-message {
+            display: block;
+            margin-top: 6px;
+            color: #d93025;
+            font-size: 12px;
+            line-height: 1.4;
+            min-height: 16px;
+        }
+
+        .fecha-edad-grid { display:grid; grid-template-columns:minmax(0,1fr) 92px; gap:8px; align-items:stretch; }
+        .edad-calculada { display:flex; flex-direction:column; justify-content:center; align-items:center; border:1px solid #d7e1e3; border-radius:10px; background:#f4f8f8; color:#718492; min-height:46px; }
+        .edad-calculada span { font-size:11px; }
+        .edad-calculada strong { color:#1769aa; font-size:18px; line-height:1.2; }
+        @media (max-width:520px) { .fecha-edad-grid { grid-template-columns:1fr 78px; } }
+
         input,
         select,
         textarea {
@@ -1945,6 +1960,7 @@
 @media(max-width:900px){.dashboard.has-role-sidebar{grid-template-columns:1fr}.dashboard.has-role-sidebar>.role-sidebar{grid-column:1;grid-row:auto;position:static;min-height:auto}.sidebar-nav{display:grid;grid-template-columns:repeat(2,1fr)}.sidebar-logout{margin-top:10px}.dashboard.has-role-sidebar>.role-sidebar~*{grid-column:1}.role-kpis{grid-template-columns:1fr}.teacher-admin-card .assignment-grid{grid-template-columns:1fr}}
 
 /* ===== Correcciones y nuevas interacciones SIGHO ===== */
+.select-sin-flecha { appearance:none; -webkit-appearance:none; background-image:none; padding-right:12px; }
 .evidence-file-preview { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:9px; min-height:42px; padding:8px 10px 8px 12px; border:1px solid #dfe8ed; border-radius:11px; background:#f6f8f9; color:#63727a; font-size:12px; }
 .evidence-file-preview span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .evidence-uploader { display:grid; grid-template-columns:auto minmax(0,1fr) 34px; align-items:center; gap:10px; min-height:50px; padding:7px 8px 7px 9px; border:1px solid #dfe8ed; border-radius:12px; background:#f6f8f9; box-sizing:border-box; }
@@ -2069,6 +2085,213 @@
     word-break: break-word !important;
     white-space: normal !important;
     box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   MEJORAS MÓVILES SIGHO — EXCLUSIVAS HASTA 900px
+   No modifica el diseño de escritorio.
+   ========================================================= */
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+
+    /* Sidebar: soporta la clase .sidebar solicitada y las clases
+       .role-sidebar/.admin-sidebar existentes en SIGHO. */
+    .sidebar,
+    .role-sidebar,
+    .admin-sidebar,
+    .super-admin-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        will-change: transform;
+    }
+
+    .sidebar.active,
+    .role-sidebar.active,
+    .admin-sidebar.active,
+    .super-admin-sidebar.active {
+        transform: translateX(0);
+    }
+
+    .mobile-sidebar-open .sidebar,
+    .mobile-sidebar-open .role-sidebar,
+    .mobile-sidebar-open .admin-sidebar,
+    .mobile-sidebar-open .super-admin-sidebar {
+        transform: translateX(0);
+    }
+
+    .mobile-only-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1199;
+        background: rgba(15, 23, 42, 0.38);
+    }
+
+    .mobile-only-overlay.active {
+        display: block;
+    }
+
+    .bottom-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        z-index: 999;
+        box-sizing: border-box;
+        padding: 4px 6px;
+    }
+
+    .bottom-bar button {
+        flex: 1;
+        min-height: 48px;
+        border: 0;
+        background: transparent;
+        color: #475569;
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+        border-radius: 8px;
+    }
+
+    .bottom-bar button:active,
+    .bottom-bar button.active {
+        background: #f1f5f9;
+        color: #1e5aa8;
+    }
+
+    body {
+        padding-bottom: 70px !important;
+    }
+
+    main,
+    .main-content,
+    .role-main,
+    .dashboard-main,
+    .app-main,
+    .content-area {
+        padding-bottom: 70px !important;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        min-height: 48px;
+    }
+
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+        line-height: 1.35;
+    }
+
+    input,
+    select,
+    textarea {
+        margin-bottom: 10px;
+    }
+
+    button,
+    a {
+        touch-action: manipulation;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .table-responsive,
+    .table-wrapper,
+    .table-container,
+    .responsive-table,
+    .historial-table-wrapper,
+    .profesor-historial-container,
+    .admin-table-container,
+    .student-table-container {
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        max-width: none;
+    }
+
+    .ptr-indicator {
+        position: fixed;
+        top: -52px;
+        left: 50%;
+        transform: translateX(-50%);
+        min-height: 40px;
+        padding: 8px 14px;
+        border-radius: 20px;
+        background: #ffffff;
+        color: #334155;
+        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.16);
+        z-index: 1300;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+        transition: top 0.18s ease;
+        pointer-events: none;
+    }
+
+    .ptr-indicator.visible {
+        top: 10px;
+    }
+
+    .ptr-indicator.ready span {
+        transform: rotate(180deg);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .bottom-bar {
+            background: #111827;
+            border-top-color: #334155;
+        }
+
+        .bottom-bar button {
+            color: #cbd5e1;
+        }
+
+        .bottom-bar button:active,
+        .bottom-bar button.active {
+            background: #1e293b;
+            color: #93c5fd;
+        }
+
+        .ptr-indicator {
+            background: #111827;
+            color: #e2e8f0;
+        }
+    }
+}
+
+/* Ocultar los elementos móviles fuera del contexto táctil/móvil. */
+.mobile-only-overlay,
+.bottom-bar,
+.ptr-indicator {
+    display: none;
+}
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+    .mobile-only-overlay {
+        display: none;
+    }
+    .bottom-bar {
+        display: flex;
+    }
+    .ptr-indicator {
+        display: flex;
+    }
 }
 
 </style>
@@ -3425,9 +3648,1774 @@ body:has(.dashboard-screen.active) .container {
 }
 </style>
 
+
+<style>
+/* =====================================================
+   RESPONSIVE MOBILE / TABLET - SIGHO
+   ===================================================== */
+.mobile-sidebar-toggle{display:none;}
+.mobile-sidebar-backdrop{display:none;}
+
+@media (max-width: 767px){
+    html, body{width:100%;min-width:0;overflow-x:hidden;}
+    body{padding:0;background:#f4f7f8;}
+    .container{width:100%;max-width:none;min-height:100vh;margin:0;border-radius:0;box-shadow:none;overflow:visible;}
+
+    /* Formularios y controles táctiles */
+    input, select, textarea{min-height:44px;font-size:16px;}
+    button, .main-button, .secondary-button, .danger-button, .success-button, .back{min-height:44px;}
+    .main-button{padding:12px 16px;}
+    .secondary-button,.danger-button,.success-button{padding:10px 14px;}
+    .auth-card .form-row,
+    .auth-card .form-row.two-columns,
+    .role-main .form-row,
+    .role-main .form-row.two-columns{grid-template-columns:1fr!important;}
+    .auth-card .form-row{gap:0;}
+    .checkbox-grid{grid-template-columns:1fr!important;}
+    .check-option{min-height:44px;padding:11px 12px;}
+
+    /* Solicitud / inicio de sesión */
+    .auth-screen{padding:10px 8px 20px;min-height:100vh;}
+    .auth-card{width:100%!important;max-width:none!important;padding:0 14px 22px;border-radius:16px;}
+    .auth-card::before{margin-left:-14px;margin-right:-14px;}
+    .auth-hero{flex-direction:row;align-items:center;padding:14px;gap:11px;margin-bottom:16px;}
+    .auth-hero-crest{width:54px;height:54px;flex-basis:54px;}
+    .auth-hero h1{font-size:20px;}
+    .auth-hero p{font-size:12px;}
+    .auth-card .section{padding:13px 12px;margin-top:18px;}
+    .auth-card .section h3{font-size:16px;}
+    .fecha-edad-grid{grid-template-columns:1fr!important;}
+    .edad-calculada{min-height:44px;}
+
+    /* Vista previa de evidencia: nunca debe provocar scroll horizontal */
+    .evidence-preview{width:100%;max-width:100%;min-width:0;overflow:hidden;flex-wrap:wrap;}
+    .evidence-preview img{width:min(110px,100%);max-width:100%;height:auto;aspect-ratio:110/80;}
+    .evidence-preview span{max-width:100%;min-width:0;}
+
+    /* Dashboards: una sola columna */
+    .dashboard.has-role-sidebar{display:block;width:100%;max-width:none;padding:0;min-height:100vh;}
+    .dashboard.has-role-sidebar>.role-sidebar~*{grid-column:auto;}
+    .role-main{width:100%;height:auto!important;min-height:calc(100vh - 64px)!important;max-height:none!important;overflow-x:hidden!important;overflow-y:auto;padding:72px 12px 28px!important;}
+
+    /* Hamburguesa superior */
+    .mobile-sidebar-toggle{display:flex;position:static;z-index:1;width:44px;height:44px;align-items:center;justify-content:center;border:1px solid rgba(13,63,112,.16);border-radius:12px;background:#fff;color:#0d3f70;font-size:24px;line-height:1;box-shadow:0 6px 18px rgba(8,43,76,.14);cursor:pointer;}
+    .mobile-sidebar-toggle:active{transform:scale(.97);}
+    .mobile-sidebar-backdrop{display:block;position:fixed;inset:0;background:rgba(3,22,38,.42);z-index:1040;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease;}
+
+    /* Sidebar como menú deslizable */
+    .role-sidebar{position:fixed!important;z-index:1050;top:0;left:0;width:min(280px,80vw);height:100vh;min-height:100vh!important;max-height:none!important;margin:0!important;border-radius:0 18px 18px 0!important;overflow-y:auto!important;overflow-x:hidden!important;transform:translateX(-105%);transition:transform .25s ease;box-shadow:14px 0 35px rgba(8,43,76,.22);}
+    .dashboard.has-role-sidebar.mobile-sidebar-open .role-sidebar{transform:translateX(0);}
+    .dashboard.has-role-sidebar.mobile-sidebar-open .mobile-sidebar-backdrop{opacity:1;visibility:visible;pointer-events:auto;}
+    .dashboard.has-role-sidebar.mobile-sidebar-open .mobile-sidebar-toggle{z-index:1110;}
+    .sidebar-nav button,.sidebar-logout{min-height:46px;}
+
+    /* Cabeceras y tarjetas */
+    .dashboard-header{gap:12px;margin-bottom:18px;align-items:flex-start!important;}
+    .dashboard-header h2{font-size:22px;}
+    .dashboard-header p{font-size:13px;line-height:1.45;}
+    .dashboard-tools{max-width:100%;}
+    .cards,.role-kpis{grid-template-columns:1fr!important;gap:12px;}
+    .role-kpi{min-height:82px;padding:14px;}
+    .card{padding:16px;}
+    .actions{width:100%;}
+    .actions button{flex:1 1 100%;}
+
+    /* Tablas: se mantienen utilizables con desplazamiento interno, no de toda la página */
+    .table-container{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    table{min-width:650px;}
+    #profesor .profesor-historial-container{overflow-x:auto;}
+    #profesor .profesor-historial-table{min-width:680px;table-layout:auto;}
+
+    /* Paneles y grids específicos */
+    .admin-history-controls{flex-direction:column;align-items:stretch;gap:12px;}
+    .admin-professor-select{min-width:0;width:100%;}
+    .admin-reset-box{flex-direction:column;align-items:stretch;}
+    .help-grid,.faq-grid,.student-profile-grid,.admin-quick-grid,.teacher-admin-grid{grid-template-columns:1fr!important;}
+    .assignment-grid{grid-template-columns:1fr!important;}
+    .registro-hora-resumen{grid-template-columns:1fr!important;}
+    .student-summary{flex-direction:column;align-items:flex-start;}
+
+    /* Notificaciones y menús */
+    #estudiante .notification-panel{position:fixed;top:62px;right:10px;left:10px;width:auto;max-width:none;}
+    .profile-menu,.more-menu-dropdown{max-width:calc(100vw - 20px);}
+}
+
+/* Correcciones finales de layout móvil */
+@media (max-width: 767px){
+    /* El botón hamburguesa vive dentro del header: nunca tapa el título ni los iconos. */
+    .role-main{padding:12px 12px 28px!important;}
+    .role-main .dashboard-header,
+    #estudiante .role-main .dashboard-header,
+    #profesor .dashboard-header,
+    #administrador .dashboard-header{
+        display:grid!important;
+        grid-template-columns:44px minmax(0,1fr) auto;
+        align-items:center!important;
+        gap:10px;
+        width:100%;
+        box-sizing:border-box;
+        padding:12px 10px 16px!important;
+        margin:0 0 18px!important;
+        min-height:64px;
+    }
+    .role-main .dashboard-header > div:first-of-type{
+        min-width:0;
+        grid-column:2;
+        grid-row:1;
+    }
+    .mobile-sidebar-toggle{
+        display:flex!important;
+        position:static!important;
+        grid-column:1;
+        grid-row:1;
+        width:44px!important;
+        height:44px!important;
+        min-width:44px!important;
+        min-height:44px!important;
+        margin:0!important;
+        z-index:1!important;
+    }
+    .dashboard-header .dashboard-tools{
+        grid-column:3;
+        grid-row:1;
+        width:auto!important;
+        min-width:0;
+        margin:0!important;
+        justify-content:flex-end;
+        align-items:center;
+        gap:7px;
+    }
+    .dashboard-header h2{
+        font-size:21px!important;
+        line-height:1.15;
+        overflow-wrap:anywhere;
+    }
+    .dashboard-header p{
+        font-size:12px!important;
+        line-height:1.4;
+    }
+
+    /* Menú lateral siempre vertical en móvil. */
+    .role-sidebar .sidebar-nav{
+        display:flex!important;
+        flex-direction:column!important;
+        grid-template-columns:none!important;
+        width:100%;
+        gap:6px!important;
+    }
+    .role-sidebar .sidebar-nav button,
+    .role-sidebar .sidebar-logout{
+        width:100%!important;
+        flex:0 0 auto;
+        min-height:46px;
+    }
+
+    /* Mis registros: el scroll pertenece a la tabla, no a toda la página. */
+    #estudiante .student-records-table{
+        display:block;
+        width:100%;
+        max-width:100%;
+        overflow-x:auto!important;
+        overflow-y:hidden;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:thin;
+        border-radius:12px;
+    }
+    #estudiante .student-records-table table{
+        min-width:620px!important;
+        width:max-content;
+        max-width:none;
+        table-layout:auto;
+    }
+    #estudiante .student-records-table th,
+    #estudiante .student-records-table td{
+        padding:8px 9px!important;
+        font-size:11px!important;
+    }
+    #estudiante .student-record-status{
+        white-space:nowrap!important;
+        min-width:max-content;
+        padding:5px 8px!important;
+    }
+    #estudiante .student-record-description{max-width:230px;}
+
+    /* Overlay de notificaciones: resalta el panel y evita competir visualmente con el formulario. */
+    .notification-backdrop{
+        position:fixed;
+        inset:0;
+        z-index:1190;
+        background:rgba(8,43,76,.20);
+        opacity:0;
+        visibility:hidden;
+        pointer-events:none;
+        transition:opacity .18s ease,visibility .18s ease;
+    }
+    .notification-backdrop.show{
+        opacity:1;
+        visibility:visible;
+        pointer-events:auto;
+    }
+    #estudiante .notification-panel,
+    #profesor .notification-panel{
+        position:fixed!important;
+        top:76px!important;
+        left:10px!important;
+        right:10px!important;
+        width:auto!important;
+        max-width:none!important;
+        z-index:1200!important;
+        box-shadow:0 18px 45px rgba(8,43,76,.28)!important;
+        border-color:#cfdde6;
+    }
+
+    /* Desactivar cualquier control de zoom flotante si quedara de una versión anterior. */
+    .zoom-controls,.zoom-control,.zoom-buttons,#zoomControls,#zoomIn,#zoomOut,.floating-zoom,.floating-zoom-controls{
+        display:none!important;
+    }
+}
+
+/* Ajustes finales solicitados: drawer, header y scroll de notificaciones */
+@media (max-width: 767px){
+    /* Drawer móvil: 75-80% aprox., sin ocupar toda la pantalla. */
+    .role-sidebar{
+        width:min(280px,80vw)!important;
+        max-width:280px!important;
+        transform:translateX(calc(-100% - 16px))!important;
+    }
+    .dashboard.has-role-sidebar.mobile-sidebar-open .role-sidebar{
+        transform:translateX(0)!important;
+    }
+    .mobile-sidebar-backdrop{
+        background:rgba(3,22,38,.52)!important;
+    }
+
+    /* Header compacto: el título no se parte en varias líneas. */
+    #estudiante .dashboard-header,
+    #profesor .dashboard-header,
+    #administrador .dashboard-header{
+        grid-template-columns:44px minmax(0,1fr) auto!important;
+        gap:8px!important;
+        padding-left:6px!important;
+        padding-right:6px!important;
+    }
+    #estudiante .dashboard-header h2,
+    #profesor .dashboard-header h2,
+    #administrador .dashboard-header h2{
+        font-size:18px!important;
+        line-height:1.15!important;
+        white-space:nowrap!important;
+        overflow:hidden!important;
+        text-overflow:ellipsis!important;
+        overflow-wrap:normal!important;
+        word-break:normal!important;
+    }
+    #estudiante .dashboard-header .dashboard-tools,
+    #profesor .dashboard-header .dashboard-tools,
+    #administrador .dashboard-header .dashboard-tools{
+        gap:5px!important;
+    }
+    #estudiante .profile-user-name,
+    #estudiante .profile-role,
+    #estudiante .profile-chevron,
+    #profesor .profile-user-name,
+    #profesor .profile-role,
+    #profesor .profile-chevron,
+    #administrador .profile-user-name,
+    #administrador .profile-role,
+    #administrador .profile-chevron{
+        display:none!important;
+    }
+    #estudiante .profile-button,
+    #profesor .profile-button,
+    #administrador .profile-button{
+        width:44px!important;
+        min-width:44px!important;
+        padding:0!important;
+        justify-content:center!important;
+    }
+
+    /* El contenedor de la tabla conserva el scroll horizontal interno. */
+    #estudiante .student-records-table{
+        overscroll-behavior-x:contain;
+    }
+}
+
+@media (min-width:768px) and (max-width:1024px){
+    .container{width:98%;}
+    .dashboard.has-role-sidebar{grid-template-columns:210px minmax(0,1fr);gap:16px;padding:18px;}
+    .role-sidebar{padding:16px 11px;}
+    .dashboard{padding:24px;}
+    .auth-screen{padding:22px 18px 30px;}
+    .auth-card{padding-left:26px;padding-right:26px;}
+    .auth-card::before{margin-left:-26px;margin-right:-26px;}
+    .cards,.role-kpis{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+
+<style>
+.notification-backdrop{display:none;}
+@media (max-width:767px){.notification-backdrop{display:block;}}
+</style>
+</style>
+
+<style id="fix-password-mobile-scroll">
+/* Ajuste de clave única: los puntos de la contraseña deben conservar su espaciado normal. */
+#clave {
+    letter-spacing: normal !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    word-spacing: normal;
+}
+
+@media (max-width: 767px) {
+    /* El scroll móvil vuelve a ser el scroll nativo de la página. */
+    html {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: auto;
+    }
+
+    body {
+        min-height: 100vh;
+        padding-bottom: 70px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: auto;
+    }
+
+    .container {
+        min-height: calc(100vh + 1px);
+        padding-bottom: 20px;
+    }
+
+    /* En móvil el contenido de cada panel no debe tener un segundo scroll interno. */
+    .role-main,
+    #estudiante .role-main,
+    #profesor .role-main,
+    #administrador .role-main {
+        height: auto !important;
+        min-height: calc(100vh - 64px) !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+        overflow-x: hidden !important;
+        overscroll-behavior: auto !important;
+        -webkit-overflow-scrolling: auto !important;
+        scroll-behavior: auto !important;
+        scrollbar-gutter: auto !important;
+        padding-bottom: 70px !important;
+    }
+
+    /* La tabla conserva su scroll horizontal propio, que sí es intencional. */
+    .table-container,
+    #estudiante .student-records-table,
+    #profesor .profesor-historial-container {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+    }
+
+    /* Evita que el input de contraseña se vea estirado en pantallas pequeñas. */
+    #clave {
+        letter-spacing: normal !important;
+        padding: 11px 14px !important;
+    }
+}
+</style>
+
+
+<style id="fix-mobile-password-drawer-performance">
+/* =====================================================
+   AJUSTE FINAL: CLAVE ÚNICA + DRAWER MÓVIL FLUIDO
+   ===================================================== */
+
+/* La clave única no debe heredar espaciados decorativos del resto de la interfaz. */
+#clave[type="password"] {
+    letter-spacing: normal !important;
+    font-size: 16px !important;
+    font-family: inherit !important;
+    text-align: left !important;
+    word-spacing: normal !important;
+    padding: 11px 14px !important;
+    box-sizing: border-box;
+}
+
+/* Ojo para mostrar/ocultar la clave única. Estas reglas no cambian el diseño existente. */
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-wrapper #clave {
+    width: 100%;
+    padding-right: 48px !important;
+    box-sizing: border-box;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+    padding: 4px;
+    margin: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #52606d;
+    line-height: 1;
+    z-index: 2;
+}
+
+.password-toggle:hover {
+    color: #174ea6;
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid #174ea6;
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+.password-eye-icon {
+    font-style: normal;
+    font-size: 18px;
+    line-height: 1;
+}
+
+@media (max-width: 767px) {
+    /* Ajustes exclusivos para móviles: no modifican el diseño de escritorio. */
+    .password-input-wrapper #clave {
+        padding-right: 50px !important;
+    }
+
+    .password-toggle {
+        right: 10px;
+    }
+
+    #clave[type="password"] {
+        letter-spacing: normal !important;
+        font-size: 16px !important;
+        font-family: inherit !important;
+        text-align: left !important;
+        word-spacing: normal !important;
+        padding: 11px 14px !important;
+    }
+
+    /* Drawer: la única propiedad animada es transform, que evita recalcular el layout. */
+    .role-sidebar {
+        width: min(280px, 80vw) !important;
+        max-width: 280px !important;
+        left: 0 !important;
+        margin-left: 0 !important;
+        transform: translateX(-100%) !important;
+        will-change: transform;
+        transition: transform 0.3s ease-in-out !important;
+    }
+
+    .dashboard.has-role-sidebar.mobile-sidebar-open .role-sidebar {
+        transform: translateX(0) !important;
+    }
+}
+</style>
+
+
+<style id="sigho-theme-styles">
+    html.dark-mode, body.dark-mode { color-scheme: dark; }
+
+    body.dark-mode {
+        background:#0b1220 !important;
+        color:#dbe7f2 !important;
+    }
+    body.dark-mode .container { background:#111827 !important; box-shadow:0 8px 30px rgba(0,0,0,.35) !important; }
+    body.dark-mode .welcome { background:#172536 !important; }
+    body.dark-mode .logo, body.dark-mode .icon { background:#22364d !important; }
+    body.dark-mode .welcome h1,
+    body.dark-mode .options h2,
+    body.dark-mode .option h3 { color:#e7f0f8 !important; }
+    body.dark-mode .welcome p,
+    body.dark-mode .subtitle,
+    body.dark-mode .option p,
+    body.dark-mode label,
+    body.dark-mode .back,
+    body.dark-mode .table-secondary-text { color:#a9bac8 !important; }
+    body.dark-mode .options { background:#111827 !important; }
+
+    body.dark-mode .option,
+    body.dark-mode .card,
+    body.dark-mode .section,
+    body.dark-mode .professor-section,
+    body.dark-mode .profile-card,
+    body.dark-mode .faq-card,
+    body.dark-mode .help-search-card,
+    body.dark-mode .student-progress-card,
+    body.dark-mode .student-profile-card,
+    body.dark-mode .student-help-search-card,
+    body.dark-mode .admin-summary-card,
+    body.dark-mode .admin-quick-card,
+    body.dark-mode .profesor-admin-request-card,
+    body.dark-mode .info-card,
+    body.dark-mode .sigho-modal-card,
+    body.dark-mode .help-admin-card,
+    body.dark-mode .solicitud-exito-card,
+    body.dark-mode .registro-hora-exito-card {
+        background:#172334 !important;
+        border-color:#2b4259 !important;
+        color:#dbe7f2 !important;
+        box-shadow:0 6px 20px rgba(0,0,0,.20) !important;
+    }
+    body.dark-mode .option:hover { background:#1d3045 !important; border-color:#3b5a76 !important; }
+
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea {
+        background:#0f1b2a !important;
+        color:#e5eef6 !important;
+        border-color:#38516a !important;
+        caret-color:#fff;
+    }
+    body.dark-mode input::placeholder,
+    body.dark-mode textarea::placeholder { color:#7890a4 !important; }
+    body.dark-mode input:focus,
+    body.dark-mode select:focus,
+    body.dark-mode textarea:focus {
+        border-color:#4b9bd5 !important;
+        box-shadow:0 0 0 4px rgba(75,155,213,.16) !important;
+    }
+
+    body.dark-mode .security-box,
+    body.dark-mode .auth-card .security-box,
+    body.dark-mode .section-subtitle,
+    body.dark-mode .edad-calculada {
+        background:#16283a !important;
+        border-color:#2d465e !important;
+        color:#a9bdcc !important;
+    }
+
+    body.dark-mode .auth-screen {
+        background:
+            radial-gradient(circle at 90% 5%, rgba(47,164,90,.10), transparent 26%),
+            linear-gradient(180deg,#0e1a29 0%,#111827 100%) !important;
+    }
+    body.dark-mode .auth-card {
+        background:#142132 !important;
+        border-color:#29435b !important;
+        box-shadow:0 18px 50px rgba(0,0,0,.35) !important;
+        color:#dbe7f2 !important;
+    }
+    body.dark-mode .auth-card > h2,
+    body.dark-mode .auth-card label { color:#dceaf6 !important; }
+
+    body.dark-mode .dashboard,
+    body.dark-mode .role-main,
+    body.dark-mode .dashboard-header { color:#dbe7f2; }
+    body.dark-mode .dashboard-header h2,
+    body.dark-mode .professor-section-header h3,
+    body.dark-mode .role-main .dashboard-header h2 { color:#e5eef6 !important; }
+    body.dark-mode .dashboard-header p,
+    body.dark-mode .role-main .dashboard-header p { color:#9eb1c2 !important; }
+
+    body.dark-mode .table-container,
+    body.dark-mode .table-responsive,
+    body.dark-mode .table-wrapper,
+    body.dark-mode .responsive-table,
+    body.dark-mode .historial-table-wrapper,
+    body.dark-mode .admin-table-container,
+    body.dark-mode .student-table-container {
+        background:#142132 !important;
+        border-color:#2b4259 !important;
+    }
+    body.dark-mode table { color:#dbe7f2 !important; }
+    body.dark-mode th { background:#1d3045 !important; color:#dceaf6 !important; border-color:#2b4259 !important; }
+    body.dark-mode td { background:#142132 !important; color:#c9d7e3 !important; border-color:#293f54 !important; }
+    body.dark-mode tr:hover td { background:#192b3f !important; }
+
+    body.dark-mode .secondary-button { background:#263a4f !important; color:#d6e3ed !important; }
+    body.dark-mode .secondary-button:hover { background:#304962 !important; }
+    body.dark-mode .danger-button { background:#4a2b31 !important; color:#f0c4c9 !important; }
+    body.dark-mode .success-button { background:#214638 !important; color:#bfe2d2 !important; }
+
+    body.dark-mode .message { background:#183a31 !important; color:#bde3d5 !important; }
+    body.dark-mode .message.error-message,
+    body.dark-mode .auth-error-message {
+        background:#3a1e25 !important;
+        border-color:#7d3945 !important;
+        color:#ffb7c0 !important;
+    }
+
+    body.dark-mode .evidence-preview,
+    body.dark-mode #estudiante .notification-panel,
+    body.dark-mode #estudiante .notification-item {
+        background:#142132 !important;
+        border-color:#2b4259 !important;
+        color:#dbe7f2 !important;
+    }
+    body.dark-mode #estudiante .notification-item:hover,
+    body.dark-mode #estudiante .notification-item.unread { background:#1a3046 !important; }
+    body.dark-mode #estudiante .notification-copy strong,
+    body.dark-mode #estudiante .notification-empty strong { color:#dceaf6 !important; }
+    body.dark-mode #estudiante .notification-copy small,
+    body.dark-mode #estudiante .notification-empty,
+    body.dark-mode #estudiante .notification-panel-head span { color:#91a6b7 !important; }
+
+    body.dark-mode .user-topbar { background:#101c2b !important; border-color:#293f54 !important; }
+    body.dark-mode .student-menu-button,
+    body.dark-mode .profile-button,
+    body.dark-mode .more-menu-button,
+    body.dark-mode #estudiante .notification-button {
+        background:#172a3e !important;
+        color:#dceaf6 !important;
+        border-color:#34506a !important;
+    }
+    body.dark-mode .more-menu-dropdown,
+    body.dark-mode .user-dropdown {
+        background:#142132 !important;
+        border-color:#2b4259 !important;
+        color:#dbe7f2 !important;
+    }
+    body.dark-mode .more-menu-dropdown button:hover { background:#1e344a !important; color:#8ec8f2 !important; }
+
+    body.dark-mode .sidebar,
+    body.dark-mode .role-sidebar,
+    body.dark-mode .admin-sidebar,
+    body.dark-mode .super-admin-sidebar {
+        background:#0d1927 !important;
+        border-color:#263d53 !important;
+    }
+    body.dark-mode .sidebar-nav button,
+    body.dark-mode .sidebar-logout { color:#c9d9e6 !important; }
+    body.dark-mode .mobile-sidebar-toggle {
+        background:#16283a !important;
+        color:#e2edf6 !important;
+        border-color:#34506a !important;
+    }
+
+    body.dark-mode .bottom-bar {
+        background:#0d1927 !important;
+        border-top-color:#2b4259 !important;
+    }
+    body.dark-mode .bottom-bar button { color:#cbd8e4 !important; }
+    body.dark-mode .ptr-indicator {
+        background:#142132 !important;
+        color:#e2edf6 !important;
+        border-color:#2b4259 !important;
+    }
+
+    .theme-toggle {
+        position:fixed;
+        top:14px;
+        right:14px;
+        z-index:1300;
+        width:44px;
+        height:44px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        border:1px solid rgba(13,63,112,.18);
+        border-radius:12px;
+        background:rgba(255,255,255,.96);
+        color:#163b59;
+        box-shadow:0 5px 18px rgba(8,43,76,.16);
+        cursor:pointer;
+        padding:0;
+        backdrop-filter:blur(8px);
+        -webkit-backdrop-filter:blur(8px);
+        transition:transform .18s ease,background .18s ease,color .18s ease,border-color .18s ease;
+    }
+    .theme-toggle:hover { transform:translateY(-1px); }
+    .theme-toggle:active { transform:scale(.96); }
+    .theme-toggle:focus-visible { outline:3px solid rgba(23,105,170,.28); outline-offset:2px; }
+    .theme-toggle svg {
+        width:21px;
+        height:21px;
+        display:block;
+        fill:none;
+        stroke:currentColor;
+        stroke-width:2;
+        stroke-linecap:round;
+        stroke-linejoin:round;
+    }
+    .theme-toggle .theme-sun { display:none; }
+    body.dark-mode .theme-toggle {
+        background:rgba(20,33,50,.96);
+        color:#f6d77a;
+        border-color:#35516b;
+        box-shadow:0 5px 18px rgba(0,0,0,.32);
+    }
+    body.dark-mode .theme-toggle .theme-moon { display:none; }
+    body.dark-mode .theme-toggle .theme-sun { display:block; }
+
+    @media (max-width:900px) and (hover:none) and (pointer:coarse) {
+        .theme-toggle { top:10px; right:10px; width:44px; height:44px; }
+    }
+
+    /* Correcciones de Modo Oscuro: fondos persistentes y botones secundarios */
+    body.dark-mode,
+    body.dark-mode .card,
+    body.dark-mode .footer-section,
+    body.dark-mode .info-card,
+    body.dark-mode .sigho-info-strip,
+    body.dark-mode .sigho-school-note {
+        background-color: #0f172a !important;
+        color: #f8fafc !important;
+    }
+
+    body.dark-mode .back,
+    body.dark-mode .btn-volver,
+    body.dark-mode button:not(.btn-primary):not(.main-button):not(.danger-button):not(.success-button):not(.logout) {
+        background-color: #1e293b !important;
+        color: #ffffff !important;
+        border: 1px solid #334155 !important;
+    }
+
+    body.dark-mode .back:hover,
+    body.dark-mode .btn-volver:hover {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border-color: #2563eb !important;
+    }
+
+    /* Evita transformaciones visuales de mayúsculas/minúsculas en campos de entrada. */
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    body.dark-mode input[type="email"],
+    body.dark-mode input[type="password"],
+    body.dark-mode input[type="text"] {
+        text-transform: none !important;
+    }
+
+    /* Cobertura completa del Modo Oscuro para Dashboard y módulos internos */
+    body.dark-mode,
+    body.dark-mode .dashboard-container,
+    body.dark-mode .main-content,
+    body.dark-mode .app-content,
+    body.dark-mode .content-wrapper,
+    body.dark-mode .page-content {
+        background-color: #0b1329 !important;
+        color: #e2e8f0 !important;
+    }
+
+    body.dark-mode .stat-card,
+    body.dark-mode .card,
+    body.dark-mode .metric-card,
+    body.dark-mode .info-box,
+    body.dark-mode .evidence-container,
+    body.dark-mode .upload-box,
+    body.dark-mode .attachment-container,
+    body.dark-mode .upload-container {
+        background-color: #1e293b !important;
+        color: #ffffff !important;
+        border-color: #334155 !important;
+        box-shadow: none !important;
+    }
+
+    body.dark-mode h1,
+    body.dark-mode h2,
+    body.dark-mode h3,
+    body.dark-mode h4,
+    body.dark-mode p,
+    body.dark-mode span,
+    body.dark-mode label,
+    body.dark-mode .text-muted {
+        color: #f1f5f9 !important;
+    }
+
+    /* Elementos comunes que suelen conservar fondos claros en los paneles */
+    body.dark-mode .section,
+    body.dark-mode .panel,
+    body.dark-mode .table-container,
+    body.dark-mode .form-container,
+    body.dark-mode .help-card,
+    body.dark-mode .faq-card,
+    body.dark-mode .notification-panel,
+    body.dark-mode .modal-content {
+        background-color: #1e293b !important;
+        color: #f1f5f9 !important;
+        border-color: #334155 !important;
+    }
+
+    body.dark-mode input,
+    body.dark-mode textarea,
+    body.dark-mode select {
+        background-color: #0f172a !important;
+        color: #f8fafc !important;
+        border-color: #334155 !important;
+    }
+
+    body.dark-mode input::placeholder,
+    body.dark-mode textarea::placeholder {
+        color: #94a3b8 !important;
+    }
+</style>
+
+<script id="sigho-theme-init">
+(function () {
+    try {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") document.documentElement.classList.add("dark-mode");
+        if (savedTheme === "light") document.documentElement.classList.remove("dark-mode");
+    } catch (_) {}
+})();
+</script>
+
+
+<style id="sigho-dark-contrast-v4">
+/* Contraste global de textos en Modo Oscuro */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode .card-title,
+body.dark-mode .section-title,
+body.dark-mode strong {
+    color: #ffffff !important;
+}
+
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode label,
+body.dark-mode .text-muted,
+body.dark-mode .subtitle {
+    color: #cbd5e1 !important;
+}
+
+/* Mantener controles y estados con contraste suficiente */
+body.dark-mode button,
+body.dark-mode a,
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select,
+body.dark-mode option {
+    color: #f1f5f9 !important;
+}
+
+/* Fondos unificados del Dashboard */
+body.dark-mode,
+body.dark-mode .main-wrapper,
+body.dark-mode .content-area {
+    background-color: #0b1329 !important;
+}
+
+/* Tarjetas de métricas, barras de progreso y alertas */
+body.dark-mode .stat-card,
+body.dark-mode .card-metric,
+body.dark-mode .progress-banner,
+body.dark-mode .alert-info {
+    background-color: #1a233a !important;
+    border: 1px solid #2d3748 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .stat-card * {
+    color: #f1f5f9 !important;
+}
+</style>
+
+
+<script id="sigho-theme-bootstrap">
+(function () {
+    try {
+        var theme = localStorage.getItem('sigho_theme') || localStorage.getItem('theme');
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        } else if (theme === 'light') {
+            document.documentElement.classList.remove('dark-mode');
+        }
+    } catch (_) {}
+})();
+</script>
+
+
+<style id="sigho-fouc-guard">
+html.sigho-fouc-pending body > * {
+    visibility: hidden !important;
+}
+html.sigho-fouc-pending body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    background: #f8fafc;
+}
+html.dark-mode.sigho-fouc-pending body::before {
+    background: #0b1329;
+}
+</style>
+
+
+<script id="sigho-fouc-init">
+(function () {
+    try {
+        document.documentElement.classList.add('sigho-fouc-pending');
+    } catch (_) {}
+})();
+</script>
+
+
+<style id="sigho-access-form-dark-inputs">
+/* Inputs, Selects y Textareas en Modo Oscuro */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="date"],
+body.dark-mode select,
+body.dark-mode textarea {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
+}
+
+/* Placeholder en Modo Oscuro */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Campos deshabilitados o de solo lectura */
+body.dark-mode input:disabled,
+body.dark-mode input[readonly],
+body.dark-mode select:disabled {
+    background-color: #0f172a !important;
+    color: #64748b !important;
+    border-color: #1e293b !important;
+}
+
+/* Contenedores de checkboxes */
+body.dark-mode .checkbox-group,
+body.dark-mode .checkbox-container,
+body.dark-mode .form-check {
+    background-color: transparent !important;
+    color: #e2e8f0 !important;
+}
+</style>
+
+
+<style id="sigho-forms-dark-unified-v6">
+/* 1. Todos los campos de formularios y modales en Modo Oscuro */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="tel"],
+body.dark-mode input[type="date"],
+body.dark-mode select,
+body.dark-mode textarea {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
+}
+
+/* Placeholders */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Opciones de los select */
+body.dark-mode select option {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+/* Campos no editables */
+body.dark-mode input:disabled,
+body.dark-mode input[readonly],
+body.dark-mode select:disabled,
+body.dark-mode textarea:disabled {
+    background-color: #0f172a !important;
+    color: #64748b !important;
+    border-color: #1e293b !important;
+}
+
+/* 2. Contenedores y secciones de formularios */
+body.dark-mode .form-section,
+body.dark-mode .section-card,
+body.dark-mode .info-group,
+body.dark-mode .step-content,
+body.dark-mode fieldset,
+body.dark-mode .card-body {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Contenedores anidados frecuentes que pueden conservar fondo blanco */
+body.dark-mode .form-section *,
+body.dark-mode .section-card *,
+body.dark-mode .info-group *,
+body.dark-mode .step-content *,
+body.dark-mode fieldset *,
+body.dark-mode .card-body * {
+    border-color: #334155;
+}
+
+/* 3. Etiquetas y títulos de secciones */
+body.dark-mode label,
+body.dark-mode .form-label,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+    color: #ffffff !important;
+}
+
+/* Checkboxes/radios y sus agrupaciones */
+body.dark-mode .checkbox-group,
+body.dark-mode .checkbox-container,
+body.dark-mode .form-check {
+    background-color: transparent !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .form-check label,
+body.dark-mode .checkbox-group label,
+body.dark-mode .checkbox-container label {
+    color: #e2e8f0 !important;
+}
+</style>
+
+
+<style id="sigho-solicitud-checkbox-contact-v7">
+/* =========================================================
+   SOLICITUD DE ACCESO — AJUSTES FINALES DE MODO OSCURO
+   ========================================================= */
+
+/* 1. Número de contacto: igualar visualmente al campo Jornada */
+body.dark-mode #telefonoAcudiente,
+body.dark-mode #telefonoAcudiente:disabled,
+body.dark-mode #telefonoAcudiente[readonly] {
+    background-color: #0f172a !important;
+    color: #64748b !important;
+    border: 1px solid #334155 !important;
+    border-radius: 10px !important;
+    padding: 12px 14px !important;
+    opacity: 1 !important;
+    box-sizing: border-box !important;
+    -webkit-text-fill-color: #64748b !important;
+}
+
+body.dark-mode #telefonoAcudiente::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+body.dark-mode #telefonoAcudiente:not(:disabled):not([readonly]) {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    cursor: text !important;
+}
+
+/* 2. Contenedor de días: eliminar por completo el bloque blanco */
+body.dark-mode #grupoDiasServicio .checkbox-grid {
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+    padding: 10px !important;
+    box-shadow: none !important;
+}
+
+/* Casilla normal */
+body.dark-mode #grupoDiasServicio .check-option {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #334155 !important;
+    border-radius: 9px !important;
+    min-height: 48px;
+    box-sizing: border-box;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+/* Texto del día */
+body.dark-mode #grupoDiasServicio .check-option,
+body.dark-mode #grupoDiasServicio .check-option span {
+    color: #f1f5f9 !important;
+}
+
+/* Hover */
+body.dark-mode #grupoDiasServicio .check-option:hover {
+    background-color: #243552 !important;
+    border-color: #475569 !important;
+}
+
+/* Día seleccionado: tarjeta azul + texto blanco */
+body.dark-mode #grupoDiasServicio .check-option:has(input[type="checkbox"]:checked) {
+    background-color: #2563eb !important;
+    border-color: #3b82f6 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, .18) inset !important;
+}
+
+body.dark-mode #grupoDiasServicio .check-option:has(input[type="checkbox"]:checked),
+body.dark-mode #grupoDiasServicio .check-option:has(input[type="checkbox"]:checked) span {
+    color: #ffffff !important;
+}
+
+/* Checkbox nativo */
+body.dark-mode #grupoDiasServicio .check-option input[type="checkbox"],
+body.dark-mode input[type="checkbox"],
+body.dark-mode input[type="radio"] {
+    accent-color: #3b82f6 !important;
+}
+
+/* Estado seleccionado del control */
+body.dark-mode #grupoDiasServicio .check-option input[type="checkbox"]:checked {
+    accent-color: #ffffff !important;
+}
+
+/* 3. Evitar estilos blancos del navegador en controles especiales */
+body.dark-mode input[type="checkbox"],
+body.dark-mode input[type="radio"] {
+    background-color: #1e293b !important;
+    border-color: #475569 !important;
+}
+
+body.dark-mode input[type="checkbox"]:checked,
+body.dark-mode input[type="radio"]:checked {
+    background-color: #2563eb !important;
+    border-color: #3b82f6 !important;
+}
+
+/* Contenedores generales de checkbox/radio */
+body.dark-mode .checkbox-grid,
+body.dark-mode .checkbox-group,
+body.dark-mode .checkbox-container,
+body.dark-mode .form-check {
+    background-color: transparent !important;
+    color: #e2e8f0 !important;
+}
+</style>
+
+
+<style id="sigho-global-background-dark-v8">
+/* =========================================================
+   FONDO GLOBAL — MODO OSCURO
+   Solo se corrigen capas/lienzos de fondo y contraste del
+   texto que queda directamente sobre ellos.
+   ========================================================= */
+
+/* Lienzo raíz y contenedores estructurales */
+html.dark-mode,
+body.dark-mode,
+body.dark-mode .container,
+body.dark-mode .screen,
+body.dark-mode .dashboard-screen,
+body.dark-mode .dashboard,
+body.dark-mode .dashboard.has-role-sidebar,
+body.dark-mode .main-wrapper,
+body.dark-mode .content-area,
+body.dark-mode .dashboard-container,
+body.dark-mode .main-content,
+body.dark-mode .app-content,
+body.dark-mode .content-wrapper,
+body.dark-mode .page-content {
+    background-color: #0b1329 !important;
+}
+
+/* El área de trabajo de cada rol tenía fondos claros propios */
+body.dark-mode .role-main,
+body.dark-mode #estudiante .role-main,
+body.dark-mode #profesor .role-main,
+body.dark-mode #administrador .role-main {
+    background-color: #0b1329 !important;
+}
+
+/* Evitar que una capa estructural transparente deje aparecer
+   el fondo claro definido por estilos anteriores */
+body.dark-mode .dashboard-screen,
+body.dark-mode section.screen,
+body.dark-mode .dashboard-screen > .dashboard {
+    color: #e2e8f0 !important;
+}
+
+/* Texto que queda directamente sobre el lienzo */
+body.dark-mode .role-main h1,
+body.dark-mode .role-main h2,
+body.dark-mode .role-main h3,
+body.dark-mode .role-main h4,
+body.dark-mode .role-main h5,
+body.dark-mode .role-main h6,
+body.dark-mode .role-main p,
+body.dark-mode .role-main label,
+body.dark-mode .role-main .subtitle,
+body.dark-mode .role-main .section-title {
+    color: #f1f5f9 !important;
+}
+</style>
+
+
+<style id="sigho-all-inputs-dark-v9">
+/* =========================================================
+   TODOS LOS CAMPOS DE ENTRADA — MODO OSCURO
+   ========================================================= */
+
+/* Inputs, selects y textareas: fondo oscuro uniforme */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
+    color-scheme: dark !important;
+}
+
+/* Tipos de input explícitos, incluyendo campos especiales */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="tel"],
+body.dark-mode input[type="date"],
+body.dark-mode input[type="time"],
+body.dark-mode input[type="datetime-local"],
+body.dark-mode input[type="month"],
+body.dark-mode input[type="week"],
+body.dark-mode input[type="url"],
+body.dark-mode input[type="search"] {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Placeholders */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* Listas desplegables y sus opciones */
+body.dark-mode select,
+body.dark-mode select option,
+body.dark-mode select optgroup {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode select option:checked,
+body.dark-mode select option:hover {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+/* Evitar que el autocompletado del navegador vuelva a pintar
+   los campos con amarillo/blanco */
+body.dark-mode input:-webkit-autofill,
+body.dark-mode input:-webkit-autofill:hover,
+body.dark-mode input:-webkit-autofill:focus,
+body.dark-mode textarea:-webkit-autofill,
+body.dark-mode select:-webkit-autofill {
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+    box-shadow: 0 0 0 1000px #1e293b inset !important;
+    caret-color: #ffffff !important;
+}
+
+/* Campos deshabilitados o de solo lectura */
+body.dark-mode input:disabled,
+body.dark-mode input[readonly],
+body.dark-mode select:disabled,
+body.dark-mode textarea:disabled,
+body.dark-mode textarea[readonly] {
+    background-color: #0f172a !important;
+    color: #64748b !important;
+    border-color: #1e293b !important;
+    -webkit-text-fill-color: #64748b !important;
+    opacity: 1 !important;
+    cursor: not-allowed;
+}
+
+body.dark-mode input:disabled::placeholder,
+body.dark-mode input[readonly]::placeholder,
+body.dark-mode textarea:disabled::placeholder,
+body.dark-mode textarea[readonly]::placeholder {
+    color: #64748b !important;
+}
+
+/* Texto y cursor al enfocar */
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #475569 !important;
+    outline-color: #3b82f6 !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+</style>
+
+
+<style id="sigho-input-override-v10">
+/* =========================================================
+   OVERRIDE FINAL DE INPUTS BLANCOS EN DASHBOARD
+   Mayor especificidad para vencer reglas antiguas como
+   #estudiante input:disabled y #fechaNacimiento:disabled.
+   ========================================================= */
+
+/* Todos los campos del estudiante, incluidos los deshabilitados */
+body.dark-mode #estudiante input,
+body.dark-mode #estudiante select,
+body.dark-mode #estudiante textarea,
+body.dark-mode #profesor input,
+body.dark-mode #profesor select,
+body.dark-mode #profesor textarea {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #334155 !important;
+    -webkit-text-fill-color: #ffffff !important;
+    color-scheme: dark !important;
+}
+
+/* Campos bloqueados / calculados: más oscuros, pero nunca blancos */
+body.dark-mode #estudiante input:disabled,
+body.dark-mode #estudiante input[readonly],
+body.dark-mode #estudiante select:disabled,
+body.dark-mode #estudiante textarea:disabled,
+body.dark-mode #profesor input:disabled,
+body.dark-mode #profesor input[readonly],
+body.dark-mode #profesor select:disabled,
+body.dark-mode #profesor textarea:disabled {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    border: 1px solid #334155 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* Corrección específica para reglas antiguas de estos campos */
+body.dark-mode #estudiante #fechaNacimiento:disabled,
+body.dark-mode #estudiante #jornadaSolicitud:disabled,
+body.dark-mode #estudiante #telefonoAcudiente:disabled,
+body.dark-mode #estudiante #perfilNombreEstudiante:disabled,
+body.dark-mode #estudiante #perfilIdentificacionEstudiante:disabled,
+body.dark-mode #estudiante #perfilGradoEstudiante:disabled,
+body.dark-mode #estudiante #perfilJornadaEstudiante:disabled,
+body.dark-mode #estudiante #perfilModalidadEstudiante:disabled,
+body.dark-mode #estudiante #perfilCorreo:disabled,
+body.dark-mode #estudiante #perfilTelefono:disabled,
+body.dark-mode #estudiante #perfilDireccion:disabled,
+body.dark-mode #estudiante #perfilEps:disabled,
+body.dark-mode #estudiante #perfilEpsOtro:disabled,
+body.dark-mode #estudiante #perfilAcudiente:disabled,
+body.dark-mode #estudiante #perfilTelefonoAcudiente:disabled {
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* Si un campo está editable, recupera el tono estándar de los inputs */
+body.dark-mode #estudiante input:not(:disabled):not([readonly]),
+body.dark-mode #estudiante select:not(:disabled),
+body.dark-mode #estudiante textarea:not(:disabled),
+body.dark-mode #profesor input:not(:disabled):not([readonly]),
+body.dark-mode #profesor select:not(:disabled),
+body.dark-mode #profesor textarea:not(:disabled) {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #334155 !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Placeholders */
+body.dark-mode #estudiante input::placeholder,
+body.dark-mode #estudiante textarea::placeholder,
+body.dark-mode #profesor input::placeholder,
+body.dark-mode #profesor textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* Autocompletado */
+body.dark-mode #estudiante input:-webkit-autofill,
+body.dark-mode #estudiante input:-webkit-autofill:hover,
+body.dark-mode #estudiante input:-webkit-autofill:focus,
+body.dark-mode #profesor input:-webkit-autofill,
+body.dark-mode #profesor input:-webkit-autofill:hover,
+body.dark-mode #profesor input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+    box-shadow: 0 0 0 1000px #1e293b inset !important;
+}
+
+/* Opciones de select */
+body.dark-mode #estudiante select option,
+body.dark-mode #profesor select option {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+</style>
+
+
+<style id="sigho-registros-dark-final-v15">
+/* =========================================================
+   SIGHO — REGISTROS / PENDIENTES — CAPA FINAL DARK MODE v15
+   Prioridad alta para contenido estático y dinámico.
+========================================================= */
+
+/* Contenedor general de Mis registros y su contenido dinámico */
+html.dark-mode #estudiante #seccionRegistros,
+body.dark-mode #estudiante #seccionRegistros,
+html.dark-mode #estudiante #tablaEstudiante,
+body.dark-mode #estudiante #tablaEstudiante {
+    color: #f8fafc !important;
+}
+
+/* Filtros: mismas superficies oscuras en Todas / Aprobadas / Pendientes / Rechazadas */
+html.dark-mode #estudiante .student-record-filters,
+body.dark-mode #estudiante .student-record-filters {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode #estudiante .student-filter-button,
+body.dark-mode #estudiante .student-filter-button {
+    background: transparent !important;
+    color: #cbd5e1 !important;
+    border-color: transparent !important;
+}
+
+html.dark-mode #estudiante .student-filter-button:hover,
+body.dark-mode #estudiante .student-filter-button:hover {
+    background: #1e293b !important;
+    color: #ffffff !important;
+}
+
+html.dark-mode #estudiante .student-filter-button.active,
+body.dark-mode #estudiante .student-filter-button.active {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border: 1px solid #475569 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.28) !important;
+}
+
+/* Caja principal de tabla/listado, incluso si llega con background blanco */
+html.dark-mode #estudiante .student-records-table,
+body.dark-mode #estudiante .student-records-table,
+html.dark-mode #estudiante .student-records-table.table-container,
+body.dark-mode #estudiante .student-records-table.table-container,
+html.dark-mode #estudiante #tablaEstudiante .table-container,
+body.dark-mode #estudiante #tablaEstudiante .table-container {
+    background: #172334 !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+}
+
+/* Tabla y cabecera */
+html.dark-mode #estudiante .student-records-table table,
+body.dark-mode #estudiante .student-records-table table,
+html.dark-mode #estudiante .student-records-table thead,
+body.dark-mode #estudiante .student-records-table thead,
+html.dark-mode #estudiante .student-records-table tbody,
+body.dark-mode #estudiante .student-records-table tbody {
+    background: #172334 !important;
+    color: #f8fafc !important;
+}
+
+html.dark-mode #estudiante .student-records-table th,
+body.dark-mode #estudiante .student-records-table th {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+/* Filas: evitar cualquier blanco heredado de table/tr/td o clases utilitarias */
+html.dark-mode #estudiante .student-records-table tr,
+body.dark-mode #estudiante .student-records-table tr,
+html.dark-mode #estudiante .student-records-table tbody tr,
+body.dark-mode #estudiante .student-records-table tbody tr,
+html.dark-mode #estudiante .student-records-table td,
+body.dark-mode #estudiante .student-records-table td {
+    background: #172334 !important;
+    color: #e5edf5 !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #estudiante .student-records-table tbody tr:hover,
+body.dark-mode #estudiante .student-records-table tbody tr:hover {
+    background: #1e293b !important;
+}
+
+/* Texto principal/secundario de cada registro */
+html.dark-mode #estudiante .student-record-date strong,
+body.dark-mode #estudiante .student-record-date strong,
+html.dark-mode #estudiante .student-record-hours,
+body.dark-mode #estudiante .student-record-hours,
+html.dark-mode #estudiante .student-record-description,
+body.dark-mode #estudiante .student-record-description {
+    color: #f8fafc !important;
+}
+
+html.dark-mode #estudiante .student-record-date small,
+body.dark-mode #estudiante .student-record-date small,
+html.dark-mode #estudiante .student-record-description small,
+body.dark-mode #estudiante .student-record-description small,
+html.dark-mode #estudiante .table-secondary-text,
+body.dark-mode #estudiante .table-secondary-text {
+    color: #aebdca !important;
+}
+
+/* Enlaces de evidencia y acciones */
+html.dark-mode #estudiante .student-evidence-link,
+body.dark-mode #estudiante .student-evidence-link {
+    color: #93c5fd !important;
+}
+
+html.dark-mode #estudiante .student-evidence-link:hover,
+body.dark-mode #estudiante .student-evidence-link:hover {
+    color: #bfdbfe !important;
+}
+
+/* Badges: oscuros, contrastados y sin fondos amarillos/rojos brillantes */
+html.dark-mode #estudiante .student-record-status,
+body.dark-mode #estudiante .student-record-status {
+    border: 1px solid currentColor !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode #estudiante .student-record-status.pending,
+body.dark-mode #estudiante .student-record-status.pending {
+    background: rgba(146, 105, 23, .20) !important;
+    color: #f6d77a !important;
+    border-color: rgba(246, 215, 122, .48) !important;
+}
+
+html.dark-mode #estudiante .student-record-status.approved,
+body.dark-mode #estudiante .student-record-status.approved {
+    background: rgba(36, 115, 70, .20) !important;
+    color: #86efac !important;
+    border-color: rgba(134, 239, 172, .42) !important;
+}
+
+html.dark-mode #estudiante .student-record-status.rejected,
+body.dark-mode #estudiante .student-record-status.rejected {
+    background: rgba(163, 66, 66, .20) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(252, 165, 165, .42) !important;
+}
+
+/* Estado vacío: es la caja blanca que aparece al filtrar Pendientes sin resultados */
+html.dark-mode #estudiante .student-empty-records,
+body.dark-mode #estudiante .student-empty-records {
+    background: #172334 !important;
+    color: #cbd5e1 !important;
+    border: 1px dashed #475569 !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode #estudiante .student-empty-records strong,
+body.dark-mode #estudiante .student-empty-records strong {
+    color: #f8fafc !important;
+}
+
+html.dark-mode #estudiante .student-empty-records p,
+body.dark-mode #estudiante .student-empty-records p {
+    color: #aebdca !important;
+}
+
+html.dark-mode #estudiante .student-empty-icon,
+body.dark-mode #estudiante .student-empty-icon {
+    background: #223449 !important;
+    color: #cbd5e1 !important;
+}
+
+/* Si alguna renderización dinámica agrega clases genéricas de tarjeta/blanco */
+html.dark-mode #estudiante #tablaEstudiante .card,
+body.dark-mode #estudiante #tablaEstudiante .card,
+html.dark-mode #estudiante #tablaEstudiante .bg-white,
+body.dark-mode #estudiante #tablaEstudiante .bg-white,
+html.dark-mode #estudiante #tablaEstudiante [style*="background: white"],
+body.dark-mode #estudiante #tablaEstudiante [style*="background: white"],
+html.dark-mode #estudiante #tablaEstudiante [style*="background:#fff"],
+body.dark-mode #estudiante #tablaEstudiante [style*="background:#fff"],
+html.dark-mode #estudiante #tablaEstudiante [style*="background: #fff"],
+body.dark-mode #estudiante #tablaEstudiante [style*="background: #fff"] {
+    background: #172334 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* =========================================================
+   PROFESOR — Registros pendientes e historial
+========================================================= */
+html.dark-mode #profesor #seccionPendientesProfesor .table-container,
+body.dark-mode #profesor #seccionPendientesProfesor .table-container,
+html.dark-mode #profesor #seccionPendientesProfesor table,
+body.dark-mode #profesor #seccionPendientesProfesor table,
+html.dark-mode #profesor #seccionPendientesProfesor thead,
+body.dark-mode #profesor #seccionPendientesProfesor thead,
+html.dark-mode #profesor #seccionPendientesProfesor tbody,
+body.dark-mode #profesor #seccionPendientesProfesor tbody {
+    background: #172334 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #profesor #seccionPendientesProfesor th,
+body.dark-mode #profesor #seccionPendientesProfesor th {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #profesor #seccionPendientesProfesor tbody tr,
+body.dark-mode #profesor #seccionPendientesProfesor tbody tr,
+html.dark-mode #profesor #seccionPendientesProfesor td,
+body.dark-mode #profesor #seccionPendientesProfesor td {
+    background: #172334 !important;
+    color: #e5edf5 !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #profesor #seccionPendientesProfesor tbody tr:hover,
+body.dark-mode #profesor #seccionPendientesProfesor tbody tr:hover {
+    background: #1e293b !important;
+}
+
+/* Historial: misma apariencia para aprobados/rechazados */
+html.dark-mode #profesor #seccionHistorialProfesor .table-container,
+body.dark-mode #profesor #seccionHistorialProfesor .table-container,
+html.dark-mode #profesor #seccionHistorialProfesor table,
+body.dark-mode #profesor #seccionHistorialProfesor table,
+html.dark-mode #profesor #seccionHistorialProfesor tbody,
+body.dark-mode #profesor #seccionHistorialProfesor tbody,
+html.dark-mode #profesor #seccionHistorialProfesor td,
+body.dark-mode #profesor #seccionHistorialProfesor td {
+    background: #172334 !important;
+    color: #e5edf5 !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #profesor #seccionHistorialProfesor th,
+body.dark-mode #profesor #seccionHistorialProfesor th {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+/* Vacíos genéricos en módulos de registros */
+html.dark-mode #profesor #seccionPendientesProfesor .empty,
+body.dark-mode #profesor #seccionPendientesProfesor .empty,
+html.dark-mode #profesor #seccionHistorialProfesor .empty,
+body.dark-mode #profesor #seccionHistorialProfesor .empty {
+    background: #172334 !important;
+    color: #cbd5e1 !important;
+    border-color: #475569 !important;
+}
+
+/* Contraste del contador de pendientes */
+html.dark-mode #profesor .pending-counter,
+body.dark-mode #profesor .pending-counter {
+    background: #0f172a !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+</style>
+
 </head>
 
 <body>
+
+<script id="sigho-session-persistence">
+(function () {
+    const USER_KEY = "sigho_user";
+    const TOKEN_KEY = "sigho_token";
+
+    function guardarSesionSigho(usuario, token) {
+        if (!usuario) return;
+        try {
+            localStorage.setItem(USER_KEY, JSON.stringify(usuario));
+            if (token) localStorage.setItem(TOKEN_KEY, token);
+        } catch (_) {}
+    }
+
+    function recuperarSesionSigho() {
+        try {
+            const raw = localStorage.getItem(USER_KEY);
+            if (!raw) return null;
+            const usuario = JSON.parse(raw);
+            return usuario && typeof usuario === "object" ? usuario : null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function limpiarSesionSigho() {
+        try {
+            localStorage.removeItem(USER_KEY);
+            localStorage.removeItem(TOKEN_KEY);
+        } catch (_) {}
+    }
+
+    // API pequeña para que el código existente pueda persistir/limpiar sesión.
+    window.guardarSesionSigho = guardarSesionSigho;
+    window.recuperarSesionSigho = recuperarSesionSigho;
+    window.limpiarSesionSigho = limpiarSesionSigho;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const usuario = recuperarSesionSigho();
+        if (!usuario) return;
+
+        // Si el código actual ya dejó una sesión válida, no interferir.
+        if (typeof usuarioActual !== "undefined" && usuarioActual) return;
+
+        // Intentar reutilizar el flujo de navegación existente por rol.
+        try {
+            if (typeof window.usuarioActual !== "undefined") {
+                window.usuarioActual = usuario;
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
+            }
+
+            const rol = String(usuario.rol || "").toLowerCase();
+            if (rol === "estudiante" && typeof window.abrirEstudiante === "function") {
+                window.abrirEstudiante();
+            } else if (rol === "profesor" && typeof window.abrirProfesor === "function") {
+                window.abrirProfesor();
+            } else if (rol === "administrador" && typeof window.abrirAdministrador === "function") {
+                window.abrirAdministrador();
+            } else if (typeof window.abrirSuperAdmin === "function") {
+                window.abrirSuperAdmin();
+            }
+        } catch (_) {
+            // Si la sesión guardada no es compatible con la versión actual,
+            // se conserva el login normal en lugar de romper la aplicación.
+        }
+    });
+
+    // Intercepta la limpieza explícita de sesión solo cuando el código existente
+    // llama a una función de cierre conocida, sin tocar peticiones ni navegación.
+    window.cerrarSesionPersistente = function () {
+        limpiarSesionSigho();
+        window.location.reload();
+    };
+})();
+</script>
+
+<button id="themeToggle" class="theme-toggle" type="button"
+        aria-label="Activar modo oscuro" title="Activar modo oscuro" aria-pressed="false">
+    <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.5 15.2A8.7 8.7 0 0 1 8.8 3.5 8.8 8.8 0 1 0 20.5 15.2Z"></path>
+    </svg>
+    <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
+    </svg>
+</button>
+
 
 <div class="container">
 
@@ -3583,7 +5571,7 @@ body:has(.dashboard-screen.active) .container {
                 rel="noopener noreferrer"
                 class="school-link"
             >
-                Sitio institucional →
+                Sitio Institucional ->
             </a>
         </div>
     </div>
@@ -3637,10 +5625,8 @@ body:has(.dashboard-screen.active) .container {
 
                 <div class="form-group">
                     <label>Año del servicio social</label>
-                    <input type="number" id="anioServicio" min="2026" max="2029" value="2026" inputmode="numeric" required aria-describedby="ayudaAnioServicio" onkeydown="bloquearEntradaAnioServicio(event)" onpaste="return false" ondrop="return false">
-                    <small class="field-help" id="ayudaAnioServicio">Usa las flechas del control para elegir el año. No se permite escribirlo directamente.</small>
-                </div>
-
+                <input type="number" id="anioServicio" min="2026" max="2029" value="2026" inputmode="numeric" required readonly aria-readonly="true" aria-describedby="ayudaAnioServicio" onkeydown="bloquearEntradaAnioServicio(event)" onpaste="return false" ondrop="return false">
+                <small class="field-help" id="ayudaAnioServicio">Año lectivo</small>
                 <div class="section">
                     <h3>Datos del estudiante</h3>
                 </div>
@@ -3695,9 +5681,15 @@ body:has(.dashboard-screen.active) .container {
                             <option value="Ciclo V">Ciclo V</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group grupo-fecha-edad">
                         <label>Fecha de nacimiento <span class="required">*</span></label>
-                        <input type="date" id="fechaNacimiento" required disabled aria-describedby="ayudaFechaNacimiento">
+                        <div class="fecha-edad-grid">
+                            <input type="date" id="fechaNacimiento" required disabled aria-describedby="ayudaFechaNacimiento" autocomplete="bday">
+                            <div class="edad-calculada" aria-live="polite">
+                                <span>Edad</span>
+                                <strong id="edadCalculada">-</strong>
+                            </div>
+                        </div>
                         <small class="field-help" id="ayudaFechaNacimiento">Selecciona primero el grado para conocer el rango permitido.</small>
                     </div>
                     <div class="form-group">
@@ -3784,7 +5776,7 @@ body:has(.dashboard-screen.active) .container {
                     </div>
                     <div class="form-group">
                         <label>Jornada</label>
-                        <select id="jornadaSolicitud" disabled required aria-describedby="ayudaJornadaSolicitud">
+                        <select id="jornadaSolicitud" class="select-sin-flecha" disabled required aria-describedby="ayudaJornadaSolicitud">
                             <option value="" disabled selected>Seleccionar jornada</option>
                             <option value="JM">Jornada Mañana (JM)</option>
                             <option value="JN">Jornada Noche (JN)</option>
@@ -3814,7 +5806,7 @@ body:has(.dashboard-screen.active) .container {
                     </div>
                     <div class="form-group">
                         <label>Número de contacto del acudiente <span class="required">*</span></label>
-                        <input type="tel" id="telefonoAcudiente" placeholder="Selecciona el tipo de línea" maxlength="12" inputmode="numeric" autocomplete="tel" required aria-describedby="ayudaTelefonoAcudiente" disabled disabled>
+                        <input type="tel" id="telefonoAcudiente" placeholder="Selecciona el tipo de línea" maxlength="10" inputmode="numeric" autocomplete="tel" required aria-describedby="ayudaTelefonoAcudiente" disabled disabled>
                         <small class="field-help" id="ayudaTelefonoAcudiente">Primero selecciona el tipo de línea.</small>
                     </div>
                 </div>
@@ -3982,39 +5974,7 @@ body:has(.dashboard-screen.active) .container {
                 Ingresa con las credenciales de tu cuenta.
             </p>
 
-            <div class="form-group">
-
-                <label>
-                    Rol
-                </label>
-
-                <select id="rolLogin" onchange="limpiarLoginAlCambiarRol(this.value)">
-
-                    <option value="" disabled selected>
-                        Seleccionar rol
-                    </option>
-
-                    <option value="estudiante">
-                        Estudiante
-                    </option>
-
-                    <option value="profesor">
-                        Profesor
-                    </option>
-
-                    <option value="administrador">
-                        Administrador
-                    </option>
-
-                    <option value="superadmin">
-                        Super Admin
-                    </option>
-
-                </select>
-
-            </div>
-
-            <div id="camposLogin" style="display:none;">
+            <div id="camposLogin" style="display:block;">
 
                 <div class="form-group">
 
@@ -4032,15 +5992,19 @@ body:has(.dashboard-screen.active) .container {
 
                 <div class="form-group">
 
-                    <label>
+                    <label for="clave">
                         Clave única
                     </label>
 
-                    <input
-                        type="password"
-                        id="clave"
-                        placeholder="Ingrese su clave"
-                    >
+                    <div class="password-toggle-wrapper" style="position: relative; display: flex; align-items: center;">
+                        <input type="password" id="clave" name="clave" placeholder="••••••••" style="width: 100%; padding-right: 42px;" autocomplete="current-password" required>
+                        <button type="button" id="btnTogglePassword" aria-label="Mostrar u ocultar contraseña" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; color: #5a6e85;">
+                            <svg id="iconEye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
 
                 </div>
 
@@ -4068,6 +6032,7 @@ body:has(.dashboard-screen.active) .container {
     <section id="estudiante" class="screen dashboard-screen">
 
         <div class="dashboard student-dashboard has-role-sidebar">
+            <div class="mobile-sidebar-backdrop" onclick="closeMobileSidebar('estudiante')" aria-hidden="true"></div>
             <aside class="role-sidebar" aria-label="Menú principal del estudiante">
                 <div class="sidebar-brand">
                     <img src="escudo_jjfh.jpg" alt="Escudo JJFH">
@@ -4098,6 +6063,7 @@ body:has(.dashboard-screen.active) .container {
 
             <main class="role-main">
                 <header class="dashboard-header">
+                    <button type="button" class="mobile-sidebar-toggle" onclick="toggleMobileSidebar('estudiante')" aria-label="Abrir menú del estudiante" aria-expanded="false">☰</button>
                     <div>
                         <h2>Panel del estudiante</h2>
                         <p id="modalidadEstudiante">Consulta y registra el avance de tu servicio social.</p>
@@ -4109,6 +6075,7 @@ body:has(.dashboard-screen.active) .container {
                                 <div class="notification-panel-head"><div><strong>Notificaciones</strong><span>Avisos de tus jornadas</span></div><button type="button" onclick="marcarNotificacionesEstudianteLeidas()">Marcar leídas</button></div>
                                 <div id="listaNotificacionesEstudiante" class="notification-list"></div>
                             </div>
+                            <div id="backdropNotificacionesEstudiante" class="notification-backdrop" onclick="cerrarPanelNotificacionesEstudiante()" aria-hidden="true"></div>
                         </div>
                         <button class="profile-button student-profile-button" onclick="toggleUserMenu(this)" aria-label="Abrir menú del usuario" aria-expanded="false">
                             <span class="profile-avatar">👤</span>
@@ -4395,6 +6362,7 @@ body:has(.dashboard-screen.active) .container {
     <section id="profesor" class="screen dashboard-screen">
 
         <div class="dashboard professor-dashboard has-role-sidebar">
+            <div class="mobile-sidebar-backdrop" onclick="closeMobileSidebar('profesor')" aria-hidden="true"></div>
             <aside class="role-sidebar" aria-label="Menú principal del profesor">
                 <div class="sidebar-brand">
                     <img src="escudo_jjfh.jpg" alt="Escudo JJFH">
@@ -4429,6 +6397,7 @@ body:has(.dashboard-screen.active) .container {
 
             <main class="role-main">
                 <header class="dashboard-header">
+                    <button type="button" class="mobile-sidebar-toggle" onclick="toggleMobileSidebar('profesor')" aria-label="Abrir menú del profesor" aria-expanded="false">☰</button>
                     <div>
                         <h2>Panel del profesor</h2>
                         <p>Revisión y seguimiento de los registros de servicio social.</p>
@@ -4450,6 +6419,7 @@ body:has(.dashboard-screen.active) .container {
                                 </div>
                                 <div id="listaNotificacionesProfesor" class="notification-list"></div>
                             </div>
+                            <div id="backdropNotificacionesProfesor" class="notification-backdrop" onclick="cerrarPanelNotificacionesProfesor()" aria-hidden="true"></div>
                         </div>
 
                         <button class="profile-button" onclick="toggleUserMenu(this)" aria-label="Abrir menú del usuario">
@@ -4738,6 +6708,7 @@ body:has(.dashboard-screen.active) .container {
     <section id="administrador" class="screen dashboard-screen">
 
         <div class="dashboard admin-dashboard has-role-sidebar">
+            <div class="mobile-sidebar-backdrop" onclick="closeMobileSidebar('administrador')" aria-hidden="true"></div>
             <aside class="role-sidebar" aria-label="Menú principal del administrador">
                 <div class="sidebar-brand">
                     <img src="escudo_jjfh.jpg" alt="Escudo JJFH">
@@ -4777,6 +6748,7 @@ body:has(.dashboard-screen.active) .container {
 
             <main class="role-main">
                 <header class="dashboard-header">
+                    <button type="button" class="mobile-sidebar-toggle" onclick="toggleMobileSidebar('administrador')" aria-label="Abrir menú del administrador" aria-expanded="false">☰</button>
                     <div>
                         <h2 id="tituloVistaAdministrador">Inicio</h2>
                         <p id="subtituloVistaAdministrador">Vista general del sistema de servicio social.</p>
@@ -5100,6 +7072,7 @@ body:has(.dashboard-screen.active) .container {
     let registros = [];
     let solicitudes = [];
     let usuarioActual = null;
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
     let filtroHistorialProfesorActual = "todos";
     let filtroHistorialAdminActual = "todos";
     let profesorHistorialAdminActual = "todos";
@@ -5362,7 +7335,7 @@ body:has(.dashboard-screen.active) .container {
             input.value = String(actual);
         }
         const ayuda = document.getElementById("ayudaAnioServicio");
-        if (ayuda) ayuda.textContent = `Puedes elegir desde ${actual} hasta ${maximo}.`;
+        if (ayuda) ayuda.textContent = "Año lectivo";
     }
 
     function limpiarSolicitudAlCambiarRol(nuevoRol) {
@@ -5443,10 +7416,9 @@ body:has(.dashboard-screen.active) .container {
         actualizarIndicadoresObligatorios(document.getElementById("solicitud"));
     }
 
-    function limpiarLoginAlCambiarRol(nuevoRol) {
+    function limpiarLoginAlCambiarRol() {
         const login = document.getElementById("login");
-        const rol = document.getElementById("rolLogin");
-        if (!login || !rol) return;
+        if (!login) return;
 
         login.querySelectorAll("input, textarea").forEach(el => {
             el.classList.remove("campo-error");
@@ -5457,29 +7429,22 @@ body:has(.dashboard-screen.active) .container {
 
         const mensaje = document.getElementById("mensajeLogin");
         if (mensaje) { mensaje.textContent = ""; mensaje.style.display = "none"; }
-
-        rol.value = nuevoRol || "";
         actualizarCamposLogin();
     }
 
     function actualizarCamposLogin() {
-        const rol = document.getElementById("rolLogin")?.value || "";
         const campos = document.getElementById("camposLogin");
-
-        // Sin rol seleccionado, únicamente queda visible el selector.
-        if (campos) campos.style.display = rol ? "block" : "none";
+        if (campos) campos.style.display = "block";
 
         const correo = document.getElementById("correoLogin");
         const clave = document.getElementById("clave");
-        if (correo) correo.required = !!rol;
-        if (clave) clave.required = !!rol;
+        if (correo) correo.required = true;
+        if (clave) clave.required = true;
 
-        if (!rol) {
-            const mensaje = document.getElementById("mensajeLogin");
-            if (mensaje) {
-                mensaje.style.display = "none";
-                mensaje.innerText = "";
-            }
+        const mensaje = document.getElementById("mensajeLogin");
+        if (mensaje) {
+            mensaje.style.display = "none";
+            mensaje.innerText = "";
         }
         actualizarIndicadoresObligatorios(document.getElementById("login"));
     }
@@ -5592,29 +7557,45 @@ body:has(.dashboard-screen.active) .container {
        LOGIN
     ====================================================== */
 
+const inputClave = document.getElementById('clave');
+const btnToggle = document.getElementById('btnTogglePassword');
+const iconEye = document.getElementById('iconEye');
+
+const svgEye = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle>`;
+
+const svgEyeOff = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path> <line x1="1" y1="1" x2="23" y2="23"></line>`;
+
+if (inputClave && btnToggle && iconEye) {
+    btnToggle.addEventListener('click', () => {
+        const isPassword = inputClave.type === 'password';
+        inputClave.type = isPassword ? 'text' : 'password';
+        iconEye.innerHTML = isPassword ? svgEyeOff : svgEye;
+    });
+}
+
 async function iniciarSesion() {
-    const rol = document.getElementById("rolLogin").value;
     const correo = document.getElementById("correoLogin").value.trim().toLowerCase();
     const clave = document.getElementById("clave").value;
     const mensaje = document.getElementById("mensajeLogin");
 
     document.getElementById("correoLogin")?.classList.toggle("campo-error", !correo);
     document.getElementById("clave")?.classList.toggle("campo-error", !clave);
-    if (!rol || !correo || !clave) {
+    if (!correo || !clave) {
         mensaje.className = "message auth-error-message";
         mensaje.style.display = "block";
-        mensaje.innerText = "Completa el rol, correo y contraseña.";
+        mensaje.innerText = "Completa el correo y la contraseña.";
         return;
     }
 
     try {
-        const data = await api("login", { method: "POST", body: { rol, correo, clave } });
+        const data = await api("login", { method: "POST", body: { correo, clave } });
         usuarioActual = normalizarUsuario(data.user);
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
         mensaje.style.display = "none";
         await cargarDatosPorRol();
-        if (rol === "estudiante") abrirEstudiante();
-        else if (rol === "profesor") abrirProfesor();
-        else if (rol === "administrador") abrirAdministrador();
+        if (usuarioActual.rol === "estudiante") abrirEstudiante();
+        else if (usuarioActual.rol === "profesor") abrirProfesor();
+        else if (usuarioActual.rol === "administrador") abrirAdministrador();
         else abrirSuperAdmin();
     } catch (error) {
         mensaje.style.display = "block";
@@ -5632,8 +7613,15 @@ function marcarCamposSolicitudInvalidos(rol) {
     let hayError=false;
     contenedor.querySelectorAll("input, select, textarea").forEach(el=>{
         if (el.disabled || el.offsetParent===null) return;
-        const invalido = !el.checkValidity();
+        const vacioObligatorio = el.required && !String(el.value || "").trim();
+        const invalido = vacioObligatorio || !el.checkValidity();
         el.classList.toggle("campo-error", invalido);
+        if (vacioObligatorio) {
+            mostrarErrorCampo(el, "Este campo es obligatorio.");
+            el.setCustomValidity("Este campo es obligatorio.");
+        } else if (!invalido) {
+            limpiarErrorCampo(el);
+        }
         if (invalido) hayError=true;
     });
     return hayError;
@@ -5662,6 +7650,15 @@ function configurarErroresCamposSolicitud() {
     },true);
 }
 
+function mostrarErrorSolicitud(texto) {
+    const mensaje = document.getElementById("mensajeSolicitud");
+    if (!mensaje) return;
+    mensaje.className = "message error-message solicitud-feedback";
+    mensaje.textContent = texto;
+    mensaje.style.display = "block";
+    mensaje.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
 async function enviarSolicitud() {
     const rol = document.getElementById("rolSolicitud").value;
     const mensaje = document.getElementById("mensajeSolicitud");
@@ -5673,21 +7670,21 @@ async function enviarSolicitud() {
     marcarCamposSolicitudInvalidos(rol);
 
     if (!rol || !["estudiante", "profesor"].includes(rol)) {
-        alert("Debes seleccionar Estudiante o Profesor.");
+        mostrarErrorSolicitud("Selecciona si la solicitud corresponde a Estudiante o Profesor.");
         return;
     }
     if (!clave) {
-        alert("Completa la contraseña.");
+        mostrarErrorSolicitud("Completa la contraseña antes de enviar la solicitud.");
         return;
     }
 
     if (rol === "estudiante") {
         if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(clave)) {
-            alert("La contraseña del estudiante debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
+            mostrarErrorSolicitud("La contraseña del estudiante debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
             return;
         }
     } else if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(clave)) {
-        alert("La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
+        mostrarErrorSolicitud("La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
         return;
     }
 
@@ -5727,13 +7724,13 @@ async function enviarSolicitud() {
             !telefono || !eps || !nombreAcudiente || !telefonoAcudiente ||
             !sede || !proyecto || !modalidad || !jornada
         ) {
-            alert("Completa todos los campos obligatorios de la solicitud del estudiante.");
+            mostrarErrorSolicitud("Completa todos los campos obligatorios de la solicitud del estudiante.");
             return;
         }
 
         if (diasServicio.length === 0) {
             validarDiasServicio();
-            alert("Selecciona al menos un día en el que realizarás el servicio social.");
+            mostrarErrorSolicitud("Selecciona al menos un día en el que realizarás el servicio social.");
             return;
         }
         validarDiasServicio();
@@ -5742,7 +7739,7 @@ async function enviarSolicitud() {
         const validarNombre = (valor, etiqueta, obligatorio = true, maximo = 30) => {
             if (!valor && !obligatorio) return true;
             if (valor.length < 2 || valor.length > maximo || !regexNombre.test(valor)) {
-                alert(`${etiqueta} debe contener solo letras y espacios sencillos, entre 2 y ${maximo} caracteres.`);
+                mostrarErrorSolicitud(`${etiqueta} debe contener solo letras y espacios sencillos, entre 2 y ${maximo} caracteres.`);
                 return false;
             }
             return true;
@@ -5753,14 +7750,14 @@ async function enviarSolicitud() {
             !validarNombre(segundoNombre, "El segundo nombre", false)) return;
 
         if (!/^\d{8,10}$/.test(numeroDocumento)) {
-            alert("El documento debe contener únicamente entre 8 y 10 dígitos.");
+            mostrarErrorSolicitud("El número de documento no cumple el formato del tipo seleccionado.");
             return;
         }
 
         const anioNumerico = Number(anioServicio);
         const anioActualSolicitud = new Date().getFullYear();
         if (!Number.isInteger(anioNumerico) || anioNumerico < anioActualSolicitud || anioNumerico > anioActualSolicitud + 3) {
-            alert(`El año de servicio social debe estar entre ${anioActualSolicitud} y ${anioActualSolicitud + 3}.`);
+            mostrarErrorSolicitud(`El año de servicio social debe estar entre ${anioActualSolicitud} y ${anioActualSolicitud + 3}.`);
             return;
         }
 
@@ -5770,16 +7767,16 @@ async function enviarSolicitud() {
         const cumpleEsteAnio = new Date(hoy.getFullYear(), fechaNacimientoObj.getMonth(), fechaNacimientoObj.getDate());
         if (hoy < cumpleEsteAnio) edad--;
         if (!Number.isFinite(edad)) {
-            alert("La fecha de nacimiento no es válida.");
+            mostrarErrorSolicitud("La fecha de nacimiento no es válida.");
             return;
         }
         if (grado === "Ciclo V") {
             if (edad < 18 || edad > 40) {
-                alert("Para Ciclo V la edad del estudiante debe estar entre 18 y 40 años.");
+                mostrarErrorSolicitud("Para Ciclo V la edad del estudiante debe estar entre 18 y 40 años.");
                 return;
             }
         } else if (edad < 14 || edad > 19) {
-            alert("Para 10° y 11° la edad del estudiante debe estar entre 14 y 19 años.");
+            mostrarErrorSolicitud("Para 10° y 11° la edad del estudiante debe estar entre 14 y 19 años.");
             return;
         }
 
@@ -5787,32 +7784,32 @@ async function enviarSolicitud() {
         if (tipoDocumento !== "PPT") {
             // 14–17 años: TI obligatoria.
             if (edad < 18 && tipoDocumento !== "Tarjeta de identidad") {
-                alert("Para estudiantes menores de 18 años se requiere Tarjeta de identidad.");
+                mostrarErrorSolicitud("Para estudiantes menores de 18 años se requiere Tarjeta de identidad.");
                 return;
             }
             // 18 años: TI o CC.
             if (edad === 18 && tipoDocumento !== "Tarjeta de identidad" && tipoDocumento !== "Cédula de ciudadanía") {
-                alert("A los 18 años puedes seleccionar Tarjeta de identidad o Cédula de ciudadanía.");
+                mostrarErrorSolicitud("A los 18 años puedes seleccionar Tarjeta de identidad o Cédula de ciudadanía.");
                 return;
             }
             // 19 años: únicamente CC.
             if (edad === 19 && tipoDocumento !== "Cédula de ciudadanía") {
-                alert("A los 19 años se requiere Cédula de ciudadanía.");
+                mostrarErrorSolicitud("A los 19 años se requiere Cédula de ciudadanía.");
                 return;
             }
         }
 
         if (!/^\d{10}$/.test(telefono.replace(/\D/g, ""))) {
-            alert("El celular del estudiante debe tener exactamente 10 dígitos.");
+            mostrarErrorSolicitud("El celular del estudiante debe tener exactamente 10 dígitos.");
             return;
         }
         if (direccion.length > 100) {
-            alert("La dirección puede tener máximo 100 caracteres.");
+            mostrarErrorSolicitud("La dirección puede tener máximo 100 caracteres.");
             return;
         }
         if (!validarNombre(nombreAcudiente, "El nombre completo del acudiente", true, 60)) return;
         if (!tipoTelefonoAcudiente) {
-            alert("Selecciona el tipo de línea del acudiente.");
+            mostrarErrorSolicitud("Selecciona el tipo de línea del acudiente.");
             return;
         }
 
@@ -5822,39 +7819,39 @@ async function enviarSolicitud() {
             : validarCelularSIGHO(telefonoAcudienteElemento);
 
         if (!telefonoAcudienteValido) {
-            alert(telefonoAcudienteElemento.validationMessage || "El número de contacto del acudiente no es válido.");
+            mostrarErrorSolicitud(telefonoAcudienteElemento.validationMessage || "El número de contacto del acudiente no es válido.");
             return;
         }
         if (grado === "Ciclo V" && modalidad === "tecnico") {
-            alert("Ciclo V no puede seleccionar la modalidad Técnica.");
+            mostrarErrorSolicitud("Ciclo V no puede seleccionar la modalidad Técnica.");
             return;
         }
         const jornadaEsperada = grado === "Ciclo V" ? "JN" : "JM";
         if (jornada !== jornadaEsperada) {
-            alert("La jornada se asigna automáticamente según el grado seleccionado.");
+            mostrarErrorSolicitud("La jornada se asigna automáticamente según el grado seleccionado.");
             return;
         }
 
         if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
-            alert("Escribe un correo electrónico válido.");
+            mostrarErrorSolicitud("Escribe un correo electrónico válido.");
             return;
         }
 
         const regexTextoOtro = /^[\p{L}]+(?: [\p{L}]+)*$/u;
         if (proyecto === "Otro") {
             if (!proyectoOtro || proyectoOtro.length < 2 || proyectoOtro.length > 60 || !regexTextoOtro.test(proyectoOtro)) {
-                alert("El proyecto de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
+                mostrarErrorSolicitud("El proyecto de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
                 return;
             }
         }
         if (epsSeleccionada === "Otro") {
             if (!epsOtro || epsOtro.length < 2 || epsOtro.length > 60 || !regexTextoOtro.test(epsOtro)) {
-                alert("La EPS de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
+                mostrarErrorSolicitud("La EPS de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
                 return;
             }
         }
         if (eps.length > 60) {
-            alert("El nombre de la EPS puede tener máximo 60 caracteres.");
+            mostrarErrorSolicitud("El nombre de la EPS puede tener máximo 60 caracteres.");
             return;
         }
 
@@ -5867,7 +7864,7 @@ async function enviarSolicitud() {
 
         const correoEstudiante = correo;
         if (!correoEstudiante) {
-            alert("Para la solicitud del estudiante también debes indicar un correo electrónico.");
+            mostrarErrorSolicitud("Para la solicitud del estudiante también debes indicar un correo electrónico.");
             return;
         }
 
@@ -5912,30 +7909,30 @@ async function enviarSolicitud() {
         const regexCorreoInstitucional = /^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
 
         if (!nombre || !apellido || !identificacion || !correo || !telefono) {
-            alert("Completa todos los campos obligatorios del profesor.");
+            mostrarErrorSolicitud("Completa todos los campos obligatorios del profesor.");
             return;
         }
         if (!regexNombreProfesor.test(nombre)) {
-            alert("Los nombres solo pueden contener letras y un espacio sencillo entre palabras.");
+            mostrarErrorSolicitud("Los nombres solo pueden contener letras y un espacio sencillo entre palabras.");
             return;
         }
         if (!regexNombreProfesor.test(apellido)) {
-            alert("Los apellidos solo pueden contener letras y un espacio sencillo entre palabras.");
+            mostrarErrorSolicitud("Los apellidos solo pueden contener letras y un espacio sencillo entre palabras.");
             return;
         }
         if (!regexCorreoInstitucional.test(correo)) {
-            alert("El correo del profesor debe ser institucional, sin espacios, y terminar en @iejosejoaquinflorezhernandez.edu.co.");
+            mostrarErrorSolicitud("El correo del profesor debe ser institucional, sin espacios, y terminar en @iejosejoaquinflorezhernandez.edu.co.");
             return;
         }
 
         const telefonoProfesorElemento = document.getElementById("telefonoProfesorSolicitud");
         if (!validarCelularSIGHO(telefonoProfesorElemento)) {
-            alert(telefonoProfesorElemento.validationMessage || "El celular del profesor no es válido.");
+            mostrarErrorSolicitud(telefonoProfesorElemento.validationMessage || "El celular del profesor no es válido.");
             return;
         }
 
         if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(clave)) {
-            alert("La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
+            mostrarErrorSolicitud("La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
             return;
         }
 
@@ -5982,7 +7979,7 @@ async function enviarSolicitud() {
     configurarValidacionCamposOtro();
         configurarSelectoresEPS();
     } catch (error) {
-        alert(error.message);
+        mostrarErrorSolicitud(error.message || "No fue posible enviar la solicitud.");
     }
 }
 
@@ -6453,6 +8450,7 @@ async function guardarPerfilEstudiante() {
         if (botonGuardar) { botonGuardar.disabled = true; botonGuardar.textContent = "Guardando..."; }
         const data = await api("update_student_profile", { method: "POST", body });
         usuarioActual = normalizarUsuario(data.user);
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
         const nombreCompleto = (usuarioActual?.nombre || "Estudiante").trim();
         const primerNombre = nombreCompleto.split(/\s+/)[0] || "Estudiante";
         document.getElementById("nombrePerfilEstudianteHeader")?.replaceChildren(document.createTextNode(primerNombre));
@@ -6537,9 +8535,15 @@ function actualizarNotificacionesEstudiante(){
     if(!eventos.length){lista.innerHTML='<div class="notification-empty">🔔<strong>No hay avisos recientes</strong><span>Cuando haya novedades sobre tus jornadas aparecerán aquí.</span></div>';return;}
     lista.innerHTML=eventos.map(r=>{const estado=r.estado||"pendiente";const titulo=estado==="aprobada"?"Tu jornada fue aprobada":estado==="rechazada"?"Tu jornada fue rechazada":"Tu jornada está pendiente";const extra=estado==="rechazada"?(r.observacion||r.motivoRechazo||"Revisa la observación del profesor."):estado==="aprobada"?"El profesor revisó y aprobó este registro.":"El profesor aún debe revisar este registro.";return `<button type="button" class="notification-item ${!leidas.includes(String(r.id))?"unread":""}" onclick="abrirNotificacionEstudiante(${Number(r.id)})"><span class="notification-dot">${!leidas.includes(String(r.id))?"•":"✓"}</span><span class="notification-copy"><strong>${escapeHtml(titulo)}</strong><small>${escapeHtml(r.fecha||"")} · ${formatearHoras(r.horas)} h · ${escapeHtml(extra)}</small></span></button>`;}).join("");
 }
-function toggleNotificacionesEstudiante(evento){evento?.stopPropagation();const panel=document.getElementById("panelNotificacionesEstudiante"),boton=document.querySelector("#estudiante .notification-button");if(!panel)return;const abrir=!panel.classList.contains("show");document.querySelectorAll(".more-menu-dropdown.show, .notification-panel.show").forEach(el=>{if(el!==panel)el.classList.remove("show")});panel.classList.toggle("show",abrir);boton?.setAttribute("aria-expanded",abrir?"true":"false");if(abrir){actualizarNotificacionesEstudiante();}}
+function sincronizarBloqueoScrollNotificaciones(){
+    const notificacionesAbiertas = document.querySelector('.notification-panel.show') || document.querySelector('.notification-backdrop.show');
+    const sidebarAbierto = document.querySelector('.dashboard.has-role-sidebar.mobile-sidebar-open');
+    document.body.style.overflow = (notificacionesAbiertas || sidebarAbierto) ? 'hidden' : '';
+}
+function cerrarPanelNotificacionesEstudiante(){const panel=document.getElementById("panelNotificacionesEstudiante"),backdrop=document.getElementById("backdropNotificacionesEstudiante"),boton=document.querySelector("#estudiante .notification-button");panel?.classList.remove("show");backdrop?.classList.remove("show");boton?.setAttribute("aria-expanded","false");sincronizarBloqueoScrollNotificaciones();}
+function toggleNotificacionesEstudiante(evento){evento?.stopPropagation();const panel=document.getElementById("panelNotificacionesEstudiante"),backdrop=document.getElementById("backdropNotificacionesEstudiante"),boton=document.querySelector("#estudiante .notification-button");if(!panel)return;const abrir=!panel.classList.contains("show");cerrarPanelNotificacionesEstudiante();document.querySelectorAll(".more-menu-dropdown.show, .notification-panel.show").forEach(el=>{if(el!==panel)el.classList.remove("show")});if(abrir){panel.classList.add("show");backdrop?.classList.add("show");boton?.setAttribute("aria-expanded","true");actualizarNotificacionesEstudiante();}sincronizarBloqueoScrollNotificaciones();}
 function marcarNotificacionesEstudianteLeidas(){guardarIdsNotificacionesEstudianteLeidas((registros||[]).map(r=>String(r.id)));actualizarNotificacionesEstudiante();}
-function abrirNotificacionEstudiante(id){guardarIdsNotificacionesEstudianteLeidas(Array.from(new Set([...obtenerIdsNotificacionesEstudianteLeidas(),String(id)])));actualizarNotificacionesEstudiante();mostrarSeccionEstudiante("registros");document.getElementById("panelNotificacionesEstudiante")?.classList.remove("show");}
+function abrirNotificacionEstudiante(id){guardarIdsNotificacionesEstudianteLeidas(Array.from(new Set([...obtenerIdsNotificacionesEstudianteLeidas(),String(id)])));actualizarNotificacionesEstudiante();mostrarSeccionEstudiante("registros");cerrarPanelNotificacionesEstudiante();}
 
 /* =====================================================
    NOTIFICACIONES DEL PROFESOR
@@ -6591,24 +8595,29 @@ function actualizarNotificacionesProfesor(pendientes) {
     }).join("");
 }
 
+function cerrarPanelNotificacionesProfesor(){const panel=document.getElementById("panelNotificacionesProfesor"),backdrop=document.getElementById("backdropNotificacionesProfesor"),boton=document.querySelector("#profesor .notification-button");panel?.classList.remove("show");backdrop?.classList.remove("show");boton?.setAttribute("aria-expanded","false");sincronizarBloqueoScrollNotificaciones();}
+
 function toggleNotificacionesProfesor(evento) {
     evento?.stopPropagation();
     const panel = document.getElementById("panelNotificacionesProfesor");
+    const backdrop = document.getElementById("backdropNotificacionesProfesor");
     const boton = document.querySelector("#profesor .notification-button");
     if (!panel) return;
 
     const abrir = !panel.classList.contains("show");
+    cerrarPanelNotificacionesProfesor();
     document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
-    panel.classList.toggle("show", abrir);
-    boton?.setAttribute("aria-expanded", abrir ? "true" : "false");
-
     if (abrir) {
+        panel.classList.add("show");
+        backdrop?.classList.add("show");
+        boton?.setAttribute("aria-expanded", "true");
         const pendientes = registros.filter(r => r.estado === "pendiente");
         const ids = pendientes.map(r => String(r.id));
         const leidas = Array.from(new Set([...obtenerIdsNotificacionesLeidas(), ...ids]));
         guardarIdsNotificacionesLeidas(leidas);
         actualizarNotificacionesProfesor(pendientes);
     }
+    sincronizarBloqueoScrollNotificaciones();
 }
 
 function marcarNotificacionesProfesorLeidas() {
@@ -6621,8 +8630,7 @@ function abrirNotificacionProfesor(id) {
     const ids = obtenerIdsNotificacionesLeidas();
     if (!ids.includes(String(id))) ids.push(String(id));
     guardarIdsNotificacionesLeidas(ids);
-    document.getElementById("panelNotificacionesProfesor")?.classList.remove("show");
-    document.querySelector("#profesor .notification-button")?.setAttribute("aria-expanded", "false");
+    cerrarPanelNotificacionesProfesor();
     mostrarSeccionProfesor("pendientes");
 }
 
@@ -6680,6 +8688,7 @@ function detenerActualizacionProfesorTiempoReal() {
 }
 
 async function cerrarSesion() {
+    try { limpiarSesionSigho(); } catch (_) {}
     // Invalidamos inmediatamente cualquier consulta pendiente de
     // "Mis estudiantes" antes de cerrar la sesión.
     profesorVistaToken++;
@@ -6690,12 +8699,14 @@ async function cerrarSesion() {
     } catch (_) {}
 
     usuarioActual = null;
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
     usuarios = [];
     registros = [];
     solicitudes = [];
 
-    document.querySelectorAll(".more-menu-dropdown.show, .notification-panel.show")
+    document.querySelectorAll(".more-menu-dropdown.show, .notification-panel.show, .notification-backdrop.show")
         .forEach(el => el.classList.remove("show"));
+    sincronizarBloqueoScrollNotificaciones();
 
     volverInicio();
 }
@@ -6707,7 +8718,9 @@ async function cerrarSesion() {
 
 function toggleUserMenu(boton) {
     document.querySelectorAll(".notification-panel.show").forEach(panel => panel.classList.remove("show"));
+    document.querySelectorAll(".notification-backdrop.show").forEach(backdrop => backdrop.classList.remove("show"));
     document.querySelectorAll('.notification-button[aria-expanded="true"]').forEach(btn => btn.setAttribute("aria-expanded", "false"));
+    sincronizarBloqueoScrollNotificaciones();
     const menu = boton?.nextElementSibling;
     if (!menu) return;
 
@@ -6723,7 +8736,9 @@ document.addEventListener("click", (evento) => {
     if (!evento.target.closest(".dashboard-tools")) {
         document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
         document.querySelectorAll(".notification-panel.show").forEach(panel => panel.classList.remove("show"));
+        document.querySelectorAll(".notification-backdrop.show").forEach(backdrop => backdrop.classList.remove("show"));
         document.querySelectorAll('.notification-button[aria-expanded="true"]').forEach(btn => btn.setAttribute("aria-expanded", "false"));
+        sincronizarBloqueoScrollNotificaciones();
     }
 });
 
@@ -6912,7 +8927,7 @@ function configurarEdicionPerfilProfesor(){
                 if(id === "profesorPerfilNombres" || id === "profesorPerfilApellidos") {
                     el.value = el.value.replace(/[^\p{L} ]/gu, "").replace(/ {2,}/g, " ").replace(/^ +/g, "").slice(0,60);
                 } else if(id === "profesorPerfilCorreo") {
-                    el.value = el.value.replace(/\s/g, "").toLowerCase();
+                    el.value = el.value.replace(/\s/g, "");
                 } else if(id === "profesorPerfilTelefono") {
                     const numero = el.value.replace(/\D/g, "").slice(0,10);
                     el.value = numero.length > 6 ? `${numero.slice(0,3)} ${numero.slice(3,6)} ${numero.slice(6)}` : numero.length > 3 ? `${numero.slice(0,3)} ${numero.slice(3)}` : numero;
@@ -6921,7 +8936,7 @@ function configurarEdicionPerfilProfesor(){
             });
             el.addEventListener("blur",()=>{
                 if(id === "profesorPerfilNombres" || id === "profesorPerfilApellidos") el.value=capitalizarNombreCompleto(el.value).slice(0,60);
-                if(id === "profesorPerfilCorreo") el.value=el.value.replace(/\s/g, "").trim().toLowerCase();
+                if(id === "profesorPerfilCorreo") el.value=el.value.replace(/\s/g, "").trim();
                 actualizarEstadoPerfilProfesor();
             });
             el.addEventListener("change",actualizarEstadoPerfilProfesor);
@@ -6968,6 +8983,7 @@ async function guardarPerfilProfesor() {
     try{
         const data=await api("update_professor_profile",{method:"POST",body:datos});
         usuarioActual=normalizarUsuario(data.user);
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
         const nombreCompletoProfesor=(usuarioActual.nombre||"Profesor").trim();
         const primerNombreProfesor=nombreCompletoProfesor.split(/\s+/)[0] || "Profesor";
         document.getElementById("nombrePerfilProfesorHeader")?.replaceChildren(document.createTextNode(primerNombreProfesor));
@@ -7064,10 +9080,10 @@ function configurarValidacionSolicitudProfesor() {
     if (correo && correo.dataset.validacionProfesorConfigurada !== "1") {
         correo.dataset.validacionProfesorConfigurada = "1";
         correo.addEventListener("input", () => {
-            correo.value = correo.value.replace(/\s/g, "").toLowerCase();
+            /* Mantener exactamente las mayúsculas/minúsculas que escribe el usuario. */
         });
         correo.addEventListener("blur", () => {
-            correo.value = correo.value.replace(/\s/g, "").trim().toLowerCase();
+            correo.value = correo.value.replace(/\s/g, "").trim();
         });
     }
 
@@ -7098,7 +9114,186 @@ function configurarValidacionSolicitudProfesor() {
     }
 }
 
-function configurarValidacionesFormularioEstudiante() {
+function mostrarErrorCampo(input, mensaje) {
+        if (!input) return;
+        const formGroup = input.closest('.form-group');
+        if (!formGroup) return;
+        let errorNode = formGroup.querySelector('.field-error-message');
+        if (!errorNode) {
+            errorNode = document.createElement('small');
+            errorNode.className = 'field-error-message';
+            formGroup.appendChild(errorNode);
+        }
+        const texto = (mensaje || '').trim();
+        errorNode.textContent = texto;
+        errorNode.style.display = texto ? 'block' : 'none';
+        input.classList.toggle('campo-error', !!texto);
+    }
+
+    function limpiarErrorCampo(input) {
+        if (!input) return;
+        const formGroup = input.closest('.form-group');
+        if (!formGroup) return;
+        const errorNode = formGroup.querySelector('.field-error-message');
+        if (errorNode) {
+            errorNode.textContent = '';
+            errorNode.style.display = 'none';
+        }
+        input.classList.remove('campo-error');
+        input.setCustomValidity('');
+    }
+
+    function validarDocumentoSegunTipo() {
+        const tipo = document.getElementById('tipoDocumento')?.value || '';
+        const input = document.getElementById('numeroDocumento');
+        if (!input) return;
+
+        const valor = String(input.value || '').replace(/\D/g, '');
+        const limite = tipo === 'PPT' ? 8 : 10;
+        input.maxLength = limite;
+        input.value = valor.slice(0, limite);
+
+        let mensaje = '';
+        let valido = true;
+
+        if (!tipo) {
+            valido = false;
+            mensaje = 'Selecciona el tipo de documento.';
+        } else if (tipo === 'Tarjeta de identidad') {
+            valido = /^\d{10}$/.test(valor);
+            mensaje = valido ? '' : 'La tarjeta de identidad debe tener exactamente 10 dígitos.';
+        } else if (tipo === 'Cédula de ciudadanía') {
+            valido = /^\d{7,10}$/.test(valor);
+            mensaje = valido ? '' : 'La cédula debe tener entre 7 y 10 dígitos.';
+        } else if (tipo === 'PPT') {
+            valido = /^\d{6,8}$/.test(valor);
+            mensaje = valido ? '' : 'El PPT debe tener entre 6 y 8 dígitos.';
+        }
+
+        input.setCustomValidity(mensaje);
+        if (valor && !valido) {
+            mostrarErrorCampo(input, mensaje);
+        } else {
+            limpiarErrorCampo(input);
+        }
+    }
+
+    function configurarValidacionesGenericasCampos() {
+        const campos = document.querySelectorAll('#solicitud input, #solicitud select, #solicitud textarea');
+        campos.forEach(input => {
+            if (input.dataset.errorGenericoConfigurado === '1') return;
+            input.dataset.errorGenericoConfigurado = '1';
+            input.addEventListener('blur', () => {
+                const valor = input.value || '';
+                const crudo = String(valor).replace(/\s+$/g, '');
+                if (input.type !== 'select-one' && input.type !== 'select-multiple') {
+                    input.value = crudo;
+                }
+                if (input.disabled) {
+                    limpiarErrorCampo(input);
+                    return;
+                }
+                if (input.required && !String(input.value).trim()) {
+                    limpiarErrorCampo(input);
+                    input.classList.add('campo-error');
+                    return;
+                }
+                if (input.validity.valid) {
+                    limpiarErrorCampo(input);
+                    input.setCustomValidity('');
+                } else {
+                    mostrarErrorCampo(input, input.validationMessage || 'El valor ingresado no es válido.');
+                }
+            });
+            input.addEventListener('input', () => {
+                if (input.disabled) return;
+                const texto = String(input.value || '');
+                if (!texto.trim()) {
+                    limpiarErrorCampo(input);
+                    return;
+                }
+                if (input.matches('#numeroDocumento')) {
+                    validarDocumentoSegunTipo();
+                    return;
+                }
+                if (input.matches('#telefonoAcudiente')) {
+                    const tipo = document.getElementById('tipoTelefonoAcudiente')?.value;
+                    if (tipo === 'fijo') {
+                        validarTelefonoFijoAcudiente(input);
+                    } else if (tipo === 'celular') {
+                        validarCelularSIGHO(input);
+                    }
+                    return;
+                }
+                if (input.validity.valid) {
+                    limpiarErrorCampo(input);
+                }
+            });
+            input.addEventListener('change', () => {
+                if (input.disabled) return;
+                if (input.matches('select')) {
+                    input.setCustomValidity('');
+                    limpiarErrorCampo(input);
+                    return;
+                }
+                if (input.matches('#numeroDocumento')) {
+                    validarDocumentoSegunTipo();
+                    return;
+                }
+                if (input.matches('#telefonoAcudiente')) {
+                    const tipo = document.getElementById('tipoTelefonoAcudiente')?.value;
+                    if (tipo === 'fijo') validarTelefonoFijoAcudiente(input);
+                    else if (tipo === 'celular') validarCelularSIGHO(input);
+                    return;
+                }
+                if (String(input.value).trim() && input.validity.valid) {
+                    limpiarErrorCampo(input);
+                }
+            });
+        });
+    }
+
+    function configurarValidacionNumeroDocumento() {
+        const input = document.getElementById('numeroDocumento');
+        const tipo = document.getElementById('tipoDocumento');
+        if (!input || !tipo) return;
+
+        tipo.addEventListener('change', () => {
+            validarDocumentoSegunTipo();
+        });
+        input.addEventListener('input', () => {
+            validarDocumentoSegunTipo();
+        });
+        input.addEventListener('blur', () => {
+            validarDocumentoSegunTipo();
+        });
+        validarDocumentoSegunTipo();
+    }
+
+    function configurarValidacionTelefonoAcudiente() {
+        const input = document.getElementById('telefonoAcudiente');
+        const tipo = document.getElementById('tipoTelefonoAcudiente');
+        if (!input || !tipo) return;
+
+        const validar = () => {
+            const valor = tipo.value;
+            if (!valor) {
+                limpiarErrorCampo(input);
+                return;
+            }
+            if (valor === 'fijo') {
+                validarTelefonoFijoAcudiente(input);
+            } else {
+                validarCelularSIGHO(input);
+            }
+        };
+
+        tipo.addEventListener('change', validar);
+        input.addEventListener('input', validar);
+        input.addEventListener('blur', validar);
+        validar();
+    }
+
     // Todos los nombres y apellidos usan la misma regla: letras, espacios sencillos
     // y capitalización automática. Los campos opcionales pueden permanecer vacíos.
     const idsNombres = [
@@ -7113,9 +9308,7 @@ function configurarValidacionesFormularioEstudiante() {
         el.dataset.validacionNombreConfigurada = "1";
 
         el.addEventListener("keydown", evento => {
-            if (evento.key === " " && (el.selectionStart === 0 || el.value.charAt(el.selectionStart - 1) === " ")) {
-                evento.preventDefault();
-            }
+            if (evento.key === " ") return;
         });
 
         el.addEventListener("input", () => {
@@ -7133,7 +9326,10 @@ function configurarValidacionesFormularioEstudiante() {
 
         el.addEventListener("blur", () => {
             el.value = capitalizarNombreCompleto(el.value).slice(0, Number(el.maxLength) > 0 ? Number(el.maxLength) : 60);
-            if (!el.value) el.setCustomValidity("");
+            if (!el.value || /^[\p{L}]+(?: [\p{L}]+)*$/u.test(el.value)) {
+                el.setCustomValidity("");
+                limpiarErrorCampo(el);
+            }
         });
     });
 
@@ -7146,7 +9342,10 @@ function configurarValidacionesFormularioEstudiante() {
     const documento = document.getElementById("numeroDocumento");
     if (documento && documento.dataset.validacionConfigurada !== "1") {
         documento.dataset.validacionConfigurada = "1";
-        documento.addEventListener("input", () => { documento.value = documento.value.replace(/\D/g, "").slice(0, 10); });
+        documento.addEventListener("input", () => {
+            const limite = tipoDocumento?.value === "PPT" ? 8 : 10;
+            documento.value = documento.value.replace(/\D/g, "").slice(0, limite);
+        });
     }
 
     // ============================================================
@@ -7218,21 +9417,21 @@ function configurarValidacionesFormularioEstudiante() {
 
         const numero = elemento.value.replace(/\D/g, "").slice(0, 10);
         elemento.value = numero.length > 3
-            ? `${numero.slice(0,3)} ${numero.slice(3)}`
+            ? `${numero.slice(0, 3)} ${numero.slice(3)}`
             : numero;
 
-        // 10 dígitos: 608 + 7 dígitos.
+        // 10 dígitos: 60 + indicativo regional (1-8) + 7 dígitos.
         // Los 7 restantes no pueden iniciar por 0, 1 o 9
         // y no pueden ser los mismos 7 dígitos repetidos.
         const resto = numero.slice(3);
         const sieteRepetidos = /^([0-9])\1{6}$/.test(resto);
-        const valido = /^608[2-8]\d{6}$/.test(numero) && !sieteRepetidos;
+        const valido = /^60[1-8][2-8]\d{6}$/.test(numero) && !sieteRepetidos;
 
         elemento.setCustomValidity(
             numero.length === 0
                 ? ""
                 : !valido
-                    ? "El teléfono fijo debe tener el formato 608 123 4567. Después de 608 debe iniciar entre 2 y 8 y no puede repetir el mismo dígito siete veces."
+                    ? "El teléfono fijo debe iniciar con 60, continuar con un indicativo regional del 1 al 8 y luego 7 dígitos cuyo primero esté entre 2 y 8; no puede repetir un mismo dígito siete veces."
                     : ""
         );
 
@@ -7243,14 +9442,15 @@ function configurarValidacionesFormularioEstudiante() {
         if (!tipoTelefonoAcudiente || !telAcudiente) return;
 
         const tipo = tipoTelefonoAcudiente.value;
-
-        telAcudiente.value = "";
+        const tipoAnterior = telAcudiente.dataset.tipoLinea || "";
+        if (tipoAnterior !== tipo) telAcudiente.value = "";
+        telAcudiente.dataset.tipoLinea = tipo;
         telAcudiente.setCustomValidity("");
 
         if (!tipo) {
             telAcudiente.disabled = true;
             telAcudiente.placeholder = "Selecciona el tipo de línea";
-            telAcudiente.maxLength = 12;
+            telAcudiente.maxLength = 11;
             if (ayudaTelAcudiente) ayudaTelAcudiente.textContent = "Primero selecciona el tipo de línea.";
             return;
         }
@@ -7258,14 +9458,15 @@ function configurarValidacionesFormularioEstudiante() {
         telAcudiente.disabled = false;
 
         if (tipo === "fijo") {
-            telAcudiente.placeholder = "608 123 4567";
-            telAcudiente.maxLength = 12;
-            telAcudiente.pattern = "608 [2-8]\\d{6}";
+            telAcudiente.placeholder = "601 2345678";
+            telAcudiente.maxLength = 11;
+            telAcudiente.pattern = "60[1-8] [2-8]\\d{6}";
             if (ayudaTelAcudiente) {
-                ayudaTelAcudiente.textContent = "Formato: 608 123 4567. Debe comenzar por 608; los 7 dígitos restantes no pueden iniciar en 0, 1 o 9 ni ser siete dígitos iguales.";
+                ayudaTelAcudiente.textContent = "Ingrese 10 dígitos iniciando con 60, seguido del indicativo regional (1-8) y los 7 dígitos del número (donde el primero debe ser de 2 a 8).";
             }
             telAcudiente.removeEventListener("input", validarCelularAcudienteTemporal);
             telAcudiente.addEventListener("input", validarFijoAcudienteTemporal);
+            telAcudiente.removeEventListener("blur", validarCelularAcudienteTemporal);
             telAcudiente.addEventListener("blur", validarFijoAcudienteTemporal);
         } else {
             telAcudiente.placeholder = "300 123 4567";
@@ -7276,6 +9477,7 @@ function configurarValidacionesFormularioEstudiante() {
             }
             telAcudiente.removeEventListener("input", validarFijoAcudienteTemporal);
             telAcudiente.addEventListener("input", validarCelularAcudienteTemporal);
+            telAcudiente.removeEventListener("blur", validarFijoAcudienteTemporal);
             telAcudiente.addEventListener("blur", validarCelularAcudienteTemporal);
         }
     }
@@ -7330,6 +9532,35 @@ function configurarValidacionesFormularioEstudiante() {
     const grado = document.getElementById("gradoSolicitud");
     const tipoDocumento = document.getElementById("tipoDocumento");
 
+    const calcularEdad = valor => {
+        if (!valor) return null;
+        const nacimiento = new Date(`${valor}T00:00:00`);
+        if (Number.isNaN(nacimiento.getTime())) return null;
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const cumpleEsteAnio = new Date(hoy.getFullYear(), nacimiento.getMonth(), nacimiento.getDate());
+        if (hoy < cumpleEsteAnio) edad--;
+        return edad;
+    };
+
+    const validarFechaNacimiento = () => {
+        if (!fecha || fecha.disabled) return;
+        const edadVista = document.getElementById("edadCalculada");
+        if (!fecha.value) {
+            fecha.setCustomValidity("");
+            if (edadVista) edadVista.textContent = "-";
+            return;
+        }
+        const formatoValido = /^\d{4}-\d{2}-\d{2}$/.test(fecha.value);
+        const dentroDelRango = formatoValido &&
+            (!fecha.min || fecha.value >= fecha.min) &&
+            (!fecha.max || fecha.value <= fecha.max);
+        fecha.setCustomValidity(dentroDelRango ? "" : "La fecha de nacimiento no está completa o no corresponde al rango permitido.");
+        const edad = calcularEdad(fecha.value);
+        if (edadVista) edadVista.textContent = edad === null ? "-" : `${edad} años`;
+    };
+
     const actualizarRangoFechaNacimiento = () => {
         if (!fecha || !grado) return;
         const ayuda = document.getElementById("ayudaFechaNacimiento");
@@ -7368,10 +9599,10 @@ function configurarValidacionesFormularioEstudiante() {
 
         // CICLO V: Cédula obligatoria.
         if (grado.value === "Ciclo V") {
-            opcionTI.disabled = true;
+            opcionTI.disabled = false;
             opcionCC.disabled = false;
             opcionPPT.disabled = false;
-            if (tipoDocumento.value !== "PPT") tipoDocumento.value = "Cédula de ciudadanía";
+            tipoDocumento.value = "Cédula de ciudadanía";
             return;
         }
 
@@ -7384,42 +9615,15 @@ function configurarValidacionesFormularioEstudiante() {
             // Sin fecha: conservar lo que haya elegido el usuario.
             if (!fecha || !fecha.value) return;
 
-            const nacimiento = new Date(`${fecha.value}T00:00:00`);
-            const hoy = new Date();
-            let edad = hoy.getFullYear() - nacimiento.getFullYear();
-            const cumple = new Date(hoy.getFullYear(), nacimiento.getMonth(), nacimiento.getDate());
-            if (hoy < cumple) edad--;
+            const edad = calcularEdad(fecha.value);
+            if (edad === null) return;
 
-            // PPT puede mantenerse a cualquier edad dentro del rango del grado.
-            if (tipoDocumento.value === "PPT") {
-                opcionPPT.disabled = false;
-                opcionTI.disabled = false;
-                opcionCC.disabled = false;
-                return;
-            }
-
-            // 14 a 17 años: TI obligatoria.
-            if (edad < 18) {
-                opcionTI.disabled = false;
-                opcionCC.disabled = true;
-                tipoDocumento.value = "Tarjeta de identidad";
-                return;
-            }
-
-            // 18 años: TI y CC disponibles; conservar la elección.
-            if (edad === 18) {
-                opcionTI.disabled = false;
-                opcionCC.disabled = false;
-                return;
-            }
-
-            // 19 años: CC obligatoria.
-            if (edad === 19) {
-                opcionTI.disabled = true;
-                opcionCC.disabled = false;
-                tipoDocumento.value = "Cédula de ciudadanía";
-                return;
-            }
+            // La fecha propone el documento correspondiente, pero el usuario
+            // puede cambiarlo manualmente después.
+            opcionTI.disabled = false;
+            opcionCC.disabled = false;
+            opcionPPT.disabled = false;
+            tipoDocumento.value = edad >= 18 ? "Cédula de ciudadanía" : "Tarjeta de identidad";
         }
     };
 
@@ -7431,16 +9635,29 @@ function configurarValidacionesFormularioEstudiante() {
     }
 
     if (fecha) {
-        fecha.addEventListener("change", actualizarTipoDocumentoPorEdad);
+        fecha.addEventListener("input", () => {
+            validarFechaNacimiento();
+            actualizarTipoDocumentoPorEdad();
+        });
+        fecha.addEventListener("change", () => {
+            validarFechaNacimiento();
+            actualizarTipoDocumentoPorEdad();
+        });
         actualizarRangoFechaNacimiento();
+        validarFechaNacimiento();
         actualizarTipoDocumentoPorEdad();
     }
     configurarSelectorEvidencia();
     configurarSelectoresEPS();
     configurarJornadaPorGrado();
-}
 
 // Evita que el navegador intente restaurar una sesión visual antigua.
+function configurarValidacionesFormularioEstudiante() {
+    configurarValidacionesGenericasCampos();
+    configurarValidacionNumeroDocumento();
+    configurarValidacionTelefonoAcudiente();
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     llenarAniosServicio();
     configurarValidacionesFormularioEstudiante();
@@ -7462,6 +9679,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const data = await api("session");
         if (data.user) {
             usuarioActual = normalizarUsuario(data.user);
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
             await cargarDatosPorRol();
             if (usuarioActual.rol === "profesor" && document.getElementById("profesor")?.classList.contains("active")) {
                 mostrarSeccionProfesor("inicio");
@@ -8535,6 +10753,11 @@ document.addEventListener("DOMContentLoaded",()=>{
     configurarErroresCamposSolicitud();
     configurarSelectorEvidencia();
 });
+
+// Los controles inline del HTML necesitan acceder a estas acciones desde window.
+window.mostrarLogin = mostrarLogin;
+window.mostrarSolicitud = mostrarSolicitud;
+window.iniciarSesion = iniciarSesion;
 </script>
 
 
@@ -8576,6 +10799,1163 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
+
+<script id="responsive-mobile-menu">
+function toggleMobileSidebar(roleId){
+    const screen=document.getElementById(roleId);
+    if(!screen) return;
+    const dashboard=screen.querySelector('.dashboard.has-role-sidebar');
+    const button=dashboard?.querySelector('.mobile-sidebar-toggle');
+    if(!dashboard) return;
+    const abrir=!dashboard.classList.contains('mobile-sidebar-open');
+    dashboard.classList.toggle('mobile-sidebar-open',abrir);
+    if(button) button.setAttribute('aria-expanded',abrir?'true':'false');
+    document.body.style.overflow=abrir?'hidden':'';
+}
+function closeMobileSidebar(roleId){
+    const screen=document.getElementById(roleId);
+    if(!screen) return;
+    const dashboard=screen.querySelector('.dashboard.has-role-sidebar');
+    const button=dashboard?.querySelector('.mobile-sidebar-toggle');
+    dashboard?.classList.remove('mobile-sidebar-open');
+    if(button) button.setAttribute('aria-expanded','false');
+    document.body.style.overflow='';
+}
+document.addEventListener('click',function(e){
+    const navButton=e.target.closest('.role-sidebar .sidebar-nav button, .role-sidebar .sidebar-logout');
+    if(!navButton) return;
+    const screen=navButton.closest('.dashboard-screen');
+    if(screen) closeMobileSidebar(screen.id);
+});
+window.addEventListener('resize',function(){
+    if(window.innerWidth>=768){
+        document.querySelectorAll('.dashboard.has-role-sidebar.mobile-sidebar-open').forEach(function(d){d.classList.remove('mobile-sidebar-open');});
+        document.body.style.overflow='';
+    }
+});
+</script>
+
+<!-- Mejoras móviles SIGHO: no afectan la versión de escritorio -->
+<div id="mobileOverlay" class="mobile-only-overlay" aria-hidden="true"></div>
+
+<nav class="bottom-bar" aria-label="Navegación móvil">
+    <button type="button" data-mobile-nav="inicio" aria-label="Inicio">Inicio</button>
+    <button type="button" data-mobile-nav="registros" aria-label="Registros">Registros</button>
+    <button type="button" data-mobile-nav="ayuda" aria-label="Ayuda">Ayuda</button>
+    <button type="button" data-mobile-nav="perfil" aria-label="Perfil">Perfil</button>
+</nav>
+
+<div id="ptrIndicator" class="ptr-indicator" aria-hidden="true">
+    <span>↓</span> Suelta para actualizar
+</div>
+
+
+<script>
+/* =========================================================
+   MEJORAS MÓVILES SIGHO — JS táctil
+   ========================================================= */
+(function () {
+    const mobileQuery = window.matchMedia("(max-width: 900px) and (hover: none) and (pointer: coarse)");
+    const overlay = document.getElementById("mobileOverlay");
+    const ptrIndicator = document.getElementById("ptrIndicator");
+    const sidebarSelectors = ".sidebar, .role-sidebar, .admin-sidebar, .super-admin-sidebar";
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartTime = 0;
+    let ptrStartY = 0;
+    let ptrDistance = 0;
+    let ptrReady = false;
+    let ptrRefreshing = false;
+
+    function isMobileTouch() {
+        return mobileQuery.matches;
+    }
+
+    function getSidebars() {
+        return Array.from(document.querySelectorAll(sidebarSelectors));
+    }
+
+    function setSidebar(open) {
+        if (!isMobileTouch()) return;
+
+        getSidebars().forEach(sidebar => {
+            sidebar.classList.toggle("active", open);
+        });
+
+        document.documentElement.classList.toggle("mobile-sidebar-open", open);
+        document.body.classList.toggle("mobile-sidebar-open", open);
+
+        if (overlay) {
+            overlay.classList.toggle("active", open);
+            overlay.setAttribute("aria-hidden", open ? "false" : "true");
+        }
+    }
+
+    if (overlay) {
+        overlay.addEventListener("click", function () {
+            setSidebar(false);
+        });
+    }
+
+    /* Cerrar al cambiar a escritorio para no dejar estados móviles activos. */
+    function resetMobileState() {
+        if (!isMobileTouch()) {
+            getSidebars().forEach(sidebar => sidebar.classList.remove("active"));
+            document.documentElement.classList.remove("mobile-sidebar-open");
+            document.body.classList.remove("mobile-sidebar-open");
+            if (overlay) {
+                overlay.classList.remove("active");
+                overlay.setAttribute("aria-hidden", "true");
+            }
+        }
+    }
+
+    if (mobileQuery.addEventListener) {
+        mobileQuery.addEventListener("change", resetMobileState);
+    } else if (mobileQuery.addListener) {
+        mobileQuery.addListener(resetMobileState);
+    }
+
+    /* Swipe desde los bordes: derecha abre / izquierda cierra. */
+    document.addEventListener("touchstart", function (event) {
+        if (!isMobileTouch() || !event.touches.length) return;
+
+        const touch = event.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchStartTime = Date.now();
+
+        if (window.scrollY <= 0) {
+            ptrStartY = touch.clientY;
+            ptrDistance = 0;
+            ptrReady = false;
+        }
+    }, { passive: true });
+
+    document.addEventListener("touchend", function (event) {
+        if (!isMobileTouch() || !event.changedTouches.length) return;
+
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - touchStartY;
+        const duration = Date.now() - touchStartTime;
+
+        if (duration <= 700 && Math.abs(deltaX) >= 70 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
+            const menuOpen = document.body.classList.contains("mobile-sidebar-open");
+
+            if (!menuOpen && touchStartX <= 24 && deltaX > 0) {
+                setSidebar(true);
+            } else if (menuOpen && deltaX < 0) {
+                setSidebar(false);
+            }
+        }
+
+        if (ptrReady && ptrDistance >= 90 && !ptrRefreshing && window.scrollY <= 0) {
+            ptrRefreshing = true;
+            if (ptrIndicator) {
+                ptrIndicator.classList.remove("ready");
+                ptrIndicator.classList.add("visible");
+                ptrIndicator.innerHTML = "<span>↻</span> Actualizando…";
+            }
+            window.setTimeout(function () {
+                window.location.reload();
+            }, 150);
+        } else if (!ptrRefreshing && ptrIndicator) {
+            ptrIndicator.classList.remove("visible", "ready");
+        }
+
+        ptrStartY = 0;
+        ptrDistance = 0;
+        ptrReady = false;
+    }, { passive: true });
+
+    document.addEventListener("touchmove", function (event) {
+        if (!isMobileTouch() || !event.touches.length || window.scrollY > 0) return;
+
+        const currentY = event.touches[0].clientY;
+        const delta = currentY - ptrStartY;
+
+        if (ptrStartY > 0 && delta > 0) {
+            ptrDistance = Math.min(delta, 120);
+
+            if (ptrIndicator) {
+                ptrIndicator.classList.add("visible");
+
+                if (ptrDistance >= 90) {
+                    ptrReady = true;
+                    ptrIndicator.classList.add("ready");
+                    ptrIndicator.innerHTML = "<span>↑</span> Suelta para actualizar";
+                } else {
+                    ptrReady = false;
+                    ptrIndicator.classList.remove("ready");
+                    ptrIndicator.innerHTML = "<span>↓</span> Desliza para actualizar";
+                }
+            }
+        }
+    }, { passive: true });
+
+    window.addEventListener("scroll", function () {
+        if (!isMobileTouch() || !ptrIndicator || window.scrollY > 0) {
+            if (ptrIndicator && !ptrRefreshing) {
+                ptrIndicator.classList.remove("visible", "ready");
+            }
+        }
+    }, { passive: true });
+
+    /* Bottom bar: intenta reutilizar la navegación existente sin reemplazarla. */
+    document.querySelectorAll("[data-mobile-nav]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            const target = button.getAttribute("data-mobile-nav");
+
+            if (target === "inicio") {
+                const candidate = document.querySelector(
+                    '[data-section="inicio"], #inicio, [onclick*="Inicio"], [onclick*="abrirInicio"]'
+                );
+                if (candidate) candidate.click();
+                else window.scrollTo({ top: 0, behavior: "smooth" });
+            } else if (target === "registros") {
+                const candidate = document.querySelector(
+                    '[data-section="registros"], #registros, [onclick*="Registros"], [onclick*="abrirRegistros"]'
+                );
+                if (candidate) candidate.click();
+            } else if (target === "ayuda") {
+                const candidate = document.querySelector(
+                    '[data-section="ayuda"], #ayuda, [onclick*="Ayuda"], [onclick*="abrirAyuda"]'
+                );
+                if (candidate) candidate.click();
+            } else if (target === "perfil") {
+                const candidate = document.querySelector(
+                    '[data-section="perfil"], #perfil, [onclick*="Perfil"], [onclick*="abrirPerfil"], [onclick*="Mis datos"]'
+                );
+                if (candidate) candidate.click();
+            }
+
+            document.querySelectorAll(".bottom-bar button").forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+        });
+    });
+
+    /* Solicitud de permiso para notificaciones push.
+       Solo se expone en móvil y nunca se solicita automáticamente. */
+    window.solicitarNotificacionesMovil = async function () {
+        if (!isMobileTouch() || !("Notification" in window)) {
+            return "no-disponible";
+        }
+
+        if (Notification.permission === "granted") {
+            return "concedido";
+        }
+
+        if (Notification.permission === "denied") {
+            return "denegado";
+        }
+
+        const permission = await Notification.requestPermission();
+        return permission;
+    };
+
+    /* Preparación opcional para registrar un Service Worker cuando exista. */
+    window.iniciarNotificacionesPushMovil = async function () {
+        if (!isMobileTouch() || !("serviceWorker" in navigator)) {
+            return false;
+        }
+
+        try {
+            await navigator.serviceWorker.ready;
+            return true;
+        } catch (_) {
+            return false;
+        }
+    };
+})();
+</script>
+
+<script id="sigho-theme-script">
+(function () {
+    const toggle = document.getElementById("themeToggle");
+    if (!toggle) return;
+
+    function readStoredTheme() {
+        try {
+            const stored = localStorage.getItem("theme") || localStorage.getItem("sigho_theme");
+            return stored === "dark" || stored === "light" ? stored : null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function isDark() {
+        return document.documentElement.classList.contains("dark-mode") ||
+               document.body.classList.contains("dark-mode");
+    }
+
+    function applyTheme(theme, persist = true) {
+        const dark = theme === "dark";
+        document.documentElement.classList.toggle("dark-mode", dark);
+        document.body.classList.toggle("dark-mode", dark);
+        toggle.setAttribute("aria-pressed", dark ? "true" : "false");
+        toggle.setAttribute("aria-label", dark ? "Activar modo claro" : "Activar modo oscuro");
+        toggle.setAttribute("title", dark ? "Activar modo claro" : "Activar modo oscuro");
+
+        if (persist) {
+            try {
+                localStorage.setItem("theme", dark ? "dark" : "light");
+                localStorage.setItem("sigho_theme", dark ? "dark" : "light");
+            } catch (_) {}
+        }
+    }
+
+    const storedTheme = readStoredTheme();
+    applyTheme(storedTheme || (isDark() ? "dark" : "light"), false);
+
+    toggle.addEventListener("click", function () {
+        applyTheme(isDark() ? "light" : "dark", true);
+    });
+})();
+</script>
+
+
+<script id="sigho-fouc-finalize">
+(function () {
+    function reveal() {
+        try {
+            document.documentElement.classList.remove('sigho-fouc-pending');
+        } catch (_) {}
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', reveal, { once: true });
+    } else {
+        reveal();
+    }
+})();
+</script>
+
+
+<style id="sigho-dark-root-variables-v11">
+/* =========================================================
+   CORRECCIÓN PROFUNDA FINAL — MODO OSCURO
+   Variables + máxima especificidad + componentes dinámicos.
+   Se coloca al final del documento para vencer estilos antiguos
+   definidos posteriormente al <head>.
+   ========================================================= */
+
+:root {
+    --bg-page: #f4f7f8;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --text-main: #172033;
+    --text-muted: #64748b;
+    --border-input: #d9e2e8;
+}
+
+html.dark-mode,
+body.dark-mode {
+    --bg-page: #0b1329;
+    --bg-card: #1e293b;
+    --bg-input: #1e293b;
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    --border-input: #334155;
+    color-scheme: dark !important;
+}
+
+/* Lienzo y capas estructurales */
+html.dark-mode body,
+body.dark-mode,
+html.dark-mode .main-wrapper,
+body.dark-mode .main-wrapper,
+html.dark-mode .content-area,
+body.dark-mode .content-area,
+html.dark-mode .dashboard,
+body.dark-mode .dashboard,
+html.dark-mode .role-main,
+body.dark-mode .role-main {
+    background-color: var(--bg-page) !important;
+    color: var(--text-main) !important;
+}
+
+/* =========================================================
+   TODOS LOS CAMPOS
+   html.dark-mode también cubre el caso en que JS aplique la
+   clase al <html> antes de que se actualice <body>.
+   ========================================================= */
+
+html.dark-mode input,
+html.dark-mode select,
+html.dark-mode textarea,
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background: var(--bg-input) !important;
+    background-color: var(--bg-input) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--border-input) !important;
+    -webkit-text-fill-color: #ffffff !important;
+    color-scheme: dark !important;
+    box-shadow: none !important;
+}
+
+/* Campos deshabilitados / calculados / solo lectura */
+html.dark-mode input:disabled,
+html.dark-mode input[readonly],
+html.dark-mode select:disabled,
+html.dark-mode textarea:disabled,
+html.dark-mode textarea[readonly],
+body.dark-mode input:disabled,
+body.dark-mode input[readonly],
+body.dark-mode select:disabled,
+body.dark-mode textarea:disabled,
+body.dark-mode textarea[readonly] {
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* Máxima prioridad dentro del panel del estudiante */
+html.dark-mode #estudiante input,
+html.dark-mode #estudiante select,
+html.dark-mode #estudiante textarea,
+body.dark-mode #estudiante input,
+body.dark-mode #estudiante select,
+body.dark-mode #estudiante textarea {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #334155 !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+html.dark-mode #estudiante input:disabled,
+html.dark-mode #estudiante input[readonly],
+html.dark-mode #estudiante select:disabled,
+html.dark-mode #estudiante textarea:disabled,
+html.dark-mode #estudiante textarea[readonly],
+body.dark-mode #estudiante input:disabled,
+body.dark-mode #estudiante input[readonly],
+body.dark-mode #estudiante select:disabled,
+body.dark-mode #estudiante textarea:disabled,
+body.dark-mode #estudiante textarea[readonly] {
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* Placeholders */
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder,
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* Selects y opciones */
+html.dark-mode select,
+html.dark-mode select option,
+html.dark-mode select optgroup,
+body.dark-mode select,
+body.dark-mode select option,
+body.dark-mode select optgroup {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+html.dark-mode select option:checked,
+body.dark-mode select option:checked {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+/* Autocompletado de Chromium */
+html.dark-mode input:-webkit-autofill,
+html.dark-mode input:-webkit-autofill:hover,
+html.dark-mode input:-webkit-autofill:focus,
+body.dark-mode input:-webkit-autofill,
+body.dark-mode input:-webkit-autofill:hover,
+body.dark-mode input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+    box-shadow: 0 0 0 1000px #1e293b inset !important;
+    background-color: #1e293b !important;
+    caret-color: #ffffff !important;
+}
+
+/* =========================================================
+   COMPONENTES QUE NO SON INPUT NATIVO PERO SE VEÍAN BLANCOS
+   ========================================================= */
+
+html.dark-mode .evidence-uploader,
+html.dark-mode .evidence-file-preview,
+html.dark-mode #visorEvidenciaHora,
+html.dark-mode .evidence-preview,
+body.dark-mode .evidence-uploader,
+body.dark-mode .evidence-file-preview,
+body.dark-mode #visorEvidenciaHora,
+body.dark-mode .evidence-preview {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode .evidence-file-name,
+body.dark-mode .evidence-file-name {
+    color: #cbd5e1 !important;
+}
+
+html.dark-mode .remove-evidence-button,
+body.dark-mode .remove-evidence-button {
+    background: #334155 !important;
+    color: #e2e8f0 !important;
+    border-color: #475569 !important;
+}
+
+/* Checkboxes/radios y sus tarjetas */
+html.dark-mode .checkbox-grid,
+html.dark-mode .checkbox-group,
+html.dark-mode .checkbox-container,
+html.dark-mode .form-check,
+body.dark-mode .checkbox-grid,
+body.dark-mode .checkbox-group,
+body.dark-mode .checkbox-container,
+body.dark-mode .form-check {
+    background: transparent !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark-mode .check-option,
+body.dark-mode .check-option {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode .check-option:has(input[type="checkbox"]:checked),
+body.dark-mode .check-option:has(input[type="checkbox"]:checked) {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #3b82f6 !important;
+}
+
+html.dark-mode input[type="checkbox"],
+html.dark-mode input[type="radio"],
+body.dark-mode input[type="checkbox"],
+body.dark-mode input[type="radio"] {
+    accent-color: #3b82f6 !important;
+}
+
+/* Textos secundarios */
+html.dark-mode .field-help,
+html.dark-mode .section-description,
+body.dark-mode .field-help,
+body.dark-mode .section-description {
+    color: #94a3b8 !important;
+}
+</style>
+
+
+
+
+
+</style>
+
+<style id="sigho-dark-final-v14">
+/* =========================================================
+   SIGHO — CAPA DEFINITIVA DE MODO OSCURO v14
+   Esta capa queda después de los estilos anteriores para
+   neutralizar fondos claros residuales y mantener contraste.
+   ========================================================= */
+
+html.dark-mode,
+body.dark-mode {
+    --bg-page: #0b1329 !important;
+    --bg-card: #172334 !important;
+    --bg-card-2: #1e293b !important;
+    --bg-input: #1e293b !important;
+    --bg-soft: #0f172a !important;
+    --text-main: #f8fafc !important;
+    --text-muted: #cbd5e1 !important;
+    --border-input: #334155 !important;
+    color-scheme: dark !important;
+}
+
+html.dark-mode,
+html.dark-mode body,
+body.dark-mode {
+    background: #0b1329 !important;
+    color: #f8fafc !important;
+}
+
+html.dark-mode .container,
+body.dark-mode .container,
+html.dark-mode .sigho-home,
+body.dark-mode .sigho-home,
+html.dark-mode .options,
+body.dark-mode .options,
+html.dark-mode .home-content,
+body.dark-mode .home-content,
+html.dark-mode .main-wrapper,
+body.dark-mode .main-wrapper,
+html.dark-mode .content-area,
+body.dark-mode .content-area {
+    background: #0b1329 !important;
+    color: #f8fafc !important;
+}
+
+/* Pantallas y superficies generales */
+html.dark-mode .screen,
+body.dark-mode .screen,
+html.dark-mode .dashboard,
+body.dark-mode .dashboard,
+html.dark-mode .role-main,
+body.dark-mode .role-main,
+html.dark-mode .auth-screen,
+body.dark-mode .auth-screen {
+    color: #f8fafc !important;
+}
+
+html.dark-mode .welcome,
+body.dark-mode .welcome {
+    background: #111c32 !important;
+    color: #f8fafc !important;
+}
+
+html.dark-mode .welcome h1,
+html.dark-mode .welcome h2,
+html.dark-mode .welcome h3,
+html.dark-mode .welcome p,
+html.dark-mode .options h2,
+html.dark-mode .options h3,
+html.dark-mode .options p,
+body.dark-mode .welcome h1,
+body.dark-mode .welcome h2,
+body.dark-mode .welcome h3,
+body.dark-mode .welcome p,
+body.dark-mode .options h2,
+body.dark-mode .options h3,
+body.dark-mode .options p {
+    color: #f8fafc !important;
+}
+
+html.dark-mode .subtitle,
+body.dark-mode .subtitle,
+html.dark-mode label,
+body.dark-mode label,
+html.dark-mode .section-description,
+body.dark-mode .section-description {
+    color: #cbd5e1 !important;
+}
+
+/* Tarjetas y contenedores frecuentes */
+html.dark-mode .card,
+html.dark-mode .section,
+html.dark-mode .form-section,
+html.dark-mode .section-card,
+html.dark-mode .security-box,
+html.dark-mode .student-progress-card,
+html.dark-mode .role-kpi,
+html.dark-mode .assignment-banner,
+html.dark-mode .admin-reset-box,
+html.dark-mode .validation-panel,
+html.dark-mode .teacher-admin-card,
+html.dark-mode .help-card,
+html.dark-mode .faq-card,
+html.dark-mode .profile-card,
+body.dark-mode .card,
+body.dark-mode .section,
+body.dark-mode .form-section,
+body.dark-mode .section-card,
+body.dark-mode .security-box,
+body.dark-mode .student-progress-card,
+body.dark-mode .role-kpi,
+body.dark-mode .assignment-banner,
+body.dark-mode .admin-reset-box,
+body.dark-mode .validation-panel,
+body.dark-mode .teacher-admin-card,
+body.dark-mode .help-card,
+body.dark-mode .faq-card,
+body.dark-mode .profile-card {
+    background: #172334 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode .option,
+body.dark-mode .option {
+    background: #172334 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode .option:hover,
+body.dark-mode .option:hover {
+    background: #1e293b !important;
+    border-color: #3b82f6 !important;
+}
+
+html.dark-mode .icon,
+body.dark-mode .icon {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+/* Todos los campos de formulario, incluidos componentes dinámicos */
+html.dark-mode input:not([type="checkbox"]):not([type="radio"]),
+html.dark-mode select,
+html.dark-mode textarea,
+body.dark-mode input:not([type="checkbox"]):not([type="radio"]),
+body.dark-mode select,
+body.dark-mode textarea {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #334155 !important;
+    -webkit-text-fill-color: #ffffff !important;
+    color-scheme: dark !important;
+}
+
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder,
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+html.dark-mode input:disabled,
+html.dark-mode input[readonly],
+html.dark-mode select:disabled,
+html.dark-mode textarea:disabled,
+body.dark-mode input:disabled,
+body.dark-mode input[readonly],
+body.dark-mode select:disabled,
+body.dark-mode textarea:disabled {
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+    border-color: #334155 !important;
+    opacity: 1 !important;
+}
+
+html.dark-mode select option,
+html.dark-mode select optgroup,
+body.dark-mode select option,
+body.dark-mode select optgroup {
+    background: #1e293b !important;
+    color: #ffffff !important;
+}
+
+html.dark-mode input:-webkit-autofill,
+html.dark-mode input:-webkit-autofill:hover,
+html.dark-mode input:-webkit-autofill:focus,
+body.dark-mode input:-webkit-autofill,
+body.dark-mode input:-webkit-autofill:hover,
+body.dark-mode input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+    box-shadow: 0 0 0 1000px #1e293b inset !important;
+    background-color: #1e293b !important;
+}
+
+/* Días de servicio / checks */
+html.dark-mode .check-option,
+body.dark-mode .check-option {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+}
+
+html.dark-mode .check-option:has(input[type="checkbox"]:checked),
+body.dark-mode .check-option:has(input[type="checkbox"]:checked) {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #60a5fa !important;
+}
+
+html.dark-mode input[type="checkbox"],
+html.dark-mode input[type="radio"],
+body.dark-mode input[type="checkbox"],
+body.dark-mode input[type="radio"] {
+    accent-color: #3b82f6 !important;
+}
+
+/* Elementos que suelen conservar blanco por estilos propios */
+html.dark-mode .evidence-uploader,
+html.dark-mode .evidence-file-preview,
+html.dark-mode .evidence-preview,
+html.dark-mode .notification-panel,
+html.dark-mode .notification-item,
+body.dark-mode .evidence-uploader,
+body.dark-mode .evidence-file-preview,
+body.dark-mode .evidence-preview,
+body.dark-mode .notification-panel,
+body.dark-mode .notification-item {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode .notification-item:hover,
+body.dark-mode .notification-item:hover {
+    background: #1e293b !important;
+}
+
+html.dark-mode .notification-copy strong,
+body.dark-mode .notification-copy strong {
+    color: #f8fafc !important;
+}
+
+html.dark-mode .notification-copy small,
+html.dark-mode .notification-empty,
+html.dark-mode .notification-empty span,
+body.dark-mode .notification-copy small,
+body.dark-mode .notification-empty,
+body.dark-mode .notification-empty span {
+    color: #94a3b8 !important;
+}
+
+/* Menús móviles y cabeceras */
+html.dark-mode .dashboard-header,
+body.dark-mode .dashboard-header {
+    color: #f8fafc !important;
+}
+
+html.dark-mode .mobile-sidebar-toggle,
+body.dark-mode .mobile-sidebar-toggle {
+    background: #16283a !important;
+    color: #e2edf6 !important;
+    border-color: #34506a !important;
+}
+
+/* Evita que la capa de contenido vuelva a ser blanca */
+html.dark-mode .auth-card,
+body.dark-mode .auth-card,
+html.dark-mode .auth-card input,
+html.dark-mode .auth-card select,
+html.dark-mode .auth-card textarea,
+body.dark-mode .auth-card input,
+body.dark-mode .auth-card select,
+body.dark-mode .auth-card textarea {
+    background-color: #172334 !important;
+}
+
+html.dark-mode .auth-card input,
+html.dark-mode .auth-card select,
+html.dark-mode .auth-card textarea,
+body.dark-mode .auth-card input,
+body.dark-mode .auth-card select,
+body.dark-mode .auth-card textarea {
+    background: #1e293b !important;
+}
+
+/* Texto general sobre superficies oscuras */
+html.dark-mode .auth-card > h2,
+html.dark-mode .auth-card label,
+html.dark-mode .auth-card .section h3,
+html.dark-mode .auth-card strong,
+body.dark-mode .auth-card > h2,
+body.dark-mode .auth-card label,
+body.dark-mode .auth-card .section h3,
+body.dark-mode .auth-card strong {
+    color: #f8fafc !important;
+}
+
+@media (max-width: 767px) {
+    /* La hamburguesa queda integrada en la cuadrícula del header,
+       no flotando encima de la pantalla. */
+    html.dark-mode .role-main .dashboard-header,
+    body.dark-mode .role-main .dashboard-header {
+        background: transparent !important;
+    }
+
+    .mobile-sidebar-toggle {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+    }
+
+    /* El toggle de tema permanece arriba a la derecha. */
+    .theme-toggle {
+        position: fixed !important;
+        top: 10px !important;
+        right: 10px !important;
+    }
+}
+</style>
+
+<style id="sigho-comprobante-dark-v13">
+<style id="sigho-comprobante-dark-v13">
+/* =========================================================
+   COMPROBANTES / RESÚMENES DE SOLICITUD EN MODO OSCURO
+   Cubre los modales existentes y bloques que puedan ser
+   generados dinámicamente por JavaScript.
+   ========================================================= */
+
+/* Tarjeta principal */
+html.dark-mode .sigho-modal-card,
+html.dark-mode .solicitud-exito-card,
+html.dark-mode .registro-hora-exito-card,
+html.dark-mode .comprobante-solicitud,
+html.dark-mode .comprobante-registro,
+html.dark-mode .solicitud-comprobante,
+body.dark-mode .sigho-modal-card,
+body.dark-mode .solicitud-exito-card,
+body.dark-mode .registro-hora-exito-card,
+body.dark-mode .comprobante-solicitud,
+body.dark-mode .comprobante-registro,
+body.dark-mode .solicitud-comprobante {
+    background: #172334 !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 18px 50px rgba(0,0,0,.45) !important;
+}
+
+/* Cabeceras y cuerpos internos */
+html.dark-mode .sigho-modal-head,
+html.dark-mode .sigho-modal-body,
+html.dark-mode .solicitud-exito-body,
+html.dark-mode .registro-hora-exito-body,
+html.dark-mode .comprobante-solicitud .card-body,
+html.dark-mode .comprobante-registro .card-body,
+html.dark-mode .solicitud-comprobante .card-body,
+body.dark-mode .sigho-modal-head,
+body.dark-mode .sigho-modal-body,
+body.dark-mode .solicitud-exito-body,
+body.dark-mode .registro-hora-exito-body,
+body.dark-mode .comprobante-solicitud .card-body,
+body.dark-mode .comprobante-registro .card-body,
+body.dark-mode .solicitud-comprobante .card-body {
+    background: #172334 !important;
+    color: #f8fafc !important;
+}
+
+/* Bloques de información del comprobante */
+html.dark-mode .comprobante-solicitud .section,
+html.dark-mode .comprobante-solicitud .form-section,
+html.dark-mode .comprobante-solicitud .section-card,
+html.dark-mode .comprobante-solicitud .info-group,
+html.dark-mode .comprobante-solicitud fieldset,
+html.dark-mode .comprobante-registro .section,
+html.dark-mode .comprobante-registro .form-section,
+html.dark-mode .comprobante-registro .section-card,
+html.dark-mode .comprobante-registro .info-group,
+html.dark-mode .comprobante-registro fieldset,
+html.dark-mode .solicitud-comprobante .section,
+html.dark-mode .solicitud-comprobante .form-section,
+html.dark-mode .solicitud-comprobante .section-card,
+html.dark-mode .solicitud-comprobante .info-group,
+html.dark-mode .solicitud-comprobante fieldset,
+body.dark-mode .comprobante-solicitud .section,
+body.dark-mode .comprobante-solicitud .form-section,
+body.dark-mode .comprobante-solicitud .section-card,
+body.dark-mode .comprobante-solicitud .info-group,
+body.dark-mode .comprobante-solicitud fieldset,
+body.dark-mode .comprobante-registro .section,
+body.dark-mode .comprobante-registro .form-section,
+body.dark-mode .comprobante-registro .section-card,
+body.dark-mode .comprobante-registro .info-group,
+body.dark-mode .comprobante-registro fieldset,
+body.dark-mode .solicitud-comprobante .section,
+body.dark-mode .solicitud-comprobante .form-section,
+body.dark-mode .solicitud-comprobante .section-card,
+body.dark-mode .solicitud-comprobante .info-group,
+body.dark-mode .solicitud-comprobante fieldset {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+}
+
+/* Variantes de bloques que suelen aparecer como tarjetas internas */
+html.dark-mode .comprobante-solicitud .info-card,
+html.dark-mode .comprobante-registro .info-card,
+html.dark-mode .solicitud-comprobante .info-card,
+html.dark-mode .comprobante-solicitud .card,
+html.dark-mode .comprobante-registro .card,
+html.dark-mode .solicitud-comprobante .card,
+body.dark-mode .comprobante-solicitud .info-card,
+body.dark-mode .comprobante-registro .info-card,
+body.dark-mode .solicitud-comprobante .info-card,
+body.dark-mode .comprobante-solicitud .card,
+body.dark-mode .comprobante-registro .card,
+body.dark-mode .solicitud-comprobante .card {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Títulos y textos */
+html.dark-mode .comprobante-solicitud h1,
+html.dark-mode .comprobante-solicitud h2,
+html.dark-mode .comprobante-solicitud h3,
+html.dark-mode .comprobante-solicitud h4,
+html.dark-mode .comprobante-solicitud h5,
+html.dark-mode .comprobante-solicitud h6,
+html.dark-mode .comprobante-solicitud strong,
+html.dark-mode .comprobante-registro h1,
+html.dark-mode .comprobante-registro h2,
+html.dark-mode .comprobante-registro h3,
+html.dark-mode .comprobante-registro h4,
+html.dark-mode .comprobante-registro h5,
+html.dark-mode .comprobante-registro h6,
+html.dark-mode .comprobante-registro strong,
+html.dark-mode .solicitud-comprobante h1,
+html.dark-mode .solicitud-comprobante h2,
+html.dark-mode .solicitud-comprobante h3,
+html.dark-mode .solicitud-comprobante h4,
+html.dark-mode .solicitud-comprobante h5,
+html.dark-mode .solicitud-comprobante h6,
+html.dark-mode .solicitud-comprobante strong,
+body.dark-mode .comprobante-solicitud h1,
+body.dark-mode .comprobante-solicitud h2,
+body.dark-mode .comprobante-solicitud h3,
+body.dark-mode .comprobante-solicitud h4,
+body.dark-mode .comprobante-solicitud h5,
+body.dark-mode .comprobante-solicitud h6,
+body.dark-mode .comprobante-solicitud strong,
+body.dark-mode .comprobante-registro h1,
+body.dark-mode .comprobante-registro h2,
+body.dark-mode .comprobante-registro h3,
+body.dark-mode .comprobante-registro h4,
+body.dark-mode .comprobante-registro h5,
+body.dark-mode .comprobante-registro h6,
+body.dark-mode .comprobante-registro strong,
+body.dark-mode .solicitud-comprobante h1,
+body.dark-mode .solicitud-comprobante h2,
+body.dark-mode .solicitud-comprobante h3,
+body.dark-mode .solicitud-comprobante h4,
+body.dark-mode .solicitud-comprobante h5,
+body.dark-mode .solicitud-comprobante h6,
+body.dark-mode .solicitud-comprobante strong {
+    color: #ffffff !important;
+}
+
+html.dark-mode .comprobante-solicitud p,
+html.dark-mode .comprobante-solicitud span,
+html.dark-mode .comprobante-solicitud label,
+html.dark-mode .comprobante-registro p,
+html.dark-mode .comprobante-registro span,
+html.dark-mode .comprobante-registro label,
+html.dark-mode .solicitud-comprobante p,
+html.dark-mode .solicitud-comprobante span,
+html.dark-mode .solicitud-comprobante label,
+body.dark-mode .comprobante-solicitud p,
+body.dark-mode .comprobante-solicitud span,
+body.dark-mode .comprobante-solicitud label,
+body.dark-mode .comprobante-registro p,
+body.dark-mode .comprobante-registro span,
+body.dark-mode .comprobante-registro label,
+body.dark-mode .solicitud-comprobante p,
+body.dark-mode .solicitud-comprobante span,
+body.dark-mode .solicitud-comprobante label {
+    color: #cbd5e1 !important;
+}
+
+/* Estado de solicitud: pendiente / aprobado / rechazado */
+html.dark-mode .estado-solicitud,
+html.dark-mode .solicitud-status,
+html.dark-mode .status-solicitud,
+html.dark-mode .status-badge,
+body.dark-mode .estado-solicitud,
+body.dark-mode .solicitud-status,
+body.dark-mode .status-solicitud,
+body.dark-mode .status-badge {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+}
+
+html.dark-mode .estado-solicitud.pendiente,
+html.dark-mode .solicitud-status.pendiente,
+html.dark-mode .status-solicitud.pendiente,
+html.dark-mode .status-badge.pendiente,
+html.dark-mode .estado-pendiente,
+body.dark-mode .estado-solicitud.pendiente,
+body.dark-mode .solicitud-status.pendiente,
+body.dark-mode .status-solicitud.pendiente,
+body.dark-mode .status-badge.pendiente,
+body.dark-mode .estado-pendiente {
+    background: #422006 !important;
+    color: #fbbf24 !important;
+    border-color: #92400e !important;
+}
+
+html.dark-mode .estado-solicitud.aprobado,
+html.dark-mode .estado-solicitud.aprobada,
+html.dark-mode .solicitud-status.aprobado,
+html.dark-mode .solicitud-status.aprobada,
+html.dark-mode .status-badge.aprobado,
+html.dark-mode .status-badge.aprobada,
+html.dark-mode .estado-aprobado,
+html.dark-mode .estado-aprobada,
+body.dark-mode .estado-solicitud.aprobado,
+body.dark-mode .estado-solicitud.aprobada,
+body.dark-mode .solicitud-status.aprobado,
+body.dark-mode .solicitud-status.aprobada,
+body.dark-mode .status-badge.aprobado,
+body.dark-mode .status-badge.aprobada,
+body.dark-mode .estado-aprobado,
+body.dark-mode .estado-aprobada {
+    background: #052e16 !important;
+    color: #4ade80 !important;
+    border-color: #166534 !important;
+}
+
+html.dark-mode .estado-solicitud.rechazado,
+html.dark-mode .estado-solicitud.rechazada,
+html.dark-mode .solicitud-status.rechazado,
+html.dark-mode .solicitud-status.rechazada,
+html.dark-mode .status-badge.rechazado,
+html.dark-mode .status-badge.rechazada,
+html.dark-mode .estado-rechazado,
+html.dark-mode .estado-rechazada,
+body.dark-mode .estado-solicitud.rechazado,
+body.dark-mode .estado-solicitud.rechazada,
+body.dark-mode .solicitud-status.rechazado,
+body.dark-mode .solicitud-status.rechazada,
+body.dark-mode .status-badge.rechazado,
+body.dark-mode .status-badge.rechazada,
+body.dark-mode .estado-rechazado,
+body.dark-mode .estado-rechazada {
+    background: #450a0a !important;
+    color: #f87171 !important;
+    border-color: #991b1b !important;
+}
+
+/* Componentes de estado que ya existen en SIGHO */
+html.dark-mode .registro-hora-badge,
+body.dark-mode .registro-hora-badge {
+    background: #422006 !important;
+    color: #fbbf24 !important;
+    border-color: #92400e !important;
+    opacity: 1 !important;
+}
+
+/* Botones de cierre dentro de estos comprobantes */
+html.dark-mode .comprobante-solicitud .modal-close,
+html.dark-mode .comprobante-registro .modal-close,
+html.dark-mode .solicitud-comprobante .modal-close,
+body.dark-mode .comprobante-solicitud .modal-close,
+body.dark-mode .comprobante-registro .modal-close,
+body.dark-mode .solicitud-comprobante .modal-close {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #475569 !important;
+}
+</style>
 
 </body>
 

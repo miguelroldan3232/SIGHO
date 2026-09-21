@@ -382,16 +382,31 @@ try {
             respond(['ok' => true, 'user' => current_user()]);
 
         case 'login':
+            // El frontend envía JSON con correo y clave.
+            // El rol no se exige en el formulario de inicio de sesión:
+            // se obtiene de la cuenta encontrada por el correo.
             $d = json_input();
-            $rol = trim((string)($d['rol'] ?? ''));
-            $correo = strtolower(trim((string)($d['correo'] ?? '')));
-            $clave = (string)($d['clave'] ?? '');
-            if (!$rol || !$correo || !$clave) fail('Completa todos los campos.');
+
+            // Compatibilidad adicional por si alguna versión del frontend usa
+            // los nombres email/password.
+            $correo = strtolower(trim((string)($d['correo'] ?? $d['email'] ?? '')));
+            $clave = (string)($d['clave'] ?? $d['password'] ?? '');
+            $rolSolicitado = trim((string)($d['rol'] ?? ''));
+
+            if (!$correo || !$clave) fail('Completa todos los campos.');
 
             $st = db()->prepare("SELECT u.*, r.code AS role_code FROM users u JOIN roles r ON r.id = u.role_id WHERE LOWER(u.email) = ? AND u.status = 'activo'");
             $st->execute([$correo]);
             $u = $st->fetch();
-            if (!$u || $u['role_code'] !== $rol || !password_verify($clave, $u['password_hash'])) {
+
+            if (!$u || !password_verify($clave, $u['password_hash'])) {
+                fail('Correo o clave incorrectos.', 401);
+            }
+
+            // Si una versión antigua del frontend todavía envía rol,
+            // se sigue validando. El frontend actual puede omitirlo.
+            $rol = $u['role_code'];
+            if ($rolSolicitado !== '' && $rolSolicitado !== $rol) {
                 fail('Correo, clave o rol incorrectos.', 401);
             }
             if ($rol === 'profesor' && !is_institutional_email($correo)) {
