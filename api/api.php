@@ -123,13 +123,13 @@ function user_payload(array $row): array {
         }
     } else {
         ensure_optional_columns(db());
-        $st = db()->prepare('SELECT id, service_site, service_project, phone FROM staff WHERE user_id = ?');
+        $st = db()->prepare('SELECT id, service_site, service_project, phone FROM staff WHERE user_id = ? LIMIT 1');
         $st->execute([$row['id']]);
         $staff = $st->fetch();
         if ($staff) {
             $payload['staffId'] = (int)$staff['id'];
             $payload['sede'] = $staff['service_site'] ?? '';
-            $payload['proyecto'] = $staff['service_project'] ?? '';
+            $payload['zona'] = $staff['service_project'] ?? '';
             $payload['telefono'] = $staff['phone'] ?? '';
         }
     }
@@ -189,6 +189,45 @@ function ensure_optional_columns(PDO $pdo): void {
         $exists->execute([$table, $column]);
         if (!(int)$exists->fetchColumn()) $pdo->exec($alter);
     }
+}
+
+/**
+ * Zonas institucionales válidas para el servicio social.
+ *
+ * La API utiliza "zona". Las columnas antiguas de la BD
+ * (service_project/project) se conservan temporalmente para compatibilidad.
+ */
+function zonas_institucionales(): array {
+    return [
+        'Educación Física / Tiempo Libre',
+        'Proyecto Ambiental',
+        'Logística y Vigilancia',
+        'Secretaría y/o Archivo',
+        'Acompañamiento a un docente de transición o primaria',
+        'Eventos especiales',
+        'Otro'
+    ];
+}
+
+function sedes_institucionales(): array {
+    return [
+        'Central JT',
+        'San Francisco Club',
+        'Picaleña',
+        'Central J.N.',
+        'Secundino Porras Cruz',
+        'San Martín',
+        'Central JM',
+        'Bello Horizonte'
+    ];
+}
+
+function validar_zona(string $zona): bool {
+    return in_array($zona, zonas_institucionales(), true);
+}
+
+function validar_sede(string $sede): bool {
+    return in_array($sede, sedes_institucionales(), true);
 }
 
 function find_user_by_id(int $id): ?array {
@@ -290,12 +329,12 @@ function pending_requests(string $roleFilter = ''): array {
                    sa.guardian_phone,
                     sa.guardian_phone_type,
                    sa.service_site,
-                   sa.project,
-                   sa.project_other,
+                   sa.project AS zone,
+                   sa.project_other AS zone_other,
                    sa.service_days,
                    sa.service_shift,
                    ar.service_site AS request_service_site,
-                   ar.service_project AS request_service_project,
+                   ar.service_project AS request_service_zone,
                    ar.phone AS request_phone
             FROM access_requests ar
             JOIN roles r ON r.id = ar.requested_role_id
@@ -343,12 +382,12 @@ function pending_requests(string $roleFilter = ''): array {
             'telefonoAcudiente' => $r['guardian_phone'] ?? '',
              'tipoTelefonoAcudiente' => $r['guardian_phone_type'] ?? '',
             'sede' => $r['service_site'] ?? '',
-            'proyecto' => $r['project'] ?? '',
-            'proyectoOtro' => $r['project_other'] ?? '',
+            'zona' => $r['zone'] ?? '',
+            'zonaOtro' => $r['zone_other'] ?? '',
             'diasServicio' => $r['service_days'] ? (json_decode($r['service_days'], true) ?: []) : [],
             'jornada' => $r['service_shift'] ?? '',
             'sedeProfesor' => $r['request_service_site'] ?? '',
-            'proyectoProfesor' => $r['request_service_project'] ?? '',
+            'zonaProfesor' => $r['request_service_zone'] ?? '',
             'telefonoProfesor' => $r['request_phone'] ?? ''
         ];
     }
@@ -447,7 +486,7 @@ try {
             $programa = trim((string)($d['programaTecnico'] ?? '')) ?: null;
             $grado = trim((string)($d['grado'] ?? '')) ?: null;
             $sedeProfesor = trim((string)($d['sede'] ?? ''));
-            $proyectoProfesor = trim((string)($d['proyecto'] ?? ''));
+            $zonaProfesor = trim((string)($d['zona'] ?? $d['proyecto'] ?? ''));
             $telefonoProfesor = trim((string)($d['telefono'] ?? ''));
 
             if (!$rol || !$nombre || !$apellido || !$ident || !$correo || !$clave) {
@@ -514,31 +553,13 @@ try {
                 $telefonoAcudiente = trim((string)($d['telefonoAcudiente'] ?? ''));
                 $tipoTelefonoAcudiente = trim((string)($d['tipoTelefonoAcudiente'] ?? ''));
                 $sede = trim((string)($d['sede'] ?? ''));
-                $proyecto = trim((string)($d['proyecto'] ?? ''));
-                $proyectoOtro = trim((string)($d['proyectoOtro'] ?? ''));
+                $zona = trim((string)($d['zona'] ?? $d['proyecto'] ?? ''));
+                $zonaOtro = trim((string)($d['zonaOtro'] ?? $d['proyectoOtro'] ?? ''));
                 $diasServicio = $d['diasServicio'] ?? [];
                 $jornada = trim((string)($d['jornada'] ?? ''));
 
-                $sedesPermitidas = [
-                    'Central JT',
-                    'San Francisco Club',
-                    'Picaleña',
-                    'Central J.N.',
-                    'Secundino Porras Cruz',
-                    'San Martín',
-                    'Central JM',
-                    'Bello Horizonte'
-                ];
-
-                $proyectosPermitidos = [
-                    'Educación Física / Tiempo Libre',
-                    'Proyecto Ambiental',
-                    'Logística y Vigilancia',
-                    'Secretaría y/o Archivo',
-                    'Acompañamiento a un docente de transición o primaria',
-                    'Eventos especiales',
-                    'Otro'
-                ];
+                $sedesPermitidas = sedes_institucionales();
+                $zonasPermitidas = zonas_institucionales();
 
                 $diasPermitidos = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
                 $jornadasPermitidas = ['JM','JN','Mañana','Nocturna'];
@@ -548,7 +569,7 @@ try {
                 }
                 if (!$primerApellido || !$primerNombre || !$tipoDocumento || !$numeroDocumento ||
                     !$gradoEstudiante || !$fechaNacimiento || !$direccion || !$telefono || !$eps ||
-                    !$nombreAcudiente || !$telefonoAcudiente || !$sede || !$proyecto || !$jornada || !is_array($diasServicio) ||
+                    !$nombreAcudiente || !$telefonoAcudiente || !$sede || !$zona || !$jornada || !is_array($diasServicio) ||
                     count($diasServicio) === 0) {
                     fail('Completa todos los campos obligatorios del estudiante.');
                 }
@@ -650,13 +671,13 @@ try {
                 if (!in_array($sede, $sedesPermitidas, true)) {
                     fail('La sede seleccionada no es válida.');
                 }
-                if (!in_array($proyecto, $proyectosPermitidos, true)) {
-                    fail('El proyecto seleccionado no es válido.');
+                if (!in_array($zona, $zonasPermitidas, true)) {
+                    fail('La zona seleccionada no es válida.');
                 }
                 $regexTextoOtro = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
-                if ($proyecto === 'Otro') {
-                    if (!$proyectoOtro || mb_strlen($proyectoOtro, 'UTF-8') < 2 || mb_strlen($proyectoOtro, 'UTF-8') > 60 || !preg_match($regexTextoOtro, $proyectoOtro)) {
-                        fail("El proyecto de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
+                if ($zona === 'Otro') {
+                    if (!$zonaOtro || mb_strlen($zonaOtro, 'UTF-8') < 2 || mb_strlen($zonaOtro, 'UTF-8') > 60 || !preg_match($regexTextoOtro, $zonaOtro)) {
+                        fail("La zona de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
                     }
                 }
                 $epsSeleccionada = trim((string)($d['epsSeleccionada'] ?? ''));
@@ -751,8 +772,8 @@ try {
                     fail('El correo del profesor debe ser institucional, sin espacios, y usar @iejosejoaquinflorezhernandez.edu.co.');
                 }
 
-                // El proyecto y la sede del profesor no se solicitan públicamente: los asigna el Administrador.
-                $proyectoProfesor = null;
+                // La zona y la sede del profesor no se solicitan públicamente: las asigna el Administrador.
+                $zonaProfesor = null;
                 $sedeProfesor = null;
             }
 
@@ -771,7 +792,7 @@ try {
                     $rol === 'estudiante' && $modalidad === 'tecnico' ? ($programa ?: 'Técnica') : null,
                     $rol === 'estudiante' ? $gradoEstudiante : $grado,
                     $rol === 'profesor' ? $sedeProfesor : null,
-                    $rol === 'profesor' ? $proyectoProfesor : null,
+                    $rol === 'profesor' ? $zonaProfesor : null,
                     $rol === 'profesor' ? $telefonoProfesor : null
                 ]);
                 $accessRequestId = (int)$pdo->lastInsertId();
@@ -781,8 +802,8 @@ try {
                         INSERT INTO student_applications
                         (access_request_id, service_year, first_surname, second_surname, first_name, second_name,
                          document_type, document_number, grade, birth_date, residence_address, phone, eps,
-                         guardian_name, guardian_phone, service_site, project, project_other, service_days, service_shift)
-                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                         guardian_name, guardian_phone, guardian_phone_type, service_site, project, project_other, service_days, service_shift)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                     ');
                     $st->execute([
                         $accessRequestId,
@@ -802,8 +823,8 @@ try {
                         $telefonoAcudienteSoloDigitos,
                         $tipoTelefonoAcudiente,
                         $sede,
-                        $proyecto,
-                        $proyecto === 'Otro' ? $proyectoOtro : null,
+                        $zona,
+                        $zona === 'Otro' ? $zonaOtro : null,
                         json_encode($diasServicio, JSON_UNESCAPED_UNICODE),
                         $jornada
                     ]);
@@ -833,7 +854,7 @@ try {
                 'rol'=>'Profesor',
                 'identificacion'=>$p['identification'] ?? $user['identificacion'] ?? '',
                 'sede'=>$p['service_site'] ?? '',
-                'proyecto'=>$p['service_project'] ?? '',
+                'zona'=>$p['service_project'] ?? '',
                 'solicitudAdminEstado'=>$p['admin_request_status'] ?? ''
             ]]);
 
@@ -1008,11 +1029,11 @@ try {
             $st->execute([(int)$user['staffId']]);
             $teacher = $st->fetch();
             if (!$teacher || empty($teacher['service_site']) || empty($teacher['service_project'])) {
-                respond(['ok'=>true,'students'=>[],'sede'=>$teacher['service_site']??'','proyecto'=>$teacher['service_project']??'']);
+                respond(['ok'=>true,'students'=>[],'sede'=>$teacher['service_site']??'','zona'=>$teacher['service_project']??'']);
             }
             $sql = "SELECT DISTINCT u.id, u.email AS correo, CONCAT(u.first_name, ' ', u.last_name) AS nombre, s.grade AS grado,
                            s.target_hours AS metaHoras,
-                           sa.project AS proyecto,
+                           sa.project AS zona,
                            sa.service_site AS sede
                     FROM students s JOIN users u ON u.id=s.user_id
                     JOIN student_applications sa ON sa.student_id=s.id
@@ -1021,7 +1042,7 @@ try {
                       AND sa.project=?
                     ORDER BY u.first_name,u.last_name";
             $st=db()->prepare($sql);$st->execute([$teacher['service_site'],$teacher['service_project']]);
-            respond(['ok'=>true,'students'=>$st->fetchAll(),'sede'=>$teacher['service_site'],'proyecto'=>$teacher['service_project']]);
+            respond(['ok'=>true,'students'=>$st->fetchAll(),'sede'=>$teacher['service_site'],'zona'=>$teacher['service_project']]);
 
         case 'create_record':
             $user = require_roles(['estudiante']);
@@ -1161,7 +1182,7 @@ try {
                 $stArea->execute([(int)$record['student_id'], $staffId]);
                 $area = $stArea->fetch();
                 if (!$area || empty($area['service_site']) || empty($area['service_project']) || $area['service_site'] !== $area['student_site'] || $area['service_project'] !== $area['student_project']) {
-                    fail('Este registro no pertenece a tu sede y proyecto asignados.', 403);
+                    fail('Este registro no pertenece a tu sede y zona asignadas.', 403);
                 }
             }
             $oldStatus = $record['status'];
@@ -1181,34 +1202,57 @@ try {
             respond(['ok' => true, 'message' => 'Registro actualizado.']);
 
         case 'assign_teacher':
-            $user = require_roles(['administrador']);
+            require_roles(['administrador']);
             $d = json_input();
+
             $staffId = (int)($d['staffId'] ?? 0);
             $sede = trim((string)($d['sede'] ?? ''));
-            $proyecto = trim((string)($d['proyecto'] ?? ''));
-            $sedes = ['Central JT','San Francisco Club','Picaleña','Central J.N.','Secundino Porras Cruz','San Martín','Central JM','Bello Horizonte'];
-            $proyectos = ['Educación Física / Tiempo Libre','Proyecto Ambiental','Logística y Vigilancia','Secretaría y/o Archivo','Acompañamiento a un docente de transición o primaria','Eventos especiales','Otro'];
-            if (!$staffId || !in_array($sede,$sedes,true)) fail('Sede inválida.');
-            if (!$proyecto || !in_array($proyecto,$proyectos,true)) fail('Proyecto inválido.');
-            ensure_optional_columns(db());
-            $st=db()->prepare("SELECT s.id FROM staff s JOIN users u ON u.id=s.user_id JOIN roles r ON r.id=u.role_id WHERE s.id=? AND r.code='profesor' AND u.status='activo'");
-            $st->execute([$staffId]); if(!$st->fetchColumn()) fail('Profesor no encontrado.',404);
-            $st=db()->prepare('UPDATE staff SET service_site=?, service_project=? WHERE id=?');
-            $st->execute([$sede,$proyecto,$staffId]);
-            respond(['ok'=>true,'message'=>'Sede y proyecto asignados correctamente.']);
+            // Compatibilidad: versiones antiguas pueden enviar "proyecto".
+            $zona = trim((string)($d['zona'] ?? $d['proyecto'] ?? ''));
+
+            if (!$staffId) fail('Profesor inválido.');
+            if (!validar_sede($sede)) fail('Sede inválida.');
+            if (!$zona || !validar_zona($zona)) fail('Zona inválida.');
+
+            $pdo = db();
+            ensure_optional_columns($pdo);
+
+            $st = $pdo->prepare("SELECT s.id FROM staff s JOIN users u ON u.id=s.user_id JOIN roles r ON r.id=u.role_id WHERE s.id=? AND r.code='profesor' AND u.status='activo'");
+            $st->execute([$staffId]);
+            if (!$st->fetchColumn()) fail('Profesor no encontrado.', 404);
+
+            // service_project es la columna existente de la BD; representa la ZONA.
+            $st = $pdo->prepare('UPDATE staff SET service_site=?, service_project=? WHERE id=?');
+            $st->execute([$sede, $zona, $staffId]);
+
+            respond([
+                'ok' => true,
+                'message' => 'Sede y zona asignadas correctamente.',
+                'sede' => $sede,
+                'zona' => $zona
+            ]);
 
         case 'request_admin_permission':
             $user = require_roles(['profesor']);
             $pdo = db();
             ensure_optional_columns($pdo);
+
             $st = $pdo->prepare("SELECT COUNT(*) FROM access_requests WHERE status='pendiente' AND requested_role_id=(SELECT id FROM roles WHERE code='administrador') AND email=?");
             $st->execute([$user['correo']]);
             if ((int)$st->fetchColumn() > 0) fail('Ya tienes una solicitud de Administrador pendiente.');
+
             $st = $pdo->prepare("SELECT COUNT(*) FROM users u WHERE u.id=? AND u.status='activo' AND u.role_id=(SELECT id FROM roles WHERE code='administrador')");
             $st->execute([(int)$user['id']]);
             if ((int)$st->fetchColumn() > 0) fail('Tu cuenta ya tiene permisos de Administrador.');
-            $st = $pdo->prepare("INSERT INTO access_requests (identification, first_name, last_name, email, password_hash, requested_role_id, status, service_project) SELECT u.identification,u.first_name,u.last_name,u.email,u.password_hash,r.id,'pendiente',s.service_project FROM users u JOIN roles r ON r.code='administrador' LEFT JOIN staff s ON s.user_id=u.id WHERE u.id=?");
+
+            $st = $pdo->prepare("INSERT INTO access_requests (identification, first_name, last_name, email, password_hash, requested_role_id, status, service_site, service_project, phone)
+                                 SELECT u.identification,u.first_name,u.last_name,u.email,u.password_hash,r.id,'pendiente',s.service_site,s.service_project,s.phone
+                                 FROM users u
+                                 JOIN roles r ON r.code='administrador'
+                                 LEFT JOIN staff s ON s.user_id=u.id
+                                 WHERE u.id=?");
             $st->execute([(int)$user['id']]);
+
             respond(['ok'=>true,'message'=>'Solicitud de permisos de Administrador enviada al panel administrativo.']);
 
         case 'validate_admin_request_by_admin':
@@ -1243,7 +1287,7 @@ try {
             foreach ($st->fetchAll() as $u) $users[] = user_payload($u);
             $profesores = [];
             $st = $pdo->query("SELECT u.*, r.code AS role_code, s.id AS staff_id, s.service_site, s.service_project FROM users u JOIN roles r ON r.id=u.role_id JOIN staff s ON s.user_id=u.id WHERE u.status='activo' AND r.code='profesor' ORDER BY u.first_name,u.last_name");
-            foreach ($st->fetchAll() as $u) $profesores[] = ['id'=>(int)$u['staff_id'],'userId'=>(int)$u['id'],'nombre'=>trim($u['first_name'].' '.$u['last_name']),'correo'=>$u['email'],'sede'=>$u['service_site']??'','proyecto'=>$u['service_project']??''];
+            foreach ($st->fetchAll() as $u) $profesores[] = ['id'=>(int)$u['staff_id'],'userId'=>(int)$u['id'],'nombre'=>trim($u['first_name'].' '.$u['last_name']),'correo'=>$u['email'],'sede'=>$u['service_site']??'','zona'=>$u['service_project']??''];
             respond([
                 'ok' => true,
                 'users' => $users,

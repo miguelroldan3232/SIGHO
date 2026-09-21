@@ -3951,20 +3951,17 @@ body:has(.dashboard-screen.active) .container {
     .cards,.role-kpis{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 
-<style>
-.notification-backdrop{display:none;}
-@media (max-width:767px){.notification-backdrop{display:block;}}
-</style>
-</style>
+.notification-backdrop { display: none; }
+    @media (max-width: 767px) {
+        .notification-backdrop { display: block; }
+    }
 
-<style id="fix-password-mobile-scroll">
-/* Ajuste de clave única: los puntos de la contraseña deben conservar su espaciado normal. */
-#clave {
-    letter-spacing: normal !important;
-    padding-left: 14px !important;
-    padding-right: 14px !important;
-    word-spacing: normal;
-}
+    /* Ajuste de clave única: los puntos de la contraseña deben conservar su espaciado normal */
+    #clave {
+        letter-spacing: normal !important;
+        padding-left: 14px !important;
+    }
+
 
 @media (max-width: 767px) {
     /* El scroll móvil vuelve a ser el scroll nativo de la página. */
@@ -5831,9 +5828,9 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                 </div>
 
                 <div class="form-group">
-                    <label>Proyecto <span class="required">*</span></label>
+                    <label>Zona <span class="required">*</span></label>
                     <select id="proyectoSolicitud" onchange="actualizarProyectoOtro()">
-                        <option value="" disabled selected>Seleccionar proyecto</option>
+                        <option value="" disabled selected>Seleccionar zona</option>
                         <option value="Educación Física / Tiempo Libre">Educación Física / Tiempo Libre</option>
                         <option value="Proyecto Ambiental">Proyecto Ambiental</option>
                         <option value="Logística y Vigilancia">Logística y Vigilancia</option>
@@ -5845,8 +5842,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                 </div>
 
                 <div class="form-group" id="grupoProyectoOtro" style="display:none;">
-                    <label>Especifica el proyecto</label>
-                    <input type="text" id="proyectoOtro" maxlength="60" pattern="[\p{L}]+(?: [\p{L}]+)*" inputmode="text" placeholder="Escribe el proyecto" disabled>
+                    <label>Especifica la zona</label>
+                    <input type="text" id="proyectoOtro" maxlength="60" pattern="[\p{L}]+(?: [\p{L}]+)*" inputmode="text" placeholder="Escribe la zona" disabled>
                 </div>
 
                 <div class="form-group" id="grupoDiasServicio">
@@ -5907,7 +5904,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                     </div>
 
                     <div class="form-group" style="grid-column:1 / -1;">
-                        <div class="security-box" style="margin:0;">El proyecto y la sede serán asignados posteriormente por el Administrador desde «Gestión de profesores».</div>
+                        <div class="security-box" style="margin:0;">La zona y la sede serán asignadas posteriormente por el Administrador desde «Gestión de profesores».</div>
                     </div>
                 </div>
 
@@ -6511,7 +6508,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                     <div class="professor-section-header">
                         <div>
                             <h3>Mis estudiantes</h3>
-                            <p class="section-description">Estudiantes que pertenecen a tu sede y proyecto asignados.</p>
+                            <p class="section-description">Estudiantes que pertenecen a tu sede y zona asignados.</p>
                         </div>
                         <div class="pending-counter" id="totalEstudiantesAsignados">0 estudiantes</div>
                     </div>
@@ -6544,9 +6541,9 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                             </div>
                             <div class="form-row two-columns">
                                 <div class="form-group">
-                                    <label for="profesorPerfilProyectoEditable">Proyecto asignado</label>
+                                    <label for="profesorPerfilProyectoEditable">Zona asignada</label>
                                     <input id="profesorPerfilProyectoEditable" disabled readonly value="Sin asignar">
-                                    <small class="field-help">La asignación del proyecto corresponde al Administrador.</small>
+                                    <small class="field-help">La asignación de la zona corresponde al Administrador.</small>
                                 </div>
                                 <div class="form-group">
                                     <label for="profesorPerfilCorreo">Correo institucional</label>
@@ -6575,7 +6572,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                                 <label>Rol<input id="profesorPerfilRol" readonly disabled value="Profesor"></label>
                                 <label>Identificación<input id="profesorPerfilIdentificacion" readonly disabled value=""></label>
                                 <label>Sede asignada<input id="profesorPerfilSede" readonly disabled value="Sin asignar"></label>
-                                <label>Proyecto asignado<input id="profesorPerfilProyecto" readonly disabled value="Sin asignar"></label>
+                                <label>Zona asignada<input id="profesorPerfilProyecto" readonly disabled value="Sin asignar"></label>
                             </div>
                         </div>
                     </div>
@@ -6794,7 +6791,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 
                     <div class="admin-quick-grid">
                         <button type="button" class="admin-quick-card" onclick="mostrarSeccionAdministrador('profesores')">
-                            <span>👥</span><div><strong>Gestionar profesores</strong><small>Asigna la sede y el proyecto de cada docente.</small></div><b>→</b>
+                            <span>👥</span><div><strong>Gestionar profesores</strong><small>Asigna la sede y la zona de cada docente.</small></div><b>→</b>
                         </button>
                         <button type="button" class="admin-quick-card" onclick="mostrarSeccionAdministrador('progreso')">
                             <span>🎓</span><div><strong>Ver progreso</strong><small>Consulta las horas y el avance de cada estudiante.</small></div><b>→</b>
@@ -6810,7 +6807,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                         <div>
                             <span class="page-eyebrow">GESTIÓN</span>
                             <h3>Gestión de profesores</h3>
-                            <p class="section-description">Asigna la sede y el proyecto de cada profesor desde este panel.</p>
+                            <p class="section-description">Asigna la sede y la zona de cada profesor desde este panel.</p>
                         </div>
                     </div>
                     <div id="tablaProfesoresAdmin"></div>
@@ -8826,7 +8823,7 @@ function abrirAyuda() {
                     Gestiona profesores, revisa solicitudes, consulta el progreso de los estudiantes y controla las funciones generales del sistema.
                 </div>
                 <div class="help-admin-grid">
-                    <article class="help-admin-card"><div class="help-admin-icon">👥</div><h4>Gestión de profesores</h4><p>Administra la información de los docentes y define su área de trabajo.</p><ul><li>Selecciona o actualiza la <strong>sede asignada</strong>.</li><li>Selecciona o actualiza el <strong>proyecto asignado</strong>.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">👥</div><h4>Gestión de profesores</h4><p>Administra la información de los docentes y define su área de trabajo.</p><ul><li>Selecciona o actualiza la <strong>sede asignada</strong>.</li><li>Selecciona o actualiza la <strong>zona asignada</strong>.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">📊</div><h4>Progreso de estudiantes</h4><p>Consulta cómo avanza cada estudiante con sus horas de servicio social.</p><ul><li>Revisa horas aprobadas y horas faltantes.</li><li>Consulta el porcentaje de avance y utiliza los filtros por grado.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">📩</div><h4>Solicitudes de profesores / Admin</h4><p>Aquí se reúnen las solicitudes relacionadas con el personal docente.</p><ul><li>Aprueba o rechaza nuevos registros de profesores.</li><li>Revisa las solicitudes de profesores que desean el rol de Administrador.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">🎓</div><h4>Solicitudes de estudiantes</h4><p>Este módulo es independiente de las solicitudes de profesores.</p><ul><li>Revisa los datos de cada estudiante.</li><li>Acepta o rechaza su solicitud de registro.</li></ul></article>
@@ -10708,12 +10705,12 @@ async function cargarProfesoresAdmin() {
                         </div>
 
                         <div>
-                            <label>Proyecto asignado</label>
+                            <label>Zona asignada</label>
                             <select id="proyectoProf_${p.id}">
-                                <option value="" disabled ${!p.proyecto ? "selected" : ""}>Seleccionar proyecto</option>
+                                <option value="" disabled ${!p.proyecto ? "selected" : ""}>Seleccionar zona</option>
                                 ${["Educación Física / Tiempo Libre","Proyecto Ambiental","Logística y Vigilancia","Secretaría y/o Archivo","Acompañamiento a un docente de transición o primaria","Eventos especiales","Otro"].map(x => `<option value="${escapeHtml(x)}" ${x === p.proyecto ? "selected" : ""}>${escapeHtml(x)}</option>`).join("")}
                             </select>
-                            <small class="field-help">El Administrador asigna el proyecto.</small>
+                            <small class="field-help">El Administrador asigna la zona.</small>
                         </div>
 
                         <button class="assignment-save" onclick="asignarProfesor(${p.id})">Guardar asignación</button>
@@ -10731,7 +10728,7 @@ async function asignarProfesor(id) {
     const proyecto = document.getElementById(`proyectoProf_${id}`)?.value;
 
     if (!sede || !proyecto) {
-        alert("Selecciona la sede y el proyecto.");
+        alert("Selecciona la sede y la zona.");
         return;
     }
 
@@ -10740,7 +10737,7 @@ async function asignarProfesor(id) {
             method: "POST",
             body: { staffId: id, sede, proyecto }
         });
-        alert("Sede y proyecto guardados correctamente.");
+        alert("Sede y zona guardadas correctamente.");
         await cargarProfesoresAdmin();
     } catch (e) {
         alert(e.message);
@@ -11694,7 +11691,6 @@ body.dark-mode .auth-card strong {
 }
 </style>
 
-<style id="sigho-comprobante-dark-v13">
 <style id="sigho-comprobante-dark-v13">
 /* =========================================================
    COMPROBANTES / RESÚMENES DE SOLICITUD EN MODO OSCURO
