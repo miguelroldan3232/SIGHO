@@ -348,6 +348,7 @@
         #estudiante .notification-empty strong { margin:7px 0 3px; color:#4f666f; }
         #estudiante .notification-empty span { font-size:12px; }
         .teacher-admin-card select:disabled, #profesor #profesorPerfilProyectoEditable:disabled { background:#edf0f1; color:#7c888c; cursor:not-allowed; opacity:1; }
+        .teacher-admin-card .assignment-grid select { width:100%; min-height:42px; box-sizing:border-box; }
 
         .back {
             border: none;
@@ -6794,7 +6795,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 
                     <div class="admin-quick-grid">
                         <button type="button" class="admin-quick-card" onclick="mostrarSeccionAdministrador('profesores')">
-                            <span>👥</span><div><strong>Gestionar profesores</strong><small>Asigna la sede y el proyecto de cada docente.</small></div><b>→</b>
+                            <span>👥</span><div><strong>Gestionar profesores</strong><small>Asigna la sede y la zona de cada docente.</small></div><b>→</b>
                         </button>
                         <button type="button" class="admin-quick-card" onclick="mostrarSeccionAdministrador('progreso')">
                             <span>🎓</span><div><strong>Ver progreso</strong><small>Consulta las horas y el avance de cada estudiante.</small></div><b>→</b>
@@ -6810,7 +6811,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                         <div>
                             <span class="page-eyebrow">GESTIÓN</span>
                             <h3>Gestión de profesores</h3>
-                            <p class="section-description">Asigna la sede y el proyecto de cada profesor desde este panel.</p>
+                            <p class="section-description">Asigna la sede y la zona de cada profesor desde este panel.</p>
                         </div>
                     </div>
                     <div id="tablaProfesoresAdmin"></div>
@@ -10605,7 +10606,7 @@ function mostrarSeccionAdministrador(nombre) {
 
     const titulos = {
         inicio: ["Inicio", "Vista general del sistema de servicio social."],
-        profesores: ["Gestión de profesores", "Administra las sedes y proyectos asignados a cada docente."],
+        profesores: ["Gestión de profesores", "Administra las sedes y zonas asignadas a cada docente."],
         progreso: ["Progreso de estudiantes", "Consulta las horas aprobadas, faltantes y el avance de cada estudiante."],
         historial: ["Historial de revisiones", "Consulta los registros revisados por los profesores."],
         "solicitudes-personal": ["Solicitudes de profesores / Administrador", "Revisa las solicitudes de nuevos profesores y las solicitudes de permisos administrativos."],
@@ -10676,7 +10677,7 @@ async function cargarProfesoresAdmin() {
 
     try {
         const data = await api("admin_data");
-        const profesores = data.profesores || (data.users || []).filter(u => u.rol === "profesor").map(u => ({ id: u.staffId, nombre: u.nombre, correo: u.correo, sede: u.sede || "", proyecto: u.proyecto || "" }));
+        const profesores = data.profesores || (data.users || []).filter(u => u.rol === "profesor").map(u => ({ id: u.staffId, nombre: u.nombre, correo: u.correo, sede: u.sede || "", zona: u.zona || "" }));
         const sedes = [
             "Central JT",
             "San Francisco Club",
@@ -10702,18 +10703,17 @@ async function cargarProfesoresAdmin() {
                     <div class="assignment-grid">
                         <div>
                             <label>Sede</label>
-                            <select id="sedeProf_${p.id}">
+                            <select id="sedeProf_${p.id}" onchange="actualizarZonasProfesor(${p.id})">
                                 ${sedes.map(x => `<option value="${escapeHtml(x)}" ${x === p.sede ? "selected" : ""}>${escapeHtml(x)}</option>`).join("")}
                             </select>
                         </div>
 
                         <div>
-                            <label>Proyecto asignado</label>
-                            <select id="proyectoProf_${p.id}">
-                                <option value="" disabled ${!p.proyecto ? "selected" : ""}>Seleccionar proyecto</option>
-                                ${["Educación Física / Tiempo Libre","Proyecto Ambiental","Logística y Vigilancia","Secretaría y/o Archivo","Acompañamiento a un docente de transición o primaria","Eventos especiales","Otro"].map(x => `<option value="${escapeHtml(x)}" ${x === p.proyecto ? "selected" : ""}>${escapeHtml(x)}</option>`).join("")}
+                            <label>Zona asignada</label>
+                            <select id="zonaProf_${p.id}">
+                                ${opcionesZonaProfesor(p.sede, p.zona)}
                             </select>
-                            <small class="field-help">El Administrador asigna el proyecto.</small>
+                            <small class="field-help">Las zonas disponibles dependen de la sede.</small>
                         </div>
 
                         <button class="assignment-save" onclick="asignarProfesor(${p.id})">Guardar asignación</button>
@@ -10721,26 +10721,45 @@ async function cargarProfesoresAdmin() {
                 </div>
             `).join("")
             : `<div class="empty-state">No hay profesores registrados.</div>`;
+        profesores.forEach(p => actualizarZonasProfesor(p.id, p.zona));
     } catch (e) {
         cont.innerHTML = `<div class="message" style="display:block">${escapeHtml(e.message)}</div>`;
     }
 }
 
+function zonasDisponiblesPorSede(sede) {
+    return sede === "Central JM"
+        ? ["Cancha central", "Cancha punta cana", "Baños hombres", "Baños mujeres", "Pasillos bloque 1", "Pasillos bloque 2", "Pasillos bloque uno 2 piso", "Pasillos bloque dos segundo piso"]
+        : ["Próximamente"];
+}
+
+function opcionesZonaProfesor(sede, zonaSeleccionada = "") {
+    const zonas = zonasDisponiblesPorSede(sede);
+    const zonaValida = zonas.includes(zonaSeleccionada) ? zonaSeleccionada : zonas[0];
+    return zonas.map(zona => `<option value="${escapeHtml(zona)}" ${zona === zonaValida ? "selected" : ""}>${escapeHtml(zona)}</option>`).join("");
+}
+
+function actualizarZonasProfesor(id, zonaSeleccionada = "") {
+    const sede = document.getElementById(`sedeProf_${id}`)?.value || "";
+    const selector = document.getElementById(`zonaProf_${id}`);
+    if (selector) selector.innerHTML = opcionesZonaProfesor(sede, zonaSeleccionada || selector.value);
+}
+
 async function asignarProfesor(id) {
     const sede = document.getElementById(`sedeProf_${id}`)?.value;
-    const proyecto = document.getElementById(`proyectoProf_${id}`)?.value;
+    const zona = document.getElementById(`zonaProf_${id}`)?.value;
 
-    if (!sede || !proyecto) {
-        alert("Selecciona la sede y el proyecto.");
+    if (!sede || !zona) {
+        alert("Selecciona la sede y la zona.");
         return;
     }
 
     try {
         await api("assign_teacher", {
             method: "POST",
-            body: { staffId: id, sede, proyecto }
+            body: { staffId: id, sede, zona }
         });
-        alert("Sede y proyecto guardados correctamente.");
+        alert("Sede y zona guardadas correctamente.");
         await cargarProfesoresAdmin();
     } catch (e) {
         alert(e.message);

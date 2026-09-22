@@ -1185,17 +1185,18 @@ try {
             $d = json_input();
             $staffId = (int)($d['staffId'] ?? 0);
             $sede = trim((string)($d['sede'] ?? ''));
-            $proyecto = trim((string)($d['proyecto'] ?? ''));
+            $zona = trim((string)($d['zona'] ?? ''));
             $sedes = ['Central JT','San Francisco Club','Picaleña','Central J.N.','Secundino Porras Cruz','San Martín','Central JM','Bello Horizonte'];
-            $proyectos = ['Educación Física / Tiempo Libre','Proyecto Ambiental','Logística y Vigilancia','Secretaría y/o Archivo','Acompañamiento a un docente de transición o primaria','Eventos especiales','Otro'];
+            $zonasCentralJm = ['Cancha central','Cancha punta cana','Baños hombres','Baños mujeres','Pasillos bloque 1','Pasillos bloque 2','Pasillos bloque uno 2 piso','Pasillos bloque dos segundo piso'];
             if (!$staffId || !in_array($sede,$sedes,true)) fail('Sede inválida.');
-            if (!$proyecto || !in_array($proyecto,$proyectos,true)) fail('Proyecto inválido.');
+            $zonasPermitidas = $sede === 'Central JM' ? $zonasCentralJm : ['Próximamente'];
+            if (!$zona || !in_array($zona,$zonasPermitidas,true)) fail('Zona inválida.');
             ensure_optional_columns(db());
             $st=db()->prepare("SELECT s.id FROM staff s JOIN users u ON u.id=s.user_id JOIN roles r ON r.id=u.role_id WHERE s.id=? AND r.code='profesor' AND u.status='activo'");
             $st->execute([$staffId]); if(!$st->fetchColumn()) fail('Profesor no encontrado.',404);
             $st=db()->prepare('UPDATE staff SET service_site=?, service_project=? WHERE id=?');
-            $st->execute([$sede,$proyecto,$staffId]);
-            respond(['ok'=>true,'message'=>'Sede y proyecto asignados correctamente.']);
+            $st->execute([$sede,$zona,$staffId]);
+            respond(['ok'=>true,'message'=>'Sede y zona asignadas correctamente.']);
 
         case 'request_admin_permission':
             $user = require_roles(['profesor']);
@@ -1243,7 +1244,7 @@ try {
             foreach ($st->fetchAll() as $u) $users[] = user_payload($u);
             $profesores = [];
             $st = $pdo->query("SELECT u.*, r.code AS role_code, s.id AS staff_id, s.service_site, s.service_project FROM users u JOIN roles r ON r.id=u.role_id JOIN staff s ON s.user_id=u.id WHERE u.status='activo' AND r.code='profesor' ORDER BY u.first_name,u.last_name");
-            foreach ($st->fetchAll() as $u) $profesores[] = ['id'=>(int)$u['staff_id'],'userId'=>(int)$u['id'],'nombre'=>trim($u['first_name'].' '.$u['last_name']),'correo'=>$u['email'],'sede'=>$u['service_site']??'','proyecto'=>$u['service_project']??''];
+            foreach ($st->fetchAll() as $u) $profesores[] = ['id'=>(int)$u['staff_id'],'userId'=>(int)$u['id'],'nombre'=>trim($u['first_name'].' '.$u['last_name']),'correo'=>$u['email'],'sede'=>$u['service_site']??'','zona'=>$u['service_project']??''];
             respond([
                 'ok' => true,
                 'users' => $users,
