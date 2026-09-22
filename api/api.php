@@ -198,6 +198,95 @@ function find_user_by_id(int $id): ?array {
     return $row ?: null;
 }
 
+function ensure_superadmin_tables(PDO $pdo): void {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS permissions (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        code VARCHAR(80) NOT NULL UNIQUE,
+        name VARCHAR(120) NOT NULL,
+        description VARCHAR(255) NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS role_permissions (
+        role_id TINYINT UNSIGNED NOT NULL,
+        permission_id INT UNSIGNED NOT NULL,
+        enabled TINYINT(1) NOT NULL DEFAULT 0,
+        PRIMARY KEY (role_id, permission_id),
+        CONSTRAINT fk_role_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+        CONSTRAINT fk_role_permissions_permission FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    $permissions = [
+        ['dashboard', 'Ver inicio', 'Consultar el resumen del sistema'],
+        ['users.view', 'Ver usuarios', 'Consultar cuentas y estados'],
+        ['users.manage', 'Administrar usuarios', 'Crear, editar y desactivar usuarios'],
+        ['roles.manage', 'Administrar roles', 'Asignar roles a las cuentas'],
+        ['permissions.manage', 'Administrar permisos', 'Activar permisos por rol'],
+        ['settings.manage', 'Administrar configuración', 'Modificar la configuración general']
+    ];
+    $insert = $pdo->prepare('INSERT IGNORE INTO permissions (code, name, description) VALUES (?,?,?)');
+    foreach ($permissions as $permission) $insert->execute($permission);
+    $defaults = [
+        'estudiante' => ['dashboard'],
+        'profesor' => ['dashboard', 'users.view'],
+        'administrador' => ['dashboard', 'users.view', 'users.manage', 'roles.manage'],
+        'superadmin' => ['dashboard', 'users.view', 'users.manage', 'roles.manage', 'permissions.manage', 'settings.manage']
+    ];
+    $roleQuery = $pdo->prepare('SELECT id FROM roles WHERE code = ?');
+    $permissionQuery = $pdo->prepare('SELECT id FROM permissions WHERE code = ?');
+    $link = $pdo->prepare('INSERT IGNORE INTO role_permissions (role_id, permission_id, enabled) VALUES (?,?,1)');
+    foreach ($defaults as $roleCode => $codes) {
+        $roleQuery->execute([$roleCode]);
+        $roleId = (int)$roleQuery->fetchColumn();
+        foreach ($codes as $code) {
+            $permissionQuery->execute([$code]);
+            $permissionId = (int)$permissionQuery->fetchColumn();
+            if ($roleId && $permissionId) $link->execute([$roleId, $permissionId]);
+        }
+    }
+}
+
+function superadmin_user_payload(array $row): array {
+    return [
+        'id' => (int)$row['id'],
+        'identificacion' => $row['identification'],
+        'nombre' => trim($row['first_name'] . ' ' . $row['last_name']),
+        'nombres' => $row['first_name'],
+        'apellidos' => $row['last_name'],
+        'correo' => $row['email'],
+        'rol' => $row['role_code'],
+        'estado' => $row['status'],
+        'creado' => $row['created_at']
+    ];
+}
+
+function superadmin_snapshot(): array {
+    $pdo = db();
+    ensure_superadmin_tables($pdo);
+    $users = [];
+    $st = $pdo->query("SELECT u.*, r.code AS role_code FROM users u JOIN roles r ON r.id = u.role_id ORDER BY u.first_name, u.last_name");
+    foreach ($st->fetchAll() as $row) $users[] = superadmin_user_payload($row);
+    $roles = $pdo->query('SELECT id, code, name, description FROM roles ORDER BY id')->fetchAll();
+    $permissions = $pdo->query('SELECT id, code, name, description FROM permissions ORDER BY id')->fetchAll();
+    $links = $pdo->query('SELECT role_id, permission_id, enabled FROM role_permissions')->fetchAll();
+    $matrix = [];
+    foreach ($links as $link) $matrix[(int)$link['role_id']][(int)$link['permission_id']] = (bool)$link['enabled'];
+    $settings = [];
+    foreach ($pdo->query('SELECT setting_key, setting_value, description FROM system_settings ORDER BY setting_key')->fetchAll() as $setting) {
+        $settings[$setting['setting_key']] = ['valor' => $setting['setting_value'], 'descripcion' => $setting['description'] ?? ''];
+    }
+    $count = function (string $role) use ($pdo): int {
+        $st = $pdo->prepare("SELECT COUNT(*) FROM users u JOIN roles r ON r.id = u.role_id WHERE u.status = 'activo' AND r.code = ?");
+        $st->execute([$role]);
+        return (int)$st->fetchColumn();
+    };
+    return [
+        'users' => $users,
+        'roles' => $roles,
+        'permissions' => $permissions,
+        'matrix' => $matrix,
+        'settings' => $settings,
+        'counts' => ['estudiantes' => $count('estudiante'), 'profesores' => $count('profesor'), 'administradores' => $count('administrador')]
+    ];
+}
+
 function record_payload(array $r): array {
     return [
         'id' => (int)$r['id'],
@@ -1305,7 +1394,95 @@ try {
             $requests = pending_requests('administrador');
             $totalUsers = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE status='activo'")->fetchColumn();
             $totalAdmins = (int)$pdo->query("SELECT COUNT(*) FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code='administrador'")->fetchColumn();
-            respond(['ok'=>true,'requests'=>$requests,'totalUsuarios'=>$totalUsers,'totalAdministradores'=>$totalAdmins]);
+            $snapshot = superadmin_snapshot();
+            respond(['ok'=>true,'requests'=>$requests,'totalUsuarios'=>$totalUsers,'totalAdministradores'=>$totalAdmins] + $snapshot);
+
+        case 'superadmin_user_save':
+            $admin = require_roles(['superadmin']);
+            $d = json_input();
+            $id = (int)($d['id'] ?? 0);
+            $identificacion = trim((string)($d['identificacion'] ?? ''));
+            $nombres = trim((string)($d['nombres'] ?? ''));
+            $apellidos = trim((string)($d['apellidos'] ?? ''));
+            $correo = strtolower(trim((string)($d['correo'] ?? '')));
+            $rol = trim((string)($d['rol'] ?? ''));
+            $estado = trim((string)($d['estado'] ?? 'activo'));
+            $clave = (string)($d['clave'] ?? '');
+            if (!$identificacion || !$nombres || !$apellidos || !filter_var($correo, FILTER_VALIDATE_EMAIL)) fail('Completa identificación, nombres, apellidos y un correo válido.');
+            if (!in_array($rol, ['estudiante','profesor','administrador'], true)) fail('El rol seleccionado no es válido.');
+            if (!in_array($estado, ['activo','inactivo'], true)) fail('El estado seleccionado no es válido.');
+            $pdo = db();
+            $roleStatement = $pdo->prepare('SELECT id FROM roles WHERE code = ?');
+            $roleStatement->execute([$rol]);
+            $roleId = (int)$roleStatement->fetchColumn();
+            if (!$roleId) fail('No se encontró el rol seleccionado.');
+            if ($id) {
+                $existing = find_user_by_id($id);
+                if (!$existing) fail('Usuario no encontrado.', 404);
+                if ((int)$existing['id'] === (int)$admin['id']) fail('No puedes modificar tu propia cuenta desde esta sección.');
+                if ($existing['role_code'] === 'superadmin') fail('Las cuentas de Super Admin están protegidas.');
+                $duplicate = $pdo->prepare('SELECT COUNT(*) FROM users WHERE (email = ? OR identification = ?) AND id <> ?');
+                $duplicate->execute([$correo, $identificacion, $id]);
+                if ((int)$duplicate->fetchColumn()) fail('El correo o la identificación ya pertenecen a otra cuenta.');
+                $sql = 'UPDATE users SET identification=?, first_name=?, last_name=?, email=?, role_id=?, status=?';
+                $params = [$identificacion, $nombres, $apellidos, $correo, $roleId, $estado];
+                if ($clave !== '') { $sql .= ', password_hash=?'; $params[] = password_hash($clave, PASSWORD_DEFAULT); }
+                $sql .= ' WHERE id=?'; $params[] = $id;
+                $pdo->prepare($sql)->execute($params);
+            } else {
+                if (!$clave || strlen($clave) < 8) fail('La contraseña debe tener mínimo 8 caracteres.');
+                $duplicate = $pdo->prepare('SELECT COUNT(*) FROM users WHERE email = ? OR identification = ?');
+                $duplicate->execute([$correo, $identificacion]);
+                if ((int)$duplicate->fetchColumn()) fail('El correo o la identificación ya pertenecen a otra cuenta.');
+                $pdo->prepare('INSERT INTO users (identification, first_name, last_name, email, password_hash, role_id, status) VALUES (?,?,?,?,?,?,?)')
+                    ->execute([$identificacion, $nombres, $apellidos, $correo, password_hash($clave, PASSWORD_DEFAULT), $roleId, $estado]);
+                $newUserId = (int)$pdo->lastInsertId();
+                if ($rol === 'estudiante') {
+                    $pdo->prepare('INSERT INTO students (user_id, student_code, grade, modality, technical_program, target_hours) VALUES (?,?,?,?,?,?)')
+                        ->execute([$newUserId, $identificacion, null, 'academico', null, 120]);
+                } elseif (in_array($rol, ['profesor', 'administrador'], true)) {
+                    $pdo->prepare('INSERT INTO staff (user_id, staff_code, position) VALUES (?,?,?)')
+                        ->execute([$newUserId, $identificacion, $rol === 'administrador' ? 'Docente Administrador' : 'Docente']);
+                }
+            }
+            respond(['ok' => true, 'data' => superadmin_snapshot()]);
+
+        case 'superadmin_user_delete':
+            $admin = require_roles(['superadmin']);
+            $id = (int)(json_input()['id'] ?? 0);
+            if (!$id || $id === (int)$admin['id']) fail('No puedes eliminar tu propia cuenta.');
+            $existing = find_user_by_id($id);
+            if (!$existing || $existing['role_code'] === 'superadmin') fail('La cuenta no puede eliminarse.');
+            db()->prepare("UPDATE users SET status='inactivo' WHERE id=?")->execute([$id]);
+            respond(['ok' => true, 'data' => superadmin_snapshot()]);
+
+        case 'superadmin_permissions_save':
+            require_roles(['superadmin']);
+            $d = json_input();
+            $roleId = (int)($d['roleId'] ?? 0);
+            $values = $d['permissions'] ?? [];
+            if (!$roleId || !is_array($values)) fail('Datos de permisos inválidos.');
+            $role = db()->prepare('SELECT code FROM roles WHERE id=?');
+            $role->execute([$roleId]);
+            if ($role->fetchColumn() === 'superadmin') fail('Los permisos del Super Admin no se pueden modificar.');
+            $pdo = db();
+            ensure_superadmin_tables($pdo);
+            $pdo->prepare('DELETE FROM role_permissions WHERE role_id=?')->execute([$roleId]);
+            $insert = $pdo->prepare('INSERT INTO role_permissions (role_id, permission_id, enabled) VALUES (?,?,1)');
+            foreach ($values as $permissionId) $insert->execute([$roleId, (int)$permissionId]);
+            respond(['ok' => true, 'data' => superadmin_snapshot()]);
+
+        case 'superadmin_settings_save':
+            require_roles(['superadmin']);
+            $settings = json_input()['settings'] ?? [];
+            if (!is_array($settings)) fail('Configuración inválida.');
+            $pdo = db();
+            $statement = $pdo->prepare('UPDATE system_settings SET setting_value=? WHERE setting_key=?');
+            foreach ($settings as $key => $value) {
+                if (!preg_match('/^[a-zA-Z0-9_]+$/', (string)$key)) continue;
+                $statement->execute([trim((string)$value), (string)$key]);
+            }
+            respond(['ok' => true, 'data' => superadmin_snapshot()]);
 
         case 'validate_admin_request':
             require_roles(['superadmin']);
