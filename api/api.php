@@ -382,33 +382,21 @@ try {
             respond(['ok' => true, 'user' => current_user()]);
 
         case 'login':
-            // El frontend envía JSON con correo y clave.
-            // El rol no se exige en el formulario de inicio de sesión:
-            // se obtiene de la cuenta encontrada por el correo.
             $d = json_input();
-
-            // Compatibilidad adicional por si alguna versión del frontend usa
-            // los nombres email/password.
-            $correo = strtolower(trim((string)($d['correo'] ?? $d['email'] ?? '')));
-            $clave = (string)($d['clave'] ?? $d['password'] ?? '');
-            $rolSolicitado = trim((string)($d['rol'] ?? ''));
-
+            $rol = trim((string)($d['rol'] ?? ''));
+            $correo = strtolower(trim((string)($d['correo'] ?? '')));
+            $clave = (string)($d['clave'] ?? '');
             if (!$correo || !$clave) fail('Completa todos los campos.');
 
             $st = db()->prepare("SELECT u.*, r.code AS role_code FROM users u JOIN roles r ON r.id = u.role_id WHERE LOWER(u.email) = ? AND u.status = 'activo'");
             $st->execute([$correo]);
             $u = $st->fetch();
-
             if (!$u || !password_verify($clave, $u['password_hash'])) {
                 fail('Correo o clave incorrectos.', 401);
             }
 
-
-            // Si una versión antigua del frontend todavía envía rol,
-            // se sigue validando. El frontend actual puede omitirlo.
-            $rol = $u['role_code'];
-            if ($rolSolicitado !== '' && $rolSolicitado !== $rol) {
-
+            $rol = $rol ?: $u['role_code'];
+            if ($u['role_code'] !== $rol) {
                 fail('Correo, clave o rol incorrectos.', 401);
             }
 
@@ -781,8 +769,9 @@ try {
                         INSERT INTO student_applications
                         (access_request_id, service_year, first_surname, second_surname, first_name, second_name,
                          document_type, document_number, grade, birth_date, residence_address, phone, eps,
-                         guardian_name, guardian_phone, service_site, project, project_other, service_days, service_shift)
-                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                         guardian_name, guardian_phone, guardian_phone_type, service_site, project, project_other,
+                         service_days, service_shift)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                     ');
                     $st->execute([
                         $accessRequestId,
@@ -1359,9 +1348,9 @@ case 'pending_requests':
             fail('Acción no encontrada.', 404);
     }
 } catch (PDOException $e) {
-    error_log($e->getMessage());
-    fail('Error de base de datos. Verifica que MySQL esté encendido y que la base de datos jjfh_servicio_social exista.', 500);
+    error_log('SIGHO PDO: ' . $e->getMessage());
+    fail('Error SQL real: ' . $e->getMessage(), 500);
 } catch (Throwable $e) {
-    error_log($e->getMessage());
-    fail('Error interno del servidor.', 500);
+    error_log('SIGHO Throwable: ' . $e->getMessage());
+    fail('Error interno del servidor: ' . $e->getMessage(), 500);
 }
