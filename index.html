@@ -5407,6 +5407,1347 @@ body.dark-mode #profesor .pending-counter {
 }
 </style>
 
+
+<style id="sigho-password-focus-visibility-v17">
+/* =========================================================
+   SIGHO — CONTRASEÑA: VISIBILIDAD SOLO AL ENFOCAR v17
+   - Oculta por completo la máscara/puntos cuando el campo no tiene foco.
+   - Los puntos aparecen únicamente mientras el campo está enfocado.
+   - Funciona con Modo Claro, body.dark-mode y html.dark-mode.
+   - Corrige también -webkit-text-fill-color y placeholders de WebKit.
+   - El texto de ayuda asociado a contraseñas aparece solo con focus/focus-within.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. CONTRASEÑAS SIN FOCO: TEXTO Y MÁSCARA INVISIBLES
+   --------------------------------------------------------- */
+input[type="password"]:not(:focus),
+input[type="password"]:not(:focus-within),
+html.dark-mode input[type="password"]:not(:focus),
+body.dark-mode input[type="password"]:not(:focus),
+html.dark-mode input[type="password"]:not(:focus-within),
+body.dark-mode input[type="password"]:not(:focus-within) {
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    caret-color: transparent !important;
+    text-shadow: none !important;
+}
+
+/* ---------------------------------------------------------
+   2. PLACEHOLDER DE CONTRASEÑA: OCULTO SIN FOCO
+   --------------------------------------------------------- */
+input[type="password"]:not(:focus)::placeholder,
+input[type="password"]:not(:focus)::-webkit-input-placeholder,
+html.dark-mode input[type="password"]:not(:focus)::placeholder,
+html.dark-mode input[type="password"]:not(:focus)::-webkit-input-placeholder,
+body.dark-mode input[type="password"]:not(:focus)::placeholder,
+body.dark-mode input[type="password"]:not(:focus)::-webkit-input-placeholder {
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    opacity: 0 !important;
+}
+
+/* ---------------------------------------------------------
+   3. CONTRASEÑA CON FOCO: MOSTRAR MÁSCARA/PUNTOS
+   --------------------------------------------------------- */
+input[type="password"]:focus,
+input[type="password"]:focus-within {
+    color: #35434a !important;
+    -webkit-text-fill-color: #35434a !important;
+    caret-color: #35434a !important;
+    text-shadow: none !important;
+}
+
+input[type="password"]:focus::placeholder,
+input[type="password"]:focus::-webkit-input-placeholder {
+    color: #7b8a93 !important;
+    -webkit-text-fill-color: #7b8a93 !important;
+    opacity: 1 !important;
+}
+
+/* ---------------------------------------------------------
+   4. MODO OSCURO: MOSTRAR SOLO CON FOCO
+   --------------------------------------------------------- */
+html.dark-mode input[type="password"]:focus,
+html.dark-mode input[type="password"]:focus-within,
+body.dark-mode input[type="password"]:focus,
+body.dark-mode input[type="password"]:focus-within {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
+    text-shadow: none !important;
+}
+
+html.dark-mode input[type="password"]:focus::placeholder,
+html.dark-mode input[type="password"]:focus::-webkit-input-placeholder,
+body.dark-mode input[type="password"]:focus::placeholder,
+body.dark-mode input[type="password"]:focus::-webkit-input-placeholder {
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+    opacity: 1 !important;
+}
+
+/* ---------------------------------------------------------
+   5. AUTOFILL DE WEBKIT: TAMBIÉN OCULTO SIN FOCO
+   --------------------------------------------------------- */
+input[type="password"]:-webkit-autofill,
+input[type="password"]:-webkit-autofill:hover,
+input[type="password"]:-webkit-autofill:active,
+html.dark-mode input[type="password"]:-webkit-autofill,
+html.dark-mode input[type="password"]:-webkit-autofill:hover,
+html.dark-mode input[type="password"]:-webkit-autofill:active,
+body.dark-mode input[type="password"]:-webkit-autofill,
+body.dark-mode input[type="password"]:-webkit-autofill:hover,
+body.dark-mode input[type="password"]:-webkit-autofill:active {
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    caret-color: transparent !important;
+}
+
+input[type="password"]:-webkit-autofill:focus,
+html.dark-mode input[type="password"]:-webkit-autofill:focus,
+body.dark-mode input[type="password"]:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff !important;
+    color: #ffffff !important;
+    caret-color: #ffffff !important;
+}
+
+/* ---------------------------------------------------------
+   6. AYUDA DEL CAMPO: SOLO VISIBLE AL SELECCIONAR CONTRASEÑA
+   --------------------------------------------------------- */
+.form-group:has(input[type="password"]) > .field-help,
+.form-group:has(input[type="password"]) .field-help {
+    display: none !important;
+}
+
+.form-group:has(input[type="password"]:focus) > .field-help,
+.form-group:has(input[type="password"]:focus) .field-help,
+.form-group:focus-within:has(input[type="password"]) > .field-help,
+.form-group:focus-within:has(input[type="password"]) .field-help {
+    display: block !important;
+}
+
+/* Ayuda de los tres campos de cambio de contraseña del profesor. */
+#formularioCambioClaveProfesor .field-help {
+    display: none !important;
+}
+
+#formularioCambioClaveProfesor:has(input[type="password"]:focus) .field-help,
+#formularioCambioClaveProfesor:focus-within .field-help {
+    display: block !important;
+}
+
+/* Compatibilidad adicional para ayudas colocadas inmediatamente después del input. */
+input[type="password"] + .field-help {
+    display: none !important;
+}
+
+input[type="password"]:focus + .field-help,
+input[type="password"]:focus-within + .field-help {
+    display: block !important;
+}
+
+/* ---------------------------------------------------------
+   7. PREFERS-COLOR-SCHEME: DARK
+   --------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+    input[type="password"]:not(:focus),
+    input[type="password"]:not(:focus-within) {
+        color: transparent !important;
+        -webkit-text-fill-color: transparent !important;
+        caret-color: transparent !important;
+        text-shadow: none !important;
+    }
+
+    input[type="password"]:not(:focus)::placeholder,
+    input[type="password"]:not(:focus)::-webkit-input-placeholder {
+        color: transparent !important;
+        -webkit-text-fill-color: transparent !important;
+        opacity: 0 !important;
+    }
+
+    input[type="password"]:focus,
+    input[type="password"]:focus-within {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        caret-color: #ffffff !important;
+        text-shadow: none !important;
+    }
+
+    input[type="password"]:focus::placeholder,
+    input[type="password"]:focus::-webkit-input-placeholder {
+        color: #94a3b8 !important;
+        -webkit-text-fill-color: #94a3b8 !important;
+        opacity: 1 !important;
+    }
+
+    input[type="password"]:-webkit-autofill,
+    input[type="password"]:-webkit-autofill:hover,
+    input[type="password"]:-webkit-autofill:active {
+        color: transparent !important;
+        -webkit-text-fill-color: transparent !important;
+        caret-color: transparent !important;
+    }
+
+    input[type="password"]:-webkit-autofill:focus {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        caret-color: #ffffff !important;
+    }
+}
+</style>
+
+
+<style id="sigho-profesor-home-dark-v18">
+/* =========================================================
+   PANEL DEL PROFESOR — TARJETA DE INICIO EN MODO OSCURO
+   ========================================================= */
+html.dark-mode #profesor .profesor-home-quick,
+body.dark-mode #profesor .profesor-home-quick {
+    background: rgba(255, 255, 255, 0.05) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.20) !important;
+}
+
+html.dark-mode #profesor .profesor-home-quick .quick-icon,
+body.dark-mode #profesor .profesor-home-quick .quick-icon {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark-mode #profesor .profesor-home-quick strong,
+body.dark-mode #profesor .profesor-home-quick strong {
+    color: #f1f5f9 !important;
+}
+
+html.dark-mode #profesor .profesor-home-quick p,
+body.dark-mode #profesor .profesor-home-quick p {
+    color: #a0aec0 !important;
+}
+
+html.dark-mode #profesor .profesor-home-quick p b,
+body.dark-mode #profesor .profesor-home-quick p b {
+    color: #e2e8f0 !important;
+}
+
+html.dark-mode #profesor .profesor-home-quick button:not(.quick-admin-button),
+body.dark-mode #profesor .profesor-home-quick button:not(.quick-admin-button) {
+    background: #2563eb !important;
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28) !important;
+}
+
+html.dark-mode #profesor .profesor-home-quick button:not(.quick-admin-button):hover,
+body.dark-mode #profesor .profesor-home-quick button:not(.quick-admin-button):hover {
+    background: #3b82f6 !important;
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+html.dark-mode #profesor .profesor-home-quick .quick-admin-button,
+body.dark-mode #profesor .profesor-home-quick .quick-admin-button {
+    background: rgba(255, 255, 255, 0.06) !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    color: #93c5fd !important;
+    border: 1px solid rgba(147, 197, 253, 0.30) !important;
+}
+
+html.dark-mode #profesor .profesor-home-quick .quick-admin-button:hover,
+body.dark-mode #profesor .profesor-home-quick .quick-admin-button:hover {
+    background: rgba(255, 255, 255, 0.10) !important;
+    background-color: rgba(255, 255, 255, 0.10) !important;
+    color: #bfdbfe !important;
+    border-color: rgba(191, 219, 254, 0.42) !important;
+}
+</style>
+
+
+
+<style id="sigho-dark-global-tabs-v22">
+/* =========================================================
+   SIGHO — MODO OSCURO GLOBAL v22
+   Tabs/filtros y superficies de Estudiante, Profesor y Admin.
+   Esta capa final prevalece sobre estilos claros anteriores.
+========================================================= */
+
+/* ---------- ESTÁNDAR GLOBAL DE FILTROS / TABS ---------- */
+html.dark-mode #estudiante .student-record-filters,
+body.dark-mode #estudiante .student-record-filters,
+html.dark-mode #profesor .history-filter,
+body.dark-mode #profesor .history-filter,
+html.dark-mode #administrador .history-filter,
+body.dark-mode #administrador .history-filter,
+html.dark-mode #administrador .admin-history-controls .history-filter,
+body.dark-mode #administrador .admin-history-controls .history-filter {
+    background: rgba(255,255,255,.05) !important;
+    background-color: rgba(255,255,255,.05) !important;
+    border: 1px solid rgba(255,255,255,.10) !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,.16) !important;
+    border-radius: 12px !important;
+    padding: 4px !important;
+}
+
+html.dark-mode #estudiante .student-filter-button,
+body.dark-mode #estudiante .student-filter-button,
+html.dark-mode #profesor .filter-button,
+body.dark-mode #profesor .filter-button,
+html.dark-mode #administrador .filter-button,
+body.dark-mode #administrador .filter-button {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #94a3b8 !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
+}
+
+html.dark-mode #estudiante .student-filter-button:hover,
+body.dark-mode #estudiante .student-filter-button:hover,
+html.dark-mode #profesor .filter-button:hover,
+body.dark-mode #profesor .filter-button:hover,
+html.dark-mode #administrador .filter-button:hover,
+body.dark-mode #administrador .filter-button:hover {
+    background: rgba(255,255,255,.07) !important;
+    background-color: rgba(255,255,255,.07) !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(255,255,255,.08) !important;
+}
+
+html.dark-mode #estudiante .student-filter-button.active,
+body.dark-mode #estudiante .student-filter-button.active,
+html.dark-mode #profesor .filter-button.active,
+body.dark-mode #profesor .filter-button.active,
+html.dark-mode #administrador .filter-button.active,
+body.dark-mode #administrador .filter-button.active {
+    background: #2563eb !important;
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 3px 10px rgba(37,99,235,.28) !important;
+    text-shadow: none !important;
+}
+
+/* ---------- SUPERFICIES PRINCIPALES POR CUENTA ---------- */
+html.dark-mode #estudiante .section,
+body.dark-mode #estudiante .section,
+html.dark-mode #estudiante .card,
+body.dark-mode #estudiante .card,
+html.dark-mode #estudiante .panel,
+body.dark-mode #estudiante .panel,
+html.dark-mode #profesor .section,
+body.dark-mode #profesor .section,
+html.dark-mode #profesor .professor-section,
+body.dark-mode #profesor .professor-section,
+html.dark-mode #profesor .teacher-admin-card,
+body.dark-mode #profesor .teacher-admin-card,
+html.dark-mode #profesor .card,
+body.dark-mode #profesor .card,
+html.dark-mode #profesor .panel,
+body.dark-mode #profesor .panel,
+html.dark-mode #administrador .section,
+body.dark-mode #administrador .section,
+html.dark-mode #administrador .admin-section,
+body.dark-mode #administrador .admin-section,
+html.dark-mode #administrador .card,
+body.dark-mode #administrador .card,
+html.dark-mode #administrador .panel,
+body.dark-mode #administrador .panel,
+html.dark-mode #administrador .validation-panel,
+body.dark-mode #administrador .validation-panel,
+html.dark-mode #administrador .admin-history-controls,
+body.dark-mode #administrador .admin-history-controls {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18) !important;
+}
+
+/* El admin-section base es transparente; en dark se mantiene integrado sin blanco. */
+html.dark-mode #administrador .admin-section,
+body.dark-mode #administrador .admin-section {
+    box-shadow: none !important;
+}
+
+/* ---------- TABLAS / CONTENEDORES ---------- */
+html.dark-mode #estudiante .table-container,
+body.dark-mode #estudiante .table-container,
+html.dark-mode #profesor .table-container,
+body.dark-mode #profesor .table-container,
+html.dark-mode #administrador .table-container,
+body.dark-mode #administrador .table-container,
+html.dark-mode #estudiante .table-responsive,
+body.dark-mode #estudiante .table-responsive,
+html.dark-mode #profesor .table-responsive,
+body.dark-mode #profesor .table-responsive,
+html.dark-mode #administrador .table-responsive {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode #estudiante table,
+body.dark-mode #estudiante table,
+html.dark-mode #profesor table,
+body.dark-mode #profesor table,
+html.dark-mode #administrador table,
+body.dark-mode #administrador table {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #estudiante th,
+body.dark-mode #estudiante th,
+html.dark-mode #profesor th,
+body.dark-mode #profesor th,
+html.dark-mode #administrador th,
+body.dark-mode #administrador th {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #estudiante td,
+body.dark-mode #estudiante td,
+html.dark-mode #profesor td,
+body.dark-mode #profesor td,
+html.dark-mode #administrador td,
+body.dark-mode #administrador td {
+    background: transparent !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #estudiante tbody tr:hover,
+body.dark-mode #estudiante tbody tr:hover,
+html.dark-mode #profesor tbody tr:hover,
+body.dark-mode #profesor tbody tr:hover,
+html.dark-mode #administrador tbody tr:hover,
+body.dark-mode #administrador tbody tr:hover {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+}
+
+/* ---------- CABECERAS, TEXTOS Y ELEMENTOS SECUNDARIOS ---------- */
+html.dark-mode #estudiante .section-title,
+body.dark-mode #estudiante .section-title,
+html.dark-mode #estudiante h2,
+body.dark-mode #estudiante h2,
+html.dark-mode #estudiante h3,
+body.dark-mode #estudiante h3,
+html.dark-mode #profesor .section-title,
+body.dark-mode #profesor .section-title,
+html.dark-mode #profesor h2,
+body.dark-mode #profesor h2,
+html.dark-mode #profesor h3,
+body.dark-mode #profesor h3,
+html.dark-mode #administrador .section-title,
+body.dark-mode #administrador .section-title,
+html.dark-mode #administrador h2,
+body.dark-mode #administrador h2,
+html.dark-mode #administrador h3,
+body.dark-mode #administrador h3,
+html.dark-mode #administrador .admin-page-title h3,
+body.dark-mode #administrador .admin-page-title h3 {
+    color: #f8fafc !important;
+}
+
+html.dark-mode #estudiante .section-description,
+body.dark-mode #estudiante .section-description,
+html.dark-mode #profesor .section-description,
+body.dark-mode #profesor .section-description,
+html.dark-mode #administrador .section-description,
+body.dark-mode #administrador .section-description,
+html.dark-mode #administrador .admin-section .section-description {
+    color: #94a3b8 !important;
+}
+
+/* ---------- CAMPOS Y CONTROLES ---------- */
+html.dark-mode #administrador input:not(:disabled),
+body.dark-mode #administrador input:not(:disabled),
+html.dark-mode #administrador select:not(:disabled),
+body.dark-mode #administrador select:not(:disabled),
+html.dark-mode #administrador textarea:not(:disabled),
+body.dark-mode #administrador textarea:not(:disabled),
+html.dark-mode #estudiante input:not(:disabled),
+body.dark-mode #estudiante input:not(:disabled),
+html.dark-mode #estudiante select:not(:disabled),
+body.dark-mode #estudiante select:not(:disabled),
+html.dark-mode #estudiante textarea:not(:disabled),
+body.dark-mode #estudiante textarea:not(:disabled),
+html.dark-mode #profesor input:not(:disabled),
+body.dark-mode #profesor input:not(:disabled),
+html.dark-mode #profesor select:not(:disabled),
+body.dark-mode #profesor select:not(:disabled),
+html.dark-mode #profesor textarea:not(:disabled),
+body.dark-mode #profesor textarea:not(:disabled) {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* ---------- ELIMINACIÓN GLOBAL DE SUPERFICIES BLANCAS EN LAS CUENTAS ---------- */
+html.dark-mode #estudiante [style*="background:#fff"],
+body.dark-mode #estudiante [style*="background:#fff"],
+html.dark-mode #estudiante [style*="background: #fff"],
+body.dark-mode #estudiante [style*="background: #fff"],
+html.dark-mode #estudiante [style*="background:#ffffff"],
+body.dark-mode #estudiante [style*="background:#ffffff"],
+html.dark-mode #estudiante [style*="background: #ffffff"],
+body.dark-mode #estudiante [style*="background: #ffffff"],
+html.dark-mode #estudiante [style*="background-color:#fff"],
+body.dark-mode #estudiante [style*="background-color:#fff"],
+html.dark-mode #estudiante [style*="background-color: #fff"],
+body.dark-mode #estudiante [style*="background-color: #fff"],
+html.dark-mode #estudiante [style*="background-color:#ffffff"],
+body.dark-mode #estudiante [style*="background-color:#ffffff"],
+html.dark-mode #estudiante [style*="background-color: #ffffff"],
+body.dark-mode #estudiante [style*="background-color: #ffffff"],
+html.dark-mode #profesor [style*="background:#fff"],
+body.dark-mode #profesor [style*="background:#fff"],
+html.dark-mode #profesor [style*="background: #fff"],
+body.dark-mode #profesor [style*="background: #fff"],
+html.dark-mode #profesor [style*="background:#ffffff"],
+body.dark-mode #profesor [style*="background:#ffffff"],
+html.dark-mode #profesor [style*="background: #ffffff"],
+body.dark-mode #profesor [style*="background: #ffffff"],
+html.dark-mode #profesor [style*="background-color:#fff"],
+body.dark-mode #profesor [style*="background-color:#fff"],
+html.dark-mode #profesor [style*="background-color: #fff"],
+body.dark-mode #profesor [style*="background-color: #fff"],
+html.dark-mode #profesor [style*="background-color:#ffffff"],
+body.dark-mode #profesor [style*="background-color:#ffffff"],
+html.dark-mode #profesor [style*="background-color: #ffffff"],
+body.dark-mode #profesor [style*="background-color: #ffffff"],
+html.dark-mode #administrador [style*="background:#fff"],
+body.dark-mode #administrador [style*="background:#fff"],
+html.dark-mode #administrador [style*="background: #fff"],
+body.dark-mode #administrador [style*="background: #fff"],
+html.dark-mode #administrador [style*="background:#ffffff"],
+body.dark-mode #administrador [style*="background:#ffffff"],
+html.dark-mode #administrador [style*="background: #ffffff"],
+body.dark-mode #administrador [style*="background: #ffffff"],
+html.dark-mode #administrador [style*="background-color:#fff"],
+body.dark-mode #administrador [style*="background-color:#fff"],
+html.dark-mode #administrador [style*="background-color: #fff"],
+body.dark-mode #administrador [style*="background-color: #fff"],
+html.dark-mode #administrador [style*="background-color:#ffffff"],
+body.dark-mode #administrador [style*="background-color:#ffffff"],
+html.dark-mode #administrador [style*="background-color: #ffffff"],
+body.dark-mode #administrador [style*="background-color: #ffffff"] {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+/* Utilidades blancas dentro de paneles de las cuentas */
+html.dark-mode #estudiante .bg-white,
+body.dark-mode #estudiante .bg-white,
+html.dark-mode #profesor .bg-white,
+body.dark-mode #profesor .bg-white,
+html.dark-mode #administrador .bg-white,
+body.dark-mode #administrador .bg-white,
+html.dark-mode #estudiante [class*="bg-white"],
+body.dark-mode #estudiante [class*="bg-white"],
+html.dark-mode #profesor [class*="bg-white"],
+body.dark-mode #profesor [class*="bg-white"],
+html.dark-mode #administrador [class*="bg-white"],
+body.dark-mode #administrador [class*="bg-white"] {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Estados vacíos y mensajes dinámicos */
+html.dark-mode #estudiante .empty,
+body.dark-mode #estudiante .empty,
+html.dark-mode #profesor .empty,
+body.dark-mode #profesor .empty,
+html.dark-mode #administrador .empty,
+body.dark-mode #administrador .empty,
+html.dark-mode #administrador .admin-empty-state,
+body.dark-mode #administrador .admin-empty-state {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+</style>
+
+<style id="sigho-dark-gestion-profesores-v23">
+/* ===== Ajustes específicos: Gestión de profesores / Modo Oscuro ===== */
+html.dark-mode #administrador .assignment-save,
+body.dark-mode #administrador .assignment-save,
+html.dark-mode #tablaProfesoresAdmin .assignment-save,
+body.dark-mode #tablaProfesoresAdmin .assignment-save {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid #3b82f6 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28) !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+}
+
+html.dark-mode #administrador .assignment-save:hover,
+body.dark-mode #administrador .assignment-save:hover,
+html.dark-mode #tablaProfesoresAdmin .assignment-save:hover,
+body.dark-mode #tablaProfesoresAdmin .assignment-save:hover {
+    background-color: #1d4ed8 !important;
+    color: #ffffff !important;
+    border-color: #60a5fa !important;
+}
+
+html.dark-mode #administrador .assignment-save:focus-visible,
+body.dark-mode #administrador .assignment-save:focus-visible,
+html.dark-mode #tablaProfesoresAdmin .assignment-save:focus-visible,
+body.dark-mode #tablaProfesoresAdmin .assignment-save:focus-visible {
+    outline: 2px solid #93c5fd !important;
+    outline-offset: 2px !important;
+}
+
+/* La sede mostrada junto al nombre no debe parecer una etiqueta/recuadro. */
+html.dark-mode #administrador .teacher-admin-card .teacher-head .status-badge,
+body.dark-mode #administrador .teacher-admin-card .teacher-head .status-badge,
+html.dark-mode #tablaProfesoresAdmin .teacher-admin-card .teacher-head .status-badge,
+body.dark-mode #tablaProfesoresAdmin .teacher-admin-card .teacher-head .status-badge {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #cbd5e1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+}
+</style>
+
+<style id="sigho-dark-sistema-admin-v24">
+/* Ajuste específico: Administración > Sistema en Modo Oscuro */
+html.dark-mode #administrador #seccionValidacionesAdmin,
+body.dark-mode #administrador #seccionValidacionesAdmin {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode #administrador #seccionValidacionesAdmin .admin-reset-box,
+body.dark-mode #administrador #seccionValidacionesAdmin .admin-reset-box {
+    background: rgba(239, 68, 68, 0.15) !important;
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    border: 1px solid #ef4444 !important;
+    border-left: 4px solid #ef4444 !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+    color: #fecaca !important;
+}
+
+html.dark-mode #administrador #seccionValidacionesAdmin .admin-reset-box strong,
+body.dark-mode #administrador #seccionValidacionesAdmin .admin-reset-box strong {
+    color: #fca5a5 !important;
+}
+
+html.dark-mode #administrador #seccionValidacionesAdmin .admin-reset-box p,
+body.dark-mode #administrador #seccionValidacionesAdmin .admin-reset-box p {
+    color: #fecaca !important;
+}
+
+html.dark-mode #administrador #seccionValidacionesAdmin .admin-reset-box .danger-button,
+body.dark-mode #administrador #seccionValidacionesAdmin .admin-reset-box .danger-button {
+    background: #dc2626 !important;
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+    border: 1px solid #ef4444 !important;
+    box-shadow: 0 3px 10px rgba(239, 68, 68, 0.25) !important;
+}
+
+html.dark-mode #administrador #seccionValidacionesAdmin .admin-reset-box .danger-button:hover,
+body.dark-mode #administrador #seccionValidacionesAdmin .admin-reset-box .danger-button:hover {
+    background: #b91c1c !important;
+    background-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+</style>
+
+<style id="sigho-dark-sidebar-v26">
+html.dark-mode .role-sidebar, body.dark-mode .role-sidebar {
+  background: linear-gradient(180deg,#081d33 0%,#0d2a48 100%) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,.32) !important;
+}
+html.dark-mode .sidebar-nav button, body.dark-mode .sidebar-nav button {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #cbd5e1 !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: background-color .2s ease-in-out, color .2s ease-in-out, box-shadow .2s ease-in-out, transform .2s ease-in-out, border-color .2s ease-in-out !important;
+}
+html.dark-mode .sidebar-nav button:hover, body.dark-mode .sidebar-nav button:hover {
+  background: rgba(255,255,255,.08) !important;
+  background-color: rgba(255,255,255,.08) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,.06) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.30) !important;
+  transform: translateX(3px) !important;
+}
+html.dark-mode .sidebar-nav button.active, body.dark-mode .sidebar-nav button.active {
+  background: rgba(255,255,255,.12) !important;
+  background-color: rgba(255,255,255,.12) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: inset 3px 0 0 #55c27a, 0 4px 12px rgba(0,0,0,.28) !important;
+  transform: none !important;
+}
+html.dark-mode .sidebar-nav button.active:hover, body.dark-mode .sidebar-nav button.active:hover {
+  background: rgba(255,255,255,.15) !important;
+  background-color: rgba(255,255,255,.15) !important;
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 #55c27a, 0 5px 14px rgba(0,0,0,.32) !important;
+  transform: translateX(3px) !important;
+}
+html.dark-mode .sidebar-nav button:focus-visible, body.dark-mode .sidebar-nav button:focus-visible {
+  outline: 2px solid rgba(96,165,250,.75) !important;
+  outline-offset: 2px !important;
+}
+html.dark-mode .sidebar-nav button b, body.dark-mode .sidebar-nav button b {
+  background: #2fa45a !important;
+  color: #ffffff !important;
+}
+html.dark-mode .sidebar-logout, body.dark-mode .sidebar-logout {
+  background: rgba(255,255,255,.05) !important;
+  background-color: rgba(255,255,255,.05) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+}
+html.dark-mode .sidebar-logout:hover, body.dark-mode .sidebar-logout:hover {
+  background: rgba(255,255,255,.10) !important;
+  background-color: rgba(255,255,255,.10) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,.06) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.30) !important;
+}
+html.dark-mode .sidebar-brand, body.dark-mode .sidebar-brand { border-bottom-color: rgba(255,255,255,.10) !important; }
+html.dark-mode .sidebar-role, body.dark-mode .sidebar-role { color: #93c5fd !important; }
+</style>
+
+<style id="sigho-sidebar-unified-v27">
+/* Menú lateral unificado: Modo Claro + Modo Oscuro */
+.role-sidebar .sidebar-nav button,
+.role-sidebar .sidebar-logout {
+  border: 1px solid transparent !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* MODO CLARO */
+html:not(.dark-mode) .role-sidebar .sidebar-nav button,
+body:not(.dark-mode) .role-sidebar .sidebar-nav button {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #eaf5fb !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+html:not(.dark-mode) .role-sidebar .sidebar-nav button:hover,
+body:not(.dark-mode) .role-sidebar .sidebar-nav button:hover {
+  background: rgba(255,255,255,.13) !important;
+  background-color: rgba(255,255,255,.13) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: 0 4px 12px rgba(8,43,76,.18) !important;
+  transform: translateX(3px) !important;
+}
+html:not(.dark-mode) .role-sidebar .sidebar-nav button.active,
+body:not(.dark-mode) .role-sidebar .sidebar-nav button.active {
+  background: rgba(255,255,255,.18) !important;
+  background-color: rgba(255,255,255,.18) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,.10) !important;
+  box-shadow: inset 3px 0 0 #55c27a, 0 4px 12px rgba(8,43,76,.20) !important;
+  transform: none !important;
+}
+html:not(.dark-mode) .role-sidebar .sidebar-nav button.active:hover,
+body:not(.dark-mode) .role-sidebar .sidebar-nav button.active:hover {
+  background: rgba(255,255,255,.22) !important;
+  background-color: rgba(255,255,255,.22) !important;
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 #55c27a, 0 5px 14px rgba(8,43,76,.24) !important;
+  transform: translateX(3px) !important;
+}
+
+/* MODO OSCURO */
+html.dark-mode .role-sidebar .sidebar-nav button,
+body.dark-mode .role-sidebar .sidebar-nav button {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #cbd5e1 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+html.dark-mode .role-sidebar .sidebar-nav button:hover,
+body.dark-mode .role-sidebar .sidebar-nav button:hover {
+  background: rgba(255,255,255,.08) !important;
+  background-color: rgba(255,255,255,.08) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,.06) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.30) !important;
+  transform: translateX(3px) !important;
+}
+html.dark-mode .role-sidebar .sidebar-nav button.active,
+body.dark-mode .role-sidebar .sidebar-nav button.active {
+  background: rgba(255,255,255,.12) !important;
+  background-color: rgba(255,255,255,.12) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: inset 3px 0 0 #55c27a, 0 4px 12px rgba(0,0,0,.28) !important;
+  transform: none !important;
+}
+html.dark-mode .role-sidebar .sidebar-nav button.active:hover,
+body.dark-mode .role-sidebar .sidebar-nav button.active:hover {
+  background: rgba(255,255,255,.15) !important;
+  background-color: rgba(255,255,255,.15) !important;
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 #55c27a, 0 5px 14px rgba(0,0,0,.32) !important;
+  transform: translateX(3px) !important;
+}
+
+.role-sidebar .sidebar-nav button:focus-visible,
+.role-sidebar .sidebar-logout:focus-visible {
+  outline: 2px solid rgba(96,165,250,.75) !important;
+  outline-offset: 2px !important;
+}
+</style>
+
+<style id="sigho-superadmin-dark-v28">
+/* =========================================================
+   SUPER ADMIN — ADAPTACIÓN COMPLETA AL MODO OSCURO
+   El modo claro no se modifica.
+   ========================================================= */
+
+/* Contenedor general de la vista Super Admin: sin tarjeta blanca */
+html.dark-mode #superAdmin,
+body.dark-mode #superAdmin,
+html.dark-mode #superAdmin > .dashboard,
+body.dark-mode #superAdmin > .dashboard {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Evita que la sección de validaciones conserve una tarjeta blanca */
+html.dark-mode #superAdmin .admin-section,
+body.dark-mode #superAdmin .admin-section {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Títulos y descripción de Validaciones de administradores */
+html.dark-mode #superAdmin .admin-section h3,
+body.dark-mode #superAdmin .admin-section h3 {
+    color: #f1f5f9 !important;
+}
+
+html.dark-mode #superAdmin .admin-section .section-description,
+body.dark-mode #superAdmin .admin-section .section-description {
+    color: #94a3b8 !important;
+}
+
+/* Caja "No hay solicitudes de administrador pendientes." */
+html.dark-mode #superAdmin #tablaValidacionesSuperAdmin .empty,
+body.dark-mode #superAdmin #tablaValidacionesSuperAdmin .empty {
+    background: rgba(255, 255, 255, 0.05) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    color: #cbd5e1 !important;
+    box-shadow: none !important;
+}
+
+/* Si la caja recibe estilos de tarjeta por reglas genéricas, prevalece el tema oscuro */
+html.dark-mode #superAdmin #tablaValidacionesSuperAdmin .empty p,
+body.dark-mode #superAdmin #tablaValidacionesSuperAdmin .empty p,
+html.dark-mode #superAdmin #tablaValidacionesSuperAdmin .empty span,
+body.dark-mode #superAdmin #tablaValidacionesSuperAdmin .empty span,
+html.dark-mode #superAdmin #tablaValidacionesSuperAdmin .empty strong,
+body.dark-mode #superAdmin #tablaValidacionesSuperAdmin .empty strong {
+    color: #cbd5e1 !important;
+}
+
+/* El contenedor de la tabla sigue integrado al lienzo oscuro */
+html.dark-mode #superAdmin #tablaValidacionesSuperAdmin,
+body.dark-mode #superAdmin #tablaValidacionesSuperAdmin {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+</style>
+
+
+<style id="sigho-superadmin-misdatos-metricas-v29">
+html.dark-mode #superAdmin .sigho-modal-card,
+body.dark-mode #superAdmin .sigho-modal-card {
+  background: #172334 !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+}
+html.dark-mode #superAdmin .sigho-modal-body,
+body.dark-mode #superAdmin .sigho-modal-body {
+  background: #172334 !important;
+}
+html.dark-mode #superAdmin .dato-usuario,
+body.dark-mode #superAdmin .dato-usuario {
+  background: rgba(255,255,255,.05) !important;
+  background-color: rgba(255,255,255,.05) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  color: #e2e8f0 !important;
+}
+html.dark-mode #superAdmin .dato-usuario strong,
+body.dark-mode #superAdmin .dato-usuario strong {
+  color: #ffffff !important;
+}
+html.dark-mode #superAdmin .dato-usuario span,
+body.dark-mode #superAdmin .dato-usuario span {
+  color: #cbd5e1 !important;
+}
+html.dark-mode #superAdmin .cards .card,
+body.dark-mode #superAdmin .cards .card {
+  background: #172334 !important;
+  background-color: #172334 !important;
+  border-color: rgba(255,255,255,.10) !important;
+}
+html.dark-mode #superAdmin .cards .card-title,
+body.dark-mode #superAdmin .cards .card-title {
+  color: #cbd5e1 !important;
+}
+html.dark-mode #superAdmin .cards .card-number,
+body.dark-mode #superAdmin .cards .card-number {
+  color: #60a5fa !important;
+  text-shadow: 0 0 12px rgba(96,165,250,.16) !important;
+}
+</style>
+
+<style id="sigho-dark-modals-global-v30">
+/* =========================================================
+   MODALES — MODO OSCURO GLOBAL
+   Ningún contenedor interno de modal conserva fondo blanco.
+   El modo claro permanece sin cambios.
+   ========================================================= */
+html.dark-mode .sigho-modal-card,
+body.dark-mode .sigho-modal-card {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(255,255,255,.10) !important;
+    box-shadow: 0 24px 70px rgba(0,0,0,.45) !important;
+}
+
+html.dark-mode .sigho-modal-body,
+body.dark-mode .sigho-modal-body {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Modal Ayuda para Super Admin y demás ayudas */
+html.dark-mode .sigho-modal .help-animation,
+body.dark-mode .sigho-modal .help-animation {
+    background: rgba(255,255,255,.05) !important;
+    background-color: rgba(255,255,255,.05) !important;
+    border: 1px solid rgba(255,255,255,.10) !important;
+    color: #cbd5e1 !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode .sigho-modal .help-animation strong,
+body.dark-mode .sigho-modal .help-animation strong {
+    color: #ffffff !important;
+}
+
+html.dark-mode .sigho-modal .help-animation p,
+body.dark-mode .sigho-modal .help-animation p {
+    color: #cbd5e1 !important;
+}
+
+/* Tarjetas y bloques internos de ayuda */
+html.dark-mode .sigho-modal .help-admin-intro,
+body.dark-mode .sigho-modal .help-admin-intro,
+html.dark-mode .sigho-modal .help-admin-card,
+body.dark-mode .sigho-modal .help-admin-card {
+    background: rgba(255,255,255,.05) !important;
+    background-color: rgba(255,255,255,.05) !important;
+    border-color: rgba(255,255,255,.10) !important;
+    color: #cbd5e1 !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode .sigho-modal .help-admin-intro strong,
+body.dark-mode .sigho-modal .help-admin-intro strong,
+html.dark-mode .sigho-modal .help-admin-card h4,
+body.dark-mode .sigho-modal .help-admin-card h4 {
+    color: #ffffff !important;
+}
+
+html.dark-mode .sigho-modal .help-admin-intro,
+body.dark-mode .sigho-modal .help-admin-intro,
+html.dark-mode .sigho-modal .help-admin-card p,
+body.dark-mode .sigho-modal .help-admin-card p,
+html.dark-mode .sigho-modal .help-admin-card ul,
+body.dark-mode .sigho-modal .help-admin-card ul {
+    color: #cbd5e1 !important;
+}
+
+html.dark-mode .sigho-modal .help-admin-card .help-admin-icon,
+body.dark-mode .sigho-modal .help-admin-card .help-admin-icon {
+    background: rgba(255,255,255,.08) !important;
+    border: 1px solid rgba(255,255,255,.08) !important;
+}
+
+/* Modal Mis datos */
+html.dark-mode .sigho-modal .dato-usuario,
+body.dark-mode .sigho-modal .dato-usuario {
+    background: rgba(255,255,255,.05) !important;
+    background-color: rgba(255,255,255,.05) !important;
+    border: 1px solid rgba(255,255,255,.10) !important;
+    color: #e2e8f0 !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode .sigho-modal .dato-usuario strong,
+body.dark-mode .sigho-modal .dato-usuario strong {
+    color: #ffffff !important;
+}
+
+html.dark-mode .sigho-modal .dato-usuario span,
+body.dark-mode .sigho-modal .dato-usuario span {
+    color: #cbd5e1 !important;
+}
+
+/* Cualquier bloque informativo reutilizado dentro de un modal */
+html.dark-mode .sigho-modal .info-card,
+body.dark-mode .sigho-modal .info-card,
+html.dark-mode .sigho-modal .info-card-inner,
+body.dark-mode .sigho-modal .info-card-inner {
+    background: rgba(255,255,255,.05) !important;
+    background-color: rgba(255,255,255,.05) !important;
+    border-color: rgba(255,255,255,.10) !important;
+    color: #cbd5e1 !important;
+    box-shadow: none !important;
+}
+
+/* Modal de confirmación de solicitud */
+html.dark-mode .sigho-modal .solicitud-exito-body,
+body.dark-mode .sigho-modal .solicitud-exito-body,
+html.dark-mode .sigho-modal .registro-hora-exito-body,
+body.dark-mode .sigho-modal .registro-hora-exito-body {
+    background: transparent !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark-mode .sigho-modal .solicitud-exito-body h3,
+body.dark-mode .sigho-modal .solicitud-exito-body h3,
+html.dark-mode .sigho-modal .registro-hora-exito-body h3,
+body.dark-mode .sigho-modal .registro-hora-exito-body h3 {
+    color: #ffffff !important;
+}
+
+html.dark-mode .sigho-modal .solicitud-exito-body p,
+body.dark-mode .sigho-modal .solicitud-exito-body p,
+html.dark-mode .sigho-modal .registro-hora-exito-subtitle,
+body.dark-mode .sigho-modal .registro-hora-exito-subtitle {
+    color: #cbd5e1 !important;
+}
+
+html.dark-mode .sigho-modal .registro-hora-resumen > div,
+body.dark-mode .sigho-modal .registro-hora-resumen > div {
+    background: rgba(255,255,255,.05) !important;
+    background-color: rgba(255,255,255,.05) !important;
+    border-color: rgba(255,255,255,.10) !important;
+}
+
+html.dark-mode .sigho-modal .registro-hora-resumen span,
+body.dark-mode .sigho-modal .registro-hora-resumen span {
+    color: #94a3b8 !important;
+}
+
+html.dark-mode .sigho-modal .registro-hora-resumen strong,
+body.dark-mode .sigho-modal .registro-hora-resumen strong {
+    color: #ffffff !important;
+}
+
+/* Botón cerrar integrado al tema oscuro */
+html.dark-mode .sigho-modal .modal-close,
+body.dark-mode .sigho-modal .modal-close {
+    background: rgba(255,255,255,.07) !important;
+    background-color: rgba(255,255,255,.07) !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(255,255,255,.12) !important;
+}
+
+html.dark-mode .sigho-modal .modal-close:hover,
+body.dark-mode .sigho-modal .modal-close:hover {
+    background: rgba(255,255,255,.12) !important;
+    background-color: rgba(255,255,255,.12) !important;
+    color: #ffffff !important;
+}
+
+/* Barrido global: elimina fondos blancos directos de elementos internos
+   conocidos/reutilizados dentro de cualquier modal oscuro. */
+html.dark-mode .sigho-modal .bg-white,
+body.dark-mode .sigho-modal .bg-white,
+html.dark-mode .sigho-modal [class*="bg-white"],
+body.dark-mode .sigho-modal [class*="bg-white"] {
+    background: rgba(255,255,255,.05) !important;
+    background-color: rgba(255,255,255,.05) !important;
+}
+</style>
+
+
+<style id="sigho-dark-panel-divider-v31">
+html.dark-mode #estudiante .section-header, body.dark-mode #estudiante .section-header,
+html.dark-mode #estudiante .dashboard-header, body.dark-mode #estudiante .dashboard-header {
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+}
+html.dark-mode #estudiante hr, body.dark-mode #estudiante hr {
+  border: 0 !important;
+  border-top: 1px solid rgba(255,255,255,.08) !important;
+  height: 0 !important;
+  background: transparent !important;
+  opacity: 1 !important;
+}
+</style>
+
+<style id="sigho-dark-lock-pill-v32">
+html.dark-mode #profesor .lock-pill,
+body.dark-mode #profesor .lock-pill {
+  background: rgba(255,255,255,.08) !important;
+  background-color: rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  color: #cbd5e1 !important;
+  box-shadow: none !important;
+}
+</style>
+
+<style id="sigho-dark-assignment-banner-v33">
+/* Barra informativa "Sede: ... · Proyecto: ..." del panel del profesor */
+html.dark-mode #profesor .assignment-banner,
+body.dark-mode #profesor .assignment-banner {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #4ade80 !important;
+    border: 1px solid rgba(74, 222, 128, 0.3) !important;
+    border-left: 4px solid rgba(74, 222, 128, 0.65) !important;
+    box-shadow: none !important;
+}
+</style>
+
+<style id="sigho-dark-account-security-buttons-v34">
+/* =========================================================
+   SEGURIDAD DE LA CUENTA DEL PROFESOR — BOTONES EN MODO OSCURO
+   ========================================================= */
+html.dark-mode #profesor #botonMostrarCambioClaveProfesor,
+body.dark-mode #profesor #botonMostrarCambioClaveProfesor {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.20) !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode #profesor #botonMostrarCambioClaveProfesor:hover,
+body.dark-mode #profesor #botonMostrarCambioClaveProfesor:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* Cancelar: peligro tenue, pero completamente legible. */
+html.dark-mode #profesor .password-card .profile-actions button.secondary-button:not(.profile-password-button),
+body.dark-mode #profesor .password-card .profile-actions button.secondary-button:not(.profile-password-button) {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #fca5a5 !important;
+    border: 1px solid rgba(248, 113, 113, 0.30) !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode #profesor .password-card .profile-actions button.secondary-button:not(.profile-password-button):hover,
+body.dark-mode #profesor .password-card .profile-actions button.secondary-button:not(.profile-password-button):hover {
+    background-color: rgba(239, 68, 68, 0.22) !important;
+    background: rgba(239, 68, 68, 0.22) !important;
+    color: #fecaca !important;
+    border-color: rgba(248, 113, 113, 0.45) !important;
+}
+
+/* Actualizar contraseña: botón principal azul, con texto blanco. */
+html.dark-mode #profesor .password-card .profile-actions button.profile-password-button,
+body.dark-mode #profesor .password-card .profile-actions button.profile-password-button {
+    background-color: #2563eb !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid #3b82f6 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22) !important;
+}
+
+html.dark-mode #profesor .password-card .profile-actions button.profile-password-button:hover,
+body.dark-mode #profesor .password-card .profile-actions button.profile-password-button:hover {
+    background-color: #3b82f6 !important;
+    background: #3b82f6 !important;
+    color: #ffffff !important;
+    border-color: #60a5fa !important;
+    box-shadow: 0 5px 16px rgba(59, 130, 246, 0.28) !important;
+}
+
+html.dark-mode #profesor #botonMostrarCambioClaveProfesor:focus-visible,
+body.dark-mode #profesor #botonMostrarCambioClaveProfesor:focus-visible,
+html.dark-mode #profesor .password-card .profile-actions button.secondary-button:focus-visible,
+body.dark-mode #profesor .password-card .profile-actions button.secondary-button:focus-visible,
+html.dark-mode #profesor .password-card .profile-actions button.profile-password-button:focus-visible,
+body.dark-mode #profesor .password-card .profile-actions button.profile-password-button:focus-visible {
+    outline: 2px solid #60a5fa !important;
+    outline-offset: 2px !important;
+}
+</style>
+
+
+<style id="sigho-account-security-theme-v35">
+/* Seguridad de la cuenta: conservar expresamente el estilo original en Modo Claro. */
+html:not(.dark-mode) #profesor #botonMostrarCambioClaveProfesor,
+body:not(.dark-mode) #profesor #botonMostrarCambioClaveProfesor,
+html:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-button,
+body:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-button {
+    background: #e6eff0 !important;
+    background-color: #e6eff0 !important;
+    color: #52646a !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+html:not(.dark-mode) #profesor #botonMostrarCambioClaveProfesor:hover,
+body:not(.dark-mode) #profesor #botonMostrarCambioClaveProfesor:hover,
+html:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-button:hover,
+body:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-button:hover {
+    background: #d9e6e8 !important;
+    background-color: #d9e6e8 !important;
+    color: #52646a !important;
+    border: none !important;
+}
+</style>
+
+<style id="sigho-mobile-nav-theme-v36">
+/* =========================================================
+   AJUSTE EXCLUSIVO MÓVIL — NAVEGACIÓN INFERIOR Y TEMA
+   No modifica la versión de escritorio.
+   ========================================================= */
+@media (max-width: 768px) {
+    /* Ocultar completamente la barra de navegación inferior móvil. */
+    .bottom-bar {
+        display: none !important;
+    }
+
+    /* Al no existir la barra inferior, eliminar el espacio reservado por ella. */
+    body {
+        padding-bottom: 0 !important;
+    }
+
+    main,
+    .main-content,
+    .role-main,
+    .dashboard-main,
+    .app-main,
+    .content-area {
+        padding-bottom: 0 !important;
+    }
+
+    /* Retirar el botón de tema de su posición en la cabecera y hacerlo flotante. */
+    .theme-toggle {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        z-index: 9999 !important;
+    }
+}
+</style>
+
+<style id="sigho-mobile-no-pull-refresh-v37">
+/* Ajustes exclusivos para móviles. No alteran escritorio. */
+@media (max-width: 768px) {
+    .theme-toggle {
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        top: auto !important;
+        left: auto !important;
+        z-index: 9999 !important;
+    }
+
+    /* Respaldo visual: el indicador personalizado de pull-to-refresh no se muestra. */
+    #ptrIndicator,
+    .ptr-indicator {
+        display: none !important;
+    }
+}
+</style>
+
+
+<style id="sigho-dark-primary-action-buttons-v39">
+/* Botones primarios de registro: visibles y consistentes en Modo Oscuro.
+   Estas reglas son globales para escritorio y móvil. */
+html.dark-mode #estudiante .student-progress-footer button,
+body.dark-mode #estudiante .student-progress-footer button,
+html.dark-mode #estudiante .student-empty-records button,
+body.dark-mode #estudiante .student-empty-records button {
+    background-color: #2563eb !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    border: 1px solid #2563eb !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode #estudiante .student-progress-footer button:hover,
+body.dark-mode #estudiante .student-progress-footer button:hover,
+html.dark-mode #estudiante .student-empty-records button:hover,
+body.dark-mode #estudiante .student-empty-records button:hover {
+    background-color: #1e40af !important;
+    background: #1e40af !important;
+    color: #ffffff !important;
+    border-color: #1e40af !important;
+}
+
+html.dark-mode #estudiante .student-progress-footer button:focus-visible,
+body.dark-mode #estudiante .student-progress-footer button:focus-visible,
+html.dark-mode #estudiante .student-empty-records button:focus-visible,
+body.dark-mode #estudiante .student-empty-records button:focus-visible {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    outline: 3px solid rgba(96, 165, 250, 0.45) !important;
+    outline-offset: 2px !important;
+}
+</style>
 </head>
 
 <body>
@@ -6678,9 +8019,9 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                         <button type="button" id="botonMostrarCambioClaveProfesor" class="secondary-button profile-password-button" onclick="alternarCambioClaveProfesor()">Cambiar contraseña</button>
                         <div id="formularioCambioClaveProfesor" style="display:none; margin-top:16px;">
                             <div class="form-row three-columns">
-                                <div class="form-group"><label for="claveActualProfesor">Contraseña actual</label><input type="password" id="claveActualProfesor" autocomplete="current-password" placeholder="Contraseña actual"></div>
-                                <div class="form-group"><label for="nuevaClaveProfesor">Nueva contraseña</label><input type="password" id="nuevaClaveProfesor" autocomplete="new-password" minlength="8" placeholder="Mínimo 8 caracteres"></div>
-                                <div class="form-group"><label for="confirmarClaveProfesor">Confirmar nueva contraseña</label><input type="password" id="confirmarClaveProfesor" autocomplete="new-password" minlength="8" placeholder="Repite la nueva contraseña"></div>
+                                <div class="form-group"><label for="claveActualProfesor">Contraseña actual</label><div class="password-toggle-wrapper profesor-password-wrapper"><input type="password" id="claveActualProfesor" autocomplete="current-password" placeholder="Contraseña actual"><button type="button" class="profesor-password-toggle" data-password-target="claveActualProfesor" aria-label="Mostrar contraseña actual" aria-pressed="false" title="Mostrar contraseña"><svg class="profesor-password-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div>
+                                <div class="form-group"><label for="nuevaClaveProfesor">Nueva contraseña</label><div class="password-toggle-wrapper profesor-password-wrapper"><input type="password" id="nuevaClaveProfesor" autocomplete="new-password" minlength="8" placeholder="Mínimo 8 caracteres"><button type="button" class="profesor-password-toggle" data-password-target="nuevaClaveProfesor" aria-label="Mostrar nueva contraseña" aria-pressed="false" title="Mostrar contraseña"><svg class="profesor-password-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div>
+                                <div class="form-group"><label for="confirmarClaveProfesor">Confirmar nueva contraseña</label><div class="password-toggle-wrapper profesor-password-wrapper"><input type="password" id="confirmarClaveProfesor" autocomplete="new-password" minlength="8" placeholder="Repite la nueva contraseña"><button type="button" class="profesor-password-toggle" data-password-target="confirmarClaveProfesor" aria-label="Mostrar confirmación de contraseña" aria-pressed="false" title="Mostrar contraseña"><svg class="profesor-password-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div></div>
                             </div>
                             <small class="field-help">Mínimo 8 caracteres, debe incluir mayúscula, minúscula y número.</small>
                             <div class="profile-actions">
@@ -7716,11 +9057,20 @@ const svgEye = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <
 const svgEyeOff = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path> <line x1="1" y1="1" x2="23" y2="23"></line>`;
 
 if (inputClave && btnToggle && iconEye) {
+    function actualizarOjoLogin() {
+        const visible = inputClave.type === 'text';
+        iconEye.innerHTML = visible ? svgEye : svgEyeOff;
+        btnToggle.setAttribute('aria-pressed', visible ? 'true' : 'false');
+        btnToggle.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        btnToggle.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    }
+
     btnToggle.addEventListener('click', () => {
-        const isPassword = inputClave.type === 'password';
-        inputClave.type = isPassword ? 'text' : 'password';
-        iconEye.innerHTML = isPassword ? svgEyeOff : svgEye;
+        inputClave.type = inputClave.type === 'password' ? 'text' : 'password';
+        actualizarOjoLogin();
     });
+
+    actualizarOjoLogin();
 }
 
 async function iniciarSesion() {
@@ -9387,7 +10737,8 @@ function alternarCambioClaveProfesor(mostrar) {
     form.style.display = abrir ? "block" : "none";
     boton.textContent = abrir ? "Ocultar cambio de contraseña" : "Cambiar contraseña";
     if(!abrir){
-        ["claveActualProfesor","nuevaClaveProfesor","confirmarClaveProfesor"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+        ["claveActualProfesor","nuevaClaveProfesor","confirmarClaveProfesor"].forEach(id=>{const el=document.getElementById(id);if(el){el.value="";el.type="password";}});
+        if (typeof window.restablecerOjosProfesor === "function") window.restablecerOjosProfesor();
         const estado=document.getElementById("estadoClaveProfesor"); if(estado){estado.textContent="";estado.className="profile-save-state";}
     }
 }
@@ -11262,10 +12613,6 @@ window.addEventListener('resize',function(){
     <button type="button" data-mobile-nav="perfil" aria-label="Perfil">Perfil</button>
 </nav>
 
-<div id="ptrIndicator" class="ptr-indicator" aria-hidden="true">
-    <span>↓</span> Suelta para actualizar
-</div>
-
 
 <script>
 /* =========================================================
@@ -11274,16 +12621,11 @@ window.addEventListener('resize',function(){
 (function () {
     const mobileQuery = window.matchMedia("(max-width: 900px) and (hover: none) and (pointer: coarse)");
     const overlay = document.getElementById("mobileOverlay");
-    const ptrIndicator = document.getElementById("ptrIndicator");
     const sidebarSelectors = ".sidebar, .role-sidebar, .admin-sidebar, .super-admin-sidebar";
 
     let touchStartX = 0;
     let touchStartY = 0;
     let touchStartTime = 0;
-    let ptrStartY = 0;
-    let ptrDistance = 0;
-    let ptrReady = false;
-    let ptrRefreshing = false;
 
     function isMobileTouch() {
         return mobileQuery.matches;
@@ -11342,12 +12684,6 @@ window.addEventListener('resize',function(){
         touchStartX = touch.clientX;
         touchStartY = touch.clientY;
         touchStartTime = Date.now();
-
-        if (window.scrollY <= 0) {
-            ptrStartY = touch.clientY;
-            ptrDistance = 0;
-            ptrReady = false;
-        }
     }, { passive: true });
 
     document.addEventListener("touchend", function (event) {
@@ -11365,57 +12701,6 @@ window.addEventListener('resize',function(){
                 setSidebar(true);
             } else if (menuOpen && deltaX < 0) {
                 setSidebar(false);
-            }
-        }
-
-        if (ptrReady && ptrDistance >= 90 && !ptrRefreshing && window.scrollY <= 0) {
-            ptrRefreshing = true;
-            if (ptrIndicator) {
-                ptrIndicator.classList.remove("ready");
-                ptrIndicator.classList.add("visible");
-                ptrIndicator.innerHTML = "<span>↻</span> Actualizando…";
-            }
-            window.setTimeout(function () {
-                window.location.reload();
-            }, 150);
-        } else if (!ptrRefreshing && ptrIndicator) {
-            ptrIndicator.classList.remove("visible", "ready");
-        }
-
-        ptrStartY = 0;
-        ptrDistance = 0;
-        ptrReady = false;
-    }, { passive: true });
-
-    document.addEventListener("touchmove", function (event) {
-        if (!isMobileTouch() || !event.touches.length || window.scrollY > 0) return;
-
-        const currentY = event.touches[0].clientY;
-        const delta = currentY - ptrStartY;
-
-        if (ptrStartY > 0 && delta > 0) {
-            ptrDistance = Math.min(delta, 120);
-
-            if (ptrIndicator) {
-                ptrIndicator.classList.add("visible");
-
-                if (ptrDistance >= 90) {
-                    ptrReady = true;
-                    ptrIndicator.classList.add("ready");
-                    ptrIndicator.innerHTML = "<span>↑</span> Suelta para actualizar";
-                } else {
-                    ptrReady = false;
-                    ptrIndicator.classList.remove("ready");
-                    ptrIndicator.innerHTML = "<span>↓</span> Desliza para actualizar";
-                }
-            }
-        }
-    }, { passive: true });
-
-    window.addEventListener("scroll", function () {
-        if (!isMobileTouch() || !ptrIndicator || window.scrollY > 0) {
-            if (ptrIndicator && !ptrRefreshing) {
-                ptrIndicator.classList.remove("visible", "ready");
             }
         }
     }, { passive: true });
@@ -12101,11 +13386,17 @@ body.dark-mode .auth-card strong {
         left: auto !important;
     }
 
-    /* El toggle de tema permanece arriba a la derecha. */
-    .theme-toggle {
+    /* El toggle de tema queda flotante abajo a la derecha únicamente en móvil. */
+    .theme-toggle,
+    #themeToggle,
+    button[aria-label*="modo"] {
         position: fixed !important;
-        top: 10px !important;
-        right: 10px !important;
+        bottom: 24px !important;
+        right: 20px !important;
+        top: auto !important;
+        left: auto !important;
+        z-index: 99999 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
     }
 }
 </style>
@@ -12373,6 +13664,656 @@ body.dark-mode .solicitud-comprobante .modal-close {
     border-color: #475569 !important;
 }
 </style>
+
+
+<style id="sigho-pendientes-dark-final-v16">
+/* =========================================================
+   SIGHO — SOLICITUDES / REGISTROS → PENDIENTES
+   DARK MODE v16
+   Última capa: evita fondos blancos en contenedores,
+   tablas/listas, filas/celdas y contenido dinámico.
+   No modifica la lógica PHP/JavaScript.
+   ========================================================= */
+
+html.dark-mode #estudiante #seccionRegistros,
+body.dark-mode #estudiante #seccionRegistros,
+html.dark-mode #estudiante #tablaEstudiante,
+body.dark-mode #estudiante #tablaEstudiante {
+    background: transparent !important;
+    color: #f8fafc !important;
+}
+
+/* Tarjeta/listado principal */
+html.dark-mode #estudiante #tablaEstudiante .student-records-table,
+body.dark-mode #estudiante #tablaEstudiante .student-records-table,
+html.dark-mode #estudiante #tablaEstudiante .table-container,
+body.dark-mode #estudiante #tablaEstudiante .table-container {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+    box-shadow: none !important;
+}
+
+/* Tabla completa */
+html.dark-mode #estudiante #tablaEstudiante table,
+body.dark-mode #estudiante #tablaEstudiante table,
+html.dark-mode #estudiante #tablaEstudiante thead,
+body.dark-mode #estudiante #tablaEstudiante thead,
+html.dark-mode #estudiante #tablaEstudiante tbody,
+body.dark-mode #estudiante #tablaEstudiante tbody,
+html.dark-mode #estudiante #tablaEstudiante tr,
+body.dark-mode #estudiante #tablaEstudiante tr,
+html.dark-mode #estudiante #tablaEstudiante td,
+body.dark-mode #estudiante #tablaEstudiante td {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #e5edf5 !important;
+    border-color: #334155 !important;
+}
+
+/* Encabezado de tabla */
+html.dark-mode #estudiante #tablaEstudiante th,
+body.dark-mode #estudiante #tablaEstudiante th {
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+/* Hover de filas */
+html.dark-mode #estudiante #tablaEstudiante tbody tr:hover,
+body.dark-mode #estudiante #tablaEstudiante tbody tr:hover {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+}
+
+/* Contenido dinámico que pueda traer clases utilitarias blancas */
+html.dark-mode #estudiante #tablaEstudiante .card,
+body.dark-mode #estudiante #tablaEstudiante .card,
+html.dark-mode #estudiante #tablaEstudiante .bg-white,
+body.dark-mode #estudiante #tablaEstudiante .bg-white,
+html.dark-mode #estudiante #tablaEstudiante [class*="bg-white"],
+body.dark-mode #estudiante #tablaEstudiante [class*="bg-white"],
+html.dark-mode #estudiante #tablaEstudiante [style*="background: white"],
+body.dark-mode #estudiante #tablaEstudiante [style*="background: white"],
+html.dark-mode #estudiante #tablaEstudiante [style*="background:white"],
+body.dark-mode #estudiante #tablaEstudiante [style*="background:white"],
+html.dark-mode #estudiante #tablaEstudiante [style*="background-color: white"],
+body.dark-mode #estudiante #tablaEstudiante [style*="background-color: white"],
+html.dark-mode #estudiante #tablaEstudiante [style*="background:#fff"],
+body.dark-mode #estudiante #tablaEstudiante [style*="background:#fff"],
+html.dark-mode #estudiante #tablaEstudiante [style*="background: #fff"],
+body.dark-mode #estudiante #tablaEstudiante [style*="background: #fff"],
+html.dark-mode #estudiante #tablaEstudiante [style*="background-color:#fff"],
+body.dark-mode #estudiante #tablaEstudiante [style*="background-color:#fff"],
+html.dark-mode #estudiante #tablaEstudiante [style*="background-color: #fff"],
+body.dark-mode #estudiante #tablaEstudiante [style*="background-color: #fff"] {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Estado vacío del filtro Pendientes */
+html.dark-mode #estudiante #tablaEstudiante .student-empty-records,
+body.dark-mode #estudiante #tablaEstudiante .student-empty-records {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #cbd5e1 !important;
+    border-color: #475569 !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode #estudiante #tablaEstudiante .student-empty-records strong,
+body.dark-mode #estudiante #tablaEstudiante .student-empty-records strong {
+    color: #f8fafc !important;
+}
+
+html.dark-mode #estudiante #tablaEstudiante .student-empty-records p,
+body.dark-mode #estudiante #tablaEstudiante .student-empty-records p {
+    color: #aebdca !important;
+}
+
+/* Filtros de estado */
+html.dark-mode #estudiante .student-record-filters,
+body.dark-mode #estudiante .student-record-filters {
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #estudiante .student-filter-button,
+body.dark-mode #estudiante .student-filter-button {
+    color: #cbd5e1 !important;
+    background: transparent !important;
+}
+
+html.dark-mode #estudiante .student-filter-button.active,
+body.dark-mode #estudiante .student-filter-button.active {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #475569 !important;
+}
+
+/* Textos, enlaces y estados */
+html.dark-mode #estudiante #tablaEstudiante .student-record-date strong,
+body.dark-mode #estudiante #tablaEstudiante .student-record-date strong,
+html.dark-mode #estudiante #tablaEstudiante .student-record-hours,
+body.dark-mode #estudiante #tablaEstudiante .student-record-hours,
+html.dark-mode #estudiante #tablaEstudiante .student-record-description,
+body.dark-mode #estudiante #tablaEstudiante .student-record-description {
+    color: #f8fafc !important;
+}
+
+html.dark-mode #estudiante #tablaEstudiante .student-record-date small,
+body.dark-mode #estudiante #tablaEstudiante .student-record-date small,
+html.dark-mode #estudiante #tablaEstudiante .student-record-description small,
+body.dark-mode #estudiante #tablaEstudiante .student-record-description small,
+html.dark-mode #estudiante #tablaEstudiante .table-secondary-text,
+body.dark-mode #estudiante #tablaEstudiante .table-secondary-text {
+    color: #aebdca !important;
+}
+
+html.dark-mode #estudiante #tablaEstudiante .student-evidence-link,
+body.dark-mode #estudiante #tablaEstudiante .student-evidence-link {
+    color: #93c5fd !important;
+}
+
+html.dark-mode #estudiante #tablaEstudiante .student-evidence-link:hover,
+body.dark-mode #estudiante #tablaEstudiante .student-evidence-link:hover {
+    color: #bfdbfe !important;
+}
+
+/* Badges de Pendiente / Aprobado / Rechazado */
+html.dark-mode #estudiante #tablaEstudiante .student-record-status,
+body.dark-mode #estudiante #tablaEstudiante .student-record-status {
+    border: 1px solid currentColor !important;
+    box-shadow: none !important;
+}
+
+html.dark-mode #estudiante #tablaEstudiante .student-record-status.pending,
+body.dark-mode #estudiante #tablaEstudiante .student-record-status.pending {
+    background: rgba(146,105,23,.20) !important;
+    background-color: rgba(146,105,23,.20) !important;
+    color: #f6d77a !important;
+    border-color: rgba(246,215,122,.48) !important;
+}
+
+html.dark-mode #estudiante #tablaEstudiante .student-record-status.approved,
+body.dark-mode #estudiante #tablaEstudiante .student-record-status.approved {
+    background: rgba(36,115,70,.20) !important;
+    background-color: rgba(36,115,70,.20) !important;
+    color: #86efac !important;
+    border-color: rgba(134,239,172,.42) !important;
+}
+
+html.dark-mode #estudiante #tablaEstudiante .student-record-status.rejected,
+body.dark-mode #estudiante #tablaEstudiante .student-record-status.rejected {
+    background: rgba(163,66,66,.20) !important;
+    background-color: rgba(163,66,66,.20) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(252,165,165,.42) !important;
+}
+
+/* Solicitudes del administrador: contenedor + tabla/lista dinámica */
+html.dark-mode #administrador #seccionSolicitudesEstudiantesAdmin,
+body.dark-mode #administrador #seccionSolicitudesEstudiantesAdmin,
+html.dark-mode #administrador #seccionSolicitudesPersonalAdmin,
+body.dark-mode #administrador #seccionSolicitudesPersonalAdmin {
+    color: #f8fafc !important;
+}
+
+html.dark-mode #administrador #seccionSolicitudesEstudiantesAdmin .validation-panel,
+body.dark-mode #administrador #seccionSolicitudesEstudiantesAdmin .validation-panel {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html.dark-mode #administrador #seccionSolicitudesEstudiantesAdmin #tablaSolicitudesEstudiantesAdmin .table-container,
+body.dark-mode #administrador #seccionSolicitudesEstudiantesAdmin #tablaSolicitudesEstudiantesAdmin .table-container,
+html.dark-mode #administrador #seccionSolicitudesPersonalAdmin #tablaSolicitudesPersonalAdministrador .table-container,
+body.dark-mode #administrador #seccionSolicitudesPersonalAdmin #tablaSolicitudesPersonalAdministrador .table-container {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin table,
+body.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin table,
+html.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin thead,
+body.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin thead,
+html.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin tbody,
+body.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin tbody,
+html.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin tr,
+body.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin tr,
+html.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin td,
+body.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin td,
+html.dark-mode #administrador #tablaSolicitudesPersonalAdministrador table,
+body.dark-mode #administrador #tablaSolicitudesPersonalAdministrador table,
+html.dark-mode #administrador #tablaSolicitudesPersonalAdministrador thead,
+body.dark-mode #administrador #tablaSolicitudesPersonalAdministrador thead,
+html.dark-mode #administrador #tablaSolicitudesPersonalAdministrador tbody,
+body.dark-mode #administrador #tablaSolicitudesPersonalAdministrador tbody,
+html.dark-mode #administrador #tablaSolicitudesPersonalAdministrador tr,
+body.dark-mode #administrador #tablaSolicitudesPersonalAdministrador tr,
+html.dark-mode #administrador #tablaSolicitudesPersonalAdministrador td,
+body.dark-mode #administrador #tablaSolicitudesPersonalAdministrador td {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #e5edf5 !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin th,
+body.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin th,
+html.dark-mode #administrador #tablaSolicitudesPersonalAdministrador th,
+body.dark-mode #administrador #tablaSolicitudesPersonalAdministrador th {
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+html.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin tbody tr:hover,
+body.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin tbody tr:hover,
+html.dark-mode #administrador #tablaSolicitudesPersonalAdministrador tbody tr:hover,
+body.dark-mode #administrador #tablaSolicitudesPersonalAdministrador tbody tr:hover {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+}
+
+/* Cualquier tarjeta/clase blanca generada dinámicamente dentro de estas solicitudes */
+html.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin .card,
+body.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin .card,
+html.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin .bg-white,
+body.dark-mode #administrador #tablaSolicitudesEstudiantesAdmin .bg-white,
+html.dark-mode #administrador #tablaSolicitudesPersonalAdministrador .card,
+body.dark-mode #administrador #tablaSolicitudesPersonalAdministrador .card,
+html.dark-mode #administrador #tablaSolicitudesPersonalAdministrador .bg-white,
+body.dark-mode #administrador #tablaSolicitudesPersonalAdministrador .bg-white {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+</style>
+
+
+<style id="profesor-password-eye-v19">
+/* =========================================================
+   SEGURIDAD DEL PROFESOR: BOTONES PARA MOSTRAR/OCULTAR CLAVE
+   ========================================================= */
+.profesor-password-wrapper {
+    position: relative !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.profesor-password-wrapper input[type="password"],
+.profesor-password-wrapper input[type="text"] {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding-right: 50px !important;
+}
+
+.profesor-password-toggle {
+    position: absolute !important;
+    right: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    color: #5a6e85 !important;
+    cursor: pointer !important;
+    z-index: 3 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+
+.profesor-password-toggle:hover {
+    color: #174ea6 !important;
+    background: rgba(23, 78, 166, 0.08) !important;
+}
+
+.profesor-password-toggle:focus-visible {
+    outline: 2px solid #174ea6 !important;
+    outline-offset: 2px !important;
+}
+
+.profesor-password-eye {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    flex: 0 0 20px !important;
+}
+
+html.dark-mode .profesor-password-toggle,
+body.dark-mode .profesor-password-toggle {
+    color: #aebdca !important;
+}
+
+html.dark-mode .profesor-password-toggle:hover,
+body.dark-mode .profesor-password-toggle:hover {
+    color: #93c5fd !important;
+    background: rgba(147, 197, 253, 0.10) !important;
+}
+
+html.dark-mode .profesor-password-toggle:focus-visible,
+body.dark-mode .profesor-password-toggle:focus-visible {
+    outline-color: #60a5fa !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    .profesor-password-toggle {
+        color: #aebdca !important;
+    }
+
+    .profesor-password-toggle:hover {
+        color: #93c5fd !important;
+        background: rgba(147, 197, 253, 0.10) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .profesor-password-wrapper input[type="password"],
+    .profesor-password-wrapper input[type="text"] {
+        padding-right: 52px !important;
+    }
+
+    .profesor-password-toggle {
+        right: 8px !important;
+    }
+}
+</style>
+
+<script id="profesor-password-eye-v19">
+(function () {
+    const svgEye = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+    const svgEyeOff = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+
+    function actualizarBotonOjo(button, visible) {
+        const icon = button.querySelector('.profesor-password-eye');
+        if (icon) icon.innerHTML = visible ? svgEye : svgEyeOff;
+        const targetId = button.getAttribute('data-password-target') || '';
+        const nombre = targetId === 'claveActualProfesor' ? 'contraseña actual' : targetId === 'nuevaClaveProfesor' ? 'nueva contraseña' : 'confirmación de contraseña';
+        button.setAttribute('aria-label', visible ? 'Ocultar ' + nombre : 'Mostrar ' + nombre);
+        button.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        button.setAttribute('aria-pressed', visible ? 'true' : 'false');
+    }
+
+    function alternarVisibilidadClaveProfesor(button) {
+        const targetId = button.getAttribute('data-password-target');
+        const input = document.getElementById(targetId);
+        if (!input) return;
+        const visible = input.type === 'password';
+        input.type = visible ? 'text' : 'password';
+        actualizarBotonOjo(button, visible);
+    }
+
+    function restablecerOjosProfesor() {
+        document.querySelectorAll('.profesor-password-toggle').forEach(function (button) {
+            const targetId = button.getAttribute('data-password-target');
+            const input = document.getElementById(targetId);
+            if (input) input.type = 'password';
+            actualizarBotonOjo(button, false);
+        });
+    }
+
+    document.addEventListener('click', function (evento) {
+        const button = evento.target.closest('.profesor-password-toggle');
+        if (!button) return;
+        evento.preventDefault();
+        alternarVisibilidadClaveProfesor(button);
+    });
+
+    window.restablecerOjosProfesor = restablecerOjosProfesor;
+    document.querySelectorAll('.profesor-password-toggle').forEach(function (button) {
+        actualizarBotonOjo(button, false);
+    });
+})();
+</script>
+
+
+
+<style id="sigho-universal-password-eye-v20">
+/* =========================================================
+   OJO UNIVERSAL DE CONTRASEÑAS — V20
+   Estado oculto  = ojo tachado
+   Estado visible = ojo abierto
+   ========================================================= */
+.password-universal-wrapper {
+    position: relative !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.password-universal-wrapper > input[type="password"],
+.password-universal-wrapper > input[type="text"] {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding-right: 50px !important;
+}
+
+.password-universal-toggle {
+    position: absolute !important;
+    top: 50% !important;
+    right: 10px !important;
+    transform: translateY(-50%) !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    color: #5a6e85 !important;
+    cursor: pointer !important;
+    z-index: 5 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+
+.password-universal-toggle:hover {
+    color: #174ea6 !important;
+    background: rgba(23,78,166,.08) !important;
+}
+
+.password-universal-toggle:focus-visible {
+    outline: 2px solid #174ea6 !important;
+    outline-offset: 2px !important;
+}
+
+.password-universal-toggle svg {
+    width: 20px !important;
+    height: 20px !important;
+    display: block !important;
+}
+
+body.dark-mode .password-universal-toggle,
+html.dark-mode .password-universal-toggle {
+    color: #aebdca !important;
+}
+
+body.dark-mode .password-universal-toggle:hover,
+html.dark-mode .password-universal-toggle:hover {
+    color: #93c5fd !important;
+    background: rgba(147,197,253,.10) !important;
+}
+
+body.dark-mode .password-universal-toggle:focus-visible,
+html.dark-mode .password-universal-toggle:focus-visible {
+    outline-color: #60a5fa !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    .password-universal-toggle {
+        color: #aebdca !important;
+    }
+    .password-universal-toggle:hover {
+        color: #93c5fd !important;
+        background: rgba(147,197,253,.10) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .password-universal-wrapper > input[type="password"],
+    .password-universal-wrapper > input[type="text"] {
+        padding-right: 52px !important;
+    }
+    .password-universal-toggle {
+        right: 8px !important;
+    }
+}
+
+
+/* =========================================================
+   HISTORIAL DE REGISTROS — STATUS BADGES EN MODO OSCURO
+   Evita fondos claros, texto ilegible y saltos de línea.
+========================================================= */
+html.dark-mode #profesor #seccionHistorialProfesor .status,
+body.dark-mode #profesor #seccionHistorialProfesor .status,
+html.dark-mode #tablaHistorialProfesor .status,
+body.dark-mode #tablaHistorialProfesor .status,
+html.dark-mode #administrador #seccionHistorialAdmin .status,
+body.dark-mode #administrador #seccionHistorialAdmin .status,
+html.dark-mode #tablaHistorialAdmin .status,
+body.dark-mode #tablaHistorialAdmin .status {
+    display: inline-block !important;
+    white-space: nowrap !important;
+    padding: 4px 12px !important;
+    border-radius: 9999px !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+    border: 1px solid transparent !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+}
+
+html.dark-mode #profesor #seccionHistorialProfesor .status.rejected,
+body.dark-mode #profesor #seccionHistorialProfesor .status.rejected,
+html.dark-mode #tablaHistorialProfesor .status.rejected,
+body.dark-mode #tablaHistorialProfesor .status.rejected,
+html.dark-mode #administrador #seccionHistorialAdmin .status.rejected,
+body.dark-mode #administrador #seccionHistorialAdmin .status.rejected,
+html.dark-mode #tablaHistorialAdmin .status.rejected,
+body.dark-mode #tablaHistorialAdmin .status.rejected {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(252, 165, 165, 0.35) !important;
+}
+
+html.dark-mode #profesor #seccionHistorialProfesor .status.approved,
+body.dark-mode #profesor #seccionHistorialProfesor .status.approved,
+html.dark-mode #tablaHistorialProfesor .status.approved,
+body.dark-mode #tablaHistorialProfesor .status.approved,
+html.dark-mode #administrador #seccionHistorialAdmin .status.approved,
+body.dark-mode #administrador #seccionHistorialAdmin .status.approved,
+html.dark-mode #tablaHistorialAdmin .status.approved,
+body.dark-mode #tablaHistorialAdmin .status.approved {
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    color: #86efac !important;
+    border-color: rgba(134, 239, 172, 0.35) !important;
+}
+
+html.dark-mode #profesor #seccionHistorialProfesor .status.pending,
+body.dark-mode #profesor #seccionHistorialProfesor .status.pending,
+html.dark-mode #tablaHistorialProfesor .status.pending,
+body.dark-mode #tablaHistorialProfesor .status.pending,
+html.dark-mode #administrador #seccionHistorialAdmin .status.pending,
+body.dark-mode #administrador #seccionHistorialAdmin .status.pending,
+html.dark-mode #tablaHistorialAdmin .status.pending,
+body.dark-mode #tablaHistorialAdmin .status.pending {
+    background-color: rgba(234, 179, 8, 0.15) !important;
+    color: #fde047 !important;
+    border-color: rgba(253, 224, 71, 0.35) !important;
+}
+</style>
+
+<script id="sigho-universal-password-eye-v20">
+(function () {
+    const EYE_OPEN = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+    const EYE_OFF = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+
+    function actualizarBoton(button, input) {
+        const visible = input.type === 'text';
+        const icon = button.querySelector('svg');
+        if (icon) icon.innerHTML = visible ? EYE_OPEN : EYE_OFF;
+        button.setAttribute('aria-pressed', visible ? 'true' : 'false');
+        button.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        button.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    }
+
+    function crearBoton(input) {
+        if (!input || input.dataset.passwordEyeReady === 'true') return;
+        if (input.id === 'clave') return;
+        if (input.closest('.profesor-password-wrapper')) return;
+        if (input.closest('.password-universal-wrapper')) return;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'password-universal-wrapper';
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'password-universal-toggle';
+        button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></svg>';
+        wrapper.appendChild(button);
+
+        input.dataset.passwordEyeReady = 'true';
+        actualizarBoton(button, input);
+
+        button.addEventListener('click', function () {
+            input.type = input.type === 'password' ? 'text' : 'password';
+            actualizarBoton(button, input);
+        });
+    }
+
+    function inicializar() {
+        document.querySelectorAll('input[type="password"]').forEach(crearBoton);
+        document.querySelectorAll('.profesor-password-toggle').forEach(function (button) {
+            const id = button.getAttribute('data-password-target');
+            const input = id ? document.getElementById(id) : null;
+            if (!input) return;
+            const icon = button.querySelector('.profesor-password-eye');
+            if (icon) icon.innerHTML = input.type === 'text' ? EYE_OPEN : EYE_OFF;
+            button.setAttribute('aria-pressed', input.type === 'text' ? 'true' : 'false');
+            button.setAttribute('aria-label', input.type === 'text' ? 'Ocultar contraseña' : 'Mostrar contraseña');
+            button.setAttribute('title', input.type === 'text' ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', inicializar, { once: true });
+    } else {
+        inicializar();
+    }
+
+    window.sighoInicializarOjosPassword = inicializar;
+})();
+</script>
 
 </body>
 
