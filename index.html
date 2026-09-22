@@ -7304,7 +7304,29 @@ html.dark-mode input::placeholder,
 html.dark-mode textarea::placeholder,
 html.dark-mode select::placeholder {
     color: #64748b !important;
-    opacity: .66 !important;
+    -webkit-text-fill-color: #64748b !important;
+    opacity: .38 !important;
+    font-weight: 400 !important;
+}
+
+/* Ayuda escrita DENTRO del campo: mucho más tenue que un dato real. */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder,
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder {
+    color: #64748b !important;
+    -webkit-text-fill-color: #64748b !important;
+    opacity: .34 !important;
+    text-shadow: none !important;
+}
+
+body.dark-mode input:focus::placeholder,
+body.dark-mode textarea:focus::placeholder,
+html.dark-mode input:focus::placeholder,
+html.dark-mode textarea:focus::placeholder {
+    color: #64748b !important;
+    -webkit-text-fill-color: #64748b !important;
+    opacity: .28 !important;
 }
 
 /* =========================================================
@@ -7494,6 +7516,37 @@ html.dark-mode #administrador .admin-reset-box {
     background: #111827 !important;
     color: #e5e7eb !important;
     border-color: #334155 !important;
+}
+</style>
+
+<style id="sigho-dark-help-opacity-v43">
+/* V43 — Las ayudas en modo oscuro deben verse claramente como texto auxiliar. */
+body.dark-mode .field-help,
+body.dark-mode small.field-help,
+html.dark-mode .field-help,
+html.dark-mode small.field-help {
+    color: #64748b !important;
+    opacity: .48 !important;
+    font-size: .76rem !important;
+    font-weight: 400 !important;
+    line-height: 1.35 !important;
+}
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder,
+body.dark-mode select::placeholder,
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder,
+html.dark-mode select::placeholder {
+    color: #64748b !important;
+    opacity: .42 !important;
+    font-weight: 400 !important;
+}
+/* También baja ayudas que usan clases equivalentes o textos secundarios dentro de formularios. */
+body.dark-mode .form-group > small:not(.error-message),
+html.dark-mode .form-group > small:not(.error-message) {
+    color: #64748b !important;
+    opacity: .48 !important;
+    font-weight: 400 !important;
 }
 </style>
 </head>
@@ -10001,7 +10054,9 @@ async function enviarSolicitud() {
     configurarValidacionCamposOtro();
         configurarSelectoresEPS();
     } catch (error) {
-        mostrarErrorSolicitud(error.message || "No fue posible enviar la solicitud.");
+        // api() ya convierte la respuesta del backend en Error usando data.message.
+        // Por eso aquí se muestra exactamente el mensaje SQL que devuelva PHP.
+        mostrarErrorSolicitud(error.message || "Error desconocido.");
     }
 }
 
@@ -14600,5 +14655,21 @@ input[type="text"].password-universal-visible {
     }
 })();
 </script>
+
+<style id="sigho-mobile-theme-toggle-bottom-right-v42">
+/* Boton de modo oscuro: solo se mueve en dispositivos moviles tactiles. */
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+  #themeToggle.theme-toggle,
+  button#themeToggle {
+    position: fixed !important;
+    top: auto !important;
+    right: 16px !important;
+    bottom: 16px !important;
+    left: auto !important;
+    margin: 0 !important;
+    z-index: 10000 !important;
+  }
+}
+</style>
 </body>
 </html>
