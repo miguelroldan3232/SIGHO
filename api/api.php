@@ -769,8 +769,9 @@ try {
                         INSERT INTO student_applications
                         (access_request_id, service_year, first_surname, second_surname, first_name, second_name,
                          document_type, document_number, grade, birth_date, residence_address, phone, eps,
-                         guardian_name, guardian_phone, service_site, project, project_other, service_days, service_shift)
-                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                         guardian_name, guardian_phone, guardian_phone_type, service_site, project, project_other,
+                         service_days, service_shift)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                     ');
                     $st->execute([
                         $accessRequestId,
@@ -1347,9 +1348,9 @@ case 'pending_requests':
             fail('Acción no encontrada.', 404);
     }
 } catch (PDOException $e) {
-    error_log($e->getMessage());
-    fail('Error de base de datos. Verifica que MySQL esté encendido y que la base de datos jjfh_servicio_social exista.', 500);
+    error_log('SIGHO PDO: ' . $e->getMessage());
+    fail('Error SQL real: ' . $e->getMessage(), 500);
 } catch (Throwable $e) {
-    error_log($e->getMessage());
-    fail('Error interno del servidor.', 500);
+    error_log('SIGHO Throwable: ' . $e->getMessage());
+    fail('Error interno del servidor: ' . $e->getMessage(), 500);
 }
