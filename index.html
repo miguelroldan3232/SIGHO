@@ -3090,6 +3090,10 @@ body:not(:has(.dashboard-screen.active)) .container {
     margin: 0 auto;
 }
 
+body:has(#login.active) .container {
+    display: none;
+}
+
 /* =====================================================
    AJUSTES FINALES: PANTALLA FIJA + SCROLL INDEPENDIENTE
 ====================================================== */
@@ -7228,6 +7232,11 @@ body.dark-mode #tablaHistorialAdmin .status.pending {
     opacity: 1 !important;
     cursor: text !important;
 }
+#fechaNacimiento.campo-error {
+    border: 2px solid #e23b3b !important;
+    border-color: #e23b3b !important;
+    box-shadow: 0 0 0 2px rgba(226,59,59,.08) !important;
+}
 #fechaNacimiento::-webkit-datetime-edit,
 #fechaNacimiento::-webkit-datetime-edit-fields-wrapper,
 #fechaNacimiento::-webkit-datetime-edit-text,
@@ -7799,6 +7808,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <label>Año del servicio social</label>
 <input aria-describedby="ayudaAnioServicio" aria-readonly="true" id="anioServicio" inputmode="numeric" max="2029" min="2026" ondrop="return false" onkeydown="bloquearEntradaAnioServicio(event)" onpaste="return false" readonly="" required="" type="number" value="2026"/>
 <small class="field-help" id="ayudaAnioServicio">Año lectivo</small>
+</div>
 <div class="section">
 <h3>Datos del estudiante</h3>
 </div>
@@ -9277,6 +9287,9 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         cerrarModales();
         ocultarPantallas();
         document.getElementById("login")?.classList.add("active");
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        window.scrollTo({ top: 0, behavior: "auto" });
         actualizarCamposLogin();
         actualizarIndicadoresObligatorios(document.getElementById("login"));
     }
@@ -9296,7 +9309,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         const proyectoOtro=document.getElementById("proyectoOtro"); if(proyectoOtro){proyectoOtro.value="";proyectoOtro.disabled=true;proyectoOtro.required=false;}
         document.querySelectorAll('input[name="diasServicio"]').forEach(el=>el.checked=false);
         const jornada=document.getElementById("jornadaSolicitud"); if(jornada){jornada.value="";jornada.disabled=true;}
-        const fecha=document.getElementById("fechaNacimiento"); if(fecha){fecha.value="";fecha.disabled=true;fecha.removeAttribute("min");fecha.removeAttribute("max");}
+        const fecha=document.getElementById("fechaNacimiento"); if(fecha){fecha.value="";fecha.dataset.interacted="0";fecha.disabled=true;fecha.removeAttribute("min");fecha.removeAttribute("max");}
         const msg=document.getElementById("mensajeSolicitud"); if(msg){msg.textContent="";msg.style.display="none";}
         const login=document.getElementById("login");
         login?.querySelectorAll("input, select, textarea").forEach(el => {
@@ -9713,10 +9726,14 @@ function configurarErroresCamposSolicitud() {
     const contenedor=document.getElementById("solicitud"); if(!contenedor || contenedor.dataset.erroresConfigurados==="1") return;
     contenedor.dataset.erroresConfigurados="1";
     contenedor.addEventListener("input", e=>{
-        if(e.target.matches("input,select,textarea")) e.target.classList.remove("campo-error");
+        if (!e.target.matches("input,select,textarea")) return;
+        if (e.target.id === "fechaNacimiento") e.target.classList.toggle("campo-error", !e.target.checkValidity());
+        else e.target.classList.remove("campo-error");
     });
     contenedor.addEventListener("change", e=>{
-        if(e.target.matches("input,select,textarea")) e.target.classList.remove("campo-error");
+        if (!e.target.matches("input,select,textarea")) return;
+        if (e.target.id === "fechaNacimiento") e.target.classList.toggle("campo-error", !e.target.checkValidity());
+        else e.target.classList.remove("campo-error");
         if(e.target.matches('input[name="diasServicio"]')) validarDiasServicio();
     });
     contenedor.addEventListener("blur", e=>{
@@ -9838,6 +9855,14 @@ async function enviarSolicitud() {
 
         const fechaNacimientoObj = new Date(`${fechaNacimiento}T00:00:00`);
         const hoy = new Date();
+        const fechaNacimientoControl = document.getElementById("fechaNacimiento");
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaNacimiento) ||
+            !fechaNacimientoControl ||
+            fechaNacimiento < fechaNacimientoControl.min ||
+            fechaNacimiento > fechaNacimientoControl.max) {
+            mostrarErrorSolicitud("La fecha de nacimiento no corresponde al rango permitido para el grado seleccionado.");
+            return;
+        }
         let edad = hoy.getFullYear() - fechaNacimientoObj.getFullYear();
         const cumpleEsteAnio = new Date(hoy.getFullYear(), fechaNacimientoObj.getMonth(), fechaNacimientoObj.getDate());
         if (hoy < cumpleEsteAnio) edad--;
@@ -11857,18 +11882,36 @@ function mostrarErrorCampo(input, mensaje) {
     const validarFechaNacimiento = () => {
         if (!fecha || fecha.disabled) return;
         const edadVista = document.getElementById("edadCalculada");
+        const ayuda = document.getElementById("ayudaFechaNacimiento");
         if (!fecha.value) {
-            fecha.setCustomValidity("");
+            const incompleta = fecha.dataset.interacted === "1";
+            fecha.setCustomValidity(incompleta ? "El año debe tener cuatro dígitos (XXXX)." : "");
+            fecha.classList.toggle("campo-error", incompleta);
+            if (incompleta && ayuda) ayuda.textContent = "El año debe tener cuatro dígitos (XXXX).";
             if (edadVista) edadVista.textContent = "-";
             return;
         }
-        const formatoValido = /^\d{4}-\d{2}-\d{2}$/.test(fecha.value);
+        const partesFecha = fecha.value.split("-");
+        const anioConCuatroDigitos = /^[1-9]\d{3}$/.test(partesFecha[0] || "");
+        const formatoValido = anioConCuatroDigitos && /^\d{4}-\d{2}-\d{2}$/.test(fecha.value);
         const dentroDelRango = formatoValido &&
             (!fecha.min || fecha.value >= fecha.min) &&
             (!fecha.max || fecha.value <= fecha.max);
-        fecha.setCustomValidity(dentroDelRango ? "" : "La fecha de nacimiento no está completa o no corresponde al rango permitido.");
+        fecha.setCustomValidity(dentroDelRango ? "" : "El año debe tener cuatro dígitos, comenzar por un número distinto de cero y estar dentro del rango permitido.");
+        fecha.classList.toggle("campo-error", !dentroDelRango);
+        if (!dentroDelRango && ayuda) {
+            ayuda.textContent = !anioConCuatroDigitos
+                ? "El año debe tener cuatro dígitos (XXXX) y no puede comenzar por 0."
+                : `Para ${grado.value} se permiten fechas entre ${fecha.min} y ${fecha.max}.`;
+        }
+        if (dentroDelRango && ayuda) {
+            const rangoEdad = grado.value === "Ciclo V" ? "18 a 40 años" : "14 a 19 años";
+            ayuda.textContent = `Para ${grado.value} se permiten fechas entre ${fecha.min} y ${fecha.max} (${rangoEdad}).`;
+        }
         const edad = calcularEdad(fecha.value);
-        if (edadVista) edadVista.textContent = edad === null ? "-" : `${edad} años`;
+        const anioNacimiento = Number(fecha.value.slice(0, 4));
+        const esAnioNacimientoNoValido = !anioConCuatroDigitos || anioNacimiento >= new Date().getFullYear();
+        if (edadVista) edadVista.textContent = edad === null || esAnioNacimientoNoValido ? "-" : `${edad} años`;
     };
 
     const actualizarRangoFechaNacimiento = () => {
@@ -11885,11 +11928,14 @@ function mostrarErrorCampo(input, mensaje) {
         const formatoFecha = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
         const hoy = new Date(); hoy.setHours(0,0,0,0);
         const fechaHaceAnios = anios => { const d = new Date(hoy); d.setFullYear(d.getFullYear()-anios); return formatoFecha(d); };
+        const hoyTexto = formatoFecha(hoy);
         if (grado.value === "10°" || grado.value === "11°") {
             fecha.min = fechaHaceAnios(19); fecha.max = fechaHaceAnios(14);
+            fecha.max = fecha.max > hoyTexto ? hoyTexto : fecha.max;
             if (ayuda) ayuda.textContent = `Para ${grado.value} se permiten fechas entre ${fecha.min} y ${fecha.max} (14 a 19 años).`;
         } else if (grado.value === "Ciclo V") {
             fecha.min = fechaHaceAnios(40); fecha.max = fechaHaceAnios(18);
+            fecha.max = fecha.max > hoyTexto ? hoyTexto : fecha.max;
             if (ayuda) ayuda.textContent = `Para Ciclo V se permiten fechas entre ${fecha.min} y ${fecha.max} (18 a 40 años).`;
         } else {
             fecha.disabled = true; fecha.removeAttribute("min"); fecha.removeAttribute("max"); fecha.value = "";
@@ -11946,10 +11992,12 @@ function mostrarErrorCampo(input, mensaje) {
 
     if (fecha) {
         fecha.addEventListener("input", () => {
+            fecha.dataset.interacted = "1";
             validarFechaNacimiento();
             actualizarTipoDocumentoPorEdad();
         });
         fecha.addEventListener("change", () => {
+            fecha.dataset.interacted = "1";
             validarFechaNacimiento();
             actualizarTipoDocumentoPorEdad();
         });
