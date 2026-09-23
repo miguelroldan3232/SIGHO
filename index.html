@@ -3090,10 +3090,6 @@ body:not(:has(.dashboard-screen.active)) .container {
     margin: 0 auto;
 }
 
-body:has(#login.active) .container {
-    display: none;
-}
-
 /* =====================================================
    AJUSTES FINALES: PANTALLA FIJA + SCROLL INDEPENDIENTE
 ====================================================== */
@@ -7232,11 +7228,6 @@ body.dark-mode #tablaHistorialAdmin .status.pending {
     opacity: 1 !important;
     cursor: text !important;
 }
-#fechaNacimiento.campo-error {
-    border: 2px solid #e23b3b !important;
-    border-color: #e23b3b !important;
-    box-shadow: 0 0 0 2px rgba(226,59,59,.08) !important;
-}
 #fechaNacimiento::-webkit-datetime-edit,
 #fechaNacimiento::-webkit-datetime-edit-fields-wrapper,
 #fechaNacimiento::-webkit-datetime-edit-text,
@@ -8029,7 +8020,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <label>Año del servicio social</label>
 <input aria-describedby="ayudaAnioServicio" aria-readonly="true" id="anioServicio" inputmode="numeric" max="2029" min="2026" ondrop="return false" onkeydown="bloquearEntradaAnioServicio(event)" onpaste="return false" readonly="" required="" type="number" value="2026"/>
 <small class="field-help" id="ayudaAnioServicio">Año lectivo</small>
-</div>
 <div class="section">
 <h3>Datos del estudiante</h3>
 </div>
@@ -9508,384 +9498,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         cerrarModales();
         ocultarPantallas();
         document.getElementById("login")?.classList.add("active");
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-        window.scrollTo({ top: 0, behavior: "auto" });
-        actualizarCamposLogin();
-        actualizarIndicadoresObligatorios(document.getElementById("login"));
-    }
-
-
-    function restablecerFormulariosAcceso() {
-        const solicitud = document.getElementById("solicitud");
-        solicitud?.querySelectorAll("input, select, textarea").forEach(el => {
-            el.classList.remove("campo-error");
-            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
-            else if (!el.disabled) el.value = "";
-        });
-        const rolSolicitud=document.getElementById("rolSolicitud"); if(rolSolicitud) rolSolicitud.value="";
-        ["camposSolicitudEstudiante","camposSolicitudPersonal","camposSolicitudComunes"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="none";});
-        const grupoEps=document.getElementById("grupoEpsOtroSolicitud"); if(grupoEps) grupoEps.style.display="none";
-        const epsOtro=document.getElementById("epsOtroSolicitud"); if(epsOtro){epsOtro.value="";epsOtro.disabled=true;epsOtro.required=false;}
-        const proyectoOtro=document.getElementById("proyectoOtro"); if(proyectoOtro){proyectoOtro.value="";proyectoOtro.disabled=true;proyectoOtro.required=false;}
-        document.querySelectorAll('input[name="diasServicio"]').forEach(el=>el.checked=false);
-        const jornada=document.getElementById("jornadaSolicitud"); if(jornada){jornada.value="";jornada.disabled=true;}
-        const fecha=document.getElementById("fechaNacimiento"); if(fecha){fecha.value="";fecha.dataset.interacted="0";fecha.disabled=true;fecha.removeAttribute("min");fecha.removeAttribute("max");}
-        const msg=document.getElementById("mensajeSolicitud"); if(msg){msg.textContent="";msg.style.display="none";}
-        const login=document.getElementById("login");
-        login?.querySelectorAll("input, select, textarea").forEach(el => {
-            el.classList.remove("campo-error");
-            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
-            else el.value = "";
-            el.setCustomValidity("");
-        });
-        const rolLogin=document.getElementById("rolLogin"); if(rolLogin) rolLogin.value="";
-        const camposLogin=document.getElementById("camposLogin"); if(camposLogin) camposLogin.style.display="none";
-        // Cada regreso a login/solicitud deja las contraseñas ocultas y sus ojos sincronizados.
-        document.querySelectorAll('#login input[type="password"], #solicitud input[type="password"]').forEach(el => { el.type = 'password'; });
-        const loginEye = document.getElementById('iconEye');
-        const loginEyeButton = document.getElementById('btnTogglePassword');
-        if (typeof window.restablecerOjoLogin === 'function') window.restablecerOjoLogin();
-        else if (loginEye && typeof svgEyeOff !== 'undefined') loginEye.innerHTML = svgEyeOff;
-        if (loginEyeButton) { loginEyeButton.setAttribute('aria-label','Mostrar contraseña'); loginEyeButton.setAttribute('title','Mostrar contraseña'); loginEyeButton.setAttribute('aria-pressed','false'); }
-        if (typeof window.restablecerOjosProfesor === 'function') window.restablecerOjosProfesor();
-        if (typeof window.sighoRestablecerOjosUniversales === 'function') window.sighoRestablecerOjosUniversales();
-        const msgLogin=document.getElementById("mensajeLogin"); if(msgLogin){msgLogin.textContent="";msgLogin.style.display="none";}
-        llenarAniosServicio();
-        configurarSelectorEvidencia();
-        reiniciarSelectorEvidencia();
-        actualizarCamposSolicitud();
-    }
-
-    function volverInicio() {
-        restablecerFormulariosAcceso();
-        cerrarModales();
-        ocultarPantallas();
-        document.getElementById("home")?.classList.add("active");
-    }
-
-
-    /* =====================================================
-       SOLICITUD
-    ====================================================== */
-
-    function actualizarIndicadoresObligatorios(contenedor = document) {
-        if (!contenedor) return;
-
-        const esSolicitudEstudiante = contenedor.id === "solicitud" ||
-            !!contenedor.querySelector("#camposSolicitudEstudiante");
-        const camposObligatoriosEstudiante = new Set([
-            "primerApellido", "primerNombre", "tipoDocumento", "numeroDocumento",
-            "gradoSolicitud", "fechaNacimiento", "telefonoSolicitud",
-            "direccionSolicitud", "epsSolicitud", "correoSolicitudEstudiante",
-            "modalidadSolicitud", "nombreAcudiente", "telefonoAcudiente",
-            "sedeSolicitud", "proyectoSolicitud", "claveSolicitud"
-        ]);
-
-        contenedor.querySelectorAll("label").forEach(label => {
-            const forId = label.getAttribute("for");
-            let control = null;
-            if (forId) control = document.getElementById(forId);
-            if (!control) control = label.querySelector("input, select, textarea");
-
-            const existente = label.querySelector(":scope > .required-mark");
-            if (existente) existente.remove();
-
-            // La sección de días usa su propio <span class="required">*.
-            if (label.querySelector('span.required')) return;
-
-            if (esSolicitudEstudiante && control) {
-                const id = control.id;
-                if (id && camposObligatoriosEstudiante.has(id)) {
-                    const marca = document.createElement("span");
-                    marca.className = "required-mark";
-                    marca.textContent = "*";
-                    marca.setAttribute("aria-hidden", "true");
-                    label.appendChild(marca);
-                }
-                return;
-            }
-
-            if (control?.required) {
-                const marca = document.createElement("span");
-                marca.className = "required-mark";
-                marca.textContent = "*";
-                marca.setAttribute("aria-hidden", "true");
-                label.appendChild(marca);
-            }
-        });
-    }
-
-    function bloquearEntradaAnioServicio(evento) {
-        const teclasPermitidas = ["ArrowUp", "ArrowDown", "Tab", "Shift", "Escape", "Enter", "Home", "End"];
-        if (teclasPermitidas.includes(evento.key) || evento.ctrlKey || evento.metaKey || evento.altKey) return;
-        evento.preventDefault();
-    }
-
-    function llenarAniosServicio() {
-        const input = document.getElementById("anioServicio");
-        if (!input) return;
-        const actual = new Date().getFullYear();
-        const maximo = actual + 3;
-        input.min = String(actual);
-        input.max = String(maximo);
-        let valor = Number(input.value);
-        if (!Number.isInteger(valor) || valor < actual || valor > maximo) {
-            input.value = String(actual);
-        }
-        const ayuda = document.getElementById("ayudaAnioServicio");
-        if (ayuda) ayuda.textContent = "Año lectivo";
-    }
-
-    function limpiarSolicitudAlCambiarRol(nuevoRol) {
-        const solicitud = document.getElementById("solicitud");
-        const rol = document.getElementById("rolSolicitud");
-        if (!solicitud || !rol) return;
-
-        solicitud.querySelectorAll("input, select, textarea").forEach(el => {
-            if (el === rol) return;
-            el.classList.remove("campo-error");
-            el.setCustomValidity("");
-            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
-            else el.value = "";
-        });
-
-        // Restablecer estados dependientes para que el nuevo rol comience limpio.
-        const tipoTelefono = document.getElementById("tipoTelefonoAcudiente");
-        if (tipoTelefono) tipoTelefono.value = "";
-        const telAcudiente = document.getElementById("telefonoAcudiente");
-        if (telAcudiente) {
-            telAcudiente.value = "";
-            telAcudiente.disabled = true;
-            telAcudiente.setCustomValidity("");
-        }
-        const grupoEps = document.getElementById("grupoEpsOtroSolicitud");
-        if (grupoEps) grupoEps.style.display = "none";
-        ["epsOtroSolicitud", "proyectoOtro"].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) { el.value = ""; el.disabled = true; el.required = false; el.setCustomValidity(""); }
-        });
-        const jornada = document.getElementById("jornadaSolicitud");
-        if (jornada) jornada.disabled = true;
-        const fecha = document.getElementById("fechaNacimiento");
-        if (fecha) { fecha.disabled = true; fecha.removeAttribute("min"); fecha.removeAttribute("max"); }
-
-        rol.value = nuevoRol || "";
-        actualizarCamposSolicitud();
-        if (typeof configurarTelefonoAcudiente === "function") configurarTelefonoAcudiente();
-        actualizarIndicadoresObligatorios(solicitud);
-    }
-
-    function actualizarCamposSolicitud() {
-        const rol = document.getElementById("rolSolicitud")?.value || "";
-        const estudiante = document.getElementById("camposSolicitudEstudiante");
-        const personal = document.getElementById("camposSolicitudPersonal");
-        const comunes = document.getElementById("camposSolicitudComunes");
-        const claveEstudiante = document.getElementById("claveSolicitud");
-        const claveProfesor = document.getElementById("claveSolicitudProfesor");
-
-        if (estudiante) estudiante.style.display = rol === "estudiante" ? "block" : "none";
-        if (personal) personal.style.display = rol === "profesor" ? "block" : "none";
-        if (comunes) comunes.style.display = rol ? "block" : "none";
-
-        const accesoEstudiante = document.getElementById("accesoSolicitudEstudiante");
-        const accesoProfesor = document.getElementById("accesoSolicitudProfesor");
-        if (accesoEstudiante) accesoEstudiante.classList.toggle("visible", rol === "estudiante");
-        if (accesoProfesor) accesoProfesor.classList.toggle("visible", rol === "profesor");
-
-        if (estudiante) estudiante.querySelectorAll("input, select").forEach(el => {
-            el.required = rol === "estudiante" &&
-                !["segundoNombre", "segundoApellido"].includes(el.id);
-        });
-        if (personal) personal.querySelectorAll("input, select").forEach(el => {
-            el.required = rol === "profesor";
-        });
-
-        if (claveEstudiante) {
-            claveEstudiante.required = rol === "estudiante";
-            if (rol !== "estudiante") claveEstudiante.value = "";
-        }
-        if (claveProfesor) {
-            claveProfesor.required = rol === "profesor";
-            if (rol !== "profesor") claveProfesor.value = "";
-        }
-
-        llenarAniosServicio();
-        configurarJornadaPorGrado();
-        actualizarIndicadoresObligatorios(document.getElementById("solicitud"));
-    }
-
-    function limpiarLoginAlCambiarRol() {
-        const login = document.getElementById("login");
-        if (!login) return;
-
-        login.querySelectorAll("input, textarea").forEach(el => {
-            el.classList.remove("campo-error");
-            el.setCustomValidity("");
-            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
-            else el.value = "";
-        });
-
-        const mensaje = document.getElementById("mensajeLogin");
-        if (mensaje) { mensaje.textContent = ""; mensaje.style.display = "none"; }
-        actualizarCamposLogin();
-    }
-
-    function actualizarCamposLogin() {
-        const campos = document.getElementById("camposLogin");
-        if (campos) campos.style.display = "block";
-
-        const correo = document.getElementById("correoLogin");
-        const clave = document.getElementById("clave");
-        if (correo) correo.required = true;
-        if (clave) clave.required = true;
-
-        const mensaje = document.getElementById("mensajeLogin");
-        if (mensaje) {
-            mensaje.style.display = "none";
-            mensaje.innerText = "";
-        }
-        actualizarIndicadoresObligatorios(document.getElementById("login"));
-    }
-
-    // Mantiene los campos "Otro" únicamente con letras y espacios sencillos.
-    function sanitizarTextoSoloLetras(valor, max = 60) {
-        return String(valor || "")
-            .replace(/[^\p{L} ]/gu, "")
-            .replace(/ {2,}/g, " ")
-            .replace(/^ +/g, "")
-            .slice(0, max);
-    }
-
-    function configurarValidacionCamposOtro() {
-        const ids = ["epsOtroSolicitud", "proyectoOtro", "perfilEpsOtro"];
-        ids.forEach(id => {
-            const input = document.getElementById(id);
-            if (!input || input.dataset.validacionTextoConfigurada === "1") return;
-            input.dataset.validacionTextoConfigurada = "1";
-            input.classList.add("input-validacion-texto");
-            input.setAttribute("autocomplete", "off");
-            input.addEventListener("input", () => {
-                const inicio = input.selectionStart ?? input.value.length;
-                const anterior = input.value;
-                const limpio = sanitizarTextoSoloLetras(anterior, 60);
-                input.value = limpio;
-                const desplazamiento = anterior.length - limpio.length;
-                try { input.setSelectionRange(Math.max(0, inicio - desplazamiento), Math.max(0, inicio - desplazamiento)); } catch (_) {}
-                input.setCustomValidity(limpio.length >= 2 || limpio.length === 0 ? "" : "Escribe al menos 2 letras.");
-            });
-            input.addEventListener("blur", () => {
-                input.value = sanitizarTextoSoloLetras(input.value, 60).trim();
-                if (input.disabled) input.setCustomValidity("");
-            });
-        });
-    }
-
-    // Los datos reales se cargan desde PHP + MySQL.
-    let usuarios = [];
-    let registros = [];
-    let solicitudes = [];
-    let usuarioActual = null;
-try { guardarSesionSigho(usuarioActual); } catch (_) {}
-    let filtroHistorialProfesorActual = "todos";
-    let filtroHistorialAdminActual = "todos";
-    let profesorHistorialAdminActual = "todos";
-    let filtroGradoAdminActual = "todos";
-
-    /* =====================================================
-       CONEXIÓN REAL CON PHP + MYSQL
-    ====================================================== */
-
-    const API_URL = "api/api.php";
-
-    async function api(action, options = {}) {
-        const config = { credentials: "same-origin", ...options };
-        config.headers = { ...(options.headers || {}) };
-
-        if (options.body && !(options.body instanceof FormData)) {
-            config.headers["Content-Type"] = "application/json";
-            config.body = JSON.stringify(options.body);
-        }
-
-        let response;
-        try {
-            response = await fetch(`${API_URL}?action=${encodeURIComponent(action)}`, config);
-        } catch (_) {
-            throw new Error("No se puede conectar con SIGHO. Abre el sistema desde http://localhost/jjfh/ y verifica que Apache y MySQL estén iniciados en XAMPP.");
-        }
-        let data;
-
-        try {
-            data = await response.json();
-        } catch (_) {
-            throw new Error("El servidor devolvió una respuesta no válida.");
-        }
-
-        if (!response.ok || data.ok === false) {
-            throw new Error(data.message || "Error en el servidor.");
-        }
-
-        return data;
-    }
-
-/* =====================================================
-   LOGIN — OJO DE CONTRASEÑA
-   Control directo y aislado. Sin delegación, sin onclick inline,
-   sin listeners duplicados. El evento click funciona con mouse y touch.
-
-    // Carga los datos que corresponden al rol que acaba de iniciar sesión.
-    // Cada rol consulta únicamente la información que necesita.
-    async function cargarDatosPorRol() {
-        if (!usuarioActual) return;
-
-        if (usuarioActual.rol === "estudiante") {
-            const data = await api("my_records");
-            registros = (data.records || []).map(normalizarRegistro);
-        } else if (usuarioActual.rol === "profesor") {
-            const data = await api("teacher_data");
-            registros = (data.records || []).map(normalizarRegistro);
-        } else if (usuarioActual.rol === "administrador") {
-            const data = await api("admin_data");
-            registros = (data.records || []).map(normalizarRegistro);
-            usuarios = (data.users || []).map(normalizarUsuario);
-            solicitudes = data.requests || [];
-            window.solicitudesAdministradorAdmin = data.adminRequests || [];
-        } else if (usuarioActual.rol === "superadmin") {
-            const data = await api("superadmin_data");
-            solicitudes = data.requests || [];
-        }
-    }
-
-    /* =====================================================
-       CAMBIO DE PANTALLAS
-    ====================================================== */
-
-    function ocultarPantallas() {
-
-        document
-            .querySelectorAll(".screen")
-            .forEach(pantalla => {
-
-                pantalla.classList.remove("active");
-
-            });
-
-    }
-
-
-    function mostrarSolicitud() {
-        restablecerFormulariosAcceso();
-        cerrarModales();
-        ocultarPantallas();
-        document.getElementById("solicitud")?.classList.add("active");
-        actualizarIndicadoresObligatorios(document.getElementById("solicitud"));
-    }
-
-    function mostrarLogin() {
-        restablecerFormulariosAcceso();
-        cerrarModales();
-        ocultarPantallas();
-        document.getElementById("login")?.classList.add("active");
         actualizarCamposLogin();
         actualizarIndicadoresObligatorios(document.getElementById("login"));
     }
@@ -9920,7 +9532,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         document.querySelectorAll('#login input[type="password"], #solicitud input[type="password"]').forEach(el => { el.type = 'password'; });
         const loginEye = document.getElementById('iconEye');
         const loginEyeButton = document.getElementById('btnTogglePassword');
-        if (loginEye && typeof svgEyeOff !== 'undefined') loginEye.innerHTML = svgEyeOff;
+        if (typeof window.restablecerOjoLogin === 'function') window.restablecerOjoLogin();
+        else if (loginEye && typeof svgEyeOff !== 'undefined') loginEye.innerHTML = svgEyeOff;
         if (loginEyeButton) { loginEyeButton.setAttribute('aria-label','Mostrar contraseña'); loginEyeButton.setAttribute('title','Mostrar contraseña'); loginEyeButton.setAttribute('aria-pressed','false'); }
         if (typeof window.restablecerOjosProfesor === 'function') window.restablecerOjosProfesor();
         if (typeof window.sighoRestablecerOjosUniversales === 'function') window.sighoRestablecerOjosUniversales();
@@ -10230,41 +9843,100 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
        LOGIN
     ====================================================== */
 
-const inputClave = document.getElementById('clave');
-const btnToggle = document.getElementById('btnTogglePassword');
-const iconEye = document.getElementById('iconEye');
+/* =====================================================
+   LOGIN — OJO DE CONTRASEÑA
+   Control directo y aislado. Sin delegación, sin onclick inline,
+   sin listeners duplicados. El evento click funciona con mouse y touch.
+===================================================== */
+(function instalarOjoLoginDirecto() {
+    const SVG_EYE = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+    const SVG_EYE_OFF = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
 
-const svgEye = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle>`;
+    function sincronizar() {
+        const input = document.getElementById('clave');
+        const boton = document.getElementById('btnTogglePassword');
+        const icono = document.getElementById('iconEye');
+        if (!input || !boton || !icono) return;
 
-const svgEyeOff = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path> <line x1="1" y1="1" x2="23" y2="23"></line>`;
+        const visible = input.getAttribute('type') === 'text';
+        icono.innerHTML = visible ? SVG_EYE : SVG_EYE_OFF;
+        boton.setAttribute('aria-pressed', visible ? 'true' : 'false');
+        boton.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        boton.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    }
 
-if (inputClave && btnToggle && iconEye) {
-    // Estado inicial correcto: contraseña oculta = ojo tachado.
-    inputClave.type = 'password';
-    iconEye.innerHTML = svgEyeOff;
-    btnToggle.setAttribute('aria-label', 'Mostrar contraseña');
-    btnToggle.setAttribute('title', 'Mostrar contraseña');
-    btnToggle.setAttribute('aria-pressed', 'false');
+    function instalar() {
+        const boton = document.getElementById('btnTogglePassword');
+        const input = document.getElementById('clave');
+        if (!boton || !input || boton.dataset.loginEyeInstalled === '1') return;
 
-    btnToggle.addEventListener('click', () => {
-        const isPassword = inputClave.type === 'password';
-        inputClave.type = isPassword ? 'text' : 'password';
-        iconEye.innerHTML = isPassword ? svgEye : svgEyeOff;
-        btnToggle.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
-        btnToggle.setAttribute('title', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
-        btnToggle.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
-        inputClave.focus();
-    });
-}
+        boton.dataset.loginEyeInstalled = '1';
+        input.setAttribute('type', 'password');
+        sincronizar();
+
+        // ÚNICO listener del ojo de login.
+        boton.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const oculto = input.getAttribute('type') === 'password';
+            input.setAttribute('type', oculto ? 'text' : 'password');
+
+            // IMPORTANTE: el focusin global puede haber aplicado -webkit-text-security.
+            // Al mostrar la clave hay que quitar explícitamente cualquier máscara inline.
+            if (oculto) {
+                input.style.webkitTextSecurity = 'none';
+                input.style.textSecurity = 'none';
+            } else {
+                input.style.webkitTextSecurity = 'disc';
+                input.style.textSecurity = 'disc';
+            }
+
+            sincronizar();
+            try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); }
+        }, false);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', instalar, { once: true });
+    } else {
+        instalar();
+    }
+
+    window.restablecerOjoLogin = function () {
+        const input = document.getElementById('clave');
+        if (input) input.setAttribute('type', 'password');
+        sincronizar();
+    };
+})();
 
 async function iniciarSesion() {
     const correo = document.getElementById("correoLogin").value.trim().toLowerCase();
     const clave = document.getElementById("clave").value;
     const mensaje = document.getElementById("mensajeLogin");
 
-function renderizarEvidencia(r) {
-    if (r.evidenciaUrl) {
-        return `<a class="evidence-link" href="${escaparHTML(r.evidenciaUrl)}">Ver</a>`;
+    document.getElementById("correoLogin")?.classList.toggle("campo-error", !correo);
+    document.getElementById("clave")?.classList.toggle("campo-error", !clave);
+    if (!correo || !clave) {
+        mensaje.className = "message auth-error-message";
+        mensaje.style.display = "block";
+        mensaje.innerText = "Completa el correo y la contraseña.";
+        return;
+    }
+
+    try {
+        const data = await api("login", { method: "POST", body: { correo, clave } });
+        usuarioActual = normalizarUsuario(data.user);
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
+        mensaje.style.display = "none";
+        await cargarDatosPorRol();
+        if (usuarioActual.rol === "estudiante") abrirEstudiante();
+        else if (usuarioActual.rol === "profesor") abrirProfesor();
+        else if (usuarioActual.rol === "administrador") abrirAdministrador();
+        else abrirSuperAdmin();
+    } catch (error) {
+        mensaje.style.display = "block";
+        mensaje.innerText = error.message;
     }
 }
 
@@ -10303,14 +9975,10 @@ function configurarErroresCamposSolicitud() {
     const contenedor=document.getElementById("solicitud"); if(!contenedor || contenedor.dataset.erroresConfigurados==="1") return;
     contenedor.dataset.erroresConfigurados="1";
     contenedor.addEventListener("input", e=>{
-        if (!e.target.matches("input,select,textarea")) return;
-        if (e.target.id === "fechaNacimiento") e.target.classList.toggle("campo-error", !e.target.checkValidity());
-        else e.target.classList.remove("campo-error");
+        if(e.target.matches("input,select,textarea")) e.target.classList.remove("campo-error");
     });
     contenedor.addEventListener("change", e=>{
-        if (!e.target.matches("input,select,textarea")) return;
-        if (e.target.id === "fechaNacimiento") e.target.classList.toggle("campo-error", !e.target.checkValidity());
-        else e.target.classList.remove("campo-error");
+        if(e.target.matches("input,select,textarea")) e.target.classList.remove("campo-error");
         if(e.target.matches('input[name="diasServicio"]')) validarDiasServicio();
     });
     contenedor.addEventListener("blur", e=>{
@@ -10432,14 +10100,6 @@ async function enviarSolicitud() {
 
         const fechaNacimientoObj = new Date(`${fechaNacimiento}T00:00:00`);
         const hoy = new Date();
-        const fechaNacimientoControl = document.getElementById("fechaNacimiento");
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaNacimiento) ||
-            !fechaNacimientoControl ||
-            fechaNacimiento < fechaNacimientoControl.min ||
-            fechaNacimiento > fechaNacimientoControl.max) {
-            mostrarErrorSolicitud("La fecha de nacimiento no corresponde al rango permitido para el grado seleccionado.");
-            return;
-        }
         let edad = hoy.getFullYear() - fechaNacimientoObj.getFullYear();
         const cumpleEsteAnio = new Date(hoy.getFullYear(), fechaNacimientoObj.getMonth(), fechaNacimientoObj.getDate());
         if (hoy < cumpleEsteAnio) edad--;
@@ -10656,9 +10316,7 @@ async function enviarSolicitud() {
     configurarValidacionCamposOtro();
         configurarSelectoresEPS();
     } catch (error) {
-        // api() ya convierte la respuesta del backend en Error usando data.message.
-        // Por eso aquí se muestra exactamente el mensaje SQL que devuelva PHP.
-        mostrarErrorSolicitud(error.message || "Error desconocido.");
+        mostrarErrorSolicitud(error.message || "No fue posible enviar la solicitud.");
     }
 }
 
@@ -10745,248 +10403,44 @@ function configurarRestriccionesRegistroHoras(gradoForzado = "") {
     horas.inputMode = "numeric";
 }
 
-async function abrirSuperAdmin() {
-    try {
-        const data = await api("superadmin_data");
-        solicitudes = data.requests || [];
-        superAdminData = data;
-        superAdminNavigation = [];
-        superAdminCurrentSection = "inicio";
-        ocultarPantallas();
-        document.getElementById("superAdmin").classList.add("active");
-        document.getElementById("superadminCountStudents").textContent = data.counts?.estudiantes ?? 0;
-        document.getElementById("superadminCountTeachers").textContent = data.counts?.profesores ?? 0;
-        document.getElementById("superadminCountAdmins").textContent = data.counts?.administradores ?? 0;
-        configurarSuperAdmin();
-        mostrarValidacionesSuperAdmin();
-    } catch (e) {
-        const login = document.getElementById("login");
-        ocultarPantallas();
-        login?.classList.add("active");
-        const mensaje = document.getElementById("mensajeLogin");
-        if (mensaje) {
-            mensaje.className = "message auth-error-message";
-            mensaje.style.display = "block";
-            mensaje.textContent = `No fue posible cargar el panel Super Admin: ${e.message}`;
-        }
-    }
-}
-
-let superAdminData = { users: [], roles: [], permissions: [], matrix: {}, settings: {} };
-let superAdminTabConfigured = false;
-let superAdminNavigation = [];
-let superAdminCurrentSection = "inicio";
-
-function configurarSuperAdmin() {
-    if (!superAdminTabConfigured) {
-        document.querySelectorAll("[data-superadmin-tab]").forEach(tab => tab.addEventListener("click", () => mostrarSeccionSuperAdmin(tab.dataset.superadminTab)));
-        superAdminTabConfigured = true;
-    }
-    llenarUsuariosSuperAdmin(); llenarRolesSuperAdmin(); llenarConfiguracionSuperAdmin();
-}
-
-function mostrarSeccionSuperAdmin(nombre, registrar = true) {
-    const titulos = { inicio: "Plantel de Super Admin", usuarios: "Usuarios", permisos: "Roles y permisos", configuracion: "Configuración", ayuda: "Ayuda", ia: "IA SIGHO" };
-    if (registrar && superAdminCurrentSection !== nombre) superAdminNavigation.push(superAdminCurrentSection);
-    superAdminCurrentSection = nombre;
-    document.querySelectorAll(".superadmin-panel").forEach(panel => { panel.hidden = true; });
-    document.getElementById(`superadminPanel${nombre[0].toUpperCase()}${nombre.slice(1)}`)?.removeAttribute("hidden");
-    document.querySelectorAll("[data-superadmin-tab]").forEach(tab => tab.classList.toggle("active", tab.dataset.superadminTab === nombre));
-    document.getElementById("tituloSuperAdmin").textContent = titulos[nombre] || "Inicio";
-    if (nombre === "permisos") mostrarMatrizPermisos();
-}
-
-function volverSeccionSuperAdmin() {
-    document.querySelectorAll("#superAdmin .more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
-    const anterior = superAdminNavigation.pop();
-    if (anterior) {
-        mostrarSeccionSuperAdmin(anterior, false);
-    } else if (superAdminCurrentSection !== "inicio") {
-        mostrarSeccionSuperAdmin("inicio", false);
-    }
-}
-
-function mostrarAyudaSuperAdmin(tema) {
-    const respuestas = {
-        usuarios: "En Usuarios puedes crear cuentas, editar sus datos, cambiar el rol, activar o desactivar cuentas y filtrar por nombre, correo, identificación o rol.",
-        permisos: "En Roles y permisos selecciona un rol y activa solo los permisos que necesita. Estudiante, Profesor y Administrador tienen permisos diferentes; el Super Admin conserva el control completo.",
-        configuracion: "En Configuración puedes actualizar los valores generales que utiliza SIGHO, como el dominio institucional y las metas de horas.",
-        volver: "Usa Volver al inicio en el menú de puntos o el botón Atrás del navegador. Las evidencias ahora se abren en la misma pestaña para que puedas regresar normalmente."
+function configurarSelectorEvidencia() {
+    const input=document.getElementById("evidenciaHora");
+    const nombre=document.getElementById("nombreEvidenciaHora");
+    const quitar=document.getElementById("quitarEvidenciaHora");
+    const preview=document.getElementById("previewEvidenciaHora");
+    const imagen=document.getElementById("imagenPreviewEvidenciaHora");
+    const texto=document.getElementById("textoPreviewEvidenciaHora");
+    if(!input || !nombre || !quitar || input.dataset.configurado==="1") return;
+    input.dataset.configurado="1";
+    const actualizar=()=>{
+        const archivo=input.files?.[0];
+        const esJpg=archivo && (archivo.type==="image/jpeg" || /\.jpe?g$/i.test(archivo.name));
+        if(archivo && !esJpg){ input.value=""; nombre.textContent="Ninguna imagen seleccionada"; quitar.hidden=true; if(preview) preview.classList.remove("show"); alert("Solo puedes seleccionar imágenes JPG o JPEG."); return; }
+        nombre.textContent=archivo ? archivo.name : "Ninguna imagen seleccionada";
+        quitar.hidden=!archivo;
+        if(archivo && preview && imagen){
+            const url=URL.createObjectURL(archivo);
+            imagen.onload=()=>URL.revokeObjectURL(url);
+            imagen.src=url;
+            if(texto) texto.textContent=`Vista previa: ${archivo.name}`;
+            preview.classList.add("show");
+        } else if(preview){ preview.classList.remove("show"); if(imagen) imagen.removeAttribute("src"); }
     };
-    const answer = document.getElementById("superadminHelpAnswer");
-    if (answer) answer.textContent = respuestas[tema] || "Selecciona una pregunta.";
+    input.addEventListener("change",actualizar);
+    quitar.addEventListener("click",()=>{ input.value=""; actualizar(); });
+    actualizar();
 }
-
-function consultarAyudaRol(rol) {
-    const input = document.getElementById(`preguntaAyuda${rol.charAt(0).toUpperCase()}${rol.slice(1)}`);
-    const answer = document.getElementById(`respuestaAyuda${rol.charAt(0).toUpperCase()}${rol.slice(1)}`);
-    const pregunta = (input?.value || "").trim().toLowerCase();
-    const respuestas = {
-        estudiante: {
-            registro: "Para registrar una jornada entra a Registrar horas, completa fecha, entrada, salida, descripción y adjunta la evidencia. El registro quedará pendiente hasta que un profesor lo revise.",
-            hora: "Las horas solo se suman como aprobadas cuando el profesor acepta el registro. Las jornadas pendientes o rechazadas no cuentan como aprobadas.",
-            cuenta: "En Mis datos puedes consultar y actualizar la información permitida de tu perfil. Si olvidaste tu contraseña, solicita ayuda al administrador.",
-            general: "Puedo orientarte sobre registrar horas, evidencias, estados de tus jornadas, progreso y datos de tu cuenta."
-        },
-        profesor: {
-            registro: "En Registros pendientes revisa fecha, horario, actividad y evidencia. Después puedes aceptar o rechazar la jornada y dejar una observación.",
-            estudiante: "En Mis estudiantes ves únicamente los estudiantes relacionados con tu sede y proyecto asignados.",
-            cuenta: "En Mis datos puedes actualizar los campos permitidos y cambiar tu contraseña desde Seguridad de la cuenta.",
-            general: "Puedo orientarte sobre registros pendientes, estudiantes asignados, historial, observaciones y tu perfil."
-        },
-        administrador: {
-            profesor: "En Gestión de profesores puedes consultar y asignar la sede y el proyecto de cada docente.",
-            solicitud: "En Solicitudes puedes revisar y aceptar o rechazar solicitudes de estudiantes, profesores y permisos de Administrador.",
-            progreso: "En Progreso de estudiantes puedes consultar horas aprobadas, faltantes y porcentaje de avance.",
-            general: "Puedo orientarte sobre profesores, solicitudes, progreso, historial y funciones generales del sistema."
-        }
-    };
-    const contenido = respuestas[rol] || {};
-    let respuesta = contenido.general;
-    if (pregunta.includes("registro") || pregunta.includes("jornada") || pregunta.includes("evidencia")) respuesta = contenido.registro || respuesta;
-    else if (pregunta.includes("hora") || pregunta.includes("progreso")) respuesta = contenido.hora || contenido.progreso || respuesta;
-    else if (pregunta.includes("estudiante")) respuesta = contenido.estudiante || respuesta;
-    else if (pregunta.includes("profesor")) respuesta = contenido.profesor || respuesta;
-    else if (pregunta.includes("solicitud")) respuesta = contenido.solicitud || respuesta;
-    else if (pregunta.includes("cuenta") || pregunta.includes("contraseña") || pregunta.includes("perfil")) respuesta = contenido.cuenta || respuesta;
-    if (answer) answer.textContent = pregunta ? respuesta : "Escribe una pregunta para recibir orientación.";
-}
-
-function preguntaRapidaAyuda(rol, pregunta) {
-    const id = `preguntaAyuda${rol.charAt(0).toUpperCase()}${rol.slice(1)}`;
-    const input = document.getElementById(id);
-    if (input) input.value = pregunta;
-    consultarAyudaRol(rol);
-}
-
-function alternarChatAyuda(rol) {
-    const sufijo = rol === "superadmin" ? "Superadmin" : rol.charAt(0).toUpperCase() + rol.slice(1);
-    const chat = document.getElementById(`chatAyuda${sufijo}`);
-    const launcher = document.querySelector(`[aria-controls="chatAyuda${sufijo}"]`);
-    if (!chat) return;
-    const abierto = chat.style.display === "flex";
-    chat.style.display = abierto ? "none" : "flex";
-    launcher?.setAttribute("aria-expanded", abierto ? "false" : "true");
-    if (!abierto) chat.querySelector("input")?.focus();
-}
-
-function consultarAyudaSuperAdmin() {
-    const input = document.getElementById("superadminHelpQuestion");
-    const pregunta = (input?.value || "").trim().toLowerCase();
-    if (!pregunta) {
-        mostrarAyudaSuperAdmin("usuarios");
-        return;
-    }
-    if (pregunta.includes("permiso") || pregunta.includes("rol")) mostrarAyudaSuperAdmin("permisos");
-    else if (pregunta.includes("config") || pregunta.includes("meta") || pregunta.includes("dominio")) mostrarAyudaSuperAdmin("configuracion");
-    else if (pregunta.includes("volver") || pregunta.includes("regresar") || pregunta.includes("atrás") || pregunta.includes("atras")) mostrarAyudaSuperAdmin("volver");
-    else mostrarAyudaSuperAdmin("usuarios");
-}
-
-function preguntaRapidaSuperAdmin(pregunta) {
-    const input = document.getElementById("superadminHelpQuestion");
-    if (input) input.value = pregunta;
-    consultarAyudaSuperAdmin();
-}
-
-function preguntarIaSuperAdmin() {
-    const input = document.getElementById("superadminAiQuestion");
-    const windowChat = document.getElementById("superadminAiMessages");
-    const pregunta = (input?.value || "").trim();
-    if (!pregunta || !windowChat) return;
-    const userMessage = document.createElement("div");
-    userMessage.className = "ai-message ai-message-user";
-    userMessage.textContent = pregunta;
-    windowChat.appendChild(userMessage);
-    const texto = pregunta.toLowerCase();
-    let respuesta = "Puedo ayudarte con usuarios, roles, permisos, configuración y navegación del panel Super Admin.";
-    if (texto.includes("usuario") || texto.includes("profesor") || texto.includes("estudiante") || texto.includes("admin")) respuesta = "En Usuarios puedes buscar por nombre, correo o identificación, filtrar por rol, crear cuentas, editar datos y desactivar usuarios.";
-    else if (texto.includes("permiso") || texto.includes("rol")) respuesta = "En Roles y permisos selecciona el rol y activa solo los permisos que necesita. Cada rol tiene una configuración diferente.";
-    else if (texto.includes("config") || texto.includes("meta") || texto.includes("dominio")) respuesta = "En Configuración puedes modificar los valores generales de SIGHO, como dominio institucional y metas de horas.";
-    else if (texto.includes("volver") || texto.includes("regresar") || texto.includes("naveg")) respuesta = "Usa las opciones de la barra lateral para cambiar de sección. El botón Atrás del navegador también conserva la navegación de páginas abiertas.";
-    const botMessage = document.createElement("div");
-    botMessage.className = "ai-message ai-message-bot";
-    botMessage.textContent = respuesta;
-    windowChat.appendChild(botMessage);
-    input.value = "";
-    windowChat.scrollTop = windowChat.scrollHeight;
-}
-
-function llenarUsuariosSuperAdmin() {
-    const cont = document.getElementById("superadminUsersTable"); if (!cont) return;
-    const search = document.getElementById("superadminUserSearch");
-    const role = document.getElementById("superadminUserRoleFilter");
-    if (search && search.dataset.configurado !== "1") {
-        search.dataset.configurado = "1";
-        search.addEventListener("input", filtrarUsuariosSuperAdmin);
-    }
-    if (role && role.dataset.configurado !== "1") {
-        role.dataset.configurado = "1";
-        role.addEventListener("change", filtrarUsuariosSuperAdmin);
-    }
-    filtrarUsuariosSuperAdmin();
-}
-
-function filtrarUsuariosSuperAdmin() {
-    const cont = document.getElementById("superadminUsersTable");
-    if (!cont) return;
-    const texto = (document.getElementById("superadminUserSearch")?.value || "").trim().toLowerCase();
-    const rol = document.getElementById("superadminUserRoleFilter")?.value || "todos";
-    const users = (superAdminData.users || []).filter(user => {
-        const coincideRol = rol === "todos" || user.rol === rol;
-        const contenido = `${user.nombre} ${user.correo} ${user.identificacion}`.toLowerCase();
-        return coincideRol && (!texto || contenido.includes(texto));
-    });
-    const count = document.getElementById("superadminUserCount");
-    if (count) count.textContent = `${users.length} usuario${users.length === 1 ? "" : "s"}`;
-    cont.innerHTML = `<div class="table-container"><table class="superadmin-users-table"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.length ? users.map(user => `<tr><td>${escaparHTML(user.nombre)}</td><td>${escaparHTML(user.correo)}</td><td>${escaparHTML(user.rol)}</td><td><span class="status ${user.estado === "activo" ? "approved" : "rejected"}">${escaparHTML(user.estado)}</span></td><td><div class="actions"><button class="secondary-button" onclick="abrirFormularioUsuario(${user.id})">Editar</button><button class="danger-button" onclick="eliminarUsuarioSuperAdmin(${user.id})">Desactivar</button></div></td></tr>`).join("") : `<tr><td colspan="5">No hay usuarios que coincidan con el filtro.</td></tr>`}</tbody></table></div>`;
-}
-
-function abrirFormularioUsuario(id = 0) {
-    const user = (superAdminData.users || []).find(item => Number(item.id) === Number(id)); const cont = document.getElementById("superadminUserForm"); if (!cont) return;
-    cont.innerHTML = `<button type="button" class="secondary-button superadmin-back-button" onclick="cancelarFormularioUsuarioSuperAdmin()">← Volver a Usuarios</button><form class="superadmin-form" onsubmit="guardarUsuarioSuperAdmin(event)"><input type="hidden" id="superadminUserId" value="${user?.id || ""}"><div class="form-group"><label>Identificación</label><input id="superadminIdentificacion" required value="${escaparHTML(user?.identificacion || "")}"></div><div class="form-group"><label>Nombres</label><input id="superadminNombres" required value="${escaparHTML(user?.nombres || "")}"></div><div class="form-group"><label>Apellidos</label><input id="superadminApellidos" required value="${escaparHTML(user?.apellidos || "")}"></div><div class="form-group"><label>Correo</label><input id="superadminCorreo" type="email" required value="${escaparHTML(user?.correo || "")}"></div><div class="form-group"><label>Rol</label><select id="superadminRol"><option value="estudiante">Estudiante</option><option value="profesor">Profesor</option><option value="administrador">Administrador</option></select></div><div class="form-group"><label>Estado</label><select id="superadminEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div><div class="form-group wide"><label>${user ? "Nueva contraseña (opcional)" : "Contraseña"}</label><input id="superadminClave" type="password" ${user ? "" : "required"} minlength="8"></div><div class="superadmin-form-actions"><button class="main-button superadmin-action" type="submit">Guardar usuario</button><button class="secondary-button" type="button" onclick="cancelarFormularioUsuarioSuperAdmin()">Cancelar</button></div></form>`;
-    document.getElementById("superadminRol").value = user?.rol || "estudiante"; document.getElementById("superadminEstado").value = user?.estado || "activo";
-}
-
-function cancelarFormularioUsuarioSuperAdmin() {
-    document.getElementById("superadminUserForm").innerHTML = "";
-}
-
-async function guardarUsuarioSuperAdmin(event) {
-    event.preventDefault(); const body = { id: Number(document.getElementById("superadminUserId").value || 0), identificacion: document.getElementById("superadminIdentificacion").value, nombres: document.getElementById("superadminNombres").value, apellidos: document.getElementById("superadminApellidos").value, correo: document.getElementById("superadminCorreo").value, rol: document.getElementById("superadminRol").value, estado: document.getElementById("superadminEstado").value, clave: document.getElementById("superadminClave").value };
-    try { const result = await api("superadmin_user_save", { method: "POST", body }); superAdminData = result.data; document.getElementById("superadminUserForm").innerHTML = ""; llenarUsuariosSuperAdmin(); alert("Usuario guardado correctamente."); } catch (e) { alert(e.message); }
-}
-
-async function eliminarUsuarioSuperAdmin(id) {
-    if (!confirm("¿Desactivar esta cuenta?")) return;
-    try { const result = await api("superadmin_user_delete", { method: "POST", body: { id } }); superAdminData = result.data; llenarUsuariosSuperAdmin(); } catch (e) { alert(e.message); }
-}
-
-function llenarRolesSuperAdmin() {
-    const select = document.getElementById("superadminRoleSelect"); if (!select) return;
-    select.innerHTML = (superAdminData.roles || []).map(role => `<option value="${role.id}">${escaparHTML(role.name)}</option>`).join("");
-}
-
-function mostrarMatrizPermisos() {
-    const roleId = Number(document.getElementById("superadminRoleSelect")?.value || 0); const role = (superAdminData.roles || []).find(item => Number(item.id) === roleId); const cont = document.getElementById("superadminPermissionsTable"); if (!cont || !role) return;
-    const bloqueado = role.code === "superadmin";
-    cont.innerHTML = `<div class="table-container"><table class="superadmin-permission-table"><thead><tr><th>Permiso</th><th>Descripción</th><th>Activo</th></tr></thead><tbody>${(superAdminData.permissions || []).map(permission => `<tr><td>${escaparHTML(permission.name)}</td><td>${escaparHTML(permission.description || "")}</td><td><input type="checkbox" data-permission-id="${permission.id}" ${superAdminData.matrix?.[roleId]?.[permission.id] ? "checked" : ""} ${bloqueado ? "disabled checked" : ""}></td></tr>`).join("")}</tbody></table></div>`;
-    document.querySelector('#superAdmin button[onclick="guardarPermisosSuperAdmin()"]')?.toggleAttribute("disabled", bloqueado);
-}
-
-async function guardarPermisosSuperAdmin() {
-    const roleId = Number(document.getElementById("superadminRoleSelect").value); const permissions = Array.from(document.querySelectorAll("[data-permission-id]:checked")).map(input => Number(input.dataset.permissionId));
-    try { const result = await api("superadmin_permissions_save", { method: "POST", body: { roleId, permissions } }); superAdminData = result.data; mostrarMatrizPermisos(); alert("Permisos guardados correctamente."); } catch (e) { alert(e.message); }
-}
-
-function llenarConfiguracionSuperAdmin() {
-    const cont = document.getElementById("superadminSettingsForm"); if (!cont) return;
-    cont.innerHTML = `<div class="superadmin-form">${Object.entries(superAdminData.settings || {}).map(([key, item]) => `<div class="form-group wide"><label>${escaparHTML(item.descripcion || key)}</label><input data-setting-key="${escaparHTML(key)}" value="${escaparHTML(item.valor || "")}"></div>`).join("")}</div>`;
-}
-
-async function guardarConfiguracionSuperAdmin() {
-    const settings = {}; document.querySelectorAll("[data-setting-key]").forEach(input => { settings[input.dataset.settingKey] = input.value; });
-    try { const result = await api("superadmin_settings_save", { method: "POST", body: { settings } }); superAdminData = result.data; llenarConfiguracionSuperAdmin(); alert("Configuración guardada correctamente."); } catch (e) { alert(e.message); }
+function reiniciarSelectorEvidencia(){
+    const input=document.getElementById("evidenciaHora");
+    const nombre=document.getElementById("nombreEvidenciaHora");
+    const quitar=document.getElementById("quitarEvidenciaHora");
+    const preview=document.getElementById("previewEvidenciaHora");
+    const imagen=document.getElementById("imagenPreviewEvidenciaHora");
+    if(input) input.value="";
+    if(nombre) nombre.textContent="Ninguna imagen seleccionada";
+    if(quitar) quitar.hidden=true;
+    if(preview) preview.classList.remove("show");
+    if(imagen) imagen.removeAttribute("src");
 }
 
 async function registrarHoras() {
@@ -11400,16 +10854,15 @@ async function abrirSuperAdmin() {
     }
 }
 
-function abrirAyuda() {
-    if (usuarioActual?.rol === "superadmin") {
-        document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
-        mostrarSeccionSuperAdmin("ayuda");
-        return;
-    }
-    if (usuarioActual?.rol === "profesor") {
-        cerrarMenuUsuarioProfesor();
-        mostrarSeccionProfesor("ayuda");
-        return;
+let superAdminData = { users: [], roles: [], permissions: [], matrix: {}, settings: {} };
+let superAdminTabConfigured = false;
+let superAdminNavigation = [];
+let superAdminCurrentSection = "inicio";
+
+function configurarSuperAdmin() {
+    if (!superAdminTabConfigured) {
+        document.querySelectorAll("[data-superadmin-tab]").forEach(tab => tab.addEventListener("click", () => mostrarSeccionSuperAdmin(tab.dataset.superadminTab)));
+        superAdminTabConfigured = true;
     }
     llenarUsuariosSuperAdmin(); llenarRolesSuperAdmin(); llenarConfiguracionSuperAdmin();
 }
@@ -11627,17 +11080,33 @@ function mostrarValidacionesSuperAdmin() {
     pendientes.forEach(s => html += `<tr><td>${escaparHTML(s.nombre)}</td><td>${escaparHTML(s.identificacion)}</td><td>${escaparHTML(s.correo)}</td><td>${escaparHTML(s.fechaSolicitud)}</td><td><div class="actions"><button class="success-button" onclick="validarSolicitudSuper(${s.id}, 'aceptada')">✓ Aceptar</button><button class="danger-button" onclick="validarSolicitudSuper(${s.id}, 'rechazada')">✕ Rechazar</button></div></td></tr>`);
     contenedor.innerHTML = html + `</tbody></table></div>`;
 }
-function alternarCambioClaveProfesor(mostrar) {
-    const form=document.getElementById("formularioCambioClaveProfesor");
-    const boton=document.getElementById("botonMostrarCambioClaveProfesor");
-    if(!form || !boton) return;
-    const abrir = typeof mostrar === "boolean" ? mostrar : form.style.display === "none";
-    form.style.display = abrir ? "block" : "none";
-    boton.textContent = abrir ? "Ocultar cambio de contraseña" : "Cambiar contraseña";
-    if(!abrir){
-        ["claveActualProfesor","nuevaClaveProfesor","confirmarClaveProfesor"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
-        const estado=document.getElementById("estadoClaveProfesor"); if(estado){estado.textContent="";estado.className="profile-save-state";}
-    }
+
+async function validarSolicitudSuper(id, estado) {
+    if (!confirm(estado === "aceptada" ? "¿Aceptar esta solicitud de administrador?" : "¿Rechazar esta solicitud de administrador?")) return;
+    try {
+        await api("validate_admin_request", { method: "POST", body: { id, estado } });
+        await abrirSuperAdmin();
+        alert(estado === "aceptada" ? "Administrador aprobado correctamente." : "Solicitud rechazada.");
+    } catch (e) { alert(e.message); }
+}
+
+/* =====================================================
+   NOTIFICACIONES DEL ESTUDIANTE
+====================================================== */
+function obtenerIdsNotificacionesEstudianteLeidas(){try{return JSON.parse(localStorage.getItem("sigho_notificaciones_estudiante_leidas")||"[]");}catch(_){return [];}}
+function guardarIdsNotificacionesEstudianteLeidas(ids){try{localStorage.setItem("sigho_notificaciones_estudiante_leidas",JSON.stringify(ids.slice(-100)));}catch(_){} }
+function actualizarNotificacionesEstudiante(){
+    const lista=document.getElementById("listaNotificacionesEstudiante"),badge=document.getElementById("badgeNotificacionesEstudiante"); if(!lista||!badge)return;
+    const eventos=(registros||[]).slice().sort((a,b)=>String(b.fechaRegistro||b.fecha||"").localeCompare(String(a.fechaRegistro||a.fecha||""))).slice(0,12);
+    const leidas=obtenerIdsNotificacionesEstudianteLeidas();
+    const nuevas=eventos.filter(r=>!leidas.includes(String(r.id))); badge.textContent=String(nuevas.length); badge.style.display=nuevas.length?"flex":"none";
+    if(!eventos.length){lista.innerHTML='<div class="notification-empty">🔔<strong>No hay avisos recientes</strong><span>Cuando haya novedades sobre tus jornadas aparecerán aquí.</span></div>';return;}
+    lista.innerHTML=eventos.map(r=>{const estado=r.estado||"pendiente";const titulo=estado==="aprobada"?"Tu jornada fue aprobada":estado==="rechazada"?"Tu jornada fue rechazada":"Tu jornada está pendiente";const extra=estado==="rechazada"?(r.observacion||r.motivoRechazo||"Revisa la observación del profesor."):estado==="aprobada"?"El profesor revisó y aprobó este registro.":"El profesor aún debe revisar este registro.";return `<button type="button" class="notification-item ${!leidas.includes(String(r.id))?"unread":""}" onclick="abrirNotificacionEstudiante(${Number(r.id)})"><span class="notification-dot">${!leidas.includes(String(r.id))?"•":"✓"}</span><span class="notification-copy"><strong>${escapeHtml(titulo)}</strong><small>${escapeHtml(r.fecha||"")} · ${formatearHoras(r.horas)} h · ${escapeHtml(extra)}</small></span></button>`;}).join("");
+}
+function sincronizarBloqueoScrollNotificaciones(){
+    const notificacionesAbiertas = document.querySelector('.notification-panel.show') || document.querySelector('.notification-backdrop.show');
+    const sidebarAbierto = document.querySelector('.dashboard.has-role-sidebar.mobile-sidebar-open');
+    document.body.style.overflow = (notificacionesAbiertas || sidebarAbierto) ? 'hidden' : '';
 }
 function cerrarPanelNotificacionesEstudiante(){const panel=document.getElementById("panelNotificacionesEstudiante"),backdrop=document.getElementById("backdropNotificacionesEstudiante"),boton=document.querySelector("#estudiante .notification-button");panel?.classList.remove("show");backdrop?.classList.remove("show");boton?.setAttribute("aria-expanded","false");sincronizarBloqueoScrollNotificaciones();}
 function toggleNotificacionesEstudiante(evento){evento?.stopPropagation();const panel=document.getElementById("panelNotificacionesEstudiante"),backdrop=document.getElementById("backdropNotificacionesEstudiante"),boton=document.querySelector("#estudiante .notification-button");if(!panel)return;const abrir=!panel.classList.contains("show");cerrarPanelNotificacionesEstudiante();document.querySelectorAll(".more-menu-dropdown.show, .notification-panel.show").forEach(el=>{if(el!==panel)el.classList.remove("show")});if(abrir){panel.classList.add("show");backdrop?.classList.add("show");boton?.setAttribute("aria-expanded","true");actualizarNotificacionesEstudiante();}sincronizarBloqueoScrollNotificaciones();}
@@ -11696,10 +11165,12 @@ function actualizarNotificacionesProfesor(pendientes) {
 
 function cerrarPanelNotificacionesProfesor(){const panel=document.getElementById("panelNotificacionesProfesor"),backdrop=document.getElementById("backdropNotificacionesProfesor"),boton=document.querySelector("#profesor .notification-button");panel?.classList.remove("show");backdrop?.classList.remove("show");boton?.setAttribute("aria-expanded","false");sincronizarBloqueoScrollNotificaciones();}
 
-    if (loginActivo && objetivo.matches("#correoLogin, #clave")) {
-        evento.preventDefault();
-        iniciarSesion();
-    }
+function toggleNotificacionesProfesor(evento) {
+    evento?.stopPropagation();
+    const panel = document.getElementById("panelNotificacionesProfesor");
+    const backdrop = document.getElementById("backdropNotificacionesProfesor");
+    const boton = document.querySelector("#profesor .notification-button");
+    if (!panel) return;
 
     const abrir = !panel.classList.contains("show");
     cerrarPanelNotificacionesProfesor();
@@ -11894,6 +11365,389 @@ function abrirMisDatos() {
     modal.classList.add("show");
 }
 
+function abrirAyuda() {
+    if (usuarioActual?.rol === "superadmin") {
+        document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
+        mostrarSeccionSuperAdmin("ayuda");
+        return;
+    }
+    if (usuarioActual?.rol === "profesor") {
+        cerrarMenuUsuarioProfesor();
+        mostrarSeccionProfesor("ayuda");
+        return;
+    }
+    if (usuarioActual?.rol === "estudiante") {
+        document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
+        mostrarSeccionEstudiante("ayuda");
+        return;
+    }
+    document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
+    if (!usuarioActual) return;
+    const modal = document.getElementById("modalAyuda");
+    const titulo = document.getElementById("modalAyudaTitulo");
+    const subtitulo = document.getElementById("modalAyudaSubtitulo");
+    const contenido = document.getElementById("modalAyudaContenido");
+    if (!modal || !contenido) return;
+
+    const ayudas = {
+        administrador: {
+            titulo: "Ayuda para administradores",
+            subtitulo: "Guía rápida para gestionar SIGHO",
+            contenido: `
+                <div class="help-admin-intro">
+                    <strong>¿Qué puedes hacer desde este panel?</strong><br>
+                    Gestiona profesores, revisa solicitudes, consulta el progreso de los estudiantes y controla las funciones generales del sistema.
+                </div>
+                <div class="help-admin-grid">
+                    <article class="help-admin-card"><div class="help-admin-icon">👥</div><h4>Gestión de profesores</h4><p>Administra la información de los docentes y define su área de trabajo.</p><ul><li>Selecciona o actualiza la <strong>sede asignada</strong>.</li><li>Selecciona o actualiza el <strong>proyecto asignado</strong>.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">📊</div><h4>Progreso de estudiantes</h4><p>Consulta cómo avanza cada estudiante con sus horas de servicio social.</p><ul><li>Revisa horas aprobadas y horas faltantes.</li><li>Consulta el porcentaje de avance y utiliza los filtros por grado.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">📩</div><h4>Solicitudes de profesores / Admin</h4><p>Aquí se reúnen las solicitudes relacionadas con el personal docente.</p><ul><li>Aprueba o rechaza nuevos registros de profesores.</li><li>Revisa las solicitudes de profesores que desean el rol de Administrador.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">🎓</div><h4>Solicitudes de estudiantes</h4><p>Este módulo es independiente de las solicitudes de profesores.</p><ul><li>Revisa los datos de cada estudiante.</li><li>Acepta o rechaza su solicitud de registro.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">⚙️</div><h4>Sistema</h4><p>Consulta las funciones generales y el estado del sistema. Utiliza estas opciones para tareas administrativas globales cuando sea necesario.</p></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">🔒</div><h4>Buenas prácticas</h4><p>Antes de aceptar una solicitud, verifica cuidadosamente los datos. Mantén actualizada la sede de cada profesor para que pueda revisar correctamente a sus estudiantes.</p></article>
+                </div>`
+        },
+        superadmin: { titulo:"Ayuda para Super Admin", subtitulo:"Control general de SIGHO", contenido:`<div class="help-animation"><div class="help-icon">💡</div><strong>¿Cómo funciona tu panel?</strong><p>El Super Admin tiene el nivel más alto de control y puede revisar las solicitudes para crear administradores.</p></div>` },
+        estudiante: { titulo:"Ayuda para estudiantes", subtitulo:"Tu espacio para registrar y controlar el servicio social", contenido:`<div class="help-animation"><div class="help-icon">💡</div><strong>¿Cómo funciona tu panel?</strong><p>Aquí puedes registrar cada jornada de servicio social, describir lo que realizaste y adjuntar la evidencia correspondiente. Los registros quedan pendientes hasta que un profesor los revise. En «Mis registros» puedes consultar qué jornadas fueron aceptadas o rechazadas y cuántas horas te faltan.</p></div>` }
+    };
+
+    const ayuda = ayudas[usuarioActual.rol] || ayudas.estudiante;
+    titulo.innerText = ayuda.titulo;
+    subtitulo.innerText = ayuda.subtitulo;
+    contenido.innerHTML = ayuda.contenido + '<button class="modal-close" onclick="cerrarModales()">Cerrar</button>';
+    modal.classList.add("show");
+}
+
+async function actualizarEstadoSolicitudAdminProfesor() {
+    if (usuarioActual?.rol !== "profesor") return;
+    const boton = document.getElementById("botonSolicitudAdminProfesor");
+    if (!boton) return;
+    try {
+        const data = await api("professor_profile");
+        const estado = data.profile?.solicitudAdminEstado || "";
+        if (estado === "pendiente") {
+            boton.disabled = true;
+            boton.textContent = "Solicitud de Admin pendiente";
+            boton.title = "Tu solicitud ya está pendiente de revisión por un Administrador.";
+        } else {
+            boton.disabled = false;
+            boton.textContent = "Solicitar rol de Administrador";
+            boton.title = "Solicitar permisos de Administrador";
+        }
+    } catch (_) {
+        boton.disabled = false;
+        boton.textContent = "Solicitar rol de Administrador";
+    }
+}
+
+async function solicitarPermisosAdministrador(){
+    if(usuarioActual?.rol!=="profesor") return;
+    const boton=document.getElementById("botonSolicitudAdminProfesor");
+    if(boton?.disabled) return;
+    if(!confirm("¿Deseas enviar una solicitud para obtener permisos de Administrador?")) return;
+    if(boton){ boton.disabled=true; boton.textContent="Enviando solicitud..."; }
+    try{
+        const data=await api("request_admin_permission",{method:"POST",body:{}});
+        mostrarToastProfesor("Solicitud enviada con éxito. Espera la aprobación del administrador.");
+        if(boton){ boton.disabled=true; boton.textContent="Solicitud de Admin pendiente"; }
+    }catch(e){
+        if(boton){ boton.disabled=false; boton.textContent="Solicitar rol de Administrador"; }
+        mostrarToastProfesor(e.message,true);
+    }
+}
+
+async function cargarPerfilProfesor() {
+    if (!usuarioActual || usuarioActual.rol !== "profesor") return;
+    try {
+        const data = await api("professor_profile");
+        const p = data.profile || {};
+        const campos = {
+            profesorPerfilNombres: p.nombres || "",
+            profesorPerfilApellidos: p.apellidos || "",
+            profesorPerfilCorreo: p.correo || usuarioActual.correo || "",
+            profesorPerfilTelefono: p.telefono || usuarioActual.telefono || "",
+            profesorPerfilProyectoEditable: p.proyecto || usuarioActual.proyecto || "",
+            profesorPerfilRol: "Profesor",
+            profesorPerfilIdentificacion: p.identificacion || usuarioActual.identificacion || "",
+            profesorPerfilSede: p.sede || usuarioActual.sede || "Sin asignar",
+            profesorPerfilProyecto: p.proyecto || usuarioActual.proyecto || "Sin asignar"
+        };
+        Object.entries(campos).forEach(([id, value]) => { const el=document.getElementById(id); if(el) el.value=value; });
+        guardarSnapshotPerfilProfesor();
+        establecerEdicionPerfilProfesor(false);
+        actualizarEstadoSolicitudAdminProfesor();
+        const estado=document.getElementById("estadoPerfilProfesor"); if(estado){estado.textContent="Modo lectura"; estado.className="profile-save-state";}
+    } catch (e) {
+        const estado=document.getElementById("estadoPerfilProfesor"); if(estado){estado.textContent=e.message; estado.className="profile-save-state error";}
+    }
+}
+
+function establecerEdicionPerfilProfesor(editar) {
+    ["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono","profesorPerfilProyectoEditable"].forEach(id => {
+        const el=document.getElementById(id); if(el) el.disabled=!editar;
+    });
+    document.getElementById("editarPerfilProfesorBtn")?.toggleAttribute("hidden", editar);
+    const guardar=document.getElementById("guardarPerfilProfesorBtn"); if(guardar) guardar.disabled=!editar;
+}
+function activarEdicionPerfilProfesor(){ establecerEdicionPerfilProfesor(true); }
+function configurarEdicionPerfilProfesor(){
+    const campos=["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono"];
+    campos.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el && el.dataset.edicionConfigurada!=="1"){
+            el.dataset.edicionConfigurada="1";
+            el.addEventListener("input",()=>{
+                if(id === "profesorPerfilNombres" || id === "profesorPerfilApellidos") {
+                    el.value = el.value.replace(/[^\p{L} ]/gu, "").replace(/ {2,}/g, " ").replace(/^ +/g, "").slice(0,60);
+                } else if(id === "profesorPerfilCorreo") {
+                    el.value = el.value.replace(/\s/g, "");
+                } else if(id === "profesorPerfilTelefono") {
+                    const numero = el.value.replace(/\D/g, "").slice(0,10);
+                    el.value = numero.length > 6 ? `${numero.slice(0,3)} ${numero.slice(3,6)} ${numero.slice(6)}` : numero.length > 3 ? `${numero.slice(0,3)} ${numero.slice(3)}` : numero;
+                }
+                actualizarEstadoPerfilProfesor();
+            });
+            el.addEventListener("blur",()=>{
+                if(id === "profesorPerfilNombres" || id === "profesorPerfilApellidos") el.value=capitalizarNombreCompleto(el.value).slice(0,60);
+                if(id === "profesorPerfilCorreo") el.value=el.value.replace(/\s/g, "").trim();
+                actualizarEstadoPerfilProfesor();
+            });
+            el.addEventListener("change",actualizarEstadoPerfilProfesor);
+        }
+    });
+}
+
+let snapshotPerfilProfesor = "";
+function obtenerDatosPerfilProfesor() {
+    return {
+        nombres: capitalizarNombreCompleto(document.getElementById("profesorPerfilNombres")?.value || "").slice(0, 60),
+        apellidos: capitalizarNombreCompleto(document.getElementById("profesorPerfilApellidos")?.value || "").slice(0, 60),
+        correo: document.getElementById("profesorPerfilCorreo")?.value.trim().toLowerCase() || "",
+        telefono: document.getElementById("profesorPerfilTelefono")?.value.trim() || "",
+    };
+}
+function guardarSnapshotPerfilProfesor() {
+    snapshotPerfilProfesor = JSON.stringify(obtenerDatosPerfilProfesor());
+    actualizarEstadoPerfilProfesor();
+}
+function actualizarEstadoPerfilProfesor() {
+    const btn=document.getElementById("guardarPerfilProfesorBtn");
+    const estado=document.getElementById("estadoPerfilProfesor");
+    const cambiado=JSON.stringify(obtenerDatosPerfilProfesor()) !== snapshotPerfilProfesor;
+    if(btn) btn.disabled=!cambiado;
+    if(estado && cambiado){estado.textContent="Hay cambios sin guardar"; estado.className="profile-save-state";}
+    else if(estado && !estado.classList.contains("success") && !estado.classList.contains("error")) estado.textContent="Sin cambios pendientes";
+}
+async function guardarPerfilProfesor() {
+    const datos=obtenerDatosPerfilProfesor();
+    const regexNombreProfesor=/^[\p{L}]+(?: [\p{L}]+)*$/u;
+    const regexCorreoInstitucional=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
+    if(!datos.nombres || !datos.apellidos || !datos.correo || !datos.telefono){ mostrarToastProfesor("Completa todos los campos editables.", true); return; }
+    if(!regexNombreProfesor.test(datos.nombres) || !regexNombreProfesor.test(datos.apellidos)){ mostrarToastProfesor("Nombres y apellidos solo pueden contener letras y espacios sencillos.", true); return; }
+    if(!regexCorreoInstitucional.test(datos.correo)){ mostrarToastProfesor("El correo debe usar el dominio institucional y no contener espacios.", true); return; }
+    const telefonoProfesor = datos.telefono.replace(/\D/g, "");
+    const todosIgualesTelefono = /^(\d)\1{9}$/.test(telefonoProfesor);
+    const secuenciasTelefono = ["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
+    if(!/^3\d{9}$/.test(telefonoProfesor) || todosIgualesTelefono || secuenciasTelefono.includes(telefonoProfesor)){
+        mostrarToastProfesor("El teléfono debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.", true);
+        return;
+    }
+    datos.telefono = telefonoProfesor;
+    try{
+        const data=await api("update_professor_profile",{method:"POST",body:datos});
+        usuarioActual=normalizarUsuario(data.user);
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
+        const nombreCompletoProfesor=(usuarioActual.nombre||"Profesor").trim();
+        const primerNombreProfesor=nombreCompletoProfesor.split(/\s+/)[0] || "Profesor";
+        document.getElementById("nombrePerfilProfesorHeader")?.replaceChildren(document.createTextNode(primerNombreProfesor));
+        establecerEdicionPerfilProfesor(false);
+        guardarSnapshotPerfilProfesor();
+        const estado=document.getElementById("estadoPerfilProfesor"); if(estado){estado.textContent="Datos guardados correctamente"; estado.className="profile-save-state success";}
+        mostrarToastProfesor("Datos actualizados correctamente.");
+    }catch(e){mostrarToastProfesor(e.message,true);}
+}
+function alternarCambioClaveProfesor(mostrar) {
+    const form=document.getElementById("formularioCambioClaveProfesor");
+    const boton=document.getElementById("botonMostrarCambioClaveProfesor");
+    if(!form || !boton) return;
+    const abrir = typeof mostrar === "boolean" ? mostrar : form.style.display === "none";
+    form.style.display = abrir ? "block" : "none";
+    boton.textContent = abrir ? "Ocultar cambio de contraseña" : "Cambiar contraseña";
+    if(!abrir){
+        ["claveActualProfesor","nuevaClaveProfesor","confirmarClaveProfesor"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+        const estado=document.getElementById("estadoClaveProfesor"); if(estado){estado.textContent="";estado.className="profile-save-state";}
+    }
+}
+
+async function cambiarClaveProfesor(){
+    const claveActual=document.getElementById("claveActualProfesor")?.value||"";
+    const nuevaClave=document.getElementById("nuevaClaveProfesor")?.value||"";
+    const confirmarClave=document.getElementById("confirmarClaveProfesor")?.value||"";
+    const estado=document.getElementById("estadoClaveProfesor");
+    if(!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(nuevaClave)){
+        if(estado){estado.textContent="La nueva contraseña debe tener mínimo 8 caracteres, con mayúscula, minúscula y número.";estado.className="profile-save-state error";}
+        return;
+    }
+    if(nuevaClave!==confirmarClave){
+        if(estado){estado.textContent="La confirmación de la nueva contraseña no coincide.";estado.className="profile-save-state error";}
+        return;
+    }
+    try{
+        await api("change_professor_password",{method:"POST",body:{claveActual,nuevaClave,confirmarClave}});
+        ["claveActualProfesor","nuevaClaveProfesor","confirmarClaveProfesor"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+        if(estado){estado.textContent="Contraseña actualizada correctamente";estado.className="profile-save-state success";}
+        mostrarToastProfesor("Contraseña actualizada correctamente.");
+        alternarCambioClaveProfesor(false);
+    }catch(e){if(estado){estado.textContent=e.message;estado.className="profile-save-state error";} }
+}
+function mostrarToastProfesor(mensaje,error=false){
+    const toast=document.getElementById("toastProfesor"); if(!toast)return;
+    toast.textContent=mensaje; toast.style.borderLeftColor=error?"#c44747":"#2fa45a"; toast.style.color=error?"#9b3030":"#315b42";
+    toast.classList.add("show"); clearTimeout(window._toastSigho); window._toastSigho=setTimeout(()=>toast.classList.remove("show"),3200);
+}
+
+document.addEventListener("keydown", (evento) => {
+    if (evento.key !== "Enter") {
+        if (evento.key === "Escape") cerrarModales();
+        return;
+    }
+
+    const objetivo = evento.target;
+    if (!(objetivo instanceof HTMLElement)) return;
+
+    const loginActivo = document.getElementById("login")?.classList.contains("active");
+    const solicitudActiva = document.getElementById("solicitud")?.classList.contains("active");
+
+    if (loginActivo && objetivo.matches("#correoLogin, #clave")) {
+        evento.preventDefault();
+        iniciarSesion();
+    }
+
+    if (solicitudActiva && objetivo.matches("#claveSolicitud, #claveSolicitudProfesor")) {
+        const rol = document.getElementById("rolSolicitud")?.value;
+        if (rol) {
+            evento.preventDefault();
+            enviarSolicitud();
+        }
+    }
+});
+
+function capitalizarNombreCompleto(valor) {
+    return String(valor || "")
+        .replace(/\s+/g, " ")
+        .trimStart()
+        .split(" ")
+        .map(palabra => palabra ? palabra.charAt(0).toLocaleUpperCase("es-CO") + palabra.slice(1).toLocaleLowerCase("es-CO") : "")
+        .join(" ");
+}
+
+function configurarValidacionSolicitudProfesor() {
+    const correo = document.getElementById("correoSolicitud");
+    const telefono = document.getElementById("telefonoProfesorSolicitud");
+    const identificacion = document.getElementById("identificacionSolicitud");
+    const clave = document.getElementById("claveSolicitudProfesor");
+
+    if (correo && correo.dataset.validacionProfesorConfigurada !== "1") {
+        correo.dataset.validacionProfesorConfigurada = "1";
+        correo.addEventListener("input", () => {
+            /* Mantener exactamente las mayúsculas/minúsculas que escribe el usuario. */
+        });
+        correo.addEventListener("blur", () => {
+            correo.value = correo.value.replace(/\s/g, "").trim();
+        });
+    }
+
+    if (telefono && telefono.dataset.validacionProfesorConfigurada !== "1") {
+        telefono.dataset.validacionProfesorConfigurada = "1";
+        telefono.addEventListener("input", () => {
+            const digitos = telefono.value.replace(/\D/g, "").slice(0, 10);
+            telefono.value = digitos.length > 6
+                ? `${digitos.slice(0,3)} ${digitos.slice(3,6)} ${digitos.slice(6)}`
+                : digitos.length > 3
+                    ? `${digitos.slice(0,3)} ${digitos.slice(3)}`
+                    : digitos;
+        });
+    }
+
+    if (identificacion && identificacion.dataset.validacionProfesorConfigurada !== "1") {
+        identificacion.dataset.validacionProfesorConfigurada = "1";
+        identificacion.addEventListener("input", () => {
+            identificacion.value = identificacion.value.replace(/[<>"']/g, "").slice(0, 60);
+        });
+    }
+
+    if (clave && clave.dataset.validacionProfesorConfigurada !== "1") {
+        clave.dataset.validacionProfesorConfigurada = "1";
+        clave.addEventListener("input", () => {
+            clave.value = clave.value.replace(/\s/g, "");
+        });
+    }
+}
+
+function mostrarErrorCampo(input, mensaje) {
+        if (!input) return;
+        const formGroup = input.closest('.form-group');
+        if (!formGroup) return;
+        let errorNode = formGroup.querySelector('.field-error-message');
+        if (!errorNode) {
+            errorNode = document.createElement('small');
+            errorNode.className = 'field-error-message';
+            formGroup.appendChild(errorNode);
+        }
+        const texto = (mensaje || '').trim();
+        errorNode.textContent = texto;
+        errorNode.style.display = texto ? 'block' : 'none';
+        input.classList.toggle('campo-error', !!texto);
+    }
+
+    function limpiarErrorCampo(input) {
+        if (!input) return;
+        const formGroup = input.closest('.form-group');
+        if (!formGroup) return;
+        const errorNode = formGroup.querySelector('.field-error-message');
+        if (errorNode) {
+            errorNode.textContent = '';
+            errorNode.style.display = 'none';
+        }
+        input.classList.remove('campo-error');
+        input.setCustomValidity('');
+    }
+
+    function validarDocumentoSegunTipo() {
+        const tipo = document.getElementById('tipoDocumento')?.value || '';
+        const input = document.getElementById('numeroDocumento');
+        if (!input) return;
+
+        const valor = String(input.value || '').replace(/\D/g, '');
+        const limite = tipo === 'PPT' ? 8 : 10;
+        input.maxLength = limite;
+        input.value = valor.slice(0, limite);
+
+        let mensaje = '';
+        let valido = true;
+
+        if (!tipo) {
+            valido = false;
+            mensaje = 'Selecciona el tipo de documento.';
+        } else if (tipo === 'Tarjeta de identidad') {
+            valido = /^\d{10}$/.test(valor);
+            mensaje = valido ? '' : 'La tarjeta de identidad debe tener exactamente 10 dígitos.';
+        } else if (tipo === 'Cédula de ciudadanía') {
+            valido = /^\d{7,10}$/.test(valor);
+            mensaje = valido ? '' : 'La cédula debe tener entre 7 y 10 dígitos.';
+        } else if (tipo === 'PPT') {
+            valido = /^\d{6,8}$/.test(valor);
+            mensaje = valido ? '' : 'El PPT debe tener entre 6 y 8 dígitos.';
+        }
+
+        input.setCustomValidity(mensaje);
+        if (valor && !valido) {
+            mostrarErrorCampo(input, mensaje);
+        } else {
+            limpiarErrorCampo(input);
+        }
+    }
+
     function configurarValidacionesGenericasCampos() {
         const campos = document.querySelectorAll('#solicitud input, #solicitud select, #solicitud textarea');
         campos.forEach(input => {
@@ -12009,7 +11863,6 @@ function abrirMisDatos() {
         input.addEventListener('blur', validar);
         validar();
     }
-}
 
     // Todos los nombres y apellidos usan la misma regla: letras, espacios sencillos
     // y capitalización automática. Los campos opcionales pueden permanecer vacíos.
@@ -12264,36 +12117,18 @@ function abrirMisDatos() {
     const validarFechaNacimiento = () => {
         if (!fecha || fecha.disabled) return;
         const edadVista = document.getElementById("edadCalculada");
-        const ayuda = document.getElementById("ayudaFechaNacimiento");
         if (!fecha.value) {
-            const incompleta = fecha.dataset.interacted === "1";
-            fecha.setCustomValidity(incompleta ? "El año debe tener cuatro dígitos (XXXX)." : "");
-            fecha.classList.toggle("campo-error", incompleta);
-            if (incompleta && ayuda) ayuda.textContent = "El año debe tener cuatro dígitos (XXXX).";
+            fecha.setCustomValidity("");
             if (edadVista) edadVista.textContent = "-";
             return;
         }
-        const partesFecha = fecha.value.split("-");
-        const anioConCuatroDigitos = /^[1-9]\d{3}$/.test(partesFecha[0] || "");
-        const formatoValido = anioConCuatroDigitos && /^\d{4}-\d{2}-\d{2}$/.test(fecha.value);
+        const formatoValido = /^\d{4}-\d{2}-\d{2}$/.test(fecha.value);
         const dentroDelRango = formatoValido &&
             (!fecha.min || fecha.value >= fecha.min) &&
             (!fecha.max || fecha.value <= fecha.max);
-        fecha.setCustomValidity(dentroDelRango ? "" : "El año debe tener cuatro dígitos, comenzar por un número distinto de cero y estar dentro del rango permitido.");
-        fecha.classList.toggle("campo-error", !dentroDelRango);
-        if (!dentroDelRango && ayuda) {
-            ayuda.textContent = !anioConCuatroDigitos
-                ? "El año debe tener cuatro dígitos (XXXX) y no puede comenzar por 0."
-                : `Para ${grado.value} se permiten fechas entre ${fecha.min} y ${fecha.max}.`;
-        }
-        if (dentroDelRango && ayuda) {
-            const rangoEdad = grado.value === "Ciclo V" ? "18 a 40 años" : "14 a 19 años";
-            ayuda.textContent = `Para ${grado.value} se permiten fechas entre ${fecha.min} y ${fecha.max} (${rangoEdad}).`;
-        }
+        fecha.setCustomValidity(dentroDelRango ? "" : "La fecha de nacimiento no está completa o no corresponde al rango permitido.");
         const edad = calcularEdad(fecha.value);
-        const anioNacimiento = Number(fecha.value.slice(0, 4));
-        const esAnioNacimientoNoValido = !anioConCuatroDigitos || anioNacimiento >= new Date().getFullYear();
-        if (edadVista) edadVista.textContent = edad === null || esAnioNacimientoNoValido ? "-" : `${edad} años`;
+        if (edadVista) edadVista.textContent = edad === null ? "-" : `${edad} años`;
     };
 
     const actualizarRangoFechaNacimiento = () => {
@@ -12310,14 +12145,11 @@ function abrirMisDatos() {
         const formatoFecha = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
         const hoy = new Date(); hoy.setHours(0,0,0,0);
         const fechaHaceAnios = anios => { const d = new Date(hoy); d.setFullYear(d.getFullYear()-anios); return formatoFecha(d); };
-        const hoyTexto = formatoFecha(hoy);
         if (grado.value === "10°" || grado.value === "11°") {
             fecha.min = fechaHaceAnios(19); fecha.max = fechaHaceAnios(14);
-            fecha.max = fecha.max > hoyTexto ? hoyTexto : fecha.max;
             if (ayuda) ayuda.textContent = `Para ${grado.value} se permiten fechas entre ${fecha.min} y ${fecha.max} (14 a 19 años).`;
         } else if (grado.value === "Ciclo V") {
             fecha.min = fechaHaceAnios(40); fecha.max = fechaHaceAnios(18);
-            fecha.max = fecha.max > hoyTexto ? hoyTexto : fecha.max;
             if (ayuda) ayuda.textContent = `Para Ciclo V se permiten fechas entre ${fecha.min} y ${fecha.max} (18 a 40 años).`;
         } else {
             fecha.disabled = true; fecha.removeAttribute("min"); fecha.removeAttribute("max"); fecha.value = "";
@@ -12374,12 +12206,10 @@ function abrirMisDatos() {
 
     if (fecha) {
         fecha.addEventListener("input", () => {
-            fecha.dataset.interacted = "1";
             validarFechaNacimiento();
             actualizarTipoDocumentoPorEdad();
         });
         fecha.addEventListener("change", () => {
-            fecha.dataset.interacted = "1";
             validarFechaNacimiento();
             actualizarTipoDocumentoPorEdad();
         });
@@ -14092,7 +13922,6 @@ body.dark-mode .check-option {
     background: #1e293b !important;
     color: #f1f5f9 !important;
     border-color: #334155 !important;
-    box-shadow: none !important;
 }
 
 html.dark-mode .check-option:has(input[type="checkbox"]:checked),
@@ -14137,7 +13966,6 @@ body.dark-mode {
     --border-input: #334155 !important;
     color-scheme: dark !important;
 }
-</style>
 
 html.dark-mode,
 html.dark-mode body,
@@ -14257,7 +14085,6 @@ html.dark-mode .icon,
 body.dark-mode .icon {
     background: #1e293b !important;
     color: #f8fafc !important;
-    border-color: #334155 !important;
 }
 
 /* Todos los campos de formulario, incluidos componentes dinámicos */
@@ -14356,16 +14183,6 @@ body.dark-mode .notification-item {
     background-color: #172334 !important;
     color: #f8fafc !important;
     border-color: #334155 !important;
-    -webkit-text-fill-color: #ffffff !important;
-    color-scheme: dark !important;
-}
-
-html.dark-mode input::placeholder,
-html.dark-mode textarea::placeholder,
-body.dark-mode input::placeholder,
-body.dark-mode textarea::placeholder {
-    color: #94a3b8 !important;
-    opacity: 1 !important;
 }
 
 html.dark-mode .notification-item:hover,
@@ -14481,14 +14298,6 @@ body.dark-mode .solicitud-comprobante {
     border: 1px solid #334155;
     box-shadow: 0 18px 50px rgba(0,0,0,.45);
 }
-</style>
-<style id="sigho-comprobante-dark-v13">
-<style id="sigho-comprobante-dark-v13">
-/* =========================================================
-   COMPROBANTES / RESÚMENES DE SOLICITUD EN MODO OSCURO
-   Cubre los modales existentes y bloques que puedan ser
-   generados dinámicamente por JavaScript.
-   ========================================================= */
 
 
 /* Cabeceras y cuerpos internos */
@@ -15043,7 +14852,6 @@ input[type="text"].password-universal-visible {
     }
 }
 </style>
-
 <style id="sigho-login-eye-visible-v47">
 /* LOGIN: cuando la clave está visible, ninguna máscara de seguridad debe permanecer activa. */
 #clave[type="text"] {
@@ -15085,7 +14893,6 @@ input[type="text"].password-universal-visible {
     #btnTogglePassword { width: 48px !important; height: 48px !important; min-width: 48px !important; min-height: 48px !important; right: 2px !important; }
 }
 </style>
-
 <script id="sigho-final-password-sync-v40">
 (function () {
     const EYE_OPEN = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
@@ -15114,35 +14921,12 @@ input[type="text"].password-universal-visible {
 
     window.sighoRestablecerOjosUniversales = resetUniversalEyes;
 
-
     document.addEventListener('focusin', function (event) {
         const target = event.target;
         if (!target || !target.matches || !target.matches('input[type="password"]')) return;
         // Solo en estado oculto. Nunca volver a aplicar la máscara si el login está visible.
         target.style.webkitTextSecurity = 'disc';
         target.style.textSecurity = 'disc';
-      
-    function syncLoginEye() {
-        const input = document.getElementById('clave');
-        const button = document.getElementById('btnTogglePassword');
-        const icon = document.getElementById('iconEye');
-        if (!input || !button || !icon) return;
-        const visible = input.type === 'text';
-        icon.innerHTML = visible ? EYE_OPEN : EYE_OFF;
-        button.setAttribute('aria-pressed', visible ? 'true' : 'false');
-        button.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
-        button.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
-    }
-    // El HTML puede cambiar de pantalla sin recargar; mantener el estado visual coherente.
-    document.addEventListener('click', function (event) {
-        const target = event.target.closest('#btnTogglePassword');
-        if (target) setTimeout(syncLoginEye, 0);
-    });
-
-    document.addEventListener('focusin', function (event) {
-        if (event.target.matches && event.target.matches('input[type="password"]')) {
-            event.target.style.webkitTextSecurity = 'disc';
-        }
     });
 
     if (document.readyState === 'loading') {
@@ -15198,6 +14982,199 @@ input[type="text"].password-universal-visible {
 }
 @media (max-width: 900px) {
     #btnTogglePassword { width: 48px !important; height: 48px !important; min-width: 48px !important; min-height: 48px !important; }
+}
+</style>
+
+
+<style id="sigho-password-eye-definitive-v50">
+/* =========================================================
+   OJO DE CONTRASEÑA — CONTROL DEFINITIVO V50
+   Este selector tiene prioridad sobre las reglas antiguas de
+   visibilidad y deja el campo como texto real cuando está abierto.
+   ========================================================= */
+.password-universal-wrapper input.password-universal-visible[type="text"] {
+    -webkit-text-security: none !important;
+    text-security: none !important;
+    -webkit-text-fill-color: #35434a !important;
+    color: #35434a !important;
+    text-shadow: none !important;
+    caret-color: #35434a !important;
+    opacity: 1 !important;
+}
+html.dark-mode .password-universal-wrapper input.password-universal-visible[type="text"],
+body.dark-mode .password-universal-wrapper input.password-universal-visible[type="text"] {
+    -webkit-text-security: none !important;
+    text-security: none !important;
+    -webkit-text-fill-color: #ffffff !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+    caret-color: #ffffff !important;
+    opacity: 1 !important;
+}
+</style>
+<script id="sigho-password-eye-definitive-controller-v50">
+(function () {
+    'use strict';
+
+    const EYE_OPEN = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+    const EYE_OFF = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+
+    function sincronizarBoton(boton, input, visible) {
+        if (!boton || !input) return;
+        const icono = boton.querySelector('svg');
+        if (icono) icono.innerHTML = visible ? EYE_OPEN : EYE_OFF;
+        boton.setAttribute('aria-pressed', visible ? 'true' : 'false');
+        boton.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        boton.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    }
+
+    function limpiarMascaraVisible(input) {
+        // No basta con cambiar type: el proyecto aplica -webkit-text-security
+        // inline al enfocar una contraseña. Eliminarla aquí y en el siguiente
+        // frame evita que esa máscara antigua sobreviva al cambio a texto.
+        input.style.removeProperty('-webkit-text-security');
+        input.style.removeProperty('text-security');
+        input.style.removeProperty('-webkit-text-fill-color');
+        input.style.removeProperty('color');
+        input.style.removeProperty('text-shadow');
+        input.style.removeProperty('caret-color');
+        input.classList.add('password-universal-visible');
+    }
+
+    function aplicarMascaraOculta(input) {
+        input.classList.remove('password-universal-visible');
+        input.style.setProperty('-webkit-text-security', 'disc', 'important');
+        input.style.setProperty('text-security', 'disc', 'important');
+    }
+
+    function alternar(boton) {
+        const input = boton?.closest('.password-universal-wrapper')?.querySelector('input');
+        if (!input) return;
+
+        const mostrar = input.type === 'password';
+        input.setAttribute('type', mostrar ? 'text' : 'password');
+
+        if (mostrar) {
+            limpiarMascaraVisible(input);
+            requestAnimationFrame(function () {
+                if (input.isConnected && input.type === 'text') limpiarMascaraVisible(input);
+            });
+            setTimeout(function () {
+                if (input.isConnected && input.type === 'text') limpiarMascaraVisible(input);
+            }, 0);
+        } else {
+            aplicarMascaraOculta(input);
+        }
+
+        sincronizarBoton(boton, input, mostrar);
+        try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); }
+    }
+
+    // CAPTURE: se ejecuta antes del listener antiguo creado por V20 y evita
+    // que dos controladores cambien el type dos veces.
+    document.addEventListener('click', function (event) {
+        const boton = event.target && event.target.closest
+            ? event.target.closest('.password-universal-toggle')
+            : null;
+        if (!boton) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        alternar(boton);
+    }, true);
+
+    // Reafirma que cualquier campo ya abierto no conserve una máscara antigua.
+    function corregirCamposVisibles() {
+        document.querySelectorAll('.password-universal-wrapper input.password-universal-visible[type="text"]')
+            .forEach(limpiarMascaraVisible);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', corregirCamposVisibles, { once: true });
+    } else {
+        corregirCamposVisibles();
+    }
+})();
+</script>
+
+<style id="sigho-mobile-password-dots-v52">
+/* Contraseñas en móvil: máscara compacta y proporcional.
+   Solo modifica la apariencia del estado oculto; no toca el ojo ni el cambio password/text. */
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+    input[type="password"],
+    input[type="password"]:focus,
+    input[type="password"]:focus-within {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0 !important;
+        word-spacing: 0 !important;
+        font-weight: 400 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        text-indent: 0 !important;
+        -webkit-text-security: disc !important;
+        text-security: disc !important;
+    }
+
+    /* Mantener exactamente el mismo ajuste en las ayudas y claves de profesor. */
+    .password-universal-wrapper > input[type="password"],
+    .profesor-password-wrapper > input[type="password"],
+    .password-input-wrapper > input[type="password"] {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0 !important;
+        word-spacing: 0 !important;
+    }
+
+    /* El campo de login conserva su espacio para el botón del ojo. */
+    #clave[type="password"] {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0 !important;
+        word-spacing: 0 !important;
+    }
+}
+</style>
+<style id="sigho-mobile-password-dots-v53">
+/* =========================================================
+   CONTRASEÑAS MÓVIL — PUNTOS COMPACTOS
+   Corrige únicamente la apariencia de la máscara mientras el
+   campo permanece en type="password". El ojo y su JS no cambian.
+   ========================================================= */
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+    input[type="password"],
+    input[type="password"]:focus,
+    input[type="password"]:focus-within {
+        font-size: 12px !important;
+        line-height: 1 !important;
+        letter-spacing: -2px !important;
+        word-spacing: 0 !important;
+        font-weight: 400 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        font-feature-settings: normal !important;
+        text-indent: 0 !important;
+        text-align: left !important;
+        -webkit-text-security: disc !important;
+        text-security: disc !important;
+    }
+
+    /* Mismos valores para las contraseñas que reciben el ojo universal. */
+    .password-universal-wrapper > input[type="password"],
+    .profesor-password-wrapper > input[type="password"],
+    .password-input-wrapper > input[type="password"],
+    #clave[type="password"] {
+        font-size: 12px !important;
+        line-height: 1 !important;
+        letter-spacing: -2px !important;
+        word-spacing: 0 !important;
+        font-weight: 400 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        font-feature-settings: normal !important;
+        text-indent: 0 !important;
+    }
 }
 </style>
 </body>
