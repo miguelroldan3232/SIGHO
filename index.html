@@ -3127,10 +3127,6 @@ body:not(:has(.dashboard-screen.active)) .container {
     margin: 0 auto;
 }
 
-body:has(#login.active) .container {
-    display: none;
-}
-
 /* =====================================================
    AJUSTES FINALES: PANTALLA FIJA + SCROLL INDEPENDIENTE
 ====================================================== */
@@ -7269,11 +7265,6 @@ body.dark-mode #tablaHistorialAdmin .status.pending {
     opacity: 1 !important;
     cursor: text !important;
 }
-#fechaNacimiento.campo-error {
-    border: 2px solid #e23b3b !important;
-    border-color: #e23b3b !important;
-    box-shadow: 0 0 0 2px rgba(226,59,59,.08) !important;
-}
 #fechaNacimiento::-webkit-datetime-edit,
 #fechaNacimiento::-webkit-datetime-edit-fields-wrapper,
 #fechaNacimiento::-webkit-datetime-edit-text,
@@ -7595,6 +7586,227 @@ html.dark-mode .form-group > small:not(.error-message) {
     font-weight: 400 !important;
 }
 </style>
+
+<style id="sigho-dark-contrast-fix-v44">
+/* =========================================================
+   SIGHO — CORRECCIÓN DE CONTRASTE Y SUPERFICIES EN MODO OSCURO
+   Solo visual. No modifica lógica, eventos ni peticiones al backend.
+   ========================================================= */
+
+/* 1) Ayuda del Administrador */
+html.dark-mode #administrador .help-admin-intro,
+body.dark-mode #administrador .help-admin-intro,
+html.dark-mode #administrador .help-admin-card,
+body.dark-mode #administrador .help-admin-card {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #cbd5e1 !important;
+    border: 1px solid #334155 !important;
+    box-shadow: none !important;
+}
+html.dark-mode #administrador .help-admin-intro strong,
+body.dark-mode #administrador .help-admin-intro strong,
+html.dark-mode #administrador .help-admin-card h4,
+body.dark-mode #administrador .help-admin-card h4 {
+    color: #f8fafc !important;
+}
+html.dark-mode #administrador .help-admin-card p,
+body.dark-mode #administrador .help-admin-card p,
+html.dark-mode #administrador .help-admin-card li,
+body.dark-mode #administrador .help-admin-card li,
+html.dark-mode #administrador .help-admin-intro,
+body.dark-mode #administrador .help-admin-intro {
+    color: #cbd5e1 !important;
+}
+html.dark-mode #administrador .help-admin-card strong,
+body.dark-mode #administrador .help-admin-card strong {
+    color: #e2e8f0 !important;
+}
+
+/* 2) Usuarios del Super Admin — buscador/filtros y formulario */
+html.dark-mode #superAdmin .superadmin-user-tools,
+body.dark-mode #superAdmin .superadmin-user-tools,
+html.dark-mode #superAdmin .superadmin-form,
+body.dark-mode #superAdmin .superadmin-form {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+    box-shadow: none !important;
+}
+html.dark-mode #superAdmin .superadmin-user-tools label,
+body.dark-mode #superAdmin .superadmin-user-tools label,
+html.dark-mode #superAdmin .superadmin-form label,
+body.dark-mode #superAdmin .superadmin-form label {
+    color: #cbd5e1 !important;
+}
+html.dark-mode #superAdmin .superadmin-user-tools input,
+body.dark-mode #superAdmin .superadmin-user-tools input,
+html.dark-mode #superAdmin .superadmin-user-tools select,
+body.dark-mode #superAdmin .superadmin-user-tools select,
+html.dark-mode #superAdmin .superadmin-form input,
+body.dark-mode #superAdmin .superadmin-form input,
+html.dark-mode #superAdmin .superadmin-form select,
+body.dark-mode #superAdmin .superadmin-form select,
+html.dark-mode #superAdmin .superadmin-form textarea,
+body.dark-mode #superAdmin .superadmin-form textarea {
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+}
+html.dark-mode #superAdmin .superadmin-user-tools input::placeholder,
+body.dark-mode #superAdmin .superadmin-user-tools input::placeholder,
+html.dark-mode #superAdmin .superadmin-form input::placeholder,
+body.dark-mode #superAdmin .superadmin-form input::placeholder,
+html.dark-mode #superAdmin .superadmin-form textarea::placeholder,
+body.dark-mode #superAdmin .superadmin-form textarea::placeholder {
+    color: #94a3b8 !important;
+}
+html.dark-mode #superAdmin .superadmin-user-count,
+body.dark-mode #superAdmin .superadmin-user-count {
+    color: #94a3b8 !important;
+}
+
+/* Tablas de usuarios */
+html.dark-mode #superAdmin .superadmin-users-table,
+body.dark-mode #superAdmin .superadmin-users-table {
+    background: #172334 !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+html.dark-mode #superAdmin .superadmin-users-table th,
+body.dark-mode #superAdmin .superadmin-users-table th {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+html.dark-mode #superAdmin .superadmin-users-table td,
+body.dark-mode #superAdmin .superadmin-users-table td {
+    background: #172334 !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+html.dark-mode #superAdmin .superadmin-users-table tr:hover td,
+body.dark-mode #superAdmin .superadmin-users-table tr:hover td {
+    background: #1e293b !important;
+}
+html.dark-mode #superAdmin .superadmin-users-table td:first-child,
+body.dark-mode #superAdmin .superadmin-users-table td:first-child {
+    color: #f8fafc !important;
+}
+
+/* 3) Contador de solicitudes pendientes */
+html.dark-mode #administrador .validation-count,
+body.dark-mode #administrador .validation-count {
+    background: #2563eb !important;
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255,255,255,.22) !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.18) !important;
+    text-shadow: none !important;
+}
+
+/* 4) IA SIGHO — panel desplegable en todos los roles */
+html.dark-mode .role-help-chat,
+body.dark-mode .role-help-chat,
+html.dark-mode .superadmin-help-chat,
+body.dark-mode .superadmin-help-chat,
+html.dark-mode .ai-chat-window,
+body.dark-mode .ai-chat-window,
+html.dark-mode .ai-chat,
+body.dark-mode .ai-chat,
+html.dark-mode .ai-conversation,
+body.dark-mode .ai-conversation {
+    background: #111827 !important;
+    background-color: #111827 !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+    box-shadow: 0 18px 45px rgba(0,0,0,.38) !important;
+}
+html.dark-mode .role-help-chat input,
+body.dark-mode .role-help-chat input,
+html.dark-mode .superadmin-help-chat input,
+body.dark-mode .superadmin-help-chat input,
+html.dark-mode .ai-chat input,
+body.dark-mode .ai-chat input,
+html.dark-mode .ai-chat textarea,
+body.dark-mode .ai-chat textarea {
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+}
+html.dark-mode .role-help-chat input::placeholder,
+body.dark-mode .role-help-chat input::placeholder,
+html.dark-mode .superadmin-help-chat input::placeholder,
+body.dark-mode .superadmin-help-chat input::placeholder,
+html.dark-mode .ai-chat input::placeholder,
+body.dark-mode .ai-chat input::placeholder,
+html.dark-mode .ai-chat textarea::placeholder,
+body.dark-mode .ai-chat textarea::placeholder {
+    color: #94a3b8 !important;
+}
+html.dark-mode .role-help-chat .ai-quick-title,
+body.dark-mode .role-help-chat .ai-quick-title,
+html.dark-mode .role-help-chat .ai-quick-questions,
+body.dark-mode .role-help-chat .ai-quick-questions {
+    color: #cbd5e1 !important;
+}
+html.dark-mode .role-help-chat .ai-quick-questions button,
+body.dark-mode .role-help-chat .ai-quick-questions button,
+html.dark-mode .superadmin-help-grid button,
+body.dark-mode .superadmin-help-grid button {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #e2e8f0 !important;
+    border-color: #475569 !important;
+}
+html.dark-mode .role-help-chat .ai-quick-questions button:hover,
+body.dark-mode .role-help-chat .ai-quick-questions button:hover,
+html.dark-mode .superadmin-help-grid button:hover,
+body.dark-mode .superadmin-help-grid button:hover {
+    background: #1e293b !important;
+    border-color: #60a5fa !important;
+    color: #ffffff !important;
+}
+html.dark-mode .role-help-chat .role-help-answer,
+body.dark-mode .role-help-chat .role-help-answer,
+html.dark-mode .superadmin-help-answer,
+body.dark-mode .superadmin-help-answer {
+    background: #172334 !important;
+    background-color: #172334 !important;
+    color: #dbeafe !important;
+    border-left-color: #34d399 !important;
+    border-color: #334155 !important;
+}
+html.dark-mode .role-help-chat .ai-help-close,
+body.dark-mode .role-help-chat .ai-help-close {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #475569 !important;
+}
+html.dark-mode .ai-message,
+body.dark-mode .ai-message {
+    color: #e2e8f0 !important;
+}
+html.dark-mode .ai-message.user,
+body.dark-mode .ai-message.user {
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+html.dark-mode .ai-message.assistant,
+body.dark-mode .ai-message.assistant {
+    background: #172334 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #334155 !important;
+}
+html.dark-mode .ai-help-launcher,
+body.dark-mode .ai-help-launcher {
+    border-color: #334155 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35) !important;
+}
+</style>
 </head>
 <body>
 <script id="sigho-session-persistence">
@@ -7845,7 +8057,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <label>Año del servicio social</label>
 <input aria-describedby="ayudaAnioServicio" aria-readonly="true" id="anioServicio" inputmode="numeric" max="2029" min="2026" ondrop="return false" onkeydown="bloquearEntradaAnioServicio(event)" onpaste="return false" readonly="" required="" type="number" value="2026"/>
 <small class="field-help" id="ayudaAnioServicio">Año lectivo</small>
-</div>
 <div class="section">
 <h3>Datos del estudiante</h3>
 </div>
@@ -8193,7 +8404,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                     </label>
 <div class="password-toggle-wrapper" style="position: relative; display: flex; align-items: center;">
 <input autocomplete="current-password" id="clave" name="clave" placeholder="••••••••" required="" style="width: 100%; padding-right: 42px;" type="password"/>
-<button aria-label="Mostrar u ocultar contraseña" id="btnTogglePassword" style="position: absolute; right: 12px; background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; color: #5a6e85;" type="button">
+<button aria-label="Mostrar contraseña" aria-pressed="false" id="btnTogglePassword" style="position: absolute; right: 8px; background: none; border: none; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; color: #5a6e85; z-index: 20; pointer-events: auto; touch-action: manipulation;" title="Mostrar contraseña" type="button">
 <svg fill="none" height="20" id="iconEye" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="20">
 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
 <circle cx="12" cy="12" r="3"></circle>
@@ -9352,9 +9563,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         cerrarModales();
         ocultarPantallas();
         document.getElementById("login")?.classList.add("active");
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-        window.scrollTo({ top: 0, behavior: "auto" });
         actualizarCamposLogin();
         actualizarIndicadoresObligatorios(document.getElementById("login"));
     }
@@ -9373,7 +9581,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         const epsOtro=document.getElementById("epsOtroSolicitud"); if(epsOtro){epsOtro.value="";epsOtro.disabled=true;epsOtro.required=false;}
         document.querySelectorAll('input[name="diasServicio"]').forEach(el=>el.checked=false);
         const jornada=document.getElementById("jornadaSolicitud"); if(jornada){jornada.value="";jornada.disabled=true;}
-        const fecha=document.getElementById("fechaNacimiento"); if(fecha){fecha.value="";fecha.dataset.interacted="0";fecha.disabled=true;fecha.removeAttribute("min");fecha.removeAttribute("max");}
+        const fecha=document.getElementById("fechaNacimiento"); if(fecha){fecha.value="";fecha.disabled=true;fecha.removeAttribute("min");fecha.removeAttribute("max");}
         const msg=document.getElementById("mensajeSolicitud"); if(msg){msg.textContent="";msg.style.display="none";}
         const login=document.getElementById("login");
         login?.querySelectorAll("input, select, textarea").forEach(el => {
@@ -9388,7 +9596,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         document.querySelectorAll('#login input[type="password"], #solicitud input[type="password"]').forEach(el => { el.type = 'password'; });
         const loginEye = document.getElementById('iconEye');
         const loginEyeButton = document.getElementById('btnTogglePassword');
-        if (loginEye && typeof svgEyeOff !== 'undefined') loginEye.innerHTML = svgEyeOff;
+        if (typeof window.restablecerOjoLogin === 'function') window.restablecerOjoLogin();
+        else if (loginEye && typeof svgEyeOff !== 'undefined') loginEye.innerHTML = svgEyeOff;
         if (loginEyeButton) { loginEyeButton.setAttribute('aria-label','Mostrar contraseña'); loginEyeButton.setAttribute('title','Mostrar contraseña'); loginEyeButton.setAttribute('aria-pressed','false'); }
         if (typeof window.restablecerOjosProfesor === 'function') window.restablecerOjosProfesor();
         if (typeof window.sighoRestablecerOjosUniversales === 'function') window.sighoRestablecerOjosUniversales();
@@ -9786,32 +9995,72 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
        LOGIN
     ====================================================== */
 
-const inputClave = document.getElementById('clave');
-const btnToggle = document.getElementById('btnTogglePassword');
-const iconEye = document.getElementById('iconEye');
+/* =====================================================
+   LOGIN — OJO DE CONTRASEÑA
+   Control directo y aislado. Sin delegación, sin onclick inline,
+   sin listeners duplicados. El evento click funciona con mouse y touch.
+===================================================== */
+(function instalarOjoLoginDirecto() {
+    const SVG_EYE = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+    const SVG_EYE_OFF = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
 
-const svgEye = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle>`;
+    function sincronizar() {
+        const input = document.getElementById('clave');
+        const boton = document.getElementById('btnTogglePassword');
+        const icono = document.getElementById('iconEye');
+        if (!input || !boton || !icono) return;
 
-const svgEyeOff = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path> <line x1="1" y1="1" x2="23" y2="23"></line>`;
+        const visible = input.getAttribute('type') === 'text';
+        icono.innerHTML = visible ? SVG_EYE : SVG_EYE_OFF;
+        boton.setAttribute('aria-pressed', visible ? 'true' : 'false');
+        boton.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        boton.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    }
 
-if (inputClave && btnToggle && iconEye) {
-    // Estado inicial correcto: contraseña oculta = ojo tachado.
-    inputClave.type = 'password';
-    iconEye.innerHTML = svgEyeOff;
-    btnToggle.setAttribute('aria-label', 'Mostrar contraseña');
-    btnToggle.setAttribute('title', 'Mostrar contraseña');
-    btnToggle.setAttribute('aria-pressed', 'false');
+    function instalar() {
+        const boton = document.getElementById('btnTogglePassword');
+        const input = document.getElementById('clave');
+        if (!boton || !input || boton.dataset.loginEyeInstalled === '1') return;
 
-    btnToggle.addEventListener('click', () => {
-        const isPassword = inputClave.type === 'password';
-        inputClave.type = isPassword ? 'text' : 'password';
-        iconEye.innerHTML = isPassword ? svgEye : svgEyeOff;
-        btnToggle.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
-        btnToggle.setAttribute('title', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
-        btnToggle.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
-        inputClave.focus();
-    });
-}
+        boton.dataset.loginEyeInstalled = '1';
+        input.setAttribute('type', 'password');
+        sincronizar();
+
+        // ÚNICO listener del ojo de login.
+        boton.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const oculto = input.getAttribute('type') === 'password';
+            input.setAttribute('type', oculto ? 'text' : 'password');
+
+            // IMPORTANTE: el focusin global puede haber aplicado -webkit-text-security.
+            // Al mostrar la clave hay que quitar explícitamente cualquier máscara inline.
+            if (oculto) {
+                input.style.webkitTextSecurity = 'none';
+                input.style.textSecurity = 'none';
+            } else {
+                input.style.webkitTextSecurity = 'disc';
+                input.style.textSecurity = 'disc';
+            }
+
+            sincronizar();
+            try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); }
+        }, false);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', instalar, { once: true });
+    } else {
+        instalar();
+    }
+
+    window.restablecerOjoLogin = function () {
+        const input = document.getElementById('clave');
+        if (input) input.setAttribute('type', 'password');
+        sincronizar();
+    };
+})();
 
 async function iniciarSesion() {
     const correo = document.getElementById("correoLogin").value.trim().toLowerCase();
@@ -9878,14 +10127,10 @@ function configurarErroresCamposSolicitud() {
     const contenedor=document.getElementById("solicitud"); if(!contenedor || contenedor.dataset.erroresConfigurados==="1") return;
     contenedor.dataset.erroresConfigurados="1";
     contenedor.addEventListener("input", e=>{
-        if (!e.target.matches("input,select,textarea")) return;
-        if (e.target.id === "fechaNacimiento") e.target.classList.toggle("campo-error", !e.target.checkValidity());
-        else e.target.classList.remove("campo-error");
+        if(e.target.matches("input,select,textarea")) e.target.classList.remove("campo-error");
     });
     contenedor.addEventListener("change", e=>{
-        if (!e.target.matches("input,select,textarea")) return;
-        if (e.target.id === "fechaNacimiento") e.target.classList.toggle("campo-error", !e.target.checkValidity());
-        else e.target.classList.remove("campo-error");
+        if(e.target.matches("input,select,textarea")) e.target.classList.remove("campo-error");
         if(e.target.matches('input[name="diasServicio"]')) validarDiasServicio();
     });
     contenedor.addEventListener("blur", e=>{
@@ -10017,14 +10262,6 @@ async function enviarSolicitud() {
 
         const fechaNacimientoObj = new Date(`${fechaNacimiento}T00:00:00`);
         const hoy = new Date();
-        const fechaNacimientoControl = document.getElementById("fechaNacimiento");
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaNacimiento) ||
-            !fechaNacimientoControl ||
-            fechaNacimiento < fechaNacimientoControl.min ||
-            fechaNacimiento > fechaNacimientoControl.max) {
-            mostrarErrorSolicitud("La fecha de nacimiento no corresponde al rango permitido para el grado seleccionado.");
-            return;
-        }
         let edad = hoy.getFullYear() - fechaNacimientoObj.getFullYear();
         const cumpleEsteAnio = new Date(hoy.getFullYear(), fechaNacimientoObj.getMonth(), fechaNacimientoObj.getDate());
         if (hoy < cumpleEsteAnio) edad--;
@@ -10227,9 +10464,7 @@ async function enviarSolicitud() {
     configurarValidacionCamposOtro();
         configurarSelectoresEPS();
     } catch (error) {
-        // api() ya convierte la respuesta del backend en Error usando data.message.
-        // Por eso aquí se muestra exactamente el mensaje SQL que devuelva PHP.
-        mostrarErrorSolicitud(error.message || "Error desconocido.");
+        mostrarErrorSolicitud(error.message || "No fue posible enviar la solicitud.");
     }
 }
 
@@ -12032,36 +12267,18 @@ function mostrarErrorCampo(input, mensaje) {
     const validarFechaNacimiento = () => {
         if (!fecha || fecha.disabled) return;
         const edadVista = document.getElementById("edadCalculada");
-        const ayuda = document.getElementById("ayudaFechaNacimiento");
         if (!fecha.value) {
-            const incompleta = fecha.dataset.interacted === "1";
-            fecha.setCustomValidity(incompleta ? "El año debe tener cuatro dígitos (XXXX)." : "");
-            fecha.classList.toggle("campo-error", incompleta);
-            if (incompleta && ayuda) ayuda.textContent = "El año debe tener cuatro dígitos (XXXX).";
+            fecha.setCustomValidity("");
             if (edadVista) edadVista.textContent = "-";
             return;
         }
-        const partesFecha = fecha.value.split("-");
-        const anioConCuatroDigitos = /^[1-9]\d{3}$/.test(partesFecha[0] || "");
-        const formatoValido = anioConCuatroDigitos && /^\d{4}-\d{2}-\d{2}$/.test(fecha.value);
+        const formatoValido = /^\d{4}-\d{2}-\d{2}$/.test(fecha.value);
         const dentroDelRango = formatoValido &&
             (!fecha.min || fecha.value >= fecha.min) &&
             (!fecha.max || fecha.value <= fecha.max);
-        fecha.setCustomValidity(dentroDelRango ? "" : "El año debe tener cuatro dígitos, comenzar por un número distinto de cero y estar dentro del rango permitido.");
-        fecha.classList.toggle("campo-error", !dentroDelRango);
-        if (!dentroDelRango && ayuda) {
-            ayuda.textContent = !anioConCuatroDigitos
-                ? "El año debe tener cuatro dígitos (XXXX) y no puede comenzar por 0."
-                : `Para ${grado.value} se permiten fechas entre ${fecha.min} y ${fecha.max}.`;
-        }
-        if (dentroDelRango && ayuda) {
-            const rangoEdad = grado.value === "Ciclo V" ? "18 a 40 años" : "14 a 19 años";
-            ayuda.textContent = `Para ${grado.value} se permiten fechas entre ${fecha.min} y ${fecha.max} (${rangoEdad}).`;
-        }
+        fecha.setCustomValidity(dentroDelRango ? "" : "La fecha de nacimiento no está completa o no corresponde al rango permitido.");
         const edad = calcularEdad(fecha.value);
-        const anioNacimiento = Number(fecha.value.slice(0, 4));
-        const esAnioNacimientoNoValido = !anioConCuatroDigitos || anioNacimiento >= new Date().getFullYear();
-        if (edadVista) edadVista.textContent = edad === null || esAnioNacimientoNoValido ? "-" : `${edad} años`;
+        if (edadVista) edadVista.textContent = edad === null ? "-" : `${edad} años`;
     };
 
     const actualizarRangoFechaNacimiento = () => {
@@ -12078,14 +12295,11 @@ function mostrarErrorCampo(input, mensaje) {
         const formatoFecha = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
         const hoy = new Date(); hoy.setHours(0,0,0,0);
         const fechaHaceAnios = anios => { const d = new Date(hoy); d.setFullYear(d.getFullYear()-anios); return formatoFecha(d); };
-        const hoyTexto = formatoFecha(hoy);
         if (grado.value === "10°" || grado.value === "11°") {
             fecha.min = fechaHaceAnios(19); fecha.max = fechaHaceAnios(14);
-            fecha.max = fecha.max > hoyTexto ? hoyTexto : fecha.max;
             if (ayuda) ayuda.textContent = `Para ${grado.value} se permiten fechas entre ${fecha.min} y ${fecha.max} (14 a 19 años).`;
         } else if (grado.value === "Ciclo V") {
             fecha.min = fechaHaceAnios(40); fecha.max = fechaHaceAnios(18);
-            fecha.max = fecha.max > hoyTexto ? hoyTexto : fecha.max;
             if (ayuda) ayuda.textContent = `Para Ciclo V se permiten fechas entre ${fecha.min} y ${fecha.max} (18 a 40 años).`;
         } else {
             fecha.disabled = true; fecha.removeAttribute("min"); fecha.removeAttribute("max"); fecha.value = "";
@@ -12142,12 +12356,10 @@ function mostrarErrorCampo(input, mensaje) {
 
     if (fecha) {
         fecha.addEventListener("input", () => {
-            fecha.dataset.interacted = "1";
             validarFechaNacimiento();
             actualizarTipoDocumentoPorEdad();
         });
         fecha.addEventListener("change", () => {
-            fecha.dataset.interacted = "1";
             validarFechaNacimiento();
             actualizarTipoDocumentoPorEdad();
         });
@@ -14790,6 +15002,47 @@ input[type="text"].password-universal-visible {
     }
 }
 </style>
+<style id="sigho-login-eye-visible-v47">
+/* LOGIN: cuando la clave está visible, ninguna máscara de seguridad debe permanecer activa. */
+#clave[type="text"] {
+    -webkit-text-security: none !important;
+    text-security: none !important;
+    -webkit-text-fill-color: inherit !important;
+}
+#clave[type="password"] {
+    -webkit-text-security: disc !important;
+    text-security: disc !important;
+}
+</style>
+<style id="sigho-login-eye-hardening-v45">
+#btnTogglePassword {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    min-height: 46px !important;
+    right: 4px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 999 !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+} 
+#btnTogglePassword svg {
+    display: block !important;
+    width: 22px !important;
+    height: 22px !important;
+    pointer-events: none !important;
+} 
+#btnTogglePassword:focus-visible { outline: 2px solid currentColor !important; outline-offset: 2px !important; }
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+    #btnTogglePassword { width: 48px !important; height: 48px !important; min-width: 48px !important; min-height: 48px !important; right: 2px !important; }
+}
+</style>
 <script id="sigho-final-password-sync-v40">
 (function () {
     const EYE_OPEN = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
@@ -14818,37 +15071,19 @@ input[type="text"].password-universal-visible {
 
     window.sighoRestablecerOjosUniversales = resetUniversalEyes;
 
-    function syncLoginEye() {
-        const input = document.getElementById('clave');
-        const button = document.getElementById('btnTogglePassword');
-        const icon = document.getElementById('iconEye');
-        if (!input || !button || !icon) return;
-        const visible = input.type === 'text';
-        icon.innerHTML = visible ? EYE_OPEN : EYE_OFF;
-        button.setAttribute('aria-pressed', visible ? 'true' : 'false');
-        button.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
-        button.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
-    }
-
-    // El HTML puede cambiar de pantalla sin recargar; mantener el estado visual coherente.
-    document.addEventListener('click', function (event) {
-        const target = event.target.closest('#btnTogglePassword');
-        if (target) setTimeout(syncLoginEye, 0);
-    });
-
     document.addEventListener('focusin', function (event) {
-        if (event.target.matches && event.target.matches('input[type="password"]')) {
-            event.target.style.webkitTextSecurity = 'disc';
-        }
+        const target = event.target;
+        if (!target || !target.matches || !target.matches('input[type="password"]')) return;
+        // Solo en estado oculto. Nunca volver a aplicar la máscara si el login está visible.
+        target.style.webkitTextSecurity = 'disc';
+        target.style.textSecurity = 'disc';
     });
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function () {
-            syncLoginEye();
             resetUniversalEyes();
         }, { once: true });
     } else {
-        syncLoginEye();
         resetUniversalEyes();
     }
 })();
@@ -14867,6 +15102,229 @@ input[type="text"].password-universal-visible {
     margin: 0 !important;
     z-index: 10000 !important;
   }
+}
+</style>
+
+<style id="sigho-login-eye-isolation-v45">
+/* LOGIN: el botón ocupa toda su propia zona y ninguna capa interna bloquea el clic. */
+.password-toggle-wrapper { position: relative !important; z-index: 2 !important; }
+#btnTogglePassword {
+    position: absolute !important;
+    right: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+    cursor: pointer !important;
+}
+#btnTogglePassword svg {
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 101 !important;
+}
+@media (max-width: 900px) {
+    #btnTogglePassword { width: 48px !important; height: 48px !important; min-width: 48px !important; min-height: 48px !important; }
+}
+</style>
+
+
+<style id="sigho-password-eye-definitive-v50">
+/* =========================================================
+   OJO DE CONTRASEÑA — CONTROL DEFINITIVO V50
+   Este selector tiene prioridad sobre las reglas antiguas de
+   visibilidad y deja el campo como texto real cuando está abierto.
+   ========================================================= */
+.password-universal-wrapper input.password-universal-visible[type="text"] {
+    -webkit-text-security: none !important;
+    text-security: none !important;
+    -webkit-text-fill-color: #35434a !important;
+    color: #35434a !important;
+    text-shadow: none !important;
+    caret-color: #35434a !important;
+    opacity: 1 !important;
+}
+html.dark-mode .password-universal-wrapper input.password-universal-visible[type="text"],
+body.dark-mode .password-universal-wrapper input.password-universal-visible[type="text"] {
+    -webkit-text-security: none !important;
+    text-security: none !important;
+    -webkit-text-fill-color: #ffffff !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+    caret-color: #ffffff !important;
+    opacity: 1 !important;
+}
+</style>
+<script id="sigho-password-eye-definitive-controller-v50">
+(function () {
+    'use strict';
+
+    const EYE_OPEN = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+    const EYE_OFF = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+
+    function sincronizarBoton(boton, input, visible) {
+        if (!boton || !input) return;
+        const icono = boton.querySelector('svg');
+        if (icono) icono.innerHTML = visible ? EYE_OPEN : EYE_OFF;
+        boton.setAttribute('aria-pressed', visible ? 'true' : 'false');
+        boton.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        boton.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    }
+
+    function limpiarMascaraVisible(input) {
+        // No basta con cambiar type: el proyecto aplica -webkit-text-security
+        // inline al enfocar una contraseña. Eliminarla aquí y en el siguiente
+        // frame evita que esa máscara antigua sobreviva al cambio a texto.
+        input.style.removeProperty('-webkit-text-security');
+        input.style.removeProperty('text-security');
+        input.style.removeProperty('-webkit-text-fill-color');
+        input.style.removeProperty('color');
+        input.style.removeProperty('text-shadow');
+        input.style.removeProperty('caret-color');
+        input.classList.add('password-universal-visible');
+    }
+
+    function aplicarMascaraOculta(input) {
+        input.classList.remove('password-universal-visible');
+        input.style.setProperty('-webkit-text-security', 'disc', 'important');
+        input.style.setProperty('text-security', 'disc', 'important');
+    }
+
+    function alternar(boton) {
+        const input = boton?.closest('.password-universal-wrapper')?.querySelector('input');
+        if (!input) return;
+
+        const mostrar = input.type === 'password';
+        input.setAttribute('type', mostrar ? 'text' : 'password');
+
+        if (mostrar) {
+            limpiarMascaraVisible(input);
+            requestAnimationFrame(function () {
+                if (input.isConnected && input.type === 'text') limpiarMascaraVisible(input);
+            });
+            setTimeout(function () {
+                if (input.isConnected && input.type === 'text') limpiarMascaraVisible(input);
+            }, 0);
+        } else {
+            aplicarMascaraOculta(input);
+        }
+
+        sincronizarBoton(boton, input, mostrar);
+        try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); }
+    }
+
+    // CAPTURE: se ejecuta antes del listener antiguo creado por V20 y evita
+    // que dos controladores cambien el type dos veces.
+    document.addEventListener('click', function (event) {
+        const boton = event.target && event.target.closest
+            ? event.target.closest('.password-universal-toggle')
+            : null;
+        if (!boton) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        alternar(boton);
+    }, true);
+
+    // Reafirma que cualquier campo ya abierto no conserve una máscara antigua.
+    function corregirCamposVisibles() {
+        document.querySelectorAll('.password-universal-wrapper input.password-universal-visible[type="text"]')
+            .forEach(limpiarMascaraVisible);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', corregirCamposVisibles, { once: true });
+    } else {
+        corregirCamposVisibles();
+    }
+})();
+</script>
+
+<style id="sigho-mobile-password-dots-v52">
+/* Contraseñas en móvil: máscara compacta y proporcional.
+   Solo modifica la apariencia del estado oculto; no toca el ojo ni el cambio password/text. */
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+    input[type="password"],
+    input[type="password"]:focus,
+    input[type="password"]:focus-within {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0 !important;
+        word-spacing: 0 !important;
+        font-weight: 400 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        text-indent: 0 !important;
+        -webkit-text-security: disc !important;
+        text-security: disc !important;
+    }
+
+    /* Mantener exactamente el mismo ajuste en las ayudas y claves de profesor. */
+    .password-universal-wrapper > input[type="password"],
+    .profesor-password-wrapper > input[type="password"],
+    .password-input-wrapper > input[type="password"] {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0 !important;
+        word-spacing: 0 !important;
+    }
+
+    /* El campo de login conserva su espacio para el botón del ojo. */
+    #clave[type="password"] {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0 !important;
+        word-spacing: 0 !important;
+    }
+}
+</style>
+<style id="sigho-mobile-password-dots-v53">
+/* =========================================================
+   CONTRASEÑAS MÓVIL — PUNTOS COMPACTOS
+   Corrige únicamente la apariencia de la máscara mientras el
+   campo permanece en type="password". El ojo y su JS no cambian.
+   ========================================================= */
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+    input[type="password"],
+    input[type="password"]:focus,
+    input[type="password"]:focus-within {
+        font-size: 12px !important;
+        line-height: 1 !important;
+        letter-spacing: -2px !important;
+        word-spacing: 0 !important;
+        font-weight: 400 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        font-feature-settings: normal !important;
+        text-indent: 0 !important;
+        text-align: left !important;
+        -webkit-text-security: disc !important;
+        text-security: disc !important;
+    }
+
+    /* Mismos valores para las contraseñas que reciben el ojo universal. */
+    .password-universal-wrapper > input[type="password"],
+    .profesor-password-wrapper > input[type="password"],
+    .password-input-wrapper > input[type="password"],
+    #clave[type="password"] {
+        font-size: 12px !important;
+        line-height: 1 !important;
+        letter-spacing: -2px !important;
+        word-spacing: 0 !important;
+        font-weight: 400 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        font-feature-settings: normal !important;
+        text-indent: 0 !important;
+    }
 }
 </style>
 </body>
