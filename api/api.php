@@ -503,7 +503,6 @@ try {
                 $tipoTelefonoAcudiente = trim((string)($d['tipoTelefonoAcudiente'] ?? ''));
                 $sede = trim((string)($d['sede'] ?? ''));
                 $proyecto = trim((string)($d['proyecto'] ?? ''));
-                $proyectoOtro = trim((string)($d['proyectoOtro'] ?? ''));
                 $diasServicio = $d['diasServicio'] ?? [];
                 $jornada = trim((string)($d['jornada'] ?? ''));
 
@@ -524,8 +523,7 @@ try {
                     'Logística y Vigilancia',
                     'Secretaría y/o Archivo',
                     'Acompañamiento a un docente de transición o primaria',
-                    'Eventos especiales',
-                    'Otro'
+                    'Eventos especiales'
                 ];
 
                 $diasPermitidos = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -600,8 +598,8 @@ try {
                         fail('Los 7 dígitos finales del teléfono fijo no pueden ser todos iguales.');
                     }
                 }
-                if (mb_strlen($eps, 'UTF-8') > 60) {
-                    fail('El nombre de la EPS puede tener máximo 60 caracteres.');
+                if (mb_strlen($eps, 'UTF-8') > 150) {
+                    fail('La opción de Seguridad Social puede tener máximo 150 caracteres.');
                 }
                 if ($gradoEstudiante === 'Ciclo V' && $modalidad === 'tecnico') {
                     fail('Ciclo V no puede seleccionar la modalidad Técnica.');
@@ -642,12 +640,46 @@ try {
                     fail('El proyecto seleccionado no es válido.');
                 }
                 $regexTextoOtro = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
-                if ($proyecto === 'Otro') {
-                    if (!$proyectoOtro || mb_strlen($proyectoOtro, 'UTF-8') < 2 || mb_strlen($proyectoOtro, 'UTF-8') > 60 || !preg_match($regexTextoOtro, $proyectoOtro)) {
-                        fail("El proyecto de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
+                $epsSeleccionada = trim((string)($d['epsSeleccionada'] ?? ''));
+                $seguridadSocialTipo = trim((string)($d['seguridadSocialTipo'] ?? ''));
+                if ($seguridadSocialTipo !== '') {
+                    if ($seguridadSocialTipo === 'eps') {
+                        $epsPermitidas = [
+                            'Nueva EPS', 'EPS Sanitas', 'EPS Sura', 'Salud Total EPS', 'Compensar EPS',
+                            'E.P.S. Famisanar', 'Aliansalud EPS', 'Servicio Occidental de Salud (S.O.S.)',
+                            'Salud Mía EPS', 'Coosalud', 'Mutual Ser', 'Capital Salud EPS', 'Savia Salud EPS',
+                            'Asmet Salud', 'Emssanar', 'Cajacopi Atlántico', 'Capresoca', 'Comfachocó',
+                            'Comfaoriente', 'Comfenalco Valle', 'EPS Familiar de Colombia', 'Anas Wayuu EPSI',
+                            'Asociación Indígena del Cauca (AIC)', 'Dusakawi EPSI', 'Mallamas EPSI', 'Pijaos Salud EPSI'
+                        ];
+                        if (!in_array($epsSeleccionada, $epsPermitidas, true) || $eps !== $epsSeleccionada) {
+                            fail('Selecciona una EPS válida.');
+                        }
+                    } elseif ($seguridadSocialTipo === 'especial') {
+                        $regimenesPermitidos = [
+                            'Fuerzas Militares / Policía Nacional',
+                            'FOMAG (Fondo Nacional de Prestaciones Sociales del Magisterio - Profesores)',
+                            'Ecopetrol',
+                            'Universidades Públicas (Salud Propia)'
+                        ];
+                        if (!in_array($epsSeleccionada, $regimenesPermitidos, true) || $eps !== $epsSeleccionada) {
+                            fail('Selecciona un régimen especial o de excepción válido.');
+                        }
+                    } elseif ($seguridadSocialTipo === 'sisben') {
+                        $formatoSisbenDetallado = preg_match('/^Sisbén Grupo ([A-D]), Subgrupo (\d{1,2})$/u', $epsSeleccionada, $grupoSisben);
+                        $formatoSisbenAnterior = !$formatoSisbenDetallado && preg_match('/^Sisbén ([A-D])(\d{1,2})$/u', $epsSeleccionada, $grupoSisben);
+                        if ((!$formatoSisbenDetallado && !$formatoSisbenAnterior) || $eps !== $epsSeleccionada) {
+                            fail('Selecciona un grupo Sisbén válido.');
+                        }
+                        $maximosSisben = ['A' => 5, 'B' => 7, 'C' => 18, 'D' => 21];
+                        $numeroSisben = (int)$grupoSisben[2];
+                        if ($numeroSisben < 1 || $numeroSisben > $maximosSisben[$grupoSisben[1]]) {
+                            fail('El número no corresponde al grupo Sisbén seleccionado.');
+                        }
+                    } else {
+                        fail('Selecciona una opción válida de Seguridad Social.');
                     }
                 }
-                $epsSeleccionada = trim((string)($d['epsSeleccionada'] ?? ''));
                 if ($epsSeleccionada === 'Otro') {
                     if (!$eps || mb_strlen($eps, 'UTF-8') < 2 || mb_strlen($eps, 'UTF-8') > 60 || !preg_match($regexTextoOtro, $eps)) {
                         fail("La EPS de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
@@ -792,7 +824,7 @@ try {
                         $tipoTelefonoAcudiente,
                         $sede,
                         $proyecto,
-                        $proyecto === 'Otro' ? $proyectoOtro : null,
+                        null,
                         json_encode($diasServicio, JSON_UNESCAPED_UNICODE),
                         $jornada
                     ]);

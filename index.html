@@ -1038,6 +1038,43 @@
             grid-template-columns: repeat(2, 1fr);
         }
 
+        .seguridad-social-grid, .sisben-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .sisben-grid > .form-group { margin-bottom: 0; }
+        .sisben-grid > .form-group > select { width: 100%; height: 44px; min-height: 44px; padding: 10px 12px; }
+        .sisben-select-wrap { position: relative; }
+        .sisben-subgroup-trigger {
+            width: 100%; height: 44px; min-height: 44px; padding: 10px 12px;
+            border: 1px solid #cbd5dc; border-radius: 8px; background: #fff;
+            color: #35434a; text-align: left; cursor: pointer;
+        }
+        .sisben-subgroup-trigger:disabled { background: #eef1f3; color: #7b858c; cursor: not-allowed; }
+        .sisben-subgroup-menu {
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50;
+            display: none; max-height: 202px; overflow-y: auto; overscroll-behavior: contain;
+            border: 1px solid #cbd5dc; border-radius: 8px; background: #fff;
+            box-shadow: 0 8px 18px rgba(20,40,50,.16);
+        }
+        .sisben-subgroup-menu.open { display: block; }
+        .sisben-subgroup-option {
+            display: block; width: 100%; min-height: 40px; padding: 9px 12px;
+            border: 0; border-bottom: 1px solid #edf1f3; background: #fff;
+            color: #35434a; text-align: left; cursor: pointer;
+        }
+        .sisben-subgroup-option:hover, .sisben-subgroup-option:focus-visible { background: #eef7fb; color: #0d3f70; outline: none; }
+        .sisben-subgroup-value {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+
+        @media (max-width: 700px) {
+            .seguridad-social-grid, .sisben-grid { grid-template-columns: 1fr; gap: 0; }
+        }
+
         .solicitud-acceso-section {
             margin-top: 28px;
         }
@@ -7882,9 +7919,20 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <input id="direccionSolicitud" maxlength="100" placeholder="Ej. Calle 10 # 20-30" required="" type="text"/>
 <small class="field-help">Escribe la dirección completa de tu residencia.</small>
 </div>
+<div class="seguridad-social-grid">
 <div class="form-group">
-<label for="epsSolicitud">EPS <span class="required">*</span></label>
-<select id="epsSolicitud" required="">
+<label for="seguridadSocialTipoSolicitud">Seguridad Social <span class="required">*</span></label>
+<select id="seguridadSocialTipoSolicitud" required="">
+<option disabled="" selected="" value="">Seleccionar</option>
+<option value="eps">EPS</option>
+<option value="especial">Régimen especial o excepción</option>
+<option value="sisben">Sisbén</option>
+</select>
+<small class="field-help">Selecciona el Sistema General de Seguridad Social (SGSSS) al que perteneces</small>
+</div>
+<div class="form-group" id="grupoEpsSolicitud" style="display:none;">
+<label for="epsSolicitud">Selecciona tu EPS</label>
+<select disabled="" id="epsSolicitud">
 <option disabled="" selected="" value="">Seleccionar EPS</option>
 <optgroup label="Régimen Contributivo y Mixtas">
 <option value="Nueva EPS">Nueva EPS</option>
@@ -7918,22 +7966,44 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <option value="Mallamas EPSI">Mallamas EPSI</option>
 <option value="Pijaos Salud EPSI">Pijaos Salud EPSI</option>
 </optgroup>
-<optgroup label="Regímenes Excepcionales y Especiales">
-<option value="EPM – Unidad de Salud">EPM – Unidad de Salud</option>
-<option value="Fondo de Pasivo Social de Ferrocarriles Nacionales">Fondo de Pasivo Social de Ferrocarriles Nacionales</option>
-</optgroup>
-<option value="Otro">Otro</option>
 </select>
-<small class="field-help">Selecciona tu EPS según el régimen. Si no aparece, elige «Otro».</small>
+<small class="field-help">Selecciona tu EPS.</small>
 </div>
-<div class="form-group eps-otro-group" id="grupoEpsOtroSolicitud" style="display:none;">
-<label for="epsOtroSolicitud">Especifica tu EPS</label>
-<input id="epsOtroSolicitud" maxlength="60" pattern="[\p{L}]+(?: [\p{L}]+)*" placeholder="Nombre de la EPS" type="text"/>
+<div class="form-group" id="grupoRegimenEspecialSolicitud" style="display:none;">
+<label for="regimenEspecialSolicitud">Selecciona el régimen</label>
+<select id="regimenEspecialSolicitud" disabled="">
+<option disabled="" selected="" value="">Seleccionar</option>
+<option value="Fuerzas Militares / Policía Nacional">Fuerzas Militares / Policía Nacional</option>
+<option value="FOMAG (Fondo Nacional de Prestaciones Sociales del Magisterio - Profesores)">FOMAG (Fondo Nacional de Prestaciones Sociales del Magisterio - Profesores)</option>
+<option value="Ecopetrol">Ecopetrol</option>
+<option value="Universidades Públicas (Salud Propia)">Universidades Públicas (Salud Propia)</option>
+</select>
+</div>
+<div class="form-group" id="grupoSisbenSolicitud" style="display:none;">
+<div class="sisben-grid">
+<div class="form-group">
+<label for="sisbenLetraSolicitud">Grupo</label>
+<select aria-label="Grupo" id="sisbenLetraSolicitud" disabled="">
+<option disabled="" selected="" value=""></option>
+<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+</select>
+</div>
+<div class="form-group sisben-subgrupo-group">
+<label for="sisbenNumeroSolicitud">Subgrupo</label>
+<div class="sisben-select-wrap">
+<button aria-expanded="false" aria-haspopup="listbox" aria-label="Subgrupo" aria-controls="sisbenSubgrupoMenu" class="sisben-subgroup-trigger" disabled="" id="sisbenSubgrupoToggle" type="button">Seleccionar</button>
+<div aria-label="Subgrupo" class="sisben-subgroup-menu" id="sisbenSubgrupoMenu" role="listbox"></div>
+<select aria-hidden="true" class="sisben-subgroup-value" id="sisbenNumeroSolicitud" disabled="" required="" tabindex="-1">
+<option disabled="" selected="" value=""></option>
+</select>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="form-group">
 <label>Correo para acceder a SIGHO <span class="required">*</span></label>
-<input id="correoSolicitudEstudiante" placeholder="Correo para acceder a SIGHO" required="" type="email"/>
-<small class="field-help">El correo debe llevar tu nombre completo y tu grado. Ejemplo: miguelangelroldandevia116@gmail.com. Para tu foto de perfil, utiliza una foto relacionada con la Institución Educativa JJFH.</small>
+<input id="correoSolicitudEstudiante" placeholder="Ej: sarasanchezv116@gmail.com" required="" type="email"/>
 </div>
 <div class="section section-subtitle">
 <h3>Información escolar</h3>
@@ -8001,7 +8071,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="form-group">
 <label>Proyecto <span class="required">*</span></label>
-<select id="proyectoSolicitud" onchange="actualizarProyectoOtro()">
+<select id="proyectoSolicitud">
 <option disabled="" selected="" value="">Seleccionar proyecto</option>
 <option value="Educación Física / Tiempo Libre">Educación Física / Tiempo Libre</option>
 <option value="Proyecto Ambiental">Proyecto Ambiental</option>
@@ -8009,12 +8079,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <option value="Secretaría y/o Archivo">Secretaría y/o Archivo</option>
 <option value="Acompañamiento a un docente de transición o primaria">Acompañamiento a un docente de transición o primaria</option>
 <option value="Eventos especiales">Eventos especiales</option>
-<option value="Otro">Otro</option>
 </select>
-</div>
-<div class="form-group" id="grupoProyectoOtro" style="display:none;">
-<label>Especifica el proyecto</label>
-<input disabled="" id="proyectoOtro" inputmode="text" maxlength="60" pattern="[\p{L}]+(?: [\p{L}]+)*" placeholder="Escribe el proyecto" type="text"/>
 </div>
 <div class="form-group" id="grupoDiasServicio">
 <label>Días en los que realizará el servicio social <span class="required">*</span></label>
@@ -8056,7 +8121,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="form-row two-columns">
 <div class="form-group">
 <label>Correo para acceder a SIGHO <span class="required">*</span></label>
-<input autocomplete="email" id="correoSolicitud" placeholder="ejemplo@iejosejoaquinflorezhernandez.edu.co" required="" type="email"/>
+<input autocomplete="email" id="correoSolicitud" pattern="[^@\s]+@iejosejoaquinflorezhernandez\.edu\.co" placeholder="ejemplo@iejosejoaquinflorezhernandez.edu.co" required="" type="email"/>
 <small class="field-help">Debe ser un correo institucional y utilizar exactamente el dominio <strong>@iejosejoaquinflorezhernandez.edu.co</strong>. No se permiten espacios.</small>
 </div>
 <div class="form-group">
@@ -9306,7 +9371,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         ["camposSolicitudEstudiante","camposSolicitudPersonal","camposSolicitudComunes"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="none";});
         const grupoEps=document.getElementById("grupoEpsOtroSolicitud"); if(grupoEps) grupoEps.style.display="none";
         const epsOtro=document.getElementById("epsOtroSolicitud"); if(epsOtro){epsOtro.value="";epsOtro.disabled=true;epsOtro.required=false;}
-        const proyectoOtro=document.getElementById("proyectoOtro"); if(proyectoOtro){proyectoOtro.value="";proyectoOtro.disabled=true;proyectoOtro.required=false;}
         document.querySelectorAll('input[name="diasServicio"]').forEach(el=>el.checked=false);
         const jornada=document.getElementById("jornadaSolicitud"); if(jornada){jornada.value="";jornada.disabled=true;}
         const fecha=document.getElementById("fechaNacimiento"); if(fecha){fecha.value="";fecha.dataset.interacted="0";fecha.disabled=true;fecha.removeAttribute("min");fecha.removeAttribute("max");}
@@ -9355,7 +9419,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         const camposObligatoriosEstudiante = new Set([
             "primerApellido", "primerNombre", "tipoDocumento", "numeroDocumento",
             "gradoSolicitud", "fechaNacimiento", "telefonoSolicitud",
-            "direccionSolicitud", "epsSolicitud", "correoSolicitudEstudiante",
+            "direccionSolicitud", "seguridadSocialTipoSolicitud", "correoSolicitudEstudiante",
             "modalidadSolicitud", "nombreAcudiente", "telefonoAcudiente",
             "sedeSolicitud", "proyectoSolicitud", "claveSolicitud"
         ]);
@@ -9439,7 +9503,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         }
         const grupoEps = document.getElementById("grupoEpsOtroSolicitud");
         if (grupoEps) grupoEps.style.display = "none";
-        ["epsOtroSolicitud", "proyectoOtro"].forEach(id => {
+        ["epsOtroSolicitud"].forEach(id => {
             const el = document.getElementById(id);
             if (el) { el.value = ""; el.disabled = true; el.required = false; el.setCustomValidity(""); }
         });
@@ -9478,6 +9542,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         if (personal) personal.querySelectorAll("input, select").forEach(el => {
             el.required = rol === "profesor";
         });
+
+        actualizarSeguridadSocialSolicitud();
 
         if (claveEstudiante) {
             claveEstudiante.required = rol === "estudiante";
@@ -9536,7 +9602,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
     }
 
     function configurarValidacionCamposOtro() {
-        const ids = ["epsOtroSolicitud", "proyectoOtro", "perfilEpsOtro"];
+        const ids = ["epsOtroSolicitud", "perfilEpsOtro"];
         ids.forEach(id => {
             const input = document.getElementById(id);
             if (!input || input.dataset.validacionTextoConfigurada === "1") return;
@@ -9559,19 +9625,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         });
     }
 
-    function actualizarProyectoOtro() {
-        const proyecto = document.getElementById("proyectoSolicitud")?.value;
-        const grupo = document.getElementById("grupoProyectoOtro");
-        const otroInput = document.getElementById("proyectoOtro");
-        const esOtro = proyecto === "Otro";
-        if (grupo) grupo.style.display = esOtro ? "block" : "none";
-        if (otroInput) {
-            otroInput.required = esOtro;
-            otroInput.disabled = !esOtro;
-            if (!esOtro) otroInput.value = "";
-        }
-    }
-
     function configurarSelectoresEPS() {
         const configurar = (selectId, grupoOtroId, inputOtroId) => {
             const select = document.getElementById(selectId);
@@ -9592,8 +9645,107 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
             actualizar();
         };
 
-        configurar("epsSolicitud", "grupoEpsOtroSolicitud", "epsOtroSolicitud");
         configurar("perfilEps", "grupoEpsOtroPerfil", "perfilEpsOtro");
+    }
+
+    function actualizarSeguridadSocialSolicitud() {
+        const tipo = document.getElementById("seguridadSocialTipoSolicitud");
+        const eps = document.getElementById("epsSolicitud");
+        const regimen = document.getElementById("regimenEspecialSolicitud");
+        const letra = document.getElementById("sisbenLetraSolicitud");
+        const numero = document.getElementById("sisbenNumeroSolicitud");
+        if (!tipo || !eps || !regimen || !letra || !numero) return;
+        const selectorSubgrupo = document.getElementById("sisbenSubgrupoToggle");
+        const menuSubgrupo = document.getElementById("sisbenSubgrupoMenu");
+        if (!selectorSubgrupo || !menuSubgrupo) return;
+
+        const grupoEps = document.getElementById("grupoEpsSolicitud");
+        const grupoRegimen = document.getElementById("grupoRegimenEspecialSolicitud");
+        const grupoSisben = document.getElementById("grupoSisbenSolicitud");
+        const esEstudiante = document.getElementById("rolSolicitud")?.value === "estudiante";
+        const actualizarNumerosSisben = () => {
+            const maximo = { A: 5, B: 7, C: 18, D: 21 }[letra.value] || 0;
+            numero.replaceChildren(new Option("Subgrupo", "", true, true));
+            numero.options[0].disabled = true;
+            menuSubgrupo.replaceChildren();
+            for (let valor = 1; valor <= maximo; valor++) {
+                numero.add(new Option(String(valor), String(valor)));
+                const opcion = document.createElement("button");
+                opcion.className = "sisben-subgroup-option";
+                opcion.type = "button";
+                opcion.setAttribute("role", "option");
+                opcion.setAttribute("aria-selected", "false");
+                opcion.textContent = String(valor);
+                opcion.addEventListener("click", () => {
+                    numero.value = String(valor);
+                    cerrarMenuSubgrupo();
+                    actualizarSeguridadSocialSolicitud();
+                });
+                menuSubgrupo.appendChild(opcion);
+            }
+            numero.value = "";
+            selectorSubgrupo.textContent = "Seleccionar";
+        };
+
+        const cerrarMenuSubgrupo = () => {
+            menuSubgrupo.classList.remove("open");
+            selectorSubgrupo.setAttribute("aria-expanded", "false");
+        };
+
+        if (tipo.dataset.seguridadSocialConfigurada !== "1") {
+            tipo.dataset.seguridadSocialConfigurada = "1";
+            selectorSubgrupo.addEventListener("click", () => {
+                if (selectorSubgrupo.disabled) return;
+                const abierto = menuSubgrupo.classList.toggle("open");
+                selectorSubgrupo.setAttribute("aria-expanded", String(abierto));
+                if (abierto) menuSubgrupo.querySelector(".sisben-subgroup-option")?.focus();
+            });
+            menuSubgrupo.addEventListener("keydown", evento => {
+                if (evento.key === "Escape") {
+                    cerrarMenuSubgrupo();
+                    selectorSubgrupo.focus();
+                }
+            });
+            document.addEventListener("click", evento => {
+                if (!evento.target.closest(".sisben-select-wrap")) cerrarMenuSubgrupo();
+            });
+            tipo.addEventListener("change", () => {
+                eps.value = "";
+                regimen.value = "";
+                letra.value = "";
+                actualizarNumerosSisben();
+                actualizarSeguridadSocialSolicitud();
+            });
+            letra.addEventListener("change", () => {
+                actualizarNumerosSisben();
+                actualizarSeguridadSocialSolicitud();
+            });
+        }
+
+        const seleccion = tipo.value;
+        if (grupoEps) grupoEps.style.display = seleccion === "eps" ? "block" : "none";
+        if (grupoRegimen) grupoRegimen.style.display = seleccion === "especial" ? "block" : "none";
+        if (grupoSisben) grupoSisben.style.display = seleccion === "sisben" ? "block" : "none";
+        eps.disabled = !esEstudiante || seleccion !== "eps";
+        eps.required = esEstudiante && seleccion === "eps";
+        regimen.disabled = !esEstudiante || seleccion !== "especial";
+        regimen.required = esEstudiante && seleccion === "especial";
+        letra.disabled = !esEstudiante || seleccion !== "sisben";
+        letra.required = esEstudiante && seleccion === "sisben";
+        numero.disabled = !esEstudiante || seleccion !== "sisben" || !letra.value;
+        numero.required = esEstudiante && seleccion === "sisben";
+        selectorSubgrupo.disabled = numero.disabled;
+        selectorSubgrupo.textContent = numero.value || "Seleccionar";
+        menuSubgrupo.querySelectorAll(".sisben-subgroup-option").forEach(opcion => {
+            opcion.setAttribute("aria-selected", String(opcion.textContent === numero.value));
+        });
+        if (numero.disabled) cerrarMenuSubgrupo();
+        if (!seleccion) {
+            eps.value = "";
+            regimen.value = "";
+            letra.value = "";
+            actualizarNumerosSisben();
+        }
     }
 
     function configurarJornadaPorGrado() {
@@ -9794,15 +9946,20 @@ async function enviarSolicitud() {
         const fechaNacimiento = document.getElementById("fechaNacimiento").value;
         const direccion = document.getElementById("direccionSolicitud").value.trim();
         const telefono = document.getElementById("telefonoSolicitud").value.trim();
-        const epsSeleccionada = document.getElementById("epsSolicitud").value.trim();
-        const epsOtro = document.getElementById("epsOtroSolicitud")?.value.trim() || "";
-        const eps = epsSeleccionada === "Otro" ? epsOtro : epsSeleccionada;
+        const seguridadSocialTipo = document.getElementById("seguridadSocialTipoSolicitud").value;
+        const epsSeleccionada = seguridadSocialTipo === "eps"
+            ? document.getElementById("epsSolicitud").value.trim()
+            : seguridadSocialTipo === "especial"
+                ? document.getElementById("regimenEspecialSolicitud").value.trim()
+                : seguridadSocialTipo === "sisben"
+                    ? `Sisbén Grupo ${document.getElementById("sisbenLetraSolicitud").value}, Subgrupo ${document.getElementById("sisbenNumeroSolicitud").value}`
+                    : "";
+        const eps = epsSeleccionada;
         const nombreAcudiente = capitalizarNombreCompleto(document.getElementById("nombreAcudiente").value);
         const tipoTelefonoAcudiente = document.getElementById("tipoTelefonoAcudiente").value;
         const telefonoAcudiente = document.getElementById("telefonoAcudiente").value.trim();
         const sede = document.getElementById("sedeSolicitud").value;
         const proyecto = document.getElementById("proyectoSolicitud").value;
-        const proyectoOtro = document.getElementById("proyectoOtro").value.trim();
         const modalidad = document.getElementById("modalidadSolicitud").value;
         const jornada = document.getElementById("jornadaSolicitud").value;
         const correo = document.getElementById("correoSolicitudEstudiante")?.value.trim().toLowerCase() || "";
@@ -9817,6 +9974,11 @@ async function enviarSolicitud() {
             !sede || !proyecto || !modalidad || !jornada
         ) {
             mostrarErrorSolicitud("Completa todos los campos obligatorios de la solicitud del estudiante.");
+            return;
+        }
+
+        if (seguridadSocialTipo === "sisben" && !document.getElementById("sisbenNumeroSolicitud").value) {
+            mostrarErrorSolicitud("Selecciona el subgrupo Sisbén.");
             return;
         }
 
@@ -9938,20 +10100,8 @@ async function enviarSolicitud() {
         }
 
         const regexTextoOtro = /^[\p{L}]+(?: [\p{L}]+)*$/u;
-        if (proyecto === "Otro") {
-            if (!proyectoOtro || proyectoOtro.length < 2 || proyectoOtro.length > 60 || !regexTextoOtro.test(proyectoOtro)) {
-                mostrarErrorSolicitud("El proyecto de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
-                return;
-            }
-        }
-        if (epsSeleccionada === "Otro") {
-            if (!epsOtro || epsOtro.length < 2 || epsOtro.length > 60 || !regexTextoOtro.test(epsOtro)) {
-                mostrarErrorSolicitud("La EPS de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
-                return;
-            }
-        }
-        if (eps.length > 60) {
-            mostrarErrorSolicitud("El nombre de la EPS puede tener máximo 60 caracteres.");
+        if (eps.length > 150) {
+            mostrarErrorSolicitud("La opción de Seguridad Social puede tener máximo 150 caracteres.");
             return;
         }
 
@@ -9990,13 +10140,13 @@ async function enviarSolicitud() {
             telefono: telefono.replace(/\D/g, ""),
             eps,
             epsSeleccionada,
+            seguridadSocialTipo,
             nombreAcudiente,
             tipoTelefonoAcudiente,
             telefonoAcudiente: telefonoAcudiente.replace(/\D/g, ""),
             sede,
             jornada,
             proyecto,
-            proyectoOtro: proyecto === "Otro" ? proyectoOtro : "",
             diasServicio
         };
     } else {
@@ -10054,7 +10204,6 @@ async function enviarSolicitud() {
 
         const estudiante = document.getElementById("camposSolicitudEstudiante");
         const personal = document.getElementById("camposSolicitudPersonal");
-        const otro = document.getElementById("grupoProyectoOtro");
         if (estudiante) estudiante.style.display = "none";
         if (personal) personal.style.display = "none";
         const claveEst = document.getElementById("claveSolicitud");
@@ -10072,7 +10221,6 @@ async function enviarSolicitud() {
         if (comunes) comunes.style.display = "none";
         const rolSelect = document.getElementById("rolSolicitud");
         if (rolSelect) rolSelect.value = "";
-        if (otro) otro.style.display = "none";
         llenarAniosServicio();
         configurarJornadaPorGrado();
         configurarSelectorEvidencia();
@@ -11419,7 +11567,9 @@ function configurarValidacionSolicitudProfesor() {
         });
         correo.addEventListener("blur", () => {
             correo.value = correo.value.replace(/\s/g, "").trim();
+            correo.classList.toggle("campo-error", !correo.checkValidity());
         });
+        correo.addEventListener("input", () => correo.classList.remove("campo-error"));
     }
 
     if (telefono && telefono.dataset.validacionProfesorConfigurada !== "1") {
