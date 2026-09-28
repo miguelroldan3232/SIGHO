@@ -1038,6 +1038,43 @@
             grid-template-columns: repeat(2, 1fr);
         }
 
+        .seguridad-social-grid, .sisben-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .sisben-grid > .form-group { margin-bottom: 0; }
+        .sisben-grid > .form-group > select { width: 100%; height: 44px; min-height: 44px; padding: 10px 12px; }
+        .sisben-select-wrap { position: relative; }
+        .sisben-subgroup-trigger {
+            width: 100%; height: 44px; min-height: 44px; padding: 10px 12px;
+            border: 1px solid #cbd5dc; border-radius: 8px; background: #fff;
+            color: #35434a; text-align: left; cursor: pointer;
+        }
+        .sisben-subgroup-trigger:disabled { background: #eef1f3; color: #7b858c; cursor: not-allowed; }
+        .sisben-subgroup-menu {
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50;
+            display: none; max-height: 202px; overflow-y: auto; overscroll-behavior: contain;
+            border: 1px solid #cbd5dc; border-radius: 8px; background: #fff;
+            box-shadow: 0 8px 18px rgba(20,40,50,.16);
+        }
+        .sisben-subgroup-menu.open { display: block; }
+        .sisben-subgroup-option {
+            display: block; width: 100%; min-height: 40px; padding: 9px 12px;
+            border: 0; border-bottom: 1px solid #edf1f3; background: #fff;
+            color: #35434a; text-align: left; cursor: pointer;
+        }
+        .sisben-subgroup-option:hover, .sisben-subgroup-option:focus-visible { background: #eef7fb; color: #0d3f70; outline: none; }
+        .sisben-subgroup-value {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+
+        @media (max-width: 700px) {
+            .seguridad-social-grid, .sisben-grid { grid-template-columns: 1fr; gap: 0; }
+        }
+
         .solicitud-acceso-section {
             margin-top: 28px;
         }
@@ -8093,9 +8130,20 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <input id="direccionSolicitud" maxlength="100" placeholder="Ej. Calle 10 # 20-30" required="" type="text"/>
 <small class="field-help">Escribe la dirección completa de tu residencia.</small>
 </div>
+<div class="seguridad-social-grid">
 <div class="form-group">
-<label for="epsSolicitud">EPS <span class="required">*</span></label>
-<select id="epsSolicitud" required="">
+<label for="seguridadSocialTipoSolicitud">Seguridad Social <span class="required">*</span></label>
+<select id="seguridadSocialTipoSolicitud" required="">
+<option disabled="" selected="" value="">Seleccionar</option>
+<option value="eps">EPS</option>
+<option value="especial">Régimen especial o excepción</option>
+<option value="sisben">Sisbén</option>
+</select>
+<small class="field-help">Selecciona el Sistema General de Seguridad Social (SGSSS) al que perteneces</small>
+</div>
+<div class="form-group" id="grupoEpsSolicitud" style="display:none;">
+<label for="epsSolicitud">Selecciona tu EPS</label>
+<select disabled="" id="epsSolicitud">
 <option disabled="" selected="" value="">Seleccionar EPS</option>
 <optgroup label="Régimen Contributivo y Mixtas">
 <option value="Nueva EPS">Nueva EPS</option>
@@ -8129,22 +8177,44 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <option value="Mallamas EPSI">Mallamas EPSI</option>
 <option value="Pijaos Salud EPSI">Pijaos Salud EPSI</option>
 </optgroup>
-<optgroup label="Regímenes Excepcionales y Especiales">
-<option value="EPM – Unidad de Salud">EPM – Unidad de Salud</option>
-<option value="Fondo de Pasivo Social de Ferrocarriles Nacionales">Fondo de Pasivo Social de Ferrocarriles Nacionales</option>
-</optgroup>
-<option value="Otro">Otro</option>
 </select>
-<small class="field-help">Selecciona tu EPS según el régimen. Si no aparece, elige «Otro».</small>
+<small class="field-help">Selecciona tu EPS.</small>
 </div>
-<div class="form-group eps-otro-group" id="grupoEpsOtroSolicitud" style="display:none;">
-<label for="epsOtroSolicitud">Especifica tu EPS</label>
-<input id="epsOtroSolicitud" maxlength="60" pattern="[\p{L}]+(?: [\p{L}]+)*" placeholder="Nombre de la EPS" type="text"/>
+<div class="form-group" id="grupoRegimenEspecialSolicitud" style="display:none;">
+<label for="regimenEspecialSolicitud">Selecciona el régimen</label>
+<select id="regimenEspecialSolicitud" disabled="">
+<option disabled="" selected="" value="">Seleccionar</option>
+<option value="Fuerzas Militares / Policía Nacional">Fuerzas Militares / Policía Nacional</option>
+<option value="FOMAG (Fondo Nacional de Prestaciones Sociales del Magisterio - Profesores)">FOMAG (Fondo Nacional de Prestaciones Sociales del Magisterio - Profesores)</option>
+<option value="Ecopetrol">Ecopetrol</option>
+<option value="Universidades Públicas (Salud Propia)">Universidades Públicas (Salud Propia)</option>
+</select>
+</div>
+<div class="form-group" id="grupoSisbenSolicitud" style="display:none;">
+<div class="sisben-grid">
+<div class="form-group">
+<label for="sisbenLetraSolicitud">Grupo</label>
+<select aria-label="Grupo" id="sisbenLetraSolicitud" disabled="">
+<option disabled="" selected="" value=""></option>
+<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+</select>
+</div>
+<div class="form-group sisben-subgrupo-group">
+<label for="sisbenNumeroSolicitud">Subgrupo</label>
+<div class="sisben-select-wrap">
+<button aria-expanded="false" aria-haspopup="listbox" aria-label="Subgrupo" aria-controls="sisbenSubgrupoMenu" class="sisben-subgroup-trigger" disabled="" id="sisbenSubgrupoToggle" type="button">Seleccionar</button>
+<div aria-label="Subgrupo" class="sisben-subgroup-menu" id="sisbenSubgrupoMenu" role="listbox"></div>
+<select aria-hidden="true" class="sisben-subgroup-value" id="sisbenNumeroSolicitud" disabled="" required="" tabindex="-1">
+<option disabled="" selected="" value=""></option>
+</select>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="form-group">
 <label>Correo para acceder a SIGHO <span class="required">*</span></label>
-<input id="correoSolicitudEstudiante" placeholder="Correo para acceder a SIGHO" required="" type="email"/>
-<small class="field-help">El correo debe llevar tu nombre completo y tu grado. Ejemplo: miguelangelroldandevia116@gmail.com. Para tu foto de perfil, utiliza una foto relacionada con la Institución Educativa JJFH.</small>
+<input id="correoSolicitudEstudiante" placeholder="Ej: sarasanchezv116@gmail.com" required="" type="email"/>
 </div>
 <div class="section section-subtitle">
 <h3>Información escolar</h3>
@@ -8212,7 +8282,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="form-group">
 <label>Proyecto <span class="required">*</span></label>
-<select id="proyectoSolicitud" onchange="actualizarProyectoOtro()">
+<select id="proyectoSolicitud">
 <option disabled="" selected="" value="">Seleccionar proyecto</option>
 <option value="Educación Física / Tiempo Libre">Educación Física / Tiempo Libre</option>
 <option value="Proyecto Ambiental">Proyecto Ambiental</option>
@@ -8220,12 +8290,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <option value="Secretaría y/o Archivo">Secretaría y/o Archivo</option>
 <option value="Acompañamiento a un docente de transición o primaria">Acompañamiento a un docente de transición o primaria</option>
 <option value="Eventos especiales">Eventos especiales</option>
-<option value="Otro">Otro</option>
 </select>
-</div>
-<div class="form-group" id="grupoProyectoOtro" style="display:none;">
-<label>Especifica el proyecto</label>
-<input disabled="" id="proyectoOtro" inputmode="text" maxlength="60" pattern="[\p{L}]+(?: [\p{L}]+)*" placeholder="Escribe el proyecto" type="text"/>
 </div>
 <div class="form-group" id="grupoDiasServicio">
 <label>Días en los que realizará el servicio social <span class="required">*</span></label>
@@ -8267,7 +8332,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="form-row two-columns">
 <div class="form-group">
 <label>Correo para acceder a SIGHO <span class="required">*</span></label>
-<input autocomplete="email" id="correoSolicitud" placeholder="ejemplo@iejosejoaquinflorezhernandez.edu.co" required="" type="email"/>
+<input autocomplete="email" id="correoSolicitud" pattern="[^@\s]+@iejosejoaquinflorezhernandez\.edu\.co" placeholder="ejemplo@iejosejoaquinflorezhernandez.edu.co" required="" type="email"/>
 <small class="field-help">Debe ser un correo institucional y utilizar exactamente el dominio <strong>@iejosejoaquinflorezhernandez.edu.co</strong>. No se permiten espacios.</small>
 </div>
 <div class="form-group">
@@ -9514,7 +9579,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         ["camposSolicitudEstudiante","camposSolicitudPersonal","camposSolicitudComunes"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="none";});
         const grupoEps=document.getElementById("grupoEpsOtroSolicitud"); if(grupoEps) grupoEps.style.display="none";
         const epsOtro=document.getElementById("epsOtroSolicitud"); if(epsOtro){epsOtro.value="";epsOtro.disabled=true;epsOtro.required=false;}
-        const proyectoOtro=document.getElementById("proyectoOtro"); if(proyectoOtro){proyectoOtro.value="";proyectoOtro.disabled=true;proyectoOtro.required=false;}
         document.querySelectorAll('input[name="diasServicio"]').forEach(el=>el.checked=false);
         const jornada=document.getElementById("jornadaSolicitud"); if(jornada){jornada.value="";jornada.disabled=true;}
         const fecha=document.getElementById("fechaNacimiento"); if(fecha){fecha.value="";fecha.disabled=true;fecha.removeAttribute("min");fecha.removeAttribute("max");}
@@ -9564,7 +9628,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         const camposObligatoriosEstudiante = new Set([
             "primerApellido", "primerNombre", "tipoDocumento", "numeroDocumento",
             "gradoSolicitud", "fechaNacimiento", "telefonoSolicitud",
-            "direccionSolicitud", "epsSolicitud", "correoSolicitudEstudiante",
+            "direccionSolicitud", "seguridadSocialTipoSolicitud", "correoSolicitudEstudiante",
             "modalidadSolicitud", "nombreAcudiente", "telefonoAcudiente",
             "sedeSolicitud", "proyectoSolicitud", "claveSolicitud"
         ]);
@@ -9648,7 +9712,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         }
         const grupoEps = document.getElementById("grupoEpsOtroSolicitud");
         if (grupoEps) grupoEps.style.display = "none";
-        ["epsOtroSolicitud", "proyectoOtro"].forEach(id => {
+        ["epsOtroSolicitud"].forEach(id => {
             const el = document.getElementById(id);
             if (el) { el.value = ""; el.disabled = true; el.required = false; el.setCustomValidity(""); }
         });
@@ -9687,6 +9751,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         if (personal) personal.querySelectorAll("input, select").forEach(el => {
             el.required = rol === "profesor";
         });
+
+        actualizarSeguridadSocialSolicitud();
 
         if (claveEstudiante) {
             claveEstudiante.required = rol === "estudiante";
@@ -10175,8 +10241,107 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
             actualizar();
         };
 
-        configurar("epsSolicitud", "grupoEpsOtroSolicitud", "epsOtroSolicitud");
         configurar("perfilEps", "grupoEpsOtroPerfil", "perfilEpsOtro");
+    }
+
+    function actualizarSeguridadSocialSolicitud() {
+        const tipo = document.getElementById("seguridadSocialTipoSolicitud");
+        const eps = document.getElementById("epsSolicitud");
+        const regimen = document.getElementById("regimenEspecialSolicitud");
+        const letra = document.getElementById("sisbenLetraSolicitud");
+        const numero = document.getElementById("sisbenNumeroSolicitud");
+        if (!tipo || !eps || !regimen || !letra || !numero) return;
+        const selectorSubgrupo = document.getElementById("sisbenSubgrupoToggle");
+        const menuSubgrupo = document.getElementById("sisbenSubgrupoMenu");
+        if (!selectorSubgrupo || !menuSubgrupo) return;
+
+        const grupoEps = document.getElementById("grupoEpsSolicitud");
+        const grupoRegimen = document.getElementById("grupoRegimenEspecialSolicitud");
+        const grupoSisben = document.getElementById("grupoSisbenSolicitud");
+        const esEstudiante = document.getElementById("rolSolicitud")?.value === "estudiante";
+        const actualizarNumerosSisben = () => {
+            const maximo = { A: 5, B: 7, C: 18, D: 21 }[letra.value] || 0;
+            numero.replaceChildren(new Option("Subgrupo", "", true, true));
+            numero.options[0].disabled = true;
+            menuSubgrupo.replaceChildren();
+            for (let valor = 1; valor <= maximo; valor++) {
+                numero.add(new Option(String(valor), String(valor)));
+                const opcion = document.createElement("button");
+                opcion.className = "sisben-subgroup-option";
+                opcion.type = "button";
+                opcion.setAttribute("role", "option");
+                opcion.setAttribute("aria-selected", "false");
+                opcion.textContent = String(valor);
+                opcion.addEventListener("click", () => {
+                    numero.value = String(valor);
+                    cerrarMenuSubgrupo();
+                    actualizarSeguridadSocialSolicitud();
+                });
+                menuSubgrupo.appendChild(opcion);
+            }
+            numero.value = "";
+            selectorSubgrupo.textContent = "Seleccionar";
+        };
+
+        const cerrarMenuSubgrupo = () => {
+            menuSubgrupo.classList.remove("open");
+            selectorSubgrupo.setAttribute("aria-expanded", "false");
+        };
+
+        if (tipo.dataset.seguridadSocialConfigurada !== "1") {
+            tipo.dataset.seguridadSocialConfigurada = "1";
+            selectorSubgrupo.addEventListener("click", () => {
+                if (selectorSubgrupo.disabled) return;
+                const abierto = menuSubgrupo.classList.toggle("open");
+                selectorSubgrupo.setAttribute("aria-expanded", String(abierto));
+                if (abierto) menuSubgrupo.querySelector(".sisben-subgroup-option")?.focus();
+            });
+            menuSubgrupo.addEventListener("keydown", evento => {
+                if (evento.key === "Escape") {
+                    cerrarMenuSubgrupo();
+                    selectorSubgrupo.focus();
+                }
+            });
+            document.addEventListener("click", evento => {
+                if (!evento.target.closest(".sisben-select-wrap")) cerrarMenuSubgrupo();
+            });
+            tipo.addEventListener("change", () => {
+                eps.value = "";
+                regimen.value = "";
+                letra.value = "";
+                actualizarNumerosSisben();
+                actualizarSeguridadSocialSolicitud();
+            });
+            letra.addEventListener("change", () => {
+                actualizarNumerosSisben();
+                actualizarSeguridadSocialSolicitud();
+            });
+        }
+
+        const seleccion = tipo.value;
+        if (grupoEps) grupoEps.style.display = seleccion === "eps" ? "block" : "none";
+        if (grupoRegimen) grupoRegimen.style.display = seleccion === "especial" ? "block" : "none";
+        if (grupoSisben) grupoSisben.style.display = seleccion === "sisben" ? "block" : "none";
+        eps.disabled = !esEstudiante || seleccion !== "eps";
+        eps.required = esEstudiante && seleccion === "eps";
+        regimen.disabled = !esEstudiante || seleccion !== "especial";
+        regimen.required = esEstudiante && seleccion === "especial";
+        letra.disabled = !esEstudiante || seleccion !== "sisben";
+        letra.required = esEstudiante && seleccion === "sisben";
+        numero.disabled = !esEstudiante || seleccion !== "sisben" || !letra.value;
+        numero.required = esEstudiante && seleccion === "sisben";
+        selectorSubgrupo.disabled = numero.disabled;
+        selectorSubgrupo.textContent = numero.value || "Seleccionar";
+        menuSubgrupo.querySelectorAll(".sisben-subgroup-option").forEach(opcion => {
+            opcion.setAttribute("aria-selected", String(opcion.textContent === numero.value));
+        });
+        if (numero.disabled) cerrarMenuSubgrupo();
+        if (!seleccion) {
+            eps.value = "";
+            regimen.value = "";
+            letra.value = "";
+            actualizarNumerosSisben();
+        }
     }
 
     function configurarJornadaPorGrado() {
@@ -10354,15 +10519,20 @@ async function enviarSolicitud() {
         const fechaNacimiento = document.getElementById("fechaNacimiento").value;
         const direccion = document.getElementById("direccionSolicitud").value.trim();
         const telefono = document.getElementById("telefonoSolicitud").value.trim();
-        const epsSeleccionada = document.getElementById("epsSolicitud").value.trim();
-        const epsOtro = document.getElementById("epsOtroSolicitud")?.value.trim() || "";
-        const eps = epsSeleccionada === "Otro" ? epsOtro : epsSeleccionada;
+        const seguridadSocialTipo = document.getElementById("seguridadSocialTipoSolicitud").value;
+        const epsSeleccionada = seguridadSocialTipo === "eps"
+            ? document.getElementById("epsSolicitud").value.trim()
+            : seguridadSocialTipo === "especial"
+                ? document.getElementById("regimenEspecialSolicitud").value.trim()
+                : seguridadSocialTipo === "sisben"
+                    ? `Sisbén Grupo ${document.getElementById("sisbenLetraSolicitud").value}, Subgrupo ${document.getElementById("sisbenNumeroSolicitud").value}`
+                    : "";
+        const eps = epsSeleccionada;
         const nombreAcudiente = capitalizarNombreCompleto(document.getElementById("nombreAcudiente").value);
         const tipoTelefonoAcudiente = document.getElementById("tipoTelefonoAcudiente").value;
         const telefonoAcudiente = document.getElementById("telefonoAcudiente").value.trim();
         const sede = document.getElementById("sedeSolicitud").value;
         const proyecto = document.getElementById("proyectoSolicitud").value;
-        const proyectoOtro = document.getElementById("proyectoOtro").value.trim();
         const modalidad = document.getElementById("modalidadSolicitud").value;
         const jornada = document.getElementById("jornadaSolicitud").value;
         const correo = document.getElementById("correoSolicitudEstudiante")?.value.trim().toLowerCase() || "";
@@ -10377,6 +10547,11 @@ async function enviarSolicitud() {
             !sede || !proyecto || !modalidad || !jornada
         ) {
             mostrarErrorSolicitud("Completa todos los campos obligatorios de la solicitud del estudiante.");
+            return;
+        }
+
+        if (seguridadSocialTipo === "sisben" && !document.getElementById("sisbenNumeroSolicitud").value) {
+            mostrarErrorSolicitud("Selecciona el subgrupo Sisbén.");
             return;
         }
 
@@ -10490,20 +10665,8 @@ async function enviarSolicitud() {
         }
 
         const regexTextoOtro = /^[\p{L}]+(?: [\p{L}]+)*$/u;
-        if (proyecto === "Otro") {
-            if (!proyectoOtro || proyectoOtro.length < 2 || proyectoOtro.length > 60 || !regexTextoOtro.test(proyectoOtro)) {
-                mostrarErrorSolicitud("El proyecto de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
-                return;
-            }
-        }
-        if (epsSeleccionada === "Otro") {
-            if (!epsOtro || epsOtro.length < 2 || epsOtro.length > 60 || !regexTextoOtro.test(epsOtro)) {
-                mostrarErrorSolicitud("La EPS de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
-                return;
-            }
-        }
-        if (eps.length > 60) {
-            mostrarErrorSolicitud("El nombre de la EPS puede tener máximo 60 caracteres.");
+        if (eps.length > 150) {
+            mostrarErrorSolicitud("La opción de Seguridad Social puede tener máximo 150 caracteres.");
             return;
         }
 
@@ -10542,13 +10705,13 @@ async function enviarSolicitud() {
             telefono: telefono.replace(/\D/g, ""),
             eps,
             epsSeleccionada,
+            seguridadSocialTipo,
             nombreAcudiente,
             tipoTelefonoAcudiente,
             telefonoAcudiente: telefonoAcudiente.replace(/\D/g, ""),
             sede,
             jornada,
             proyecto,
-            proyectoOtro: proyecto === "Otro" ? proyectoOtro : "",
             diasServicio
         };
     } else {
@@ -10606,7 +10769,6 @@ async function enviarSolicitud() {
 
         const estudiante = document.getElementById("camposSolicitudEstudiante");
         const personal = document.getElementById("camposSolicitudPersonal");
-        const otro = document.getElementById("grupoProyectoOtro");
         if (estudiante) estudiante.style.display = "none";
         if (personal) personal.style.display = "none";
         const claveEst = document.getElementById("claveSolicitud");
@@ -10624,7 +10786,6 @@ async function enviarSolicitud() {
         if (comunes) comunes.style.display = "none";
         const rolSelect = document.getElementById("rolSolicitud");
         if (rolSelect) rolSelect.value = "";
-        if (otro) otro.style.display = "none";
         llenarAniosServicio();
         configurarJornadaPorGrado();
         configurarSelectorEvidencia();
@@ -11880,7 +12041,7 @@ function abrirMisDatos() {
                 if (input.type !== 'select-one' && input.type !== 'select-multiple') {
                     input.value = crudo;
                 }
-                if (input.disabled) {
+                if (input.disabled || input.readOnly) {
                     limpiarErrorCampo(input);
                     return;
                 }
@@ -15152,5 +15313,493 @@ input[type="text"].password-universal-visible {
     #btnTogglePassword { width: 48px !important; height: 48px !important; min-width: 48px !important; min-height: 48px !important; }
 }
 </style>
+
+
+<style id="sigho-password-eye-definitive-v50">
+/* =========================================================
+   OJO DE CONTRASEÑA — CONTROL DEFINITIVO V50
+   Este selector tiene prioridad sobre las reglas antiguas de
+   visibilidad y deja el campo como texto real cuando está abierto.
+   ========================================================= */
+.password-universal-wrapper input.password-universal-visible[type="text"] {
+    -webkit-text-security: none !important;
+    text-security: none !important;
+    -webkit-text-fill-color: #35434a !important;
+    color: #35434a !important;
+    text-shadow: none !important;
+    caret-color: #35434a !important;
+    opacity: 1 !important;
+}
+html.dark-mode .password-universal-wrapper input.password-universal-visible[type="text"],
+body.dark-mode .password-universal-wrapper input.password-universal-visible[type="text"] {
+    -webkit-text-security: none !important;
+    text-security: none !important;
+    -webkit-text-fill-color: #ffffff !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+    caret-color: #ffffff !important;
+    opacity: 1 !important;
+}
+</style>
+<script id="sigho-password-eye-definitive-controller-v50">
+(function () {
+    'use strict';
+
+    const EYE_OPEN = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+    const EYE_OFF = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+
+    function sincronizarBoton(boton, input, visible) {
+        if (!boton || !input) return;
+        const icono = boton.querySelector('svg');
+        if (icono) icono.innerHTML = visible ? EYE_OPEN : EYE_OFF;
+        boton.setAttribute('aria-pressed', visible ? 'true' : 'false');
+        boton.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        boton.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    }
+
+    function limpiarMascaraVisible(input) {
+        // No basta con cambiar type: el proyecto aplica -webkit-text-security
+        // inline al enfocar una contraseña. Eliminarla aquí y en el siguiente
+        // frame evita que esa máscara antigua sobreviva al cambio a texto.
+        input.style.removeProperty('-webkit-text-security');
+        input.style.removeProperty('text-security');
+        input.style.removeProperty('-webkit-text-fill-color');
+        input.style.removeProperty('color');
+        input.style.removeProperty('text-shadow');
+        input.style.removeProperty('caret-color');
+        input.classList.add('password-universal-visible');
+    }
+
+    function aplicarMascaraOculta(input) {
+        input.classList.remove('password-universal-visible');
+        input.style.setProperty('-webkit-text-security', 'disc', 'important');
+        input.style.setProperty('text-security', 'disc', 'important');
+    }
+
+    function alternar(boton) {
+        const input = boton?.closest('.password-universal-wrapper')?.querySelector('input');
+        if (!input) return;
+
+        const mostrar = input.type === 'password';
+        input.setAttribute('type', mostrar ? 'text' : 'password');
+
+        if (mostrar) {
+            limpiarMascaraVisible(input);
+            requestAnimationFrame(function () {
+                if (input.isConnected && input.type === 'text') limpiarMascaraVisible(input);
+            });
+            setTimeout(function () {
+                if (input.isConnected && input.type === 'text') limpiarMascaraVisible(input);
+            }, 0);
+        } else {
+            aplicarMascaraOculta(input);
+        }
+
+        sincronizarBoton(boton, input, mostrar);
+        try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); }
+    }
+
+    // CAPTURE: se ejecuta antes del listener antiguo creado por V20 y evita
+    // que dos controladores cambien el type dos veces.
+    document.addEventListener('click', function (event) {
+        const boton = event.target && event.target.closest
+            ? event.target.closest('.password-universal-toggle')
+            : null;
+        if (!boton) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        alternar(boton);
+    }, true);
+
+    // Reafirma que cualquier campo ya abierto no conserve una máscara antigua.
+    function corregirCamposVisibles() {
+        document.querySelectorAll('.password-universal-wrapper input.password-universal-visible[type="text"]')
+            .forEach(limpiarMascaraVisible);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', corregirCamposVisibles, { once: true });
+    } else {
+        corregirCamposVisibles();
+    }
+})();
+</script>
+
+<style id="sigho-mobile-password-dots-v52">
+/* Contraseñas en móvil: máscara compacta y proporcional.
+   Solo modifica la apariencia del estado oculto; no toca el ojo ni el cambio password/text. */
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+    input[type="password"],
+    input[type="password"]:focus,
+    input[type="password"]:focus-within {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0 !important;
+        word-spacing: 0 !important;
+        font-weight: 400 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        text-indent: 0 !important;
+        -webkit-text-security: disc !important;
+        text-security: disc !important;
+    }
+
+    /* Mantener exactamente el mismo ajuste en las ayudas y claves de profesor. */
+    .password-universal-wrapper > input[type="password"],
+    .profesor-password-wrapper > input[type="password"],
+    .password-input-wrapper > input[type="password"] {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0 !important;
+        word-spacing: 0 !important;
+    }
+
+    /* El campo de login conserva su espacio para el botón del ojo. */
+    #clave[type="password"] {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0 !important;
+        word-spacing: 0 !important;
+    }
+}
+</style>
+<style id="sigho-mobile-password-dots-v53">
+/* =========================================================
+   CONTRASEÑAS MÓVIL — PUNTOS COMPACTOS
+   Corrige únicamente la apariencia de la máscara mientras el
+   campo permanece en type="password". El ojo y su JS no cambian.
+   ========================================================= */
+@media (max-width: 900px) and (hover: none) and (pointer: coarse) {
+    input[type="password"],
+    input[type="password"]:focus,
+    input[type="password"]:focus-within {
+        font-size: 12px !important;
+        line-height: 1 !important;
+        letter-spacing: -2px !important;
+        word-spacing: 0 !important;
+        font-weight: 400 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        font-feature-settings: normal !important;
+        text-indent: 0 !important;
+        text-align: left !important;
+        -webkit-text-security: disc !important;
+        text-security: disc !important;
+    }
+
+    /* Mismos valores para las contraseñas que reciben el ojo universal. */
+    .password-universal-wrapper > input[type="password"],
+    .profesor-password-wrapper > input[type="password"],
+    .password-input-wrapper > input[type="password"],
+    #clave[type="password"] {
+        font-size: 12px !important;
+        line-height: 1 !important;
+        letter-spacing: -2px !important;
+        word-spacing: 0 !important;
+        font-weight: 400 !important;
+        font-style: normal !important;
+        font-variant: normal !important;
+        font-feature-settings: normal !important;
+        text-indent: 0 !important;
+    }
+}
+</style>
+
+<style id="sigho-form-validation-states-v43">
+/* Estados de error/validacion: solo campos y mensajes asociados. */
+.is-invalid,
+.error,
+.campo-error {
+    border: 1px solid #dc3545 !important;
+    background-color: #fff8f8 !important;
+}
+
+.field-error-message,
+.form-text.error,
+.error-message {
+    color: #dc3545 !important;
+}
+
+html.dark-mode input.is-invalid,
+body.dark-mode input.is-invalid,
+html.dark-mode select.is-invalid,
+body.dark-mode select.is-invalid,
+html.dark-mode textarea.is-invalid,
+body.dark-mode textarea.is-invalid,
+html.dark-mode input.error,
+body.dark-mode input.error,
+html.dark-mode select.error,
+body.dark-mode select.error,
+html.dark-mode textarea.error,
+body.dark-mode textarea.error,
+html.dark-mode input.campo-error,
+body.dark-mode input.campo-error,
+html.dark-mode select.campo-error,
+body.dark-mode select.campo-error,
+html.dark-mode textarea.campo-error,
+body.dark-mode textarea.campo-error,
+html[data-theme="dark"] input.is-invalid,
+body[data-theme="dark"] input.is-invalid,
+html[data-theme="dark"] select.is-invalid,
+body[data-theme="dark"] select.is-invalid,
+html[data-theme="dark"] textarea.is-invalid,
+body[data-theme="dark"] textarea.is-invalid,
+html[data-theme="dark"] input.error,
+body[data-theme="dark"] input.error,
+html[data-theme="dark"] select.error,
+body[data-theme="dark"] select.error,
+html[data-theme="dark"] textarea.error,
+body[data-theme="dark"] textarea.error,
+html[data-theme="dark"] input.campo-error,
+body[data-theme="dark"] input.campo-error,
+html[data-theme="dark"] select.campo-error,
+body[data-theme="dark"] select.campo-error,
+html[data-theme="dark"] textarea.campo-error,
+body[data-theme="dark"] textarea.campo-error {
+    border: 1px solid #ff4d4d !important;
+    background-color: rgba(255, 77, 77, 0.1) !important;
+    box-shadow: 0 0 8px rgba(255, 77, 77, 0.4) !important;
+}
+
+html.dark-mode .field-error-message,
+body.dark-mode .field-error-message,
+html.dark-mode .form-text.error,
+body.dark-mode .form-text.error,
+html.dark-mode .error-message,
+body.dark-mode .error-message,
+html[data-theme="dark"] .field-error-message,
+body[data-theme="dark"] .field-error-message,
+html[data-theme="dark"] .form-text.error,
+body[data-theme="dark"] .form-text.error,
+html[data-theme="dark"] .error-message,
+body[data-theme="dark"] .error-message {
+    color: #ff6b6b !important;
+    font-weight: 500 !important;
+}
+
+html.dark-mode .form-text,
+body.dark-mode .form-text,
+html.dark-mode input::placeholder,
+body.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder,
+body.dark-mode textarea::placeholder,
+html.dark-mode select::placeholder,
+body.dark-mode select::placeholder,
+html[data-theme="dark"] .form-text,
+body[data-theme="dark"] .form-text,
+html[data-theme="dark"] input::placeholder,
+body[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder,
+body[data-theme="dark"] textarea::placeholder,
+html[data-theme="dark"] select::placeholder,
+body[data-theme="dark"] select::placeholder {
+    color: #a0aec0 !important;
+    opacity: 1 !important;
+}
+</style>
+
+
+<style id="sigho-validation-help-separation-v45">
+/* =========================================================
+   SIGHO — SEPARACIÓN ENTRE AYUDA INFORMATIVA Y ERROR DE VALIDACIÓN
+   Solo los mensajes marcados explícitamente como error cambian a rojo.
+   ========================================================= */
+
+/* AYUDAS NORMALES: siempre neutras; nunca dependen del estado del campo. */
+html.dark-mode .field-help,
+body.dark-mode .field-help,
+html[data-theme="dark"] .field-help,
+body[data-theme="dark"] .field-help {
+    color: #a0aec0 !important;
+    font-weight: 400 !important;
+    opacity: 1 !important;
+}
+
+html.dark-mode .texto-ayuda:not(.mensaje-error):not(.invalid-feedback),
+body.dark-mode .texto-ayuda:not(.mensaje-error):not(.invalid-feedback),
+html[data-theme="dark"] .texto-ayuda:not(.mensaje-error):not(.invalid-feedback),
+body[data-theme="dark"] .texto-ayuda:not(.mensaje-error):not(.invalid-feedback),
+html.dark-mode .form-text:not(.mensaje-error):not(.invalid-feedback):not(.error-message),
+body.dark-mode .form-text:not(.mensaje-error):not(.invalid-feedback):not(.error-message),
+html[data-theme="dark"] .form-text:not(.mensaje-error):not(.invalid-feedback):not(.error-message),
+body[data-theme="dark"] .form-text:not(.mensaje-error):not(.invalid-feedback):not(.error-message) {
+    color: #a0aec0 !important;
+    font-weight: 400 !important;
+    opacity: 1 !important;
+}
+
+/* ERRORES EXPLÍCITOS: modo claro. */
+.field-error-message,
+.mensaje-error,
+.invalid-feedback,
+.form-text.error,
+.error-message {
+    color: #dc3545 !important;
+    font-weight: 500 !important;
+}
+
+/* ERRORES EXPLÍCITOS: modo oscuro.
+   No se colorean small/span/form-text genéricos por estar dentro de un grupo en error. */
+html.dark-mode .field-error-message,
+body.dark-mode .field-error-message,
+html.dark-mode .mensaje-error,
+body.dark-mode .mensaje-error,
+html.dark-mode .invalid-feedback,
+body.dark-mode .invalid-feedback,
+html.dark-mode .form-text.error,
+body.dark-mode .form-text.error,
+html.dark-mode .error-message,
+body.dark-mode .error-message,
+html[data-theme="dark"] .field-error-message,
+body[data-theme="dark"] .field-error-message,
+html[data-theme="dark"] .mensaje-error,
+body[data-theme="dark"] .mensaje-error,
+html[data-theme="dark"] .invalid-feedback,
+body[data-theme="dark"] .invalid-feedback,
+html[data-theme="dark"] .form-text.error,
+body[data-theme="dark"] .form-text.error,
+html[data-theme="dark"] .error-message,
+body[data-theme="dark"] .error-message {
+    color: #ff6b6b !important;
+    font-weight: 500 !important;
+}
+
+/* Mensajes explícitos como hermanos inmediatos o posteriores del campo con error. */
+html.dark-mode input.error + .mensaje-error,
+body.dark-mode input.error + .mensaje-error,
+html.dark-mode input.error ~ .mensaje-error,
+body.dark-mode input.error ~ .mensaje-error,
+html.dark-mode input.error + .invalid-feedback,
+body.dark-mode input.error + .invalid-feedback,
+html.dark-mode input.error ~ .invalid-feedback,
+body.dark-mode input.error ~ .invalid-feedback,
+html.dark-mode input.error + .field-error-message,
+body.dark-mode input.error + .field-error-message,
+html.dark-mode input.error ~ .field-error-message,
+body.dark-mode input.error ~ .field-error-message,
+html.dark-mode input.is-invalid + .mensaje-error,
+body.dark-mode input.is-invalid + .mensaje-error,
+html.dark-mode input.is-invalid ~ .mensaje-error,
+body.dark-mode input.is-invalid ~ .mensaje-error,
+html.dark-mode input.is-invalid + .invalid-feedback,
+body.dark-mode input.is-invalid + .invalid-feedback,
+html.dark-mode input.is-invalid ~ .invalid-feedback,
+body.dark-mode input.is-invalid ~ .invalid-feedback,
+html.dark-mode input.is-invalid + .field-error-message,
+body.dark-mode input.is-invalid + .field-error-message,
+html.dark-mode input.is-invalid ~ .field-error-message,
+body.dark-mode input.is-invalid ~ .field-error-message,
+html.dark-mode input.campo-error + .mensaje-error,
+body.dark-mode input.campo-error + .mensaje-error,
+html.dark-mode input.campo-error ~ .mensaje-error,
+body.dark-mode input.campo-error ~ .mensaje-error,
+html.dark-mode input.campo-error + .invalid-feedback,
+body.dark-mode input.campo-error + .invalid-feedback,
+html.dark-mode input.campo-error ~ .invalid-feedback,
+body.dark-mode input.campo-error ~ .invalid-feedback,
+html.dark-mode input.campo-error + .field-error-message,
+body.dark-mode input.campo-error + .field-error-message,
+html.dark-mode input.campo-error ~ .field-error-message,
+body.dark-mode input.campo-error ~ .field-error-message {
+    color: #ff6b6b !important;
+    font-weight: 500 !important;
+}
+
+/* También para select y textarea cuando el mensaje de error es explícito. */
+html.dark-mode select.error ~ .mensaje-error,
+body.dark-mode select.error ~ .mensaje-error,
+html.dark-mode select.error ~ .invalid-feedback,
+body.dark-mode select.error ~ .invalid-feedback,
+html.dark-mode select.error ~ .field-error-message,
+body.dark-mode select.error ~ .field-error-message,
+html.dark-mode select.is-invalid ~ .mensaje-error,
+body.dark-mode select.is-invalid ~ .mensaje-error,
+html.dark-mode select.is-invalid ~ .invalid-feedback,
+body.dark-mode select.is-invalid ~ .invalid-feedback,
+html.dark-mode select.is-invalid ~ .field-error-message,
+body.dark-mode select.is-invalid ~ .field-error-message,
+html.dark-mode select.campo-error ~ .mensaje-error,
+body.dark-mode select.campo-error ~ .mensaje-error,
+html.dark-mode select.campo-error ~ .invalid-feedback,
+body.dark-mode select.campo-error ~ .invalid-feedback,
+html.dark-mode select.campo-error ~ .field-error-message,
+body.dark-mode select.campo-error ~ .field-error-message,
+html.dark-mode textarea.error ~ .mensaje-error,
+body.dark-mode textarea.error ~ .mensaje-error,
+html.dark-mode textarea.error ~ .invalid-feedback,
+body.dark-mode textarea.error ~ .invalid-feedback,
+html.dark-mode textarea.error ~ .field-error-message,
+body.dark-mode textarea.error ~ .field-error-message,
+html.dark-mode textarea.is-invalid ~ .mensaje-error,
+body.dark-mode textarea.is-invalid ~ .mensaje-error,
+html.dark-mode textarea.is-invalid ~ .invalid-feedback,
+body.dark-mode textarea.is-invalid ~ .invalid-feedback,
+html.dark-mode textarea.is-invalid ~ .field-error-message,
+body.dark-mode textarea.is-invalid ~ .field-error-message,
+html.dark-mode textarea.campo-error ~ .mensaje-error,
+body.dark-mode textarea.campo-error ~ .mensaje-error,
+html.dark-mode textarea.campo-error ~ .invalid-feedback,
+body.dark-mode textarea.campo-error ~ .invalid-feedback,
+html.dark-mode textarea.campo-error ~ .field-error-message,
+body.dark-mode textarea.campo-error ~ .field-error-message {
+    color: #ff6b6b !important;
+    font-weight: 500 !important;
+}
+
+/* Los mensajes dinámicos de SIGHO usan .field-error-message y son el indicador explícito de fallo. */
+html.dark-mode .field-error-message,
+body.dark-mode .field-error-message,
+html[data-theme="dark"] .field-error-message,
+body[data-theme="dark"] .field-error-message {
+    color: #ff6b6b !important;
+    font-weight: 500 !important;
+}
+
+/* Campos informativos: aunque estén dentro de un contenedor que tenga otro error,
+   readonly/disabled no deben conservar un borde o fondo de validación. */
+input[readonly].campo-error,
+input[disabled].campo-error,
+select[disabled].campo-error,
+textarea[readonly].campo-error,
+textarea[disabled].campo-error,
+html.dark-mode input[readonly].campo-error,
+body.dark-mode input[readonly].campo-error,
+html.dark-mode input[disabled].campo-error,
+body.dark-mode input[disabled].campo-error,
+html.dark-mode select[disabled].campo-error,
+body.dark-mode select[disabled].campo-error,
+html.dark-mode textarea[readonly].campo-error,
+body.dark-mode textarea[readonly].campo-error,
+html.dark-mode textarea[disabled].campo-error,
+body.dark-mode textarea[disabled].campo-error {
+    border-color: inherit !important;
+    box-shadow: none !important;
+}
+</style>
+
+<script id="sigho-validation-informative-fields-v45">
+/* Campos informativos/deshabilitados: nunca deben quedar marcados como error. */
+(function protegerCamposInformativosDeValidacion() {
+    function limpiarEstadosInformativos() {
+        document.querySelectorAll('input[readonly], input[disabled], select[disabled], textarea[readonly], textarea[disabled]').forEach(function (el) {
+            el.classList.remove('campo-error', 'is-invalid');
+            el.setCustomValidity('');
+            const grupo = el.closest('.form-group');
+            const mensaje = grupo ? grupo.querySelector('.field-error-message') : null;
+            if (mensaje) {
+                mensaje.textContent = '';
+                mensaje.style.display = 'none';
+            }
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', limpiarEstadosInformativos, { once: true });
+    } else {
+        limpiarEstadosInformativos();
+    }
+})();
+</script>
 </body>
 </html>
