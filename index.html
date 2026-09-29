@@ -8595,53 +8595,13 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="form-group"><label>Número celular</label><input disabled="" id="perfilTelefono" inputmode="numeric" maxlength="12" pattern="\d{3} \d{3} \d{4}" placeholder="300 123 4567" type="tel"/></div>
 <div class="form-group"><label>Dirección de residencia</label><input disabled="" id="perfilDireccion" maxlength="100" placeholder="Dirección completa" type="text"/></div>
 <div class="form-group">
-<label for="perfilEps">EPS</label>
+<label for="perfilEps">Seguridad Social</label>
 <select disabled="" id="perfilEps">
-<option disabled="" value="">Seleccionar EPS</option>
-<optgroup label="Régimen Contributivo y Mixtas">
-<option value="Nueva EPS">Nueva EPS</option>
-<option value="EPS Sanitas">EPS Sanitas</option>
-<option value="EPS Sura">EPS Sura</option>
-<option value="Salud Total EPS">Salud Total EPS</option>
-<option value="Compensar EPS">Compensar EPS</option>
-<option value="E.P.S. Famisanar">E.P.S. Famisanar</option>
-<option value="Aliansalud EPS">Aliansalud EPS</option>
-<option value="Servicio Occidental de Salud (S.O.S.)">Servicio Occidental de Salud (S.O.S.)</option>
-<option value="Salud Mía EPS">Salud Mía EPS</option>
-</optgroup>
-<optgroup label="Régimen Subsidiado y Cajas de Compensación">
-<option value="Coosalud">Coosalud</option>
-<option value="Mutual Ser">Mutual Ser</option>
-<option value="Capital Salud EPS">Capital Salud EPS</option>
-<option value="Savia Salud EPS">Savia Salud EPS</option>
-<option value="Asmet Salud">Asmet Salud</option>
-<option value="Emssanar">Emssanar</option>
-<option value="Cajacopi Atlántico">Cajacopi Atlántico</option>
-<option value="Capresoca">Capresoca</option>
-<option value="Comfachocó">Comfachocó</option>
-<option value="Comfaoriente">Comfaoriente</option>
-<option value="Comfenalco Valle">Comfenalco Valle</option>
-<option value="EPS Familiar de Colombia">EPS Familiar de Colombia</option>
-</optgroup>
-<optgroup label="Entidades Indígenas (EPSI)">
-<option value="Anas Wayuu EPSI">Anas Wayuu EPSI</option>
-<option value="Asociación Indígena del Cauca (AIC)">Asociación Indígena del Cauca (AIC)</option>
-<option value="Dusakawi EPSI">Dusakawi EPSI</option>
-<option value="Mallamas EPSI">Mallamas EPSI</option>
-<option value="Pijaos Salud EPSI">Pijaos Salud EPSI</option>
-</optgroup>
-<optgroup label="Regímenes Excepcionales y Especiales">
-<option value="EPM – Unidad de Salud">EPM – Unidad de Salud</option>
-<option value="Fondo de Pasivo Social de Ferrocarriles Nacionales">Fondo de Pasivo Social de Ferrocarriles Nacionales</option>
-</optgroup>
-<option value="Otro">Otro</option>
+<option disabled="" selected="" value="">Seleccionar Seguridad Social</option>
 </select>
 </div>
-<div class="form-group eps-otro-group" id="grupoEpsOtroPerfil" style="display:none;">
-<label for="perfilEpsOtro">Especifica tu EPS</label>
-<input disabled="" id="perfilEpsOtro" maxlength="60" pattern="[\p{L}]+(?: [\p{L}]+)*" placeholder="Nombre de la EPS" type="text"/>
-</div>
 <div class="form-group"><label>Nombre del acudiente</label><input disabled="" id="perfilAcudiente" maxlength="60" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" placeholder="Nombre completo" type="text"/></div>
+<div class="form-group"><label for="perfilTipoTelefonoAcudiente">Tipo de línea del acudiente</label><select disabled="" id="perfilTipoTelefonoAcudiente"><option value="">Seleccionar tipo de línea</option><option value="fijo">Teléfono fijo</option><option value="celular">Número celular</option></select></div>
 <div class="form-group"><label>Teléfono del acudiente</label><input disabled="" id="perfilTelefonoAcudiente" inputmode="numeric" maxlength="10" pattern="\d{7,10}" placeholder="7 a 10 dígitos" type="tel"/></div>
 <div class="profile-actions">
 <button class="secondary-button" id="editarPerfilEstudianteBtn" onclick="activarEdicionPerfilEstudiante()" type="button">Editar mis datos</button>
@@ -10831,13 +10791,11 @@ async function cargarPerfilEstudiante() {
         document.getElementById("perfilDireccion").value = p.direccion || "";
 
         const epsPerfil = document.getElementById("perfilEps");
-        const epsOtroPerfil = document.getElementById("perfilEpsOtro");
-        const opcionesEPSPerfil = epsPerfil ? [...epsPerfil.options].map(o => o.value) : [];
         const epsGuardada = p.eps || "";
-        if (epsPerfil) epsPerfil.value = opcionesEPSPerfil.includes(epsGuardada) ? epsGuardada : (epsGuardada ? "Otro" : "");
-        if (epsOtroPerfil) epsOtroPerfil.value = opcionesEPSPerfil.includes(epsGuardada) ? "" : epsGuardada;
+        configurarOpcionesSeguridadSocialPerfil(epsGuardada);
 
         document.getElementById("perfilAcudiente").value = p.nombreAcudiente || "";
+        document.getElementById("perfilTipoTelefonoAcudiente").value = p.tipoTelefonoAcudiente || "";
         document.getElementById("perfilTelefonoAcudiente").value = p.telefonoAcudiente || "";
 
         establecerEdicionPerfilEstudiante(false);
@@ -10847,8 +10805,46 @@ async function cargarPerfilEstudiante() {
     }
 }
 
+function configurarOpcionesSeguridadSocialPerfil(valorActual) {
+    const select = document.getElementById("perfilEps");
+    if (!select) return;
+
+    select.replaceChildren(new Option("Seleccionar Seguridad Social", "", true, true));
+    select.options[0].disabled = true;
+
+    const epsRegistro = document.getElementById("epsSolicitud");
+    epsRegistro?.querySelectorAll("optgroup").forEach(grupo => select.appendChild(grupo.cloneNode(true)));
+
+    const regimenRegistro = document.getElementById("regimenEspecialSolicitud");
+    if (regimenRegistro) {
+        const grupoRegimen = document.createElement("optgroup");
+        grupoRegimen.label = "Régimen especial o de excepción";
+        [...regimenRegistro.options].filter(opcion => opcion.value).forEach(opcion => grupoRegimen.appendChild(opcion.cloneNode(true)));
+        select.appendChild(grupoRegimen);
+    }
+
+    const grupoSisben = document.createElement("optgroup");
+    grupoSisben.label = "Sisbén";
+    const maximosSisben = { A: 5, B: 7, C: 18, D: 21 };
+    Object.entries(maximosSisben).forEach(([letra, maximo]) => {
+        for (let subgrupo = 1; subgrupo <= maximo; subgrupo++) {
+            const valor = `Sisbén Grupo ${letra}, Subgrupo ${subgrupo}`;
+            grupoSisben.appendChild(new Option(valor, valor));
+        }
+    });
+    select.appendChild(grupoSisben);
+
+    if (valorActual && ![...select.options].some(opcion => opcion.value === valorActual)) {
+        const grupoAnterior = document.createElement("optgroup");
+        grupoAnterior.label = "Valor guardado";
+        grupoAnterior.appendChild(new Option(valorActual, valorActual));
+        select.appendChild(grupoAnterior);
+    }
+    select.value = valorActual;
+}
+
 function guardarValoresOriginalesPerfilEstudiante() {
-    const ids = ["perfilCorreo","perfilTelefono","perfilDireccion","perfilEps","perfilEpsOtro","perfilAcudiente","perfilTelefonoAcudiente"];
+    const ids = ["perfilCorreo","perfilTelefono","perfilDireccion","perfilEps","perfilAcudiente","perfilTipoTelefonoAcudiente","perfilTelefonoAcudiente"];
     window.valoresOriginalesPerfilEstudiante = {};
     ids.forEach(id => {
         const el = document.getElementById(id);
@@ -10865,20 +10861,10 @@ function restaurarValoresOriginalesPerfilEstudiante() {
 }
 
 function establecerEdicionPerfilEstudiante(editar) {
-    ["perfilCorreo","perfilTelefono","perfilDireccion","perfilEps","perfilAcudiente","perfilTelefonoAcudiente"].forEach(id => {
+    ["perfilCorreo","perfilTelefono","perfilDireccion","perfilEps","perfilAcudiente","perfilTipoTelefonoAcudiente","perfilTelefonoAcudiente"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = !editar;
     });
-
-    const eps = document.getElementById("perfilEps");
-    const epsOtro = document.getElementById("perfilEpsOtro");
-    const grupoOtro = document.getElementById("grupoEpsOtroPerfil");
-    const esOtro = eps?.value === "Otro";
-    if (grupoOtro) grupoOtro.style.display = esOtro ? "block" : "none";
-    if (epsOtro) {
-        epsOtro.disabled = !editar || !esOtro;
-        epsOtro.required = esOtro;
-    }
 
     document.getElementById("editarPerfilEstudianteBtn")?.toggleAttribute("hidden", editar);
     document.getElementById("cancelarPerfilEstudianteBtn")?.toggleAttribute("hidden", !editar);
@@ -10908,27 +10894,36 @@ async function guardarPerfilEstudiante() {
     const telefono = document.getElementById("perfilTelefono").value.trim();
     const direccion = document.getElementById("perfilDireccion").value.trim();
     const epsSeleccionada = document.getElementById("perfilEps").value;
-    const eps = epsSeleccionada === "Otro" ? document.getElementById("perfilEpsOtro").value.trim() : epsSeleccionada.trim();
+    const eps = epsSeleccionada.trim();
     const nombreAcudiente = document.getElementById("perfilAcudiente").value.trim();
+    const tipoTelefonoAcudiente = document.getElementById("perfilTipoTelefonoAcudiente").value;
     const telefonoAcudiente = document.getElementById("perfilTelefonoAcudiente").value.trim();
     const regexNombre = /^[\p{L}]+(?: [\p{L}]+)*$/u;
+    const telefonoDigitos = telefono.replace(/\D/g, "");
+    const telefonoAcudienteDigitos = telefonoAcudiente.replace(/\D/g, "");
 
     if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) { alert("Escribe un correo electrónico válido."); return; }
-    if (!/^\d{10}$/.test(telefono.replace(/\D/g, ""))) { alert("El celular debe tener exactamente 10 dígitos."); return; }
+    if (!/^3\d{9}$/.test(telefonoDigitos) || /^(\d)\1{9}$/.test(telefonoDigitos) || telefonoDigitos === "1234567890") { alert("El celular debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890."); return; }
     if (direccion.length > 100) { alert("La dirección puede tener máximo 100 caracteres."); return; }
-    if (!eps || eps.length > 60) { alert("Selecciona una EPS válida o especifica una de máximo 60 caracteres."); return; }
-    if (epsSeleccionada === "Otro" && (!regexNombre.test(eps) || eps.length < 2 || eps.length > 60)) { alert("La EPS de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres."); return; }
-    if (!regexNombre.test(nombreAcudiente) || nombreAcudiente.length > 60) { alert("El nombre del acudiente debe contener solo letras y espacios sencillos, máximo 60 caracteres."); return; }
-    if (!/^\d{7,10}$/.test(telefonoAcudiente.replace(/\D/g, ""))) { alert("El teléfono del acudiente debe tener entre 7 y 10 dígitos."); return; }
+    if (!eps) { alert("Selecciona una opción válida de Seguridad Social."); return; }
+    if (nombreAcudiente.length < 2 || !regexNombre.test(nombreAcudiente) || nombreAcudiente.length > 60) { alert("El nombre del acudiente debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres."); return; }
+    if (!["fijo", "celular"].includes(tipoTelefonoAcudiente)) { alert("Selecciona el tipo de línea del acudiente."); return; }
+    if (tipoTelefonoAcudiente === "celular") {
+        if (!/^3\d{9}$/.test(telefonoAcudienteDigitos) || /^(\d)\1{9}$/.test(telefonoAcudienteDigitos) || telefonoAcudienteDigitos === "1234567890") { alert("El celular del acudiente debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890."); return; }
+    } else {
+        const ultimosDigitos = telefonoAcudienteDigitos.slice(3);
+        if (!/^60[1-8][2-8]\d{6}$/.test(telefonoAcudienteDigitos) || /^(\d)\1{6}$/.test(ultimosDigitos)) { alert("El teléfono fijo del acudiente debe tener un indicativo regional válido y 7 dígitos finales cuyo primero esté entre 2 y 8; estos no pueden ser todos iguales."); return; }
+    }
 
     const body = {
         correo,
-        telefono: telefono.replace(/\D/g, ""),
+        telefono: telefonoDigitos,
         direccion,
         eps,
         epsSeleccionada,
         nombreAcudiente,
-        telefonoAcudiente: telefonoAcudiente.replace(/\D/g, "")
+        tipoTelefonoAcudiente,
+        telefonoAcudiente: telefonoAcudienteDigitos
     };
 
     try {
