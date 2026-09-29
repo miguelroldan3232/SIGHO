@@ -8304,6 +8304,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 </div>
 </div>
+</div>
 <!-- CAMPOS PARA PROFESOR / ADMINISTRADOR -->
 <div id="camposSolicitudPersonal" style="display:none;">
 <div class="section">
@@ -8366,7 +8367,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                     Enviar solicitud
                 </button>
 <div class="message" id="mensajeSolicitud"></div>
-</div>
 </div>
 </div></section>
 <!-- =====================================================
@@ -9523,6 +9523,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         cerrarModales();
         ocultarPantallas();
         document.getElementById("login")?.classList.add("active");
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
         actualizarCamposLogin();
         actualizarIndicadoresObligatorios(document.getElementById("login"));
     }
@@ -11686,7 +11688,7 @@ async function guardarPerfilProfesor() {
     const regexNombreProfesor=/^[\p{L}]+(?: [\p{L}]+)*$/u;
     const regexCorreoInstitucional=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
     if(!datos.nombres || !datos.apellidos || !datos.correo || !datos.telefono){ mostrarToastProfesor("Completa todos los campos editables.", true); return; }
-    if(!regexNombreProfesor.test(datos.nombres) || !regexNombreProfesor.test(datos.apellidos)){ mostrarToastProfesor("Nombres y apellidos solo pueden contener letras y espacios sencillos.", true); return; }
+    if(datos.nombres.length < 2 || datos.nombres.length > 60 || datos.apellidos.length < 2 || datos.apellidos.length > 60 || !regexNombreProfesor.test(datos.nombres) || !regexNombreProfesor.test(datos.apellidos)){ mostrarToastProfesor("Nombres y apellidos deben tener entre 2 y 60 caracteres, con solo letras y espacios sencillos.", true); return; }
     if(!regexCorreoInstitucional.test(datos.correo)){ mostrarToastProfesor("El correo debe usar el dominio institucional y no contener espacios.", true); return; }
     const telefonoProfesor = datos.telefono.replace(/\D/g, "");
     const todosIgualesTelefono = /^(\d)\1{9}$/.test(telefonoProfesor);
