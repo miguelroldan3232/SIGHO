@@ -10052,6 +10052,434 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         mensaje.style.display = "block";
         mensaje.innerText = error.message;
     }
+
+
+    /* =====================================================
+       SOLICITUD
+    ====================================================== */
+
+    function actualizarIndicadoresObligatorios(contenedor = document) {
+        if (!contenedor) return;
+
+        const esSolicitudEstudiante = contenedor.id === "solicitud" ||
+            !!contenedor.querySelector("#camposSolicitudEstudiante");
+        const camposObligatoriosEstudiante = new Set([
+            "primerApellido", "primerNombre", "tipoDocumento", "numeroDocumento",
+            "gradoSolicitud", "fechaNacimiento", "telefonoSolicitud",
+            "direccionSolicitud", "epsSolicitud", "correoSolicitudEstudiante",
+            "modalidadSolicitud", "nombreAcudiente", "telefonoAcudiente",
+            "sedeSolicitud", "proyectoSolicitud", "claveSolicitud"
+        ]);
+
+        contenedor.querySelectorAll("label").forEach(label => {
+            const forId = label.getAttribute("for");
+            let control = null;
+            if (forId) control = document.getElementById(forId);
+            if (!control) control = label.querySelector("input, select, textarea");
+
+            const existente = label.querySelector(":scope > .required-mark");
+            if (existente) existente.remove();
+
+            // La sección de días usa su propio <span class="required">*.
+            if (label.querySelector('span.required')) return;
+
+            if (esSolicitudEstudiante && control) {
+                const id = control.id;
+                if (id && camposObligatoriosEstudiante.has(id)) {
+                    const marca = document.createElement("span");
+                    marca.className = "required-mark";
+                    marca.textContent = "*";
+                    marca.setAttribute("aria-hidden", "true");
+                    label.appendChild(marca);
+                }
+                return;
+            }
+
+            if (control?.required) {
+                const marca = document.createElement("span");
+                marca.className = "required-mark";
+                marca.textContent = "*";
+                marca.setAttribute("aria-hidden", "true");
+                label.appendChild(marca);
+            }
+        });
+    }
+
+    function bloquearEntradaAnioServicio(evento) {
+        const teclasPermitidas = ["ArrowUp", "ArrowDown", "Tab", "Shift", "Escape", "Enter", "Home", "End"];
+        if (teclasPermitidas.includes(evento.key) || evento.ctrlKey || evento.metaKey || evento.altKey) return;
+        evento.preventDefault();
+    }
+
+    function llenarAniosServicio() {
+        const input = document.getElementById("anioServicio");
+        if (!input) return;
+        const actual = new Date().getFullYear();
+        const maximo = actual + 3;
+        input.min = String(actual);
+        input.max = String(maximo);
+        let valor = Number(input.value);
+        if (!Number.isInteger(valor) || valor < actual || valor > maximo) {
+            input.value = String(actual);
+        }
+        const ayuda = document.getElementById("ayudaAnioServicio");
+        if (ayuda) ayuda.textContent = "Año lectivo";
+    }
+
+    function limpiarSolicitudAlCambiarRol(nuevoRol) {
+        const solicitud = document.getElementById("solicitud");
+        const rol = document.getElementById("rolSolicitud");
+        if (!solicitud || !rol) return;
+
+        solicitud.querySelectorAll("input, select, textarea").forEach(el => {
+            if (el === rol) return;
+            el.classList.remove("campo-error");
+            el.setCustomValidity("");
+            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+            else el.value = "";
+        });
+
+        // Restablecer estados dependientes para que el nuevo rol comience limpio.
+        const tipoTelefono = document.getElementById("tipoTelefonoAcudiente");
+        if (tipoTelefono) tipoTelefono.value = "";
+        const telAcudiente = document.getElementById("telefonoAcudiente");
+        if (telAcudiente) {
+            telAcudiente.value = "";
+            telAcudiente.disabled = true;
+            telAcudiente.setCustomValidity("");
+        }
+        const grupoEps = document.getElementById("grupoEpsOtroSolicitud");
+        if (grupoEps) grupoEps.style.display = "none";
+        ["epsOtroSolicitud", "proyectoOtro"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.value = ""; el.disabled = true; el.required = false; el.setCustomValidity(""); }
+        });
+        const jornada = document.getElementById("jornadaSolicitud");
+        if (jornada) jornada.disabled = true;
+        const fecha = document.getElementById("fechaNacimiento");
+        if (fecha) { fecha.disabled = true; fecha.removeAttribute("min"); fecha.removeAttribute("max"); }
+
+        rol.value = nuevoRol || "";
+        actualizarCamposSolicitud();
+        if (typeof configurarTelefonoAcudiente === "function") configurarTelefonoAcudiente();
+        actualizarIndicadoresObligatorios(solicitud);
+    }
+
+    function actualizarCamposSolicitud() {
+        const rol = document.getElementById("rolSolicitud")?.value || "";
+        const estudiante = document.getElementById("camposSolicitudEstudiante");
+        const personal = document.getElementById("camposSolicitudPersonal");
+        const comunes = document.getElementById("camposSolicitudComunes");
+        const claveEstudiante = document.getElementById("claveSolicitud");
+        const claveProfesor = document.getElementById("claveSolicitudProfesor");
+
+        if (estudiante) estudiante.style.display = rol === "estudiante" ? "block" : "none";
+        if (personal) personal.style.display = rol === "profesor" ? "block" : "none";
+        if (comunes) comunes.style.display = rol ? "block" : "none";
+
+        const accesoEstudiante = document.getElementById("accesoSolicitudEstudiante");
+        const accesoProfesor = document.getElementById("accesoSolicitudProfesor");
+        if (accesoEstudiante) accesoEstudiante.classList.toggle("visible", rol === "estudiante");
+        if (accesoProfesor) accesoProfesor.classList.toggle("visible", rol === "profesor");
+
+        if (estudiante) estudiante.querySelectorAll("input, select").forEach(el => {
+            el.required = rol === "estudiante" &&
+                !["segundoNombre", "segundoApellido"].includes(el.id);
+        });
+        if (personal) personal.querySelectorAll("input, select").forEach(el => {
+            el.required = rol === "profesor";
+        });
+
+        if (claveEstudiante) {
+            claveEstudiante.required = rol === "estudiante";
+            if (rol !== "estudiante") claveEstudiante.value = "";
+        }
+        if (claveProfesor) {
+            claveProfesor.required = rol === "profesor";
+            if (rol !== "profesor") claveProfesor.value = "";
+        }
+
+        llenarAniosServicio();
+        configurarJornadaPorGrado();
+        actualizarIndicadoresObligatorios(document.getElementById("solicitud"));
+    }
+
+    function limpiarLoginAlCambiarRol() {
+        const login = document.getElementById("login");
+        if (!login) return;
+
+        login.querySelectorAll("input, textarea").forEach(el => {
+            el.classList.remove("campo-error");
+            el.setCustomValidity("");
+            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+            else el.value = "";
+        });
+
+        const mensaje = document.getElementById("mensajeLogin");
+        if (mensaje) { mensaje.textContent = ""; mensaje.style.display = "none"; }
+        actualizarCamposLogin();
+    }
+
+    function actualizarCamposLogin() {
+        const campos = document.getElementById("camposLogin");
+        if (campos) campos.style.display = "block";
+
+        const correo = document.getElementById("correoLogin");
+        const clave = document.getElementById("clave");
+        if (correo) correo.required = true;
+        if (clave) clave.required = true;
+
+        const mensaje = document.getElementById("mensajeLogin");
+        if (mensaje) {
+            mensaje.style.display = "none";
+            mensaje.innerText = "";
+        }
+        actualizarIndicadoresObligatorios(document.getElementById("login"));
+    }
+
+    // Mantiene los campos "Otro" únicamente con letras y espacios sencillos.
+    function sanitizarTextoSoloLetras(valor, max = 60) {
+        return String(valor || "")
+            .replace(/[^\p{L} ]/gu, "")
+            .replace(/ {2,}/g, " ")
+            .replace(/^ +/g, "")
+            .slice(0, max);
+    }
+
+    function configurarValidacionCamposOtro() {
+        const ids = ["epsOtroSolicitud", "proyectoOtro", "perfilEpsOtro"];
+        ids.forEach(id => {
+            const input = document.getElementById(id);
+            if (!input || input.dataset.validacionTextoConfigurada === "1") return;
+            input.dataset.validacionTextoConfigurada = "1";
+            input.classList.add("input-validacion-texto");
+            input.setAttribute("autocomplete", "off");
+            input.addEventListener("input", () => {
+                const inicio = input.selectionStart ?? input.value.length;
+                const anterior = input.value;
+                const limpio = sanitizarTextoSoloLetras(anterior, 60);
+                input.value = limpio;
+                const desplazamiento = anterior.length - limpio.length;
+                try { input.setSelectionRange(Math.max(0, inicio - desplazamiento), Math.max(0, inicio - desplazamiento)); } catch (_) {}
+                input.setCustomValidity(limpio.length >= 2 || limpio.length === 0 ? "" : "Escribe al menos 2 letras.");
+            });
+            input.addEventListener("blur", () => {
+                input.value = sanitizarTextoSoloLetras(input.value, 60).trim();
+                if (input.disabled) input.setCustomValidity("");
+            });
+        });
+    }
+
+    function actualizarProyectoOtro() {
+        const proyecto = document.getElementById("proyectoSolicitud")?.value;
+        const grupo = document.getElementById("grupoProyectoOtro");
+        const otroInput = document.getElementById("proyectoOtro");
+        const esOtro = proyecto === "Otro";
+        if (grupo) grupo.style.display = esOtro ? "block" : "none";
+        if (otroInput) {
+            otroInput.required = esOtro;
+            otroInput.disabled = !esOtro;
+            if (!esOtro) otroInput.value = "";
+        }
+    }
+
+    function configurarSelectoresEPS() {
+        const configurar = (selectId, grupoOtroId, inputOtroId) => {
+            const select = document.getElementById(selectId);
+            const grupo = document.getElementById(grupoOtroId);
+            const input = document.getElementById(inputOtroId);
+            if (!select || !grupo || !input || select.dataset.epsConfigurado === "1") return;
+            select.dataset.epsConfigurado = "1";
+
+            const actualizar = () => {
+                const esOtro = select.value === "Otro";
+                grupo.style.display = esOtro ? "block" : "none";
+                input.disabled = select.disabled || !esOtro;
+                input.required = esOtro;
+                if (!esOtro) input.value = "";
+            };
+
+            select.addEventListener("change", actualizar);
+            actualizar();
+        };
+
+        configurar("perfilEps", "grupoEpsOtroPerfil", "perfilEpsOtro");
+    }
+
+    function actualizarSeguridadSocialSolicitud() {
+        const tipo = document.getElementById("seguridadSocialTipoSolicitud");
+        const eps = document.getElementById("epsSolicitud");
+        const regimen = document.getElementById("regimenEspecialSolicitud");
+        const letra = document.getElementById("sisbenLetraSolicitud");
+        const numero = document.getElementById("sisbenNumeroSolicitud");
+        if (!tipo || !eps || !regimen || !letra || !numero) return;
+        const selectorSubgrupo = document.getElementById("sisbenSubgrupoToggle");
+        const menuSubgrupo = document.getElementById("sisbenSubgrupoMenu");
+        if (!selectorSubgrupo || !menuSubgrupo) return;
+
+        const grupoEps = document.getElementById("grupoEpsSolicitud");
+        const grupoRegimen = document.getElementById("grupoRegimenEspecialSolicitud");
+        const grupoSisben = document.getElementById("grupoSisbenSolicitud");
+        const esEstudiante = document.getElementById("rolSolicitud")?.value === "estudiante";
+        const actualizarNumerosSisben = () => {
+            const maximo = { A: 5, B: 7, C: 18, D: 21 }[letra.value] || 0;
+            numero.replaceChildren(new Option("Subgrupo", "", true, true));
+            numero.options[0].disabled = true;
+            menuSubgrupo.replaceChildren();
+            for (let valor = 1; valor <= maximo; valor++) {
+                numero.add(new Option(String(valor), String(valor)));
+                const opcion = document.createElement("button");
+                opcion.className = "sisben-subgroup-option";
+                opcion.type = "button";
+                opcion.setAttribute("role", "option");
+                opcion.setAttribute("aria-selected", "false");
+                opcion.textContent = String(valor);
+                opcion.addEventListener("click", () => {
+                    numero.value = String(valor);
+                    cerrarMenuSubgrupo();
+                    actualizarSeguridadSocialSolicitud();
+                });
+                menuSubgrupo.appendChild(opcion);
+            }
+            numero.value = "";
+            selectorSubgrupo.textContent = "Seleccionar";
+        };
+
+        const cerrarMenuSubgrupo = () => {
+            menuSubgrupo.classList.remove("open");
+            selectorSubgrupo.setAttribute("aria-expanded", "false");
+        };
+
+        if (tipo.dataset.seguridadSocialConfigurada !== "1") {
+            tipo.dataset.seguridadSocialConfigurada = "1";
+            selectorSubgrupo.addEventListener("click", () => {
+                if (selectorSubgrupo.disabled) return;
+                const abierto = menuSubgrupo.classList.toggle("open");
+                selectorSubgrupo.setAttribute("aria-expanded", String(abierto));
+                if (abierto) menuSubgrupo.querySelector(".sisben-subgroup-option")?.focus();
+            });
+            menuSubgrupo.addEventListener("keydown", evento => {
+                if (evento.key === "Escape") {
+                    cerrarMenuSubgrupo();
+                    selectorSubgrupo.focus();
+                }
+            });
+            document.addEventListener("click", evento => {
+                if (!evento.target.closest(".sisben-select-wrap")) cerrarMenuSubgrupo();
+            });
+            tipo.addEventListener("change", () => {
+                eps.value = "";
+                regimen.value = "";
+                letra.value = "";
+                actualizarNumerosSisben();
+                actualizarSeguridadSocialSolicitud();
+            });
+            letra.addEventListener("change", () => {
+                actualizarNumerosSisben();
+                actualizarSeguridadSocialSolicitud();
+            });
+        }
+
+        const seleccion = tipo.value;
+        if (grupoEps) grupoEps.style.display = seleccion === "eps" ? "block" : "none";
+        if (grupoRegimen) grupoRegimen.style.display = seleccion === "especial" ? "block" : "none";
+        if (grupoSisben) grupoSisben.style.display = seleccion === "sisben" ? "block" : "none";
+        eps.disabled = !esEstudiante || seleccion !== "eps";
+        eps.required = esEstudiante && seleccion === "eps";
+        regimen.disabled = !esEstudiante || seleccion !== "especial";
+        regimen.required = esEstudiante && seleccion === "especial";
+        letra.disabled = !esEstudiante || seleccion !== "sisben";
+        letra.required = esEstudiante && seleccion === "sisben";
+        numero.disabled = !esEstudiante || seleccion !== "sisben" || !letra.value;
+        numero.required = esEstudiante && seleccion === "sisben";
+        selectorSubgrupo.disabled = numero.disabled;
+        selectorSubgrupo.textContent = numero.value || "Seleccionar";
+        menuSubgrupo.querySelectorAll(".sisben-subgroup-option").forEach(opcion => {
+            opcion.setAttribute("aria-selected", String(opcion.textContent === numero.value));
+        });
+        if (numero.disabled) cerrarMenuSubgrupo();
+        if (!seleccion) {
+            eps.value = "";
+            regimen.value = "";
+            letra.value = "";
+            actualizarNumerosSisben();
+        }
+    }
+
+    function configurarJornadaPorGrado() {
+        const grado = document.getElementById("gradoSolicitud");
+        const jornada = document.getElementById("jornadaSolicitud");
+        const modalidad = document.getElementById("modalidadSolicitud");
+        const opcionTecnica = document.getElementById("opcionModalidadTecnica");
+        if (!grado || !jornada) return;
+
+        if (grado.dataset.jornadaConfigurada !== "1") {
+            grado.dataset.jornadaConfigurada = "1";
+            grado.addEventListener("change", aplicarJornadaSegunGrado);
+        }
+        aplicarJornadaSegunGrado();
+
+        function aplicarJornadaSegunGrado() {
+            if (grado.value === "Ciclo V") {
+                jornada.value = "JN";
+                jornada.disabled = true;
+                jornada.title = "Jornada asignada automáticamente para Ciclo V";
+                if (opcionTecnica) opcionTecnica.disabled = true;
+                if (modalidad && modalidad.value === "tecnico") modalidad.value = "academico";
+            } else if (grado.value === "10°" || grado.value === "11°") {
+                jornada.value = "JM";
+                jornada.disabled = true;
+                jornada.title = "Jornada asignada automáticamente para 10° y 11°";
+                if (opcionTecnica) opcionTecnica.disabled = false;
+            } else {
+                jornada.value = "";
+                jornada.disabled = true;
+                jornada.title = "Selecciona primero el grado";
+                if (opcionTecnica) opcionTecnica.disabled = false;
+            }
+        }
+    }
+
+    /* =====================================================
+       LOGIN
+    ====================================================== */
+
+const inputClave = document.getElementById('clave');
+const btnToggle = document.getElementById('btnTogglePassword');
+const iconEye = document.getElementById('iconEye');
+
+const svgEye = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle>`;
+
+const svgEyeOff = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path> <line x1="1" y1="1" x2="23" y2="23"></line>`;
+
+if (inputClave && btnToggle && iconEye) {
+    // Estado inicial correcto: contraseña oculta = ojo tachado.
+    inputClave.type = 'password';
+    iconEye.innerHTML = svgEyeOff;
+    btnToggle.setAttribute('aria-label', 'Mostrar contraseña');
+    btnToggle.setAttribute('title', 'Mostrar contraseña');
+    btnToggle.setAttribute('aria-pressed', 'false');
+
+    btnToggle.addEventListener('click', () => {
+        const isPassword = inputClave.type === 'password';
+        inputClave.type = isPassword ? 'text' : 'password';
+        iconEye.innerHTML = isPassword ? svgEye : svgEyeOff;
+        btnToggle.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        btnToggle.setAttribute('title', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        btnToggle.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+        inputClave.focus();
+    });
+}
+
+async function iniciarSesion() {
+    const correo = document.getElementById("correoLogin").value.trim().toLowerCase();
+    const clave = document.getElementById("clave").value;
+    const mensaje = document.getElementById("mensajeLogin");
+
+function renderizarEvidencia(r) {
+    if (r.evidenciaUrl) {
+        return `<a class="evidence-link" href="${escaparHTML(r.evidenciaUrl)}">Ver</a>`;
+    }
 }
 
 function limpiarErroresFormulario(contenedor) {
@@ -10384,6 +10812,261 @@ async function enviarSolicitud() {
             mostrarErrorSolicitud("La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
             return;
         }
+
+        body = { rol, nombre, apellido, identificacion, correo, telefono, clave };
+    }
+
+    try {
+        const data = await api("request_access", { method: "POST", body });
+
+        mensaje.style.display = "block";
+        mensaje.innerText = data.message;
+
+        await mostrarConfirmacionSolicitud();
+
+        document.querySelectorAll("#solicitud input, #solicitud select").forEach(el => {
+            if (el.type === "checkbox") el.checked = false;
+            else el.value = "";
+        });
+
+        const estudiante = document.getElementById("camposSolicitudEstudiante");
+        const personal = document.getElementById("camposSolicitudPersonal");
+        if (estudiante) estudiante.style.display = "none";
+        if (personal) personal.style.display = "none";
+        const claveEst = document.getElementById("claveSolicitud");
+        const claveProf = document.getElementById("claveSolicitudProfesor");
+        if (claveEst) claveEst.value = "";
+        if (claveProf) claveProf.value = "";
+        const epsOtroSolicitud = document.getElementById("epsOtroSolicitud");
+        const grupoEpsOtroSolicitud = document.getElementById("grupoEpsOtroSolicitud");
+        const epsSolicitud = document.getElementById("epsSolicitud");
+        if (epsSolicitud) epsSolicitud.value = "";
+        if (epsOtroSolicitud) { epsOtroSolicitud.value = ""; epsOtroSolicitud.disabled = true; epsOtroSolicitud.required = false; }
+        if (grupoEpsOtroSolicitud) grupoEpsOtroSolicitud.style.display = "none";
+
+        const comunes = document.getElementById("camposSolicitudComunes");
+        if (comunes) comunes.style.display = "none";
+        const rolSelect = document.getElementById("rolSolicitud");
+        if (rolSelect) rolSelect.value = "";
+        llenarAniosServicio();
+        configurarJornadaPorGrado();
+        configurarSelectorEvidencia();
+    configurarValidacionCamposOtro();
+        configurarSelectoresEPS();
+    } catch (error) {
+        // api() ya convierte la respuesta del backend en Error usando data.message.
+        // Por eso aquí se muestra exactamente el mensaje SQL que devuelva PHP.
+        mostrarErrorSolicitud(error.message || "Error desconocido.");
+    }
+}
+
+function configurarSelectorEvidencia() {
+    const input = document.getElementById("evidenciaHora");
+    const nombre = document.getElementById("nombreEvidenciaHora");
+    const quitar = document.getElementById("quitarEvidenciaHora");
+    if (!input || !nombre || !quitar || input.dataset.configurado === "1") return;
+    input.dataset.configurado = "1";
+
+    const actualizar = () => {
+        const archivo = input.files?.[0];
+        nombre.textContent = archivo ? archivo.name : "Ningún archivo seleccionado";
+        quitar.disabled = !archivo;
+        quitar.setAttribute("aria-disabled", String(!archivo));
+    };
+
+    input.addEventListener("change", actualizar);
+    quitar.addEventListener("click", () => {
+        if (quitar.disabled) return;
+        input.value = "";
+        actualizar();
+    });
+    actualizar();
+}
+function reiniciarSelectorEvidencia() {
+    const input = document.getElementById("evidenciaHora");
+    const nombre = document.getElementById("nombreEvidenciaHora");
+    const quitar = document.getElementById("quitarEvidenciaHora");
+    if (input) input.value = "";
+    if (nombre) nombre.textContent = "Ningún archivo seleccionado";
+    if (quitar) {
+        quitar.disabled = true;
+        quitar.setAttribute("aria-disabled", "true");
+    }
+}
+
+function normalizarGradoRegistro(valor) {
+    const texto = String(valor || "").trim().toLowerCase();
+    if (texto === "ciclo v" || texto.includes("ciclo v")) return "Ciclo V";
+    if (/\b11\b/.test(texto)) return "11°";
+    if (/\b10\b/.test(texto)) return "10°";
+    return "";
+}
+
+async function sincronizarDatosRegistroHoras() {
+    if (!usuarioActual || usuarioActual.rol !== "estudiante") return "";
+
+    let grado = normalizarGradoRegistro(usuarioActual.grado || usuarioActual.Grado);
+    try {
+        const data = await api("my_profile");
+        const p = data.profile || {};
+        const gradoPerfil = normalizarGradoRegistro(p.grado || p.Grado);
+        if (gradoPerfil) {
+            grado = gradoPerfil;
+            usuarioActual.grado = gradoPerfil;
+        }
+        if (p.metaHoras != null) usuarioActual.metaHoras = Number(p.metaHoras);
+        if (p.modalidad) usuarioActual.esTecnico = p.modalidad === "tecnico";
+    } catch (_) {
+        // Si el perfil no responde, usamos el grado que ya llegó con la sesión.
+    }
+    return grado;
+}
+
+function configurarRestriccionesRegistroHoras(gradoForzado = "") {
+    const fecha = document.getElementById("fechaHora");
+    const horas = document.getElementById("horasRealizadas");
+    if (!fecha || !horas) return;
+
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+    const anio = hoy.getFullYear();
+    const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+    fecha.min = `${anio}-01-01`;
+    fecha.max = iso(hoy);
+    if (fecha.value && (fecha.value < fecha.min || fecha.value > fecha.max)) fecha.value = "";
+
+    // Las horas son enteros de 1 a 50. No modificar el valor mientras se escribe.
+    horas.min = "1";
+    horas.max = "50";
+    horas.step = "1";
+    horas.inputMode = "numeric";
+}
+
+async function abrirSuperAdmin() {
+    try {
+        const data = await api("superadmin_data");
+        solicitudes = data.requests || [];
+        superAdminData = data;
+        superAdminNavigation = [];
+        superAdminCurrentSection = "inicio";
+        ocultarPantallas();
+        document.getElementById("superAdmin").classList.add("active");
+        document.getElementById("superadminCountStudents").textContent = data.counts?.estudiantes ?? 0;
+        document.getElementById("superadminCountTeachers").textContent = data.counts?.profesores ?? 0;
+        document.getElementById("superadminCountAdmins").textContent = data.counts?.administradores ?? 0;
+        configurarSuperAdmin();
+        mostrarValidacionesSuperAdmin();
+    } catch (e) {
+        const login = document.getElementById("login");
+        ocultarPantallas();
+        login?.classList.add("active");
+        const mensaje = document.getElementById("mensajeLogin");
+        if (mensaje) {
+            mensaje.className = "message auth-error-message";
+            mensaje.style.display = "block";
+            mensaje.textContent = `No fue posible cargar el panel Super Admin: ${e.message}`;
+        }
+    }
+}
+
+let superAdminData = { users: [], roles: [], permissions: [], matrix: {}, settings: {} };
+let superAdminTabConfigured = false;
+let superAdminNavigation = [];
+let superAdminCurrentSection = "inicio";
+
+function configurarSuperAdmin() {
+    if (!superAdminTabConfigured) {
+        document.querySelectorAll("[data-superadmin-tab]").forEach(tab => tab.addEventListener("click", () => mostrarSeccionSuperAdmin(tab.dataset.superadminTab)));
+        superAdminTabConfigured = true;
+    }
+    llenarUsuariosSuperAdmin(); llenarRolesSuperAdmin(); llenarConfiguracionSuperAdmin();
+}
+
+function mostrarSeccionSuperAdmin(nombre, registrar = true) {
+    const titulos = { inicio: "Plantel de Super Admin", usuarios: "Usuarios", permisos: "Roles y permisos", configuracion: "Configuración", ayuda: "Ayuda", ia: "IA SIGHO" };
+    if (registrar && superAdminCurrentSection !== nombre) superAdminNavigation.push(superAdminCurrentSection);
+    superAdminCurrentSection = nombre;
+    document.querySelectorAll(".superadmin-panel").forEach(panel => { panel.hidden = true; });
+    document.getElementById(`superadminPanel${nombre[0].toUpperCase()}${nombre.slice(1)}`)?.removeAttribute("hidden");
+    document.querySelectorAll("[data-superadmin-tab]").forEach(tab => tab.classList.toggle("active", tab.dataset.superadminTab === nombre));
+    document.getElementById("tituloSuperAdmin").textContent = titulos[nombre] || "Inicio";
+    if (nombre === "permisos") mostrarMatrizPermisos();
+}
+
+function volverSeccionSuperAdmin() {
+    document.querySelectorAll("#superAdmin .more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
+    const anterior = superAdminNavigation.pop();
+    if (anterior) {
+        mostrarSeccionSuperAdmin(anterior, false);
+    } else if (superAdminCurrentSection !== "inicio") {
+        mostrarSeccionSuperAdmin("inicio", false);
+    }
+}
+
+function mostrarAyudaSuperAdmin(tema) {
+    const respuestas = {
+        usuarios: "En Usuarios puedes crear cuentas, editar sus datos, cambiar el rol, activar o desactivar cuentas y filtrar por nombre, correo, identificación o rol.",
+        permisos: "En Roles y permisos selecciona un rol y activa solo los permisos que necesita. Estudiante, Profesor y Administrador tienen permisos diferentes; el Super Admin conserva el control completo.",
+        configuracion: "En Configuración puedes actualizar los valores generales que utiliza SIGHO, como el dominio institucional y las metas de horas.",
+        volver: "Usa Volver al inicio en el menú de puntos o el botón Atrás del navegador. Las evidencias ahora se abren en la misma pestaña para que puedas regresar normalmente."
+    };
+    const answer = document.getElementById("superadminHelpAnswer");
+    if (answer) answer.textContent = respuestas[tema] || "Selecciona una pregunta.";
+}
+
+function consultarAyudaRol(rol) {
+    const input = document.getElementById(`preguntaAyuda${rol.charAt(0).toUpperCase()}${rol.slice(1)}`);
+    const answer = document.getElementById(`respuestaAyuda${rol.charAt(0).toUpperCase()}${rol.slice(1)}`);
+    const pregunta = (input?.value || "").trim().toLowerCase();
+    const respuestas = {
+        estudiante: {
+            registro: "Para registrar una jornada entra a Registrar horas, completa fecha, entrada, salida, descripción y adjunta la evidencia. El registro quedará pendiente hasta que un profesor lo revise.",
+            hora: "Las horas solo se suman como aprobadas cuando el profesor acepta el registro. Las jornadas pendientes o rechazadas no cuentan como aprobadas.",
+            cuenta: "En Mis datos puedes consultar y actualizar la información permitida de tu perfil. Si olvidaste tu contraseña, solicita ayuda al administrador.",
+            general: "Puedo orientarte sobre registrar horas, evidencias, estados de tus jornadas, progreso y datos de tu cuenta."
+        },
+        profesor: {
+            registro: "En Registros pendientes revisa fecha, horario, actividad y evidencia. Después puedes aceptar o rechazar la jornada y dejar una observación.",
+            estudiante: "En Mis estudiantes ves únicamente los estudiantes relacionados con tu sede y proyecto asignados.",
+            cuenta: "En Mis datos puedes actualizar los campos permitidos y cambiar tu contraseña desde Seguridad de la cuenta.",
+            general: "Puedo orientarte sobre registros pendientes, estudiantes asignados, historial, observaciones y tu perfil."
+        },
+        administrador: {
+            profesor: "En Gestión de profesores puedes consultar y asignar la sede y el proyecto de cada docente.",
+            solicitud: "En Solicitudes puedes revisar y aceptar o rechazar solicitudes de estudiantes, profesores y permisos de Administrador.",
+            progreso: "En Progreso de estudiantes puedes consultar horas aprobadas, faltantes y porcentaje de avance.",
+            general: "Puedo orientarte sobre profesores, solicitudes, progreso, historial y funciones generales del sistema."
+        }
+    };
+    const contenido = respuestas[rol] || {};
+    let respuesta = contenido.general;
+    if (pregunta.includes("registro") || pregunta.includes("jornada") || pregunta.includes("evidencia")) respuesta = contenido.registro || respuesta;
+    else if (pregunta.includes("hora") || pregunta.includes("progreso")) respuesta = contenido.hora || contenido.progreso || respuesta;
+    else if (pregunta.includes("estudiante")) respuesta = contenido.estudiante || respuesta;
+    else if (pregunta.includes("profesor")) respuesta = contenido.profesor || respuesta;
+    else if (pregunta.includes("solicitud")) respuesta = contenido.solicitud || respuesta;
+    else if (pregunta.includes("cuenta") || pregunta.includes("contraseña") || pregunta.includes("perfil")) respuesta = contenido.cuenta || respuesta;
+    if (answer) answer.textContent = pregunta ? respuesta : "Escribe una pregunta para recibir orientación.";
+}
+
+function preguntaRapidaAyuda(rol, pregunta) {
+    const id = `preguntaAyuda${rol.charAt(0).toUpperCase()}${rol.slice(1)}`;
+    const input = document.getElementById(id);
+    if (input) input.value = pregunta;
+    consultarAyudaRol(rol);
+}
+
+function alternarChatAyuda(rol) {
+    const sufijo = rol === "superadmin" ? "Superadmin" : rol.charAt(0).toUpperCase() + rol.slice(1);
+    const chat = document.getElementById(`chatAyuda${sufijo}`);
+    const launcher = document.querySelector(`[aria-controls="chatAyuda${sufijo}"]`);
+    if (!chat) return;
+    const abierto = chat.style.display === "flex";
+    chat.style.display = abierto ? "none" : "flex";
+    launcher?.setAttribute("aria-expanded", abierto ? "false" : "true");
+    if (!abierto) chat.querySelector("input")?.focus();
+}
 
         body = { rol, nombre, apellido, identificacion, correo, telefono, clave };
     }
@@ -11906,7 +12589,7 @@ function mostrarErrorCampo(input, mensaje) {
                 if (input.type !== 'select-one' && input.type !== 'select-multiple') {
                     input.value = crudo;
                 }
-                if (input.disabled) {
+                if (input.disabled || input.readOnly) {
                     limpiarErrorCampo(input);
                     return;
                 }
@@ -15324,5 +16007,300 @@ body.dark-mode .password-universal-wrapper input.password-universal-visible[type
     }
 }
 </style>
+
+<style id="sigho-form-validation-states-v43">
+/* Estados de error/validacion: solo campos y mensajes asociados. */
+.is-invalid,
+.error,
+.campo-error {
+    border: 1px solid #dc3545 !important;
+    background-color: #fff8f8 !important;
+}
+
+.field-error-message,
+.form-text.error,
+.error-message {
+    color: #dc3545 !important;
+}
+
+html.dark-mode input.is-invalid,
+body.dark-mode input.is-invalid,
+html.dark-mode select.is-invalid,
+body.dark-mode select.is-invalid,
+html.dark-mode textarea.is-invalid,
+body.dark-mode textarea.is-invalid,
+html.dark-mode input.error,
+body.dark-mode input.error,
+html.dark-mode select.error,
+body.dark-mode select.error,
+html.dark-mode textarea.error,
+body.dark-mode textarea.error,
+html.dark-mode input.campo-error,
+body.dark-mode input.campo-error,
+html.dark-mode select.campo-error,
+body.dark-mode select.campo-error,
+html.dark-mode textarea.campo-error,
+body.dark-mode textarea.campo-error,
+html[data-theme="dark"] input.is-invalid,
+body[data-theme="dark"] input.is-invalid,
+html[data-theme="dark"] select.is-invalid,
+body[data-theme="dark"] select.is-invalid,
+html[data-theme="dark"] textarea.is-invalid,
+body[data-theme="dark"] textarea.is-invalid,
+html[data-theme="dark"] input.error,
+body[data-theme="dark"] input.error,
+html[data-theme="dark"] select.error,
+body[data-theme="dark"] select.error,
+html[data-theme="dark"] textarea.error,
+body[data-theme="dark"] textarea.error,
+html[data-theme="dark"] input.campo-error,
+body[data-theme="dark"] input.campo-error,
+html[data-theme="dark"] select.campo-error,
+body[data-theme="dark"] select.campo-error,
+html[data-theme="dark"] textarea.campo-error,
+body[data-theme="dark"] textarea.campo-error {
+    border: 1px solid #ff4d4d !important;
+    background-color: rgba(255, 77, 77, 0.1) !important;
+    box-shadow: 0 0 8px rgba(255, 77, 77, 0.4) !important;
+}
+
+html.dark-mode .field-error-message,
+body.dark-mode .field-error-message,
+html.dark-mode .form-text.error,
+body.dark-mode .form-text.error,
+html.dark-mode .error-message,
+body.dark-mode .error-message,
+html[data-theme="dark"] .field-error-message,
+body[data-theme="dark"] .field-error-message,
+html[data-theme="dark"] .form-text.error,
+body[data-theme="dark"] .form-text.error,
+html[data-theme="dark"] .error-message,
+body[data-theme="dark"] .error-message {
+    color: #ff6b6b !important;
+    font-weight: 500 !important;
+}
+
+html.dark-mode .form-text,
+body.dark-mode .form-text,
+html.dark-mode input::placeholder,
+body.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder,
+body.dark-mode textarea::placeholder,
+html.dark-mode select::placeholder,
+body.dark-mode select::placeholder,
+html[data-theme="dark"] .form-text,
+body[data-theme="dark"] .form-text,
+html[data-theme="dark"] input::placeholder,
+body[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder,
+body[data-theme="dark"] textarea::placeholder,
+html[data-theme="dark"] select::placeholder,
+body[data-theme="dark"] select::placeholder {
+    color: #a0aec0 !important;
+    opacity: 1 !important;
+}
+</style>
+
+
+<style id="sigho-validation-help-separation-v45">
+/* =========================================================
+   SIGHO — SEPARACIÓN ENTRE AYUDA INFORMATIVA Y ERROR DE VALIDACIÓN
+   Solo los mensajes marcados explícitamente como error cambian a rojo.
+   ========================================================= */
+
+/* AYUDAS NORMALES: siempre neutras; nunca dependen del estado del campo. */
+html.dark-mode .field-help,
+body.dark-mode .field-help,
+html[data-theme="dark"] .field-help,
+body[data-theme="dark"] .field-help {
+    color: #a0aec0 !important;
+    font-weight: 400 !important;
+    opacity: 1 !important;
+}
+
+html.dark-mode .texto-ayuda:not(.mensaje-error):not(.invalid-feedback),
+body.dark-mode .texto-ayuda:not(.mensaje-error):not(.invalid-feedback),
+html[data-theme="dark"] .texto-ayuda:not(.mensaje-error):not(.invalid-feedback),
+body[data-theme="dark"] .texto-ayuda:not(.mensaje-error):not(.invalid-feedback),
+html.dark-mode .form-text:not(.mensaje-error):not(.invalid-feedback):not(.error-message),
+body.dark-mode .form-text:not(.mensaje-error):not(.invalid-feedback):not(.error-message),
+html[data-theme="dark"] .form-text:not(.mensaje-error):not(.invalid-feedback):not(.error-message),
+body[data-theme="dark"] .form-text:not(.mensaje-error):not(.invalid-feedback):not(.error-message) {
+    color: #a0aec0 !important;
+    font-weight: 400 !important;
+    opacity: 1 !important;
+}
+
+/* ERRORES EXPLÍCITOS: modo claro. */
+.field-error-message,
+.mensaje-error,
+.invalid-feedback,
+.form-text.error,
+.error-message {
+    color: #dc3545 !important;
+    font-weight: 500 !important;
+}
+
+/* ERRORES EXPLÍCITOS: modo oscuro.
+   No se colorean small/span/form-text genéricos por estar dentro de un grupo en error. */
+html.dark-mode .field-error-message,
+body.dark-mode .field-error-message,
+html.dark-mode .mensaje-error,
+body.dark-mode .mensaje-error,
+html.dark-mode .invalid-feedback,
+body.dark-mode .invalid-feedback,
+html.dark-mode .form-text.error,
+body.dark-mode .form-text.error,
+html.dark-mode .error-message,
+body.dark-mode .error-message,
+html[data-theme="dark"] .field-error-message,
+body[data-theme="dark"] .field-error-message,
+html[data-theme="dark"] .mensaje-error,
+body[data-theme="dark"] .mensaje-error,
+html[data-theme="dark"] .invalid-feedback,
+body[data-theme="dark"] .invalid-feedback,
+html[data-theme="dark"] .form-text.error,
+body[data-theme="dark"] .form-text.error,
+html[data-theme="dark"] .error-message,
+body[data-theme="dark"] .error-message {
+    color: #ff6b6b !important;
+    font-weight: 500 !important;
+}
+
+/* Mensajes explícitos como hermanos inmediatos o posteriores del campo con error. */
+html.dark-mode input.error + .mensaje-error,
+body.dark-mode input.error + .mensaje-error,
+html.dark-mode input.error ~ .mensaje-error,
+body.dark-mode input.error ~ .mensaje-error,
+html.dark-mode input.error + .invalid-feedback,
+body.dark-mode input.error + .invalid-feedback,
+html.dark-mode input.error ~ .invalid-feedback,
+body.dark-mode input.error ~ .invalid-feedback,
+html.dark-mode input.error + .field-error-message,
+body.dark-mode input.error + .field-error-message,
+html.dark-mode input.error ~ .field-error-message,
+body.dark-mode input.error ~ .field-error-message,
+html.dark-mode input.is-invalid + .mensaje-error,
+body.dark-mode input.is-invalid + .mensaje-error,
+html.dark-mode input.is-invalid ~ .mensaje-error,
+body.dark-mode input.is-invalid ~ .mensaje-error,
+html.dark-mode input.is-invalid + .invalid-feedback,
+body.dark-mode input.is-invalid + .invalid-feedback,
+html.dark-mode input.is-invalid ~ .invalid-feedback,
+body.dark-mode input.is-invalid ~ .invalid-feedback,
+html.dark-mode input.is-invalid + .field-error-message,
+body.dark-mode input.is-invalid + .field-error-message,
+html.dark-mode input.is-invalid ~ .field-error-message,
+body.dark-mode input.is-invalid ~ .field-error-message,
+html.dark-mode input.campo-error + .mensaje-error,
+body.dark-mode input.campo-error + .mensaje-error,
+html.dark-mode input.campo-error ~ .mensaje-error,
+body.dark-mode input.campo-error ~ .mensaje-error,
+html.dark-mode input.campo-error + .invalid-feedback,
+body.dark-mode input.campo-error + .invalid-feedback,
+html.dark-mode input.campo-error ~ .invalid-feedback,
+body.dark-mode input.campo-error ~ .invalid-feedback,
+html.dark-mode input.campo-error + .field-error-message,
+body.dark-mode input.campo-error + .field-error-message,
+html.dark-mode input.campo-error ~ .field-error-message,
+body.dark-mode input.campo-error ~ .field-error-message {
+    color: #ff6b6b !important;
+    font-weight: 500 !important;
+}
+
+/* También para select y textarea cuando el mensaje de error es explícito. */
+html.dark-mode select.error ~ .mensaje-error,
+body.dark-mode select.error ~ .mensaje-error,
+html.dark-mode select.error ~ .invalid-feedback,
+body.dark-mode select.error ~ .invalid-feedback,
+html.dark-mode select.error ~ .field-error-message,
+body.dark-mode select.error ~ .field-error-message,
+html.dark-mode select.is-invalid ~ .mensaje-error,
+body.dark-mode select.is-invalid ~ .mensaje-error,
+html.dark-mode select.is-invalid ~ .invalid-feedback,
+body.dark-mode select.is-invalid ~ .invalid-feedback,
+html.dark-mode select.is-invalid ~ .field-error-message,
+body.dark-mode select.is-invalid ~ .field-error-message,
+html.dark-mode select.campo-error ~ .mensaje-error,
+body.dark-mode select.campo-error ~ .mensaje-error,
+html.dark-mode select.campo-error ~ .invalid-feedback,
+body.dark-mode select.campo-error ~ .invalid-feedback,
+html.dark-mode select.campo-error ~ .field-error-message,
+body.dark-mode select.campo-error ~ .field-error-message,
+html.dark-mode textarea.error ~ .mensaje-error,
+body.dark-mode textarea.error ~ .mensaje-error,
+html.dark-mode textarea.error ~ .invalid-feedback,
+body.dark-mode textarea.error ~ .invalid-feedback,
+html.dark-mode textarea.error ~ .field-error-message,
+body.dark-mode textarea.error ~ .field-error-message,
+html.dark-mode textarea.is-invalid ~ .mensaje-error,
+body.dark-mode textarea.is-invalid ~ .mensaje-error,
+html.dark-mode textarea.is-invalid ~ .invalid-feedback,
+body.dark-mode textarea.is-invalid ~ .invalid-feedback,
+html.dark-mode textarea.is-invalid ~ .field-error-message,
+body.dark-mode textarea.is-invalid ~ .field-error-message,
+html.dark-mode textarea.campo-error ~ .mensaje-error,
+body.dark-mode textarea.campo-error ~ .mensaje-error,
+html.dark-mode textarea.campo-error ~ .invalid-feedback,
+body.dark-mode textarea.campo-error ~ .invalid-feedback,
+html.dark-mode textarea.campo-error ~ .field-error-message,
+body.dark-mode textarea.campo-error ~ .field-error-message {
+    color: #ff6b6b !important;
+    font-weight: 500 !important;
+}
+
+/* Los mensajes dinámicos de SIGHO usan .field-error-message y son el indicador explícito de fallo. */
+html.dark-mode .field-error-message,
+body.dark-mode .field-error-message,
+html[data-theme="dark"] .field-error-message,
+body[data-theme="dark"] .field-error-message {
+    color: #ff6b6b !important;
+    font-weight: 500 !important;
+}
+
+/* Campos informativos: aunque estén dentro de un contenedor que tenga otro error,
+   readonly/disabled no deben conservar un borde o fondo de validación. */
+input[readonly].campo-error,
+input[disabled].campo-error,
+select[disabled].campo-error,
+textarea[readonly].campo-error,
+textarea[disabled].campo-error,
+html.dark-mode input[readonly].campo-error,
+body.dark-mode input[readonly].campo-error,
+html.dark-mode input[disabled].campo-error,
+body.dark-mode input[disabled].campo-error,
+html.dark-mode select[disabled].campo-error,
+body.dark-mode select[disabled].campo-error,
+html.dark-mode textarea[readonly].campo-error,
+body.dark-mode textarea[readonly].campo-error,
+html.dark-mode textarea[disabled].campo-error,
+body.dark-mode textarea[disabled].campo-error {
+    border-color: inherit !important;
+    box-shadow: none !important;
+}
+</style>
+
+<script id="sigho-validation-informative-fields-v45">
+/* Campos informativos/deshabilitados: nunca deben quedar marcados como error. */
+(function protegerCamposInformativosDeValidacion() {
+    function limpiarEstadosInformativos() {
+        document.querySelectorAll('input[readonly], input[disabled], select[disabled], textarea[readonly], textarea[disabled]').forEach(function (el) {
+            el.classList.remove('campo-error', 'is-invalid');
+            el.setCustomValidity('');
+            const grupo = el.closest('.form-group');
+            const mensaje = grupo ? grupo.querySelector('.field-error-message') : null;
+            if (mensaje) {
+                mensaje.textContent = '';
+                mensaje.style.display = 'none';
+            }
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', limpiarEstadosInformativos, { once: true });
+    } else {
+        limpiarEstadosInformativos();
+    }
+})();
+</script>
 </body>
 </html>
