@@ -7807,8 +7807,951 @@ body.dark-mode .ai-help-launcher {
     box-shadow: 0 10px 30px rgba(0,0,0,.35) !important;
 }
 </style>
+
+<style id="sigho-xbox-splash-css">
+/* =========================================================
+   SIGHO — SPLASH SCREEN
+   Glow HD optimizado — mismos tiempos de la animación original.
+   ========================================================= */
+
+:root {
+    --sigho-splash-bg: #0b0e14;
+    --sigho-splash-green: #107c10;
+    --sigho-splash-white: #f8fbff;
+}
+
+/* Capa completa de arranque */
+#sigho-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483646;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--sigho-splash-bg);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: opacity;
+    transition: opacity .85s cubic-bezier(.22, .61, .36, 1), visibility 0s linear 0s;
+}
+
+html.sigho-fouc-pending #sigho-splash {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#sigho-splash.sigho-splash-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .85s cubic-bezier(.22, .61, .36, 1), visibility 0s linear .85s;
+}
+
+/* Halo: permanece pequeño; la expansión visual se produce con sombras. */
+.sigho-splash-halo {
+    position: absolute;
+    left: 50%;
+    top: 44%;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(16, 124, 16, .10);
+    box-shadow: 0 0 5px 2px rgba(16, 124, 16, .20), 0 0 14px 5px rgba(16, 124, 16, .14), 0 0 28px 10px rgba(16, 124, 16, .09), 0 0 55px 18px rgba(16, 124, 16, .055), 0 0 95px 30px rgba(16, 124, 16, .025);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-50%, -50%, 0);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: opacity, box-shadow;
+    animation: sighoHaloExpand 2.15s cubic-bezier(.16, .72, .24, 1) .15s forwards;
+}
+
+.sigho-splash-halo::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    background: rgba(16, 124, 16, .12);
+    box-shadow: 0 0 8px 2px rgba(16, 124, 16, .16), 0 0 18px 5px rgba(16, 124, 16, .08), 0 0 32px 9px rgba(16, 124, 16, .04);
+    opacity: .8;
+    will-change: opacity;
+    backface-visibility: hidden;
+}
+
+.sigho-splash-halo::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    background: transparent;
+    box-shadow: 0 0 70px 25px rgba(16, 124, 16, .025), 0 0 120px 45px rgba(16, 124, 16, .014);
+    opacity: .8;
+    will-change: opacity;
+    backface-visibility: hidden;
+}
+
+@keyframes sighoHaloExpand {
+    0% {
+        opacity: 0;
+        box-shadow: 0 0 5px 2px rgba(16, 124, 16, .20), 0 0 14px 5px rgba(16, 124, 16, .14), 0 0 28px 10px rgba(16, 124, 16, .09), 0 0 55px 18px rgba(16, 124, 16, .055), 0 0 95px 30px rgba(16, 124, 16, .025);
+    }
+    18% {
+        opacity: .95;
+        box-shadow: 0 0 10px 3px rgba(16, 124, 16, .22), 0 0 24px 8px rgba(16, 124, 16, .16), 0 0 55px 18px rgba(16, 124, 16, .11), 0 0 105px 38px rgba(16, 124, 16, .065), 0 0 180px 65px rgba(16, 124, 16, .032);
+    }
+    58% {
+        opacity: .48;
+        box-shadow: 0 0 14px 4px rgba(16, 124, 16, .15), 0 0 35px 12px rgba(16, 124, 16, .11), 0 0 80px 28px rgba(16, 124, 16, .075), 0 0 170px 65px rgba(16, 124, 16, .040), 0 0 300px 115px rgba(16, 124, 16, .018);
+    }
+    100% {
+        opacity: 0;
+        box-shadow: 0 0 20px 6px rgba(16, 124, 16, 0), 0 0 55px 18px rgba(16, 124, 16, 0), 0 0 120px 45px rgba(16, 124, 16, 0), 0 0 260px 100px rgba(16, 124, 16, 0), 0 0 450px 190px rgba(16, 124, 16, 0);
+    }
+}
+
+/* Contenedor central */
+.sigho-splash-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: min(92vw, 720px);
+    text-align: center;
+}
+
+/* Zona del escudo */
+.sigho-splash-crest-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(145px, 22vw, 205px);
+    height: clamp(145px, 22vw, 205px);
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(.18);
+    will-change: transform, opacity, filter;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    filter:
+        drop-shadow(0 0 0 rgba(23, 105, 170, 0))
+        brightness(.72);
+    animation: sighoCrestEntrance 1.55s cubic-bezier(.16, .72, .24, 1) .25s forwards;
+}
+
+/* Anillo luminoso alrededor del escudo */
+.sigho-splash-ring {
+    position: absolute;
+    inset: -8%;
+    border: 1px solid rgba(116, 190, 255, .0);
+    border-radius: 50%;
+    transform: scale(.7);
+    opacity: 0;
+    box-shadow:
+        0 0 18px rgba(23, 105, 170, .0),
+        inset 0 0 18px rgba(255, 255, 255, .0);
+    animation: sighoRingPulse 1.8s ease-out .55s forwards;
+}
+
+/* Escudo */
+.sigho-splash-crest {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .03);
+}
+
+/* Bloque de textos */
+.sigho-splash-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: clamp(22px, 3.5vh, 34px);
+}
+
+/* SIGHO */
+.sigho-splash-title {
+    color: var(--sigho-splash-white);
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: clamp(42px, 7vw, 68px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: clamp(5px, 1.1vw, 10px);
+    padding-left: clamp(5px, 1.1vw, 10px);
+    text-shadow:
+        0 0 10px rgba(255, 255, 255, .18),
+        0 0 35px rgba(23, 105, 170, .20);
+    opacity: 0;
+    transform: translateY(28px);
+    animation: sighoTextUp 1s cubic-bezier(.22, .61, .36, 1) 1.28s forwards;
+}
+
+/* Nombre institucional */
+.sigho-splash-subtitle {
+    max-width: 680px;
+    margin-top: 13px;
+    padding: 0 15px;
+    color: rgba(232, 241, 249, .78);
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: clamp(10px, 1.45vw, 14px);
+    font-weight: 500;
+    line-height: 1.55;
+    letter-spacing: clamp(1.3px, .28vw, 2.6px);
+    text-shadow: 0 0 18px rgba(23, 105, 170, .18);
+    opacity: 0;
+    transform: translateY(24px);
+    animation: sighoTextUp 1s cubic-bezier(.22, .61, .36, 1) 1.48s forwards;
+}
+
+/* Línea tenue de luz inferior */
+.sigho-splash-text::after {
+    content: "";
+    display: block;
+    width: min(260px, 55vw);
+    height: 1px;
+    margin-top: 22px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(116, 190, 255, .55),
+        transparent
+    );
+    transform: scaleX(.15);
+    opacity: 0;
+    animation: sighoLineReveal .9s ease-out 1.7s forwards;
+}
+
+/* =========================
+   KEYFRAMES
+   ========================= */
+
+@keyframes sighoCrestEntrance {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 0, 0) scale(.18);
+        filter:
+            drop-shadow(0 0 0 rgba(23, 105, 170, 0))
+            brightness(.72);
+    }
+    34% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1.08);
+        filter:
+            drop-shadow(0 0 18px rgba(23, 105, 170, .8))
+            brightness(1.08);
+    }
+    60% {
+        transform: translate3d(0, 0, 0) scale(.97);
+        filter:
+            drop-shadow(0 0 30px rgba(23, 105, 170, .52))
+            brightness(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+        filter:
+            drop-shadow(0 0 22px rgba(23, 105, 170, .30))
+            brightness(1);
+    }
+}
+
+@keyframes sighoRingPulse {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 0, 0) scale(.7);
+        border-color: rgba(116, 190, 255, 0);
+        box-shadow: 0 0 18px rgba(23, 105, 170, 0);
+    }
+    30% {
+        opacity: .9;
+        transform: translate3d(0, 0, 0) scale(1);
+        border-color: rgba(116, 190, 255, .72);
+        box-shadow:
+            0 0 22px rgba(23, 105, 170, .45),
+            inset 0 0 18px rgba(255, 255, 255, .12);
+    }
+    100% {
+        opacity: 0;
+        transform: translate3d(0, 0, 0) scale(1.25);
+        border-color: rgba(116, 190, 255, 0);
+        box-shadow:
+            0 0 45px rgba(23, 105, 170, 0),
+            inset 0 0 35px rgba(255, 255, 255, 0);
+    }
+}
+
+@keyframes sighoTextUp {
+    0% {
+        opacity: 0;
+        transform: translateY(28px);
+        filter: blur(5px);
+    }
+    60% {
+        opacity: 1;
+        filter: blur(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+@keyframes sighoLineReveal {
+    0% {
+        opacity: 0;
+        transform: scaleX(.15);
+    }
+    100% {
+        opacity: .7;
+        transform: scaleX(1);
+    }
+}
+
+/* Accesibilidad: reducir movimiento si el usuario lo solicita. */
+@media (prefers-reduced-motion: reduce) {
+    #sigho-splash,
+    #sigho-splash.sigho-splash-hidden {
+        transition-duration: .2s;
+    }
+
+    .sigho-splash-halo,
+    .sigho-splash-crest-wrap,
+    .sigho-splash-ring,
+    .sigho-splash-title,
+    .sigho-splash-subtitle,
+    .sigho-splash-text::after {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+    }
+
+    .sigho-splash-halo,
+    .sigho-splash-ring {
+        opacity: .2 !important;
+    }
+}
+
+/* Móviles */
+@media (max-width: 520px) {
+    .sigho-splash-content {
+        width: 94vw;
+    }
+
+    .sigho-splash-subtitle {
+        max-width: 350px;
+    }
+
+    .sigho-splash-text {
+        margin-top: 19px;
+    }
+}
+
+
+/* =========================================================
+   SIGHO — AVISO DE USO INSTITUCIONAL / PRE-ARRANQUE
+   ========================================================= */
+body.sigho-awaiting-terms #sigho-splash,
+body.sigho-awaiting-terms #sigho-splash * {
+    animation-play-state: paused !important;
+}
+
+#sigho-terms-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(5, 8, 13, .88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity .38s cubic-bezier(.22,.61,.36,1), visibility 0s linear 0s;
+}
+
+#sigho-terms-gate.sigho-terms-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .38s cubic-bezier(.22,.61,.36,1), visibility 0s linear .38s;
+}
+
+.sigho-terms-card {
+    position: relative;
+    width: min(92vw, 560px);
+    padding: clamp(28px, 5vw, 42px);
+    border: 1px solid rgba(116, 190, 255, .24);
+    border-radius: 24px;
+    background: linear-gradient(145deg, rgba(16, 23, 34, .98), rgba(8, 12, 19, .98));
+    box-shadow:
+        0 28px 80px rgba(0, 0, 0, .58),
+        0 0 38px rgba(23, 105, 170, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .055);
+    color: #f4f8fb;
+    text-align: center;
+    transform: translate3d(0, 12px, 0) scale(.97);
+    animation: sighoTermsCardIn .55s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+.sigho-terms-card::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: 23px;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 0%, rgba(23,105,170,.12), transparent 52%);
+}
+
+.sigho-terms-icon {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid rgba(116,190,255,.28);
+    background: rgba(23,105,170,.10);
+    box-shadow: 0 0 28px rgba(23,105,170,.14), inset 0 0 18px rgba(255,255,255,.035);
+    font-size: 28px;
+}
+
+.sigho-terms-title {
+    position: relative;
+    margin: 0 0 14px;
+    font-size: clamp(23px, 4vw, 31px);
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.sigho-terms-text {
+    position: relative;
+    margin: 0 auto;
+    max-width: 470px;
+    color: rgba(229, 237, 244, .78);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.sigho-terms-action {
+    position: relative;
+    width: 100%;
+    min-height: 52px;
+    margin-top: 28px;
+    border: 1px solid rgba(116,190,255,.42);
+    border-radius: 14px;
+    padding: 13px 20px;
+    background: linear-gradient(135deg, #1769aa, #2385cf);
+    color: #fff;
+    font: inherit;
+    font-weight: 750;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 10px 28px rgba(23,105,170,.24), inset 0 1px 0 rgba(255,255,255,.14);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+.sigho-terms-action:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+    box-shadow: 0 14px 34px rgba(23,105,170,.34), 0 0 24px rgba(116,190,255,.13);
+}
+
+.sigho-terms-action:active {
+    transform: translateY(0) scale(.985);
+}
+
+.sigho-terms-action:focus-visible {
+    outline: 2px solid #8fd0ff;
+    outline-offset: 3px;
+}
+
+.sigho-terms-note {
+    position: relative;
+    margin: 15px 0 0;
+    color: rgba(180, 195, 208, .52);
+    font-size: 11px;
+}
+
+@keyframes sighoTermsCardIn {
+    from { opacity: 0; transform: translate3d(0, 18px, 0) scale(.96); }
+    to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@media (max-width: 520px) {
+    #sigho-terms-gate { padding: 16px; }
+    .sigho-terms-card { border-radius: 20px; padding: 27px 21px; }
+    .sigho-terms-card::before { border-radius: 19px; }
+    .sigho-terms-text { font-size: 14px; line-height: 1.62; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sigho-terms-card,
+    #sigho-terms-gate,
+    .sigho-terms-action { animation: none !important; transition: none !important; }
+}
+
+</style>
+
+
+<style id="sigho-login-welcome-loader-v1">
+/* ==============================================================
+   SIGHO — WELCOME LOADER DE LOGIN
+   Aparece después de una autenticación correcta y antes de abrir
+   el panel del rol. Diseño oscuro tipo Xbox, con escudo circular.
+   ============================================================== */
+
+#welcome-loader.sigho-login-welcome-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+
+    padding: 28px;
+    box-sizing: border-box;
+
+    background:
+        radial-gradient(circle at 50% 42%, rgba(0, 170, 255, 0.12) 0%, rgba(11, 14, 20, 0.96) 34%, #0b0e14 74%),
+        #0b0e14;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translateZ(0);
+    will-change: opacity, visibility;
+    transition: opacity 500ms ease, visibility 500ms ease;
+
+    overflow: hidden;
+}
+
+#welcome-loader.sigho-login-welcome-loader::before {
+    content: "";
+    position: absolute;
+    width: min(72vw, 620px);
+    height: min(72vw, 620px);
+    border-radius: 50%;
+    border: 1px solid rgba(85, 184, 255, 0.11);
+    box-shadow:
+        0 0 80px rgba(0, 145, 255, 0.10),
+        inset 0 0 80px rgba(0, 145, 255, 0.05);
+    animation: sighoWelcomePulse 2.4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+#welcome-loader.sigho-login-welcome-loader.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+#welcome-loader.sigho-login-welcome-loader.is-closing {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.sigho-welcome-stage {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: min(92vw, 760px);
+    text-align: center;
+    transform: translateZ(0);
+}
+
+.sigho-welcome-crest-wrap {
+    position: relative;
+    width: clamp(120px, 17vw, 180px);
+    height: clamp(120px, 17vw, 180px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: visible;
+    animation: sighoWelcomeCrestIn 900ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.sigho-welcome-crest-wrap::before,
+.sigho-welcome-crest-wrap::after {
+    content: "";
+    position: absolute;
+    inset: -18px;
+    border-radius: 50%;
+    border: 1px solid rgba(85, 184, 255, 0.28);
+    box-shadow:
+        0 0 20px rgba(0, 145, 255, 0.20),
+        0 0 55px rgba(0, 145, 255, 0.10);
+    animation: sighoWelcomeRing 2.2s ease-out infinite;
+    pointer-events: none;
+}
+
+.sigho-welcome-crest-wrap::after {
+    inset: -34px;
+    opacity: .40;
+    animation-delay: .55s;
+}
+
+.sigho-welcome-crest {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow:
+        0 0 24px rgba(85, 184, 255, 0.20),
+        0 0 75px rgba(0, 145, 255, 0.14);
+}
+
+.sigho-welcome-copy {
+    margin-top: 34px;
+    animation: sighoWelcomeTextIn 850ms 150ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.sigho-welcome-title {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-shadow: 0 0 25px rgba(85, 184, 255, .22);
+}
+
+.sigho-welcome-subtitle {
+    margin: 16px 0 0;
+    color: rgba(235, 242, 250, .72);
+    font-size: clamp(.92rem, 2vw, 1.05rem);
+    line-height: 1.6;
+}
+
+.sigho-welcome-user {
+    margin: 10px 0 0;
+    color: #55b8ff;
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    line-height: 1.5;
+    font-weight: 700;
+}
+
+@keyframes sighoWelcomeCrestIn {
+    0% {
+        opacity: 0;
+        transform: scale(.72) rotate(-4deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0);
+    }
+}
+
+@keyframes sighoWelcomeTextIn {
+    0% {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes sighoWelcomeRing {
+    0% {
+        opacity: .72;
+        transform: scale(.82);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.18);
+    }
+}
+
+@keyframes sighoWelcomePulse {
+    0%, 100% {
+        opacity: .35;
+        transform: scale(.94);
+    }
+    50% {
+        opacity: .70;
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 600px) {
+    #welcome-loader.sigho-login-welcome-loader {
+        padding: 20px;
+    }
+
+    .sigho-welcome-copy {
+        margin-top: 28px;
+    }
+
+    .sigho-welcome-subtitle {
+        max-width: 340px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #welcome-loader.sigho-login-welcome-loader::before,
+    .sigho-welcome-crest-wrap,
+    .sigho-welcome-crest-wrap::before,
+    .sigho-welcome-crest-wrap::after,
+    .sigho-welcome-copy {
+        animation: none !important;
+    }
+}
+</style>
+
 </head>
-<body>
+<body class="sigho-awaiting-terms">
+
+<!-- =========================================================
+     SIGHO — AVISO DE USO INSTITUCIONAL / PRE-ARRANQUE
+     Este aviso aparece antes de iniciar el splash y el audio.
+     ========================================================= -->
+<div id="sigho-terms-gate" role="dialog" aria-modal="true" aria-labelledby="sigho-terms-title" aria-describedby="sigho-terms-description">
+    <div class="sigho-terms-card">
+        <div class="sigho-terms-icon" aria-hidden="true">✓</div>
+        <h1 class="sigho-terms-title" id="sigho-terms-title">Aviso de Uso Institucional</h1>
+        <p class="sigho-terms-text" id="sigho-terms-description">
+            Esta plataforma está destinada exclusivamente para la gestión del Servicio Social Obligatorio de la Institución Educativa José Joaquín Flórez Hernández. Al continuar, declaras que usas este sistema con fines institucionales autorizados.
+        </p>
+        <button class="sigho-terms-action" id="sigho-terms-accept" type="button">Aceptar y Continuar</button>
+        <p class="sigho-terms-note">Al continuar se habilitan los sonidos y la experiencia de arranque de SIGHO.</p>
+    </div>
+</div>
+
+<!-- =========================================================
+     SIGHO — SPLASH SCREEN / ARRANQUE ESTILO XBOX
+     Se muestra por encima de todo el sitio durante el arranque.
+     ========================================================= -->
+<div id="sigho-splash" class="sigho-splash" aria-label="Cargando SIGHO">
+    <!-- Audio de arranque: se reproduce de forma segura; si el navegador bloquea autoplay, el splash continúa sin sonido. -->
+    <audio
+        id="sigho-startup-audio"
+        preload="auto"
+        aria-hidden="true"
+        src="sonidos/Opera_startup.mp3"
+    ></audio>
+    <div class="sigho-splash-halo" aria-hidden="true"></div>
+
+    <div class="sigho-splash-content">
+        <div class="sigho-splash-crest-wrap">
+            <span class="sigho-splash-ring" aria-hidden="true"></span>
+            <img
+                class="sigho-splash-crest"
+                src="escudo_jjfh.jpg"
+                alt="Escudo de la Institución Educativa José Joaquín Flórez Hernández"
+            />
+        </div>
+
+        <div class="sigho-splash-text">
+            <div class="sigho-splash-title">SIGHO</div>
+            <div class="sigho-splash-subtitle">
+                INSTITUCIÓN EDUCATIVA JOSÉ JOAQUÍN FLÓREZ HERNÁNDEZ
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inicio inmediato del audio: se ejecuta junto al arranque visual del splash. -->
+<script id="sigho-xbox-audio-bootstrap">
+(function () {
+    "use strict";
+
+    /* =========================================================
+       SIGHO — ACTIVACIÓN EXPLÍCITA DE AUDIO + SPLASH XBOX
+       El clic en "Aceptar y Continuar" es el gesto del usuario
+       que desbloquea el audio durante toda la sesión.
+       ========================================================= */
+
+    const SOUND_STARTUP = 'sonidos/Opera_startup.mp3';
+    const SOUND_STARTUP_FALLBACK = 'sonidos/Opera gx startup .mp3';
+    const STARTUP_AUDIO_DURATION = 4442;
+
+    const termsGate = document.getElementById("sigho-terms-gate");
+    const acceptButton = document.getElementById("sigho-terms-accept");
+    const splash = document.getElementById("sigho-splash");
+    const audio = document.getElementById("sigho-startup-audio");
+
+    if (!termsGate || !acceptButton || !splash || !audio) return;
+
+    let accepted = false;
+    let audioContext = null;
+    let fallbackUsed = false;
+
+    /* ---------------------------------------------------------
+       Desbloqueo global del contexto Web Audio.
+       --------------------------------------------------------- */
+    function habilitarContextoAudio() {
+        try {
+            const AudioContextClass =
+                window.AudioContext || window.webkitAudioContext;
+
+            if (AudioContextClass) {
+                if (!audioContext) {
+                    audioContext = new AudioContextClass();
+                }
+
+                if (audioContext.state === "suspended") {
+                    const resumePromise = audioContext.resume();
+                    if (resumePromise && typeof resumePromise.catch === "function") {
+                        resumePromise.catch(function () {});
+                    }
+                }
+
+                window.__sighoAudioContext = audioContext;
+            }
+        } catch (_) {
+            /* El audio HTML5 continúa funcionando aunque Web Audio no esté disponible. */
+        }
+
+        /* Esta bandera habilita navegación, hover y login durante la sesión. */
+        window.__sighoAudioUnlocked = true;
+    }
+
+    /* ---------------------------------------------------------
+       Preparar y reproducir el sonido de arranque.
+       --------------------------------------------------------- */
+    function reproducirArranque() {
+        audio.volume = 0.55;
+        audio.preload = "auto";
+        audio.src = SOUND_STARTUP;
+        audio.load();
+
+        try {
+            audio.currentTime = 0;
+        } catch (_) {}
+
+        /* Si el archivo principal no existe, probar el nombre anterior. */
+        audio.addEventListener("error", function usarNombreAnterior() {
+            if (fallbackUsed) return;
+            fallbackUsed = true;
+
+            try {
+                audio.src = SOUND_STARTUP_FALLBACK;
+                audio.load();
+                audio.currentTime = 0;
+
+                const fallbackPlay = audio.play();
+                if (fallbackPlay && typeof fallbackPlay.catch === "function") {
+                    fallbackPlay.catch(function () {});
+                }
+            } catch (_) {}
+        }, { once: true });
+
+        try {
+            audio.currentTime = 0;
+
+            /* IMPORTANTE: play() ocurre dentro del flujo iniciado por el clic. */
+            const playPromise = audio.play();
+
+            if (playPromise && typeof playPromise.then === "function") {
+                playPromise
+                    .then(function () {
+                        window.__sighoStartupAudioPlaying = true;
+                    })
+                    .catch(function () {
+                        /* Nunca detener el splash si el navegador rechaza audio. */
+                        window.__sighoStartupAudioPlaying = false;
+                    });
+            }
+        } catch (_) {
+            window.__sighoStartupAudioPlaying = false;
+        }
+    }
+
+    /* ---------------------------------------------------------
+       Inicio completo: términos → splash + audio simultáneos.
+       --------------------------------------------------------- */
+    function iniciarArranque() {
+        if (accepted) return;
+        accepted = true;
+
+        acceptButton.disabled = true;
+        acceptButton.setAttribute("aria-disabled", "true");
+
+        /* 1. El clic del usuario desbloquea el audio. */
+        habilitarContextoAudio();
+
+        /* 2. Registrar el instante exacto del inicio visual. */
+        window.__sighoSplashStartedAt = performance.now();
+        window.__sighoStartupAudioDuration = STARTUP_AUDIO_DURATION;
+
+        /* 3. Ocultar aviso institucional. */
+        termsGate.classList.add("sigho-terms-hidden");
+
+        /* 4. En el mismo frame: activar splash y arrancar audio. */
+        window.requestAnimationFrame(function () {
+            document.body.classList.remove("sigho-awaiting-terms");
+            splash.classList.remove("sigho-splash-hidden");
+
+            /* El audio comienza desde el segundo 0. */
+            reproducirArranque();
+
+            /* Avisar a los sistemas globales de audio. */
+            window.dispatchEvent(new CustomEvent("sigho-audio-unlocked"));
+        });
+
+        window.setTimeout(function () {
+            if (termsGate && termsGate.parentNode) {
+                termsGate.remove();
+            }
+        }, 420);
+    }
+
+    acceptButton.addEventListener("click", iniciarArranque, { once: true });
+
+    /* Enter/Espacio mantienen accesibilidad y cuentan como activación del botón. */
+    acceptButton.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            iniciarArranque();
+        }
+    });
+})();
+</script>
+
 <script id="sigho-session-persistence">
 (function () {
     const USER_KEY = "sigho_user";
@@ -8304,6 +9247,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 </div>
 </div>
+</div>
 <!-- CAMPOS PARA PROFESOR / ADMINISTRADOR -->
 <div id="camposSolicitudPersonal" style="display:none;">
 <div class="section">
@@ -8366,7 +9310,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                     Enviar solicitud
                 </button>
 <div class="message" id="mensajeSolicitud"></div>
-</div>
 </div>
 </div></section>
 <!-- =====================================================
@@ -8595,53 +9538,13 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="form-group"><label>Número celular</label><input disabled="" id="perfilTelefono" inputmode="numeric" maxlength="12" pattern="\d{3} \d{3} \d{4}" placeholder="300 123 4567" type="tel"/></div>
 <div class="form-group"><label>Dirección de residencia</label><input disabled="" id="perfilDireccion" maxlength="100" placeholder="Dirección completa" type="text"/></div>
 <div class="form-group">
-<label for="perfilEps">EPS</label>
+<label for="perfilEps">Seguridad Social</label>
 <select disabled="" id="perfilEps">
-<option disabled="" value="">Seleccionar EPS</option>
-<optgroup label="Régimen Contributivo y Mixtas">
-<option value="Nueva EPS">Nueva EPS</option>
-<option value="EPS Sanitas">EPS Sanitas</option>
-<option value="EPS Sura">EPS Sura</option>
-<option value="Salud Total EPS">Salud Total EPS</option>
-<option value="Compensar EPS">Compensar EPS</option>
-<option value="E.P.S. Famisanar">E.P.S. Famisanar</option>
-<option value="Aliansalud EPS">Aliansalud EPS</option>
-<option value="Servicio Occidental de Salud (S.O.S.)">Servicio Occidental de Salud (S.O.S.)</option>
-<option value="Salud Mía EPS">Salud Mía EPS</option>
-</optgroup>
-<optgroup label="Régimen Subsidiado y Cajas de Compensación">
-<option value="Coosalud">Coosalud</option>
-<option value="Mutual Ser">Mutual Ser</option>
-<option value="Capital Salud EPS">Capital Salud EPS</option>
-<option value="Savia Salud EPS">Savia Salud EPS</option>
-<option value="Asmet Salud">Asmet Salud</option>
-<option value="Emssanar">Emssanar</option>
-<option value="Cajacopi Atlántico">Cajacopi Atlántico</option>
-<option value="Capresoca">Capresoca</option>
-<option value="Comfachocó">Comfachocó</option>
-<option value="Comfaoriente">Comfaoriente</option>
-<option value="Comfenalco Valle">Comfenalco Valle</option>
-<option value="EPS Familiar de Colombia">EPS Familiar de Colombia</option>
-</optgroup>
-<optgroup label="Entidades Indígenas (EPSI)">
-<option value="Anas Wayuu EPSI">Anas Wayuu EPSI</option>
-<option value="Asociación Indígena del Cauca (AIC)">Asociación Indígena del Cauca (AIC)</option>
-<option value="Dusakawi EPSI">Dusakawi EPSI</option>
-<option value="Mallamas EPSI">Mallamas EPSI</option>
-<option value="Pijaos Salud EPSI">Pijaos Salud EPSI</option>
-</optgroup>
-<optgroup label="Regímenes Excepcionales y Especiales">
-<option value="EPM – Unidad de Salud">EPM – Unidad de Salud</option>
-<option value="Fondo de Pasivo Social de Ferrocarriles Nacionales">Fondo de Pasivo Social de Ferrocarriles Nacionales</option>
-</optgroup>
-<option value="Otro">Otro</option>
+<option disabled="" selected="" value="">Seleccionar Seguridad Social</option>
 </select>
 </div>
-<div class="form-group eps-otro-group" id="grupoEpsOtroPerfil" style="display:none;">
-<label for="perfilEpsOtro">Especifica tu EPS</label>
-<input disabled="" id="perfilEpsOtro" maxlength="60" pattern="[\p{L}]+(?: [\p{L}]+)*" placeholder="Nombre de la EPS" type="text"/>
-</div>
 <div class="form-group"><label>Nombre del acudiente</label><input disabled="" id="perfilAcudiente" maxlength="60" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" placeholder="Nombre completo" type="text"/></div>
+<div class="form-group"><label for="perfilTipoTelefonoAcudiente">Tipo de línea del acudiente</label><select disabled="" id="perfilTipoTelefonoAcudiente"><option value="">Seleccionar tipo de línea</option><option value="fijo">Teléfono fijo</option><option value="celular">Número celular</option></select></div>
 <div class="form-group"><label>Teléfono del acudiente</label><input disabled="" id="perfilTelefonoAcudiente" inputmode="numeric" maxlength="10" pattern="\d{7,10}" placeholder="7 a 10 dígitos" type="tel"/></div>
 <div class="profile-actions">
 <button class="secondary-button" id="editarPerfilEstudianteBtn" onclick="activarEdicionPerfilEstudiante()" type="button">Editar mis datos</button>
@@ -9563,6 +10466,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         cerrarModales();
         ocultarPantallas();
         document.getElementById("login")?.classList.add("active");
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
         actualizarCamposLogin();
         actualizarIndicadoresObligatorios(document.getElementById("login"));
     }
@@ -9811,7 +10716,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
     }
 
     function configurarValidacionCamposOtro() {
-        const ids = ["epsOtroSolicitud", "proyectoOtro", "perfilEpsOtro"];
+        const ids = ["epsOtroSolicitud", "perfilEpsOtro"];
         ids.forEach(id => {
             const input = document.getElementById(id);
             if (!input || input.dataset.validacionTextoConfigurada === "1") return;
@@ -9834,161 +10739,283 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         });
     }
 
-    // Los datos reales se cargan desde PHP + MySQL.
-    let usuarios = [];
-    let registros = [];
-    let solicitudes = [];
-    let usuarioActual = null;
-try { guardarSesionSigho(usuarioActual); } catch (_) {}
-    let filtroHistorialProfesorActual = "todos";
-    let filtroHistorialAdminActual = "todos";
-    let profesorHistorialAdminActual = "todos";
-    let filtroGradoAdminActual = "todos";
+    function configurarSelectoresEPS() {
+        const configurar = (selectId, grupoOtroId, inputOtroId) => {
+            const select = document.getElementById(selectId);
+            const grupo = document.getElementById(grupoOtroId);
+            const input = document.getElementById(inputOtroId);
+            if (!select || !grupo || !input || select.dataset.epsConfigurado === "1") return;
+            select.dataset.epsConfigurado = "1";
+
+            const actualizar = () => {
+                const esOtro = select.value === "Otro";
+                grupo.style.display = esOtro ? "block" : "none";
+                input.disabled = select.disabled || !esOtro;
+                input.required = esOtro;
+                if (!esOtro) input.value = "";
+            };
+
+            select.addEventListener("change", actualizar);
+            actualizar();
+        };
+
+        configurar("perfilEps", "grupoEpsOtroPerfil", "perfilEpsOtro");
+    }
+
+    function actualizarSeguridadSocialSolicitud() {
+        const tipo = document.getElementById("seguridadSocialTipoSolicitud");
+        const eps = document.getElementById("epsSolicitud");
+        const regimen = document.getElementById("regimenEspecialSolicitud");
+        const letra = document.getElementById("sisbenLetraSolicitud");
+        const numero = document.getElementById("sisbenNumeroSolicitud");
+        if (!tipo || !eps || !regimen || !letra || !numero) return;
+        const selectorSubgrupo = document.getElementById("sisbenSubgrupoToggle");
+        const menuSubgrupo = document.getElementById("sisbenSubgrupoMenu");
+        if (!selectorSubgrupo || !menuSubgrupo) return;
+
+        const grupoEps = document.getElementById("grupoEpsSolicitud");
+        const grupoRegimen = document.getElementById("grupoRegimenEspecialSolicitud");
+        const grupoSisben = document.getElementById("grupoSisbenSolicitud");
+        const esEstudiante = document.getElementById("rolSolicitud")?.value === "estudiante";
+        const actualizarNumerosSisben = () => {
+            const maximo = { A: 5, B: 7, C: 18, D: 21 }[letra.value] || 0;
+            numero.replaceChildren(new Option("Subgrupo", "", true, true));
+            numero.options[0].disabled = true;
+            menuSubgrupo.replaceChildren();
+            for (let valor = 1; valor <= maximo; valor++) {
+                numero.add(new Option(String(valor), String(valor)));
+                const opcion = document.createElement("button");
+                opcion.className = "sisben-subgroup-option";
+                opcion.type = "button";
+                opcion.setAttribute("role", "option");
+                opcion.setAttribute("aria-selected", "false");
+                opcion.textContent = String(valor);
+                opcion.addEventListener("click", () => {
+                    numero.value = String(valor);
+                    cerrarMenuSubgrupo();
+                    actualizarSeguridadSocialSolicitud();
+                });
+                menuSubgrupo.appendChild(opcion);
+            }
+            numero.value = "";
+            selectorSubgrupo.textContent = "Seleccionar";
+        };
+
+        const cerrarMenuSubgrupo = () => {
+            menuSubgrupo.classList.remove("open");
+            selectorSubgrupo.setAttribute("aria-expanded", "false");
+        };
+
+        if (tipo.dataset.seguridadSocialConfigurada !== "1") {
+            tipo.dataset.seguridadSocialConfigurada = "1";
+            selectorSubgrupo.addEventListener("click", () => {
+                if (selectorSubgrupo.disabled) return;
+                const abierto = menuSubgrupo.classList.toggle("open");
+                selectorSubgrupo.setAttribute("aria-expanded", String(abierto));
+                if (abierto) menuSubgrupo.querySelector(".sisben-subgroup-option")?.focus();
+            });
+            menuSubgrupo.addEventListener("keydown", evento => {
+                if (evento.key === "Escape") {
+                    cerrarMenuSubgrupo();
+                    selectorSubgrupo.focus();
+                }
+            });
+            document.addEventListener("click", evento => {
+                if (!evento.target.closest(".sisben-select-wrap")) cerrarMenuSubgrupo();
+            });
+            tipo.addEventListener("change", () => {
+                eps.value = "";
+                regimen.value = "";
+                letra.value = "";
+                actualizarNumerosSisben();
+                actualizarSeguridadSocialSolicitud();
+            });
+            letra.addEventListener("change", () => {
+                actualizarNumerosSisben();
+                actualizarSeguridadSocialSolicitud();
+            });
+        }
+
+        const seleccion = tipo.value;
+        if (grupoEps) grupoEps.style.display = seleccion === "eps" ? "block" : "none";
+        if (grupoRegimen) grupoRegimen.style.display = seleccion === "especial" ? "block" : "none";
+        if (grupoSisben) grupoSisben.style.display = seleccion === "sisben" ? "block" : "none";
+        eps.disabled = !esEstudiante || seleccion !== "eps";
+        eps.required = esEstudiante && seleccion === "eps";
+        regimen.disabled = !esEstudiante || seleccion !== "especial";
+        regimen.required = esEstudiante && seleccion === "especial";
+        letra.disabled = !esEstudiante || seleccion !== "sisben";
+        letra.required = esEstudiante && seleccion === "sisben";
+        numero.disabled = !esEstudiante || seleccion !== "sisben" || !letra.value;
+        numero.required = esEstudiante && seleccion === "sisben";
+        selectorSubgrupo.disabled = numero.disabled;
+        selectorSubgrupo.textContent = numero.value || "Seleccionar";
+        menuSubgrupo.querySelectorAll(".sisben-subgroup-option").forEach(opcion => {
+            opcion.setAttribute("aria-selected", String(opcion.textContent === numero.value));
+        });
+        if (numero.disabled) cerrarMenuSubgrupo();
+        if (!seleccion) {
+            eps.value = "";
+            regimen.value = "";
+            letra.value = "";
+            actualizarNumerosSisben();
+        }
+    }
+
+    function configurarJornadaPorGrado() {
+        const grado = document.getElementById("gradoSolicitud");
+        const jornada = document.getElementById("jornadaSolicitud");
+        const modalidad = document.getElementById("modalidadSolicitud");
+        const opcionTecnica = document.getElementById("opcionModalidadTecnica");
+        if (!grado || !jornada) return;
+
+        if (grado.dataset.jornadaConfigurada !== "1") {
+            grado.dataset.jornadaConfigurada = "1";
+            grado.addEventListener("change", aplicarJornadaSegunGrado);
+        }
+        aplicarJornadaSegunGrado();
+
+        function aplicarJornadaSegunGrado() {
+            if (grado.value === "Ciclo V") {
+                jornada.value = "JN";
+                jornada.disabled = true;
+                jornada.title = "Jornada asignada automáticamente para Ciclo V";
+                if (opcionTecnica) opcionTecnica.disabled = true;
+                if (modalidad && modalidad.value === "tecnico") modalidad.value = "academico";
+            } else if (grado.value === "10°" || grado.value === "11°") {
+                jornada.value = "JM";
+                jornada.disabled = true;
+                jornada.title = "Jornada asignada automáticamente para 10° y 11°";
+                if (opcionTecnica) opcionTecnica.disabled = false;
+            } else {
+                jornada.value = "";
+                jornada.disabled = true;
+                jornada.title = "Selecciona primero el grado";
+                if (opcionTecnica) opcionTecnica.disabled = false;
+            }
+        }
+    }
 
     /* =====================================================
-       CONEXIÓN REAL CON PHP + MYSQL
+       LOGIN
     ====================================================== */
-
-    const API_URL = "api/api.php";
-
-    async function api(action, options = {}) {
-        const config = { credentials: "same-origin", ...options };
-        config.headers = { ...(options.headers || {}) };
-
-        if (options.body && !(options.body instanceof FormData)) {
-            config.headers["Content-Type"] = "application/json";
-            config.body = JSON.stringify(options.body);
-        }
-
-        let response;
-        try {
-            response = await fetch(`${API_URL}?action=${encodeURIComponent(action)}`, config);
-        } catch (_) {
-            throw new Error("No se puede conectar con SIGHO. Abre el sistema desde http://localhost/jjfh/ y verifica que Apache y MySQL estén iniciados en XAMPP.");
-        }
-        let data;
-
-        try {
-            data = await response.json();
-        } catch (_) {
-            throw new Error("El servidor devolvió una respuesta no válida.");
-        }
-
-        if (!response.ok || data.ok === false) {
-            throw new Error(data.message || "Error en el servidor.");
-        }
-
-        return data;
-    }
 
 /* =====================================================
    LOGIN — OJO DE CONTRASEÑA
    Control directo y aislado. Sin delegación, sin onclick inline,
    sin listeners duplicados. El evento click funciona con mouse y touch.
+===================================================== */
+(function instalarOjoLoginDirecto() {
+    const SVG_EYE = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+    const SVG_EYE_OFF = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
 
-    // Carga los datos que corresponden al rol que acaba de iniciar sesión.
-    // Cada rol consulta únicamente la información que necesita.
-    async function cargarDatosPorRol() {
-        if (!usuarioActual) return;
+    function sincronizar() {
+        const input = document.getElementById('clave');
+        const boton = document.getElementById('btnTogglePassword');
+        const icono = document.getElementById('iconEye');
+        if (!input || !boton || !icono) return;
 
-        if (usuarioActual.rol === "estudiante") {
-            const data = await api("my_records");
-            registros = (data.records || []).map(normalizarRegistro);
-        } else if (usuarioActual.rol === "profesor") {
-            const data = await api("teacher_data");
-            registros = (data.records || []).map(normalizarRegistro);
-        } else if (usuarioActual.rol === "administrador") {
-            const data = await api("admin_data");
-            registros = (data.records || []).map(normalizarRegistro);
-            usuarios = (data.users || []).map(normalizarUsuario);
-            solicitudes = data.requests || [];
-            window.solicitudesAdministradorAdmin = data.adminRequests || [];
-        } else if (usuarioActual.rol === "superadmin") {
-            const data = await api("superadmin_data");
-            solicitudes = data.requests || [];
-        }
+        const visible = input.getAttribute('type') === 'text';
+        icono.innerHTML = visible ? SVG_EYE : SVG_EYE_OFF;
+        boton.setAttribute('aria-pressed', visible ? 'true' : 'false');
+        boton.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        boton.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
     }
 
-    /* =====================================================
-       CAMBIO DE PANTALLAS
-    ====================================================== */
+    function instalar() {
+        const boton = document.getElementById('btnTogglePassword');
+        const input = document.getElementById('clave');
+        if (!boton || !input || boton.dataset.loginEyeInstalled === '1') return;
 
-    function ocultarPantallas() {
+        boton.dataset.loginEyeInstalled = '1';
+        input.setAttribute('type', 'password');
+        sincronizar();
 
-        document
-            .querySelectorAll(".screen")
-            .forEach(pantalla => {
+        // ÚNICO listener del ojo de login.
+        boton.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-                pantalla.classList.remove("active");
+            const oculto = input.getAttribute('type') === 'password';
+            input.setAttribute('type', oculto ? 'text' : 'password');
 
-            });
+            // IMPORTANTE: el focusin global puede haber aplicado -webkit-text-security.
+            // Al mostrar la clave hay que quitar explícitamente cualquier máscara inline.
+            if (oculto) {
+                input.style.webkitTextSecurity = 'none';
+                input.style.textSecurity = 'none';
+            } else {
+                input.style.webkitTextSecurity = 'disc';
+                input.style.textSecurity = 'disc';
+            }
 
+            sincronizar();
+            try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); }
+        }, false);
     }
 
-
-    function mostrarSolicitud() {
-        restablecerFormulariosAcceso();
-        cerrarModales();
-        ocultarPantallas();
-        document.getElementById("solicitud")?.classList.add("active");
-        actualizarIndicadoresObligatorios(document.getElementById("solicitud"));
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', instalar, { once: true });
+    } else {
+        instalar();
     }
 
-    function mostrarLogin() {
-        restablecerFormulariosAcceso();
-        cerrarModales();
-        ocultarPantallas();
-        document.getElementById("login")?.classList.add("active");
-        actualizarCamposLogin();
-        actualizarIndicadoresObligatorios(document.getElementById("login"));
+    window.restablecerOjoLogin = function () {
+        const input = document.getElementById('clave');
+        if (input) input.setAttribute('type', 'password');
+        sincronizar();
+    };
+})();
+
+async function iniciarSesion() {
+    const correo = document.getElementById("correoLogin").value.trim().toLowerCase();
+    const clave = document.getElementById("clave").value;
+    const mensaje = document.getElementById("mensajeLogin");
+
+    document.getElementById("correoLogin")?.classList.toggle("campo-error", !correo);
+    document.getElementById("clave")?.classList.toggle("campo-error", !clave);
+    if (!correo || !clave) {
+        mensaje.className = "message auth-error-message";
+        mensaje.style.display = "block";
+        mensaje.innerText = "Completa el correo y la contraseña.";
+        return;
     }
 
+    try {
+        const data = await api("login", { method: "POST", body: { correo, clave } });
+        usuarioActual = normalizarUsuario(data.user);
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
+        mensaje.style.display = "none";
 
-    function restablecerFormulariosAcceso() {
-        const solicitud = document.getElementById("solicitud");
-        solicitud?.querySelectorAll("input, select, textarea").forEach(el => {
-            el.classList.remove("campo-error");
-            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
-            else if (!el.disabled) el.value = "";
-        });
-        const rolSolicitud=document.getElementById("rolSolicitud"); if(rolSolicitud) rolSolicitud.value="";
-        ["camposSolicitudEstudiante","camposSolicitudPersonal","camposSolicitudComunes"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="none";});
-        const grupoEps=document.getElementById("grupoEpsOtroSolicitud"); if(grupoEps) grupoEps.style.display="none";
-        const epsOtro=document.getElementById("epsOtroSolicitud"); if(epsOtro){epsOtro.value="";epsOtro.disabled=true;epsOtro.required=false;}
-        const proyectoOtro=document.getElementById("proyectoOtro"); if(proyectoOtro){proyectoOtro.value="";proyectoOtro.disabled=true;proyectoOtro.required=false;}
-        document.querySelectorAll('input[name="diasServicio"]').forEach(el=>el.checked=false);
-        const jornada=document.getElementById("jornadaSolicitud"); if(jornada){jornada.value="";jornada.disabled=true;}
-        const fecha=document.getElementById("fechaNacimiento"); if(fecha){fecha.value="";fecha.disabled=true;fecha.removeAttribute("min");fecha.removeAttribute("max");}
-        const msg=document.getElementById("mensajeSolicitud"); if(msg){msg.textContent="";msg.style.display="none";}
-        const login=document.getElementById("login");
-        login?.querySelectorAll("input, select, textarea").forEach(el => {
-            el.classList.remove("campo-error");
-            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
-            else el.value = "";
-            el.setCustomValidity("");
-        });
-        const rolLogin=document.getElementById("rolLogin"); if(rolLogin) rolLogin.value="";
-        const camposLogin=document.getElementById("camposLogin"); if(camposLogin) camposLogin.style.display="none";
-        // Cada regreso a login/solicitud deja las contraseñas ocultas y sus ojos sincronizados.
-        document.querySelectorAll('#login input[type="password"], #solicitud input[type="password"]').forEach(el => { el.type = 'password'; });
-        const loginEye = document.getElementById('iconEye');
-        const loginEyeButton = document.getElementById('btnTogglePassword');
-        if (loginEye && typeof svgEyeOff !== 'undefined') loginEye.innerHTML = svgEyeOff;
-        if (loginEyeButton) { loginEyeButton.setAttribute('aria-label','Mostrar contraseña'); loginEyeButton.setAttribute('title','Mostrar contraseña'); loginEyeButton.setAttribute('aria-pressed','false'); }
-        if (typeof window.restablecerOjosProfesor === 'function') window.restablecerOjosProfesor();
-        if (typeof window.sighoRestablecerOjosUniversales === 'function') window.sighoRestablecerOjosUniversales();
-        const msgLogin=document.getElementById("mensajeLogin"); if(msgLogin){msgLogin.textContent="";msgLogin.style.display="none";}
-        llenarAniosServicio();
-        configurarSelectorEvidencia();
-        reiniciarSelectorEvidencia();
-        actualizarCamposSolicitud();
-    }
+        /*
+         * =========================================================
+         * TRANSICIÓN OBLIGATORIA DE BIENVENIDA
+         * =========================================================
+         * La autenticación ya fue confirmada. Desde aquí se inicia
+         * el loader a pantalla completa y SE BLOQUEA temporalmente
+         * la apertura del panel hasta que termine la animación.
+         *
+         * El loader y el sonido comienzan antes de cargar los datos
+         * secundarios del rol, para que el usuario vea la bienvenida
+         * inmediatamente después de un login válido.
+         */
+        const welcomePromise =
+            typeof window.sighoIniciarBienvenidaLogin === "function"
+                ? window.sighoIniciarBienvenidaLogin(usuarioActual)
+                : Promise.resolve();
 
-    function volverInicio() {
-        restablecerFormulariosAcceso();
-        cerrarModales();
-        ocultarPantallas();
-        document.getElementById("home")?.classList.add("active");
+        await cargarDatosPorRol();
+
+        /* Esperar la animación antes de mostrar cualquier panel. */
+        await welcomePromise;
+
+        if (usuarioActual.rol === "estudiante") await abrirEstudiante();
+        else if (usuarioActual.rol === "profesor") await abrirProfesor();
+        else if (usuarioActual.rol === "administrador") await abrirAdministrador();
+        else await abrirSuperAdmin();
+    } catch (error) {
+        mensaje.style.display = "block";
+        mensaje.innerText = error.message;
     }
 
 
@@ -11006,123 +12033,172 @@ function alternarChatAyuda(rol) {
     if (!abierto) chat.querySelector("input")?.focus();
 }
 
-function consultarAyudaSuperAdmin() {
-    const input = document.getElementById("superadminHelpQuestion");
-    const pregunta = (input?.value || "").trim().toLowerCase();
-    if (!pregunta) {
-        mostrarAyudaSuperAdmin("usuarios");
-        return;
+        body = { rol, nombre, apellido, identificacion, correo, telefono, clave };
     }
-    if (pregunta.includes("permiso") || pregunta.includes("rol")) mostrarAyudaSuperAdmin("permisos");
-    else if (pregunta.includes("config") || pregunta.includes("meta") || pregunta.includes("dominio")) mostrarAyudaSuperAdmin("configuracion");
-    else if (pregunta.includes("volver") || pregunta.includes("regresar") || pregunta.includes("atrás") || pregunta.includes("atras")) mostrarAyudaSuperAdmin("volver");
-    else mostrarAyudaSuperAdmin("usuarios");
-}
 
-function preguntaRapidaSuperAdmin(pregunta) {
-    const input = document.getElementById("superadminHelpQuestion");
-    if (input) input.value = pregunta;
-    consultarAyudaSuperAdmin();
-}
+    try {
+        const data = await api("request_access", { method: "POST", body });
 
-function preguntarIaSuperAdmin() {
-    const input = document.getElementById("superadminAiQuestion");
-    const windowChat = document.getElementById("superadminAiMessages");
-    const pregunta = (input?.value || "").trim();
-    if (!pregunta || !windowChat) return;
-    const userMessage = document.createElement("div");
-    userMessage.className = "ai-message ai-message-user";
-    userMessage.textContent = pregunta;
-    windowChat.appendChild(userMessage);
-    const texto = pregunta.toLowerCase();
-    let respuesta = "Puedo ayudarte con usuarios, roles, permisos, configuración y navegación del panel Super Admin.";
-    if (texto.includes("usuario") || texto.includes("profesor") || texto.includes("estudiante") || texto.includes("admin")) respuesta = "En Usuarios puedes buscar por nombre, correo o identificación, filtrar por rol, crear cuentas, editar datos y desactivar usuarios.";
-    else if (texto.includes("permiso") || texto.includes("rol")) respuesta = "En Roles y permisos selecciona el rol y activa solo los permisos que necesita. Cada rol tiene una configuración diferente.";
-    else if (texto.includes("config") || texto.includes("meta") || texto.includes("dominio")) respuesta = "En Configuración puedes modificar los valores generales de SIGHO, como dominio institucional y metas de horas.";
-    else if (texto.includes("volver") || texto.includes("regresar") || texto.includes("naveg")) respuesta = "Usa las opciones de la barra lateral para cambiar de sección. El botón Atrás del navegador también conserva la navegación de páginas abiertas.";
-    const botMessage = document.createElement("div");
-    botMessage.className = "ai-message ai-message-bot";
-    botMessage.textContent = respuesta;
-    windowChat.appendChild(botMessage);
-    input.value = "";
-    windowChat.scrollTop = windowChat.scrollHeight;
-}
+        mensaje.style.display = "block";
+        mensaje.innerText = data.message;
 
-function llenarUsuariosSuperAdmin() {
-    const cont = document.getElementById("superadminUsersTable"); if (!cont) return;
-    const search = document.getElementById("superadminUserSearch");
-    const role = document.getElementById("superadminUserRoleFilter");
-    if (search && search.dataset.configurado !== "1") {
-        search.dataset.configurado = "1";
-        search.addEventListener("input", filtrarUsuariosSuperAdmin);
+        await mostrarConfirmacionSolicitud();
+
+        document.querySelectorAll("#solicitud input, #solicitud select").forEach(el => {
+            if (el.type === "checkbox") el.checked = false;
+            else el.value = "";
+        });
+
+        const estudiante = document.getElementById("camposSolicitudEstudiante");
+        const personal = document.getElementById("camposSolicitudPersonal");
+        if (estudiante) estudiante.style.display = "none";
+        if (personal) personal.style.display = "none";
+        const claveEst = document.getElementById("claveSolicitud");
+        const claveProf = document.getElementById("claveSolicitudProfesor");
+        if (claveEst) claveEst.value = "";
+        if (claveProf) claveProf.value = "";
+        const epsOtroSolicitud = document.getElementById("epsOtroSolicitud");
+        const grupoEpsOtroSolicitud = document.getElementById("grupoEpsOtroSolicitud");
+        const epsSolicitud = document.getElementById("epsSolicitud");
+        if (epsSolicitud) epsSolicitud.value = "";
+        if (epsOtroSolicitud) { epsOtroSolicitud.value = ""; epsOtroSolicitud.disabled = true; epsOtroSolicitud.required = false; }
+        if (grupoEpsOtroSolicitud) grupoEpsOtroSolicitud.style.display = "none";
+
+        const comunes = document.getElementById("camposSolicitudComunes");
+        if (comunes) comunes.style.display = "none";
+        const rolSelect = document.getElementById("rolSolicitud");
+        if (rolSelect) rolSelect.value = "";
+        llenarAniosServicio();
+        configurarJornadaPorGrado();
+        configurarSelectorEvidencia();
+    configurarValidacionCamposOtro();
+        configurarSelectoresEPS();
+    } catch (error) {
+        mostrarErrorSolicitud(error.message || "No fue posible enviar la solicitud.");
     }
-    if (role && role.dataset.configurado !== "1") {
-        role.dataset.configurado = "1";
-        role.addEventListener("change", filtrarUsuariosSuperAdmin);
-    }
-    filtrarUsuariosSuperAdmin();
 }
 
-function filtrarUsuariosSuperAdmin() {
-    const cont = document.getElementById("superadminUsersTable");
-    if (!cont) return;
-    const texto = (document.getElementById("superadminUserSearch")?.value || "").trim().toLowerCase();
-    const rol = document.getElementById("superadminUserRoleFilter")?.value || "todos";
-    const users = (superAdminData.users || []).filter(user => {
-        const coincideRol = rol === "todos" || user.rol === rol;
-        const contenido = `${user.nombre} ${user.correo} ${user.identificacion}`.toLowerCase();
-        return coincideRol && (!texto || contenido.includes(texto));
+function configurarSelectorEvidencia() {
+    const input = document.getElementById("evidenciaHora");
+    const nombre = document.getElementById("nombreEvidenciaHora");
+    const quitar = document.getElementById("quitarEvidenciaHora");
+    if (!input || !nombre || !quitar || input.dataset.configurado === "1") return;
+    input.dataset.configurado = "1";
+
+    const actualizar = () => {
+        const archivo = input.files?.[0];
+        nombre.textContent = archivo ? archivo.name : "Ningún archivo seleccionado";
+        quitar.disabled = !archivo;
+        quitar.setAttribute("aria-disabled", String(!archivo));
+    };
+
+    input.addEventListener("change", actualizar);
+    quitar.addEventListener("click", () => {
+        if (quitar.disabled) return;
+        input.value = "";
+        actualizar();
     });
-    const count = document.getElementById("superadminUserCount");
-    if (count) count.textContent = `${users.length} usuario${users.length === 1 ? "" : "s"}`;
-    cont.innerHTML = `<div class="table-container"><table class="superadmin-users-table"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.length ? users.map(user => `<tr><td>${escaparHTML(user.nombre)}</td><td>${escaparHTML(user.correo)}</td><td>${escaparHTML(user.rol)}</td><td><span class="status ${user.estado === "activo" ? "approved" : "rejected"}">${escaparHTML(user.estado)}</span></td><td><div class="actions"><button class="secondary-button" onclick="abrirFormularioUsuario(${user.id})">Editar</button><button class="danger-button" onclick="eliminarUsuarioSuperAdmin(${user.id})">Desactivar</button></div></td></tr>`).join("") : `<tr><td colspan="5">No hay usuarios que coincidan con el filtro.</td></tr>`}</tbody></table></div>`;
+    actualizar();
+}
+function reiniciarSelectorEvidencia() {
+    const input = document.getElementById("evidenciaHora");
+    const nombre = document.getElementById("nombreEvidenciaHora");
+    const quitar = document.getElementById("quitarEvidenciaHora");
+    if (input) input.value = "";
+    if (nombre) nombre.textContent = "Ningún archivo seleccionado";
+    if (quitar) {
+        quitar.disabled = true;
+        quitar.setAttribute("aria-disabled", "true");
+    }
 }
 
-function abrirFormularioUsuario(id = 0) {
-    const user = (superAdminData.users || []).find(item => Number(item.id) === Number(id)); const cont = document.getElementById("superadminUserForm"); if (!cont) return;
-    cont.innerHTML = `<button type="button" class="secondary-button superadmin-back-button" onclick="cancelarFormularioUsuarioSuperAdmin()">← Volver a Usuarios</button><form class="superadmin-form" onsubmit="guardarUsuarioSuperAdmin(event)"><input type="hidden" id="superadminUserId" value="${user?.id || ""}"><div class="form-group"><label>Identificación</label><input id="superadminIdentificacion" required value="${escaparHTML(user?.identificacion || "")}"></div><div class="form-group"><label>Nombres</label><input id="superadminNombres" required value="${escaparHTML(user?.nombres || "")}"></div><div class="form-group"><label>Apellidos</label><input id="superadminApellidos" required value="${escaparHTML(user?.apellidos || "")}"></div><div class="form-group"><label>Correo</label><input id="superadminCorreo" type="email" required value="${escaparHTML(user?.correo || "")}"></div><div class="form-group"><label>Rol</label><select id="superadminRol"><option value="estudiante">Estudiante</option><option value="profesor">Profesor</option><option value="administrador">Administrador</option></select></div><div class="form-group"><label>Estado</label><select id="superadminEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div><div class="form-group wide"><label>${user ? "Nueva contraseña (opcional)" : "Contraseña"}</label><input id="superadminClave" type="password" ${user ? "" : "required"} minlength="8"></div><div class="superadmin-form-actions"><button class="main-button superadmin-action" type="submit">Guardar usuario</button><button class="secondary-button" type="button" onclick="cancelarFormularioUsuarioSuperAdmin()">Cancelar</button></div></form>`;
-    document.getElementById("superadminRol").value = user?.rol || "estudiante"; document.getElementById("superadminEstado").value = user?.estado || "activo";
+function normalizarGradoRegistro(valor) {
+    const texto = String(valor || "").trim().toLowerCase();
+    if (texto === "ciclo v" || texto.includes("ciclo v")) return "Ciclo V";
+    if (/\b11\b/.test(texto)) return "11°";
+    if (/\b10\b/.test(texto)) return "10°";
+    return "";
 }
 
-function cancelarFormularioUsuarioSuperAdmin() {
-    document.getElementById("superadminUserForm").innerHTML = "";
+async function sincronizarDatosRegistroHoras() {
+    if (!usuarioActual || usuarioActual.rol !== "estudiante") return "";
+
+    let grado = normalizarGradoRegistro(usuarioActual.grado || usuarioActual.Grado);
+    try {
+        const data = await api("my_profile");
+        const p = data.profile || {};
+        const gradoPerfil = normalizarGradoRegistro(p.grado || p.Grado);
+        if (gradoPerfil) {
+            grado = gradoPerfil;
+            usuarioActual.grado = gradoPerfil;
+        }
+        if (p.metaHoras != null) usuarioActual.metaHoras = Number(p.metaHoras);
+        if (p.modalidad) usuarioActual.esTecnico = p.modalidad === "tecnico";
+    } catch (_) {
+        // Si el perfil no responde, usamos el grado que ya llegó con la sesión.
+    }
+    return grado;
 }
 
-async function guardarUsuarioSuperAdmin(event) {
-    event.preventDefault(); const body = { id: Number(document.getElementById("superadminUserId").value || 0), identificacion: document.getElementById("superadminIdentificacion").value, nombres: document.getElementById("superadminNombres").value, apellidos: document.getElementById("superadminApellidos").value, correo: document.getElementById("superadminCorreo").value, rol: document.getElementById("superadminRol").value, estado: document.getElementById("superadminEstado").value, clave: document.getElementById("superadminClave").value };
-    try { const result = await api("superadmin_user_save", { method: "POST", body }); superAdminData = result.data; document.getElementById("superadminUserForm").innerHTML = ""; llenarUsuariosSuperAdmin(); alert("Usuario guardado correctamente."); } catch (e) { alert(e.message); }
+function configurarRestriccionesRegistroHoras(gradoForzado = "") {
+    const fecha = document.getElementById("fechaHora");
+    const horas = document.getElementById("horasRealizadas");
+    if (!fecha || !horas) return;
+
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+    const anio = hoy.getFullYear();
+    const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+    fecha.min = `${anio}-01-01`;
+    fecha.max = iso(hoy);
+    if (fecha.value && (fecha.value < fecha.min || fecha.value > fecha.max)) fecha.value = "";
+
+    // Las horas son enteros de 1 a 50. No modificar el valor mientras se escribe.
+    horas.min = "1";
+    horas.max = "50";
+    horas.step = "1";
+    horas.inputMode = "numeric";
 }
 
-async function eliminarUsuarioSuperAdmin(id) {
-    if (!confirm("¿Desactivar esta cuenta?")) return;
-    try { const result = await api("superadmin_user_delete", { method: "POST", body: { id } }); superAdminData = result.data; llenarUsuariosSuperAdmin(); } catch (e) { alert(e.message); }
+function configurarSelectorEvidencia() {
+    const input=document.getElementById("evidenciaHora");
+    const nombre=document.getElementById("nombreEvidenciaHora");
+    const quitar=document.getElementById("quitarEvidenciaHora");
+    const preview=document.getElementById("previewEvidenciaHora");
+    const imagen=document.getElementById("imagenPreviewEvidenciaHora");
+    const texto=document.getElementById("textoPreviewEvidenciaHora");
+    if(!input || !nombre || !quitar || input.dataset.configurado==="1") return;
+    input.dataset.configurado="1";
+    const actualizar=()=>{
+        const archivo=input.files?.[0];
+        const esJpg=archivo && (archivo.type==="image/jpeg" || /\.jpe?g$/i.test(archivo.name));
+        if(archivo && !esJpg){ input.value=""; nombre.textContent="Ninguna imagen seleccionada"; quitar.hidden=true; if(preview) preview.classList.remove("show"); alert("Solo puedes seleccionar imágenes JPG o JPEG."); return; }
+        nombre.textContent=archivo ? archivo.name : "Ninguna imagen seleccionada";
+        quitar.hidden=!archivo;
+        if(archivo && preview && imagen){
+            const url=URL.createObjectURL(archivo);
+            imagen.onload=()=>URL.revokeObjectURL(url);
+            imagen.src=url;
+            if(texto) texto.textContent=`Vista previa: ${archivo.name}`;
+            preview.classList.add("show");
+        } else if(preview){ preview.classList.remove("show"); if(imagen) imagen.removeAttribute("src"); }
+    };
+    input.addEventListener("change",actualizar);
+    quitar.addEventListener("click",()=>{ input.value=""; actualizar(); });
+    actualizar();
 }
-
-function llenarRolesSuperAdmin() {
-    const select = document.getElementById("superadminRoleSelect"); if (!select) return;
-    select.innerHTML = (superAdminData.roles || []).map(role => `<option value="${role.id}">${escaparHTML(role.name)}</option>`).join("");
-}
-
-function mostrarMatrizPermisos() {
-    const roleId = Number(document.getElementById("superadminRoleSelect")?.value || 0); const role = (superAdminData.roles || []).find(item => Number(item.id) === roleId); const cont = document.getElementById("superadminPermissionsTable"); if (!cont || !role) return;
-    const bloqueado = role.code === "superadmin";
-    cont.innerHTML = `<div class="table-container"><table class="superadmin-permission-table"><thead><tr><th>Permiso</th><th>Descripción</th><th>Activo</th></tr></thead><tbody>${(superAdminData.permissions || []).map(permission => `<tr><td>${escaparHTML(permission.name)}</td><td>${escaparHTML(permission.description || "")}</td><td><input type="checkbox" data-permission-id="${permission.id}" ${superAdminData.matrix?.[roleId]?.[permission.id] ? "checked" : ""} ${bloqueado ? "disabled checked" : ""}></td></tr>`).join("")}</tbody></table></div>`;
-    document.querySelector('#superAdmin button[onclick="guardarPermisosSuperAdmin()"]')?.toggleAttribute("disabled", bloqueado);
-}
-
-async function guardarPermisosSuperAdmin() {
-    const roleId = Number(document.getElementById("superadminRoleSelect").value); const permissions = Array.from(document.querySelectorAll("[data-permission-id]:checked")).map(input => Number(input.dataset.permissionId));
-    try { const result = await api("superadmin_permissions_save", { method: "POST", body: { roleId, permissions } }); superAdminData = result.data; mostrarMatrizPermisos(); alert("Permisos guardados correctamente."); } catch (e) { alert(e.message); }
-}
-
-function llenarConfiguracionSuperAdmin() {
-    const cont = document.getElementById("superadminSettingsForm"); if (!cont) return;
-    cont.innerHTML = `<div class="superadmin-form">${Object.entries(superAdminData.settings || {}).map(([key, item]) => `<div class="form-group wide"><label>${escaparHTML(item.descripcion || key)}</label><input data-setting-key="${escaparHTML(key)}" value="${escaparHTML(item.valor || "")}"></div>`).join("")}</div>`;
-}
-
-async function guardarConfiguracionSuperAdmin() {
-    const settings = {}; document.querySelectorAll("[data-setting-key]").forEach(input => { settings[input.dataset.settingKey] = input.value; });
-    try { const result = await api("superadmin_settings_save", { method: "POST", body: { settings } }); superAdminData = result.data; llenarConfiguracionSuperAdmin(); alert("Configuración guardada correctamente."); } catch (e) { alert(e.message); }
+function reiniciarSelectorEvidencia(){
+    const input=document.getElementById("evidenciaHora");
+    const nombre=document.getElementById("nombreEvidenciaHora");
+    const quitar=document.getElementById("quitarEvidenciaHora");
+    const preview=document.getElementById("previewEvidenciaHora");
+    const imagen=document.getElementById("imagenPreviewEvidenciaHora");
+    if(input) input.value="";
+    if(nombre) nombre.textContent="Ninguna imagen seleccionada";
+    if(quitar) quitar.hidden=true;
+    if(preview) preview.classList.remove("show");
+    if(imagen) imagen.removeAttribute("src");
 }
 
 async function registrarHoras() {
@@ -11365,13 +12441,11 @@ async function cargarPerfilEstudiante() {
         document.getElementById("perfilDireccion").value = p.direccion || "";
 
         const epsPerfil = document.getElementById("perfilEps");
-        const epsOtroPerfil = document.getElementById("perfilEpsOtro");
-        const opcionesEPSPerfil = epsPerfil ? [...epsPerfil.options].map(o => o.value) : [];
         const epsGuardada = p.eps || "";
-        if (epsPerfil) epsPerfil.value = opcionesEPSPerfil.includes(epsGuardada) ? epsGuardada : (epsGuardada ? "Otro" : "");
-        if (epsOtroPerfil) epsOtroPerfil.value = opcionesEPSPerfil.includes(epsGuardada) ? "" : epsGuardada;
+        configurarOpcionesSeguridadSocialPerfil(epsGuardada);
 
         document.getElementById("perfilAcudiente").value = p.nombreAcudiente || "";
+        document.getElementById("perfilTipoTelefonoAcudiente").value = p.tipoTelefonoAcudiente || "";
         document.getElementById("perfilTelefonoAcudiente").value = p.telefonoAcudiente || "";
 
         establecerEdicionPerfilEstudiante(false);
@@ -11381,8 +12455,46 @@ async function cargarPerfilEstudiante() {
     }
 }
 
+function configurarOpcionesSeguridadSocialPerfil(valorActual) {
+    const select = document.getElementById("perfilEps");
+    if (!select) return;
+
+    select.replaceChildren(new Option("Seleccionar Seguridad Social", "", true, true));
+    select.options[0].disabled = true;
+
+    const epsRegistro = document.getElementById("epsSolicitud");
+    epsRegistro?.querySelectorAll("optgroup").forEach(grupo => select.appendChild(grupo.cloneNode(true)));
+
+    const regimenRegistro = document.getElementById("regimenEspecialSolicitud");
+    if (regimenRegistro) {
+        const grupoRegimen = document.createElement("optgroup");
+        grupoRegimen.label = "Régimen especial o de excepción";
+        [...regimenRegistro.options].filter(opcion => opcion.value).forEach(opcion => grupoRegimen.appendChild(opcion.cloneNode(true)));
+        select.appendChild(grupoRegimen);
+    }
+
+    const grupoSisben = document.createElement("optgroup");
+    grupoSisben.label = "Sisbén";
+    const maximosSisben = { A: 5, B: 7, C: 18, D: 21 };
+    Object.entries(maximosSisben).forEach(([letra, maximo]) => {
+        for (let subgrupo = 1; subgrupo <= maximo; subgrupo++) {
+            const valor = `Sisbén Grupo ${letra}, Subgrupo ${subgrupo}`;
+            grupoSisben.appendChild(new Option(valor, valor));
+        }
+    });
+    select.appendChild(grupoSisben);
+
+    if (valorActual && ![...select.options].some(opcion => opcion.value === valorActual)) {
+        const grupoAnterior = document.createElement("optgroup");
+        grupoAnterior.label = "Valor guardado";
+        grupoAnterior.appendChild(new Option(valorActual, valorActual));
+        select.appendChild(grupoAnterior);
+    }
+    select.value = valorActual;
+}
+
 function guardarValoresOriginalesPerfilEstudiante() {
-    const ids = ["perfilCorreo","perfilTelefono","perfilDireccion","perfilEps","perfilEpsOtro","perfilAcudiente","perfilTelefonoAcudiente"];
+    const ids = ["perfilCorreo","perfilTelefono","perfilDireccion","perfilEps","perfilAcudiente","perfilTipoTelefonoAcudiente","perfilTelefonoAcudiente"];
     window.valoresOriginalesPerfilEstudiante = {};
     ids.forEach(id => {
         const el = document.getElementById(id);
@@ -11399,20 +12511,10 @@ function restaurarValoresOriginalesPerfilEstudiante() {
 }
 
 function establecerEdicionPerfilEstudiante(editar) {
-    ["perfilCorreo","perfilTelefono","perfilDireccion","perfilEps","perfilAcudiente","perfilTelefonoAcudiente"].forEach(id => {
+    ["perfilCorreo","perfilTelefono","perfilDireccion","perfilEps","perfilAcudiente","perfilTipoTelefonoAcudiente","perfilTelefonoAcudiente"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = !editar;
     });
-
-    const eps = document.getElementById("perfilEps");
-    const epsOtro = document.getElementById("perfilEpsOtro");
-    const grupoOtro = document.getElementById("grupoEpsOtroPerfil");
-    const esOtro = eps?.value === "Otro";
-    if (grupoOtro) grupoOtro.style.display = esOtro ? "block" : "none";
-    if (epsOtro) {
-        epsOtro.disabled = !editar || !esOtro;
-        epsOtro.required = esOtro;
-    }
 
     document.getElementById("editarPerfilEstudianteBtn")?.toggleAttribute("hidden", editar);
     document.getElementById("cancelarPerfilEstudianteBtn")?.toggleAttribute("hidden", !editar);
@@ -11442,27 +12544,36 @@ async function guardarPerfilEstudiante() {
     const telefono = document.getElementById("perfilTelefono").value.trim();
     const direccion = document.getElementById("perfilDireccion").value.trim();
     const epsSeleccionada = document.getElementById("perfilEps").value;
-    const eps = epsSeleccionada === "Otro" ? document.getElementById("perfilEpsOtro").value.trim() : epsSeleccionada.trim();
+    const eps = epsSeleccionada.trim();
     const nombreAcudiente = document.getElementById("perfilAcudiente").value.trim();
+    const tipoTelefonoAcudiente = document.getElementById("perfilTipoTelefonoAcudiente").value;
     const telefonoAcudiente = document.getElementById("perfilTelefonoAcudiente").value.trim();
     const regexNombre = /^[\p{L}]+(?: [\p{L}]+)*$/u;
+    const telefonoDigitos = telefono.replace(/\D/g, "");
+    const telefonoAcudienteDigitos = telefonoAcudiente.replace(/\D/g, "");
 
     if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) { alert("Escribe un correo electrónico válido."); return; }
-    if (!/^\d{10}$/.test(telefono.replace(/\D/g, ""))) { alert("El celular debe tener exactamente 10 dígitos."); return; }
+    if (!/^3\d{9}$/.test(telefonoDigitos) || /^(\d)\1{9}$/.test(telefonoDigitos) || telefonoDigitos === "1234567890") { alert("El celular debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890."); return; }
     if (direccion.length > 100) { alert("La dirección puede tener máximo 100 caracteres."); return; }
-    if (!eps || eps.length > 60) { alert("Selecciona una EPS válida o especifica una de máximo 60 caracteres."); return; }
-    if (epsSeleccionada === "Otro" && (!regexNombre.test(eps) || eps.length < 2 || eps.length > 60)) { alert("La EPS de 'Otro' debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres."); return; }
-    if (!regexNombre.test(nombreAcudiente) || nombreAcudiente.length > 60) { alert("El nombre del acudiente debe contener solo letras y espacios sencillos, máximo 60 caracteres."); return; }
-    if (!/^\d{7,10}$/.test(telefonoAcudiente.replace(/\D/g, ""))) { alert("El teléfono del acudiente debe tener entre 7 y 10 dígitos."); return; }
+    if (!eps) { alert("Selecciona una opción válida de Seguridad Social."); return; }
+    if (nombreAcudiente.length < 2 || !regexNombre.test(nombreAcudiente) || nombreAcudiente.length > 60) { alert("El nombre del acudiente debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres."); return; }
+    if (!["fijo", "celular"].includes(tipoTelefonoAcudiente)) { alert("Selecciona el tipo de línea del acudiente."); return; }
+    if (tipoTelefonoAcudiente === "celular") {
+        if (!/^3\d{9}$/.test(telefonoAcudienteDigitos) || /^(\d)\1{9}$/.test(telefonoAcudienteDigitos) || telefonoAcudienteDigitos === "1234567890") { alert("El celular del acudiente debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890."); return; }
+    } else {
+        const ultimosDigitos = telefonoAcudienteDigitos.slice(3);
+        if (!/^60[1-8][2-8]\d{6}$/.test(telefonoAcudienteDigitos) || /^(\d)\1{6}$/.test(ultimosDigitos)) { alert("El teléfono fijo del acudiente debe tener un indicativo regional válido y 7 dígitos finales cuyo primero esté entre 2 y 8; estos no pueden ser todos iguales."); return; }
+    }
 
     const body = {
         correo,
-        telefono: telefono.replace(/\D/g, ""),
+        telefono: telefonoDigitos,
         direccion,
         eps,
         epsSeleccionada,
         nombreAcudiente,
-        telefonoAcudiente: telefonoAcudiente.replace(/\D/g, "")
+        tipoTelefonoAcudiente,
+        telefonoAcudiente: telefonoAcudienteDigitos
     };
 
     try {
@@ -11536,16 +12647,15 @@ async function abrirSuperAdmin() {
     }
 }
 
-function abrirAyuda() {
-    if (usuarioActual?.rol === "superadmin") {
-        document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
-        mostrarSeccionSuperAdmin("ayuda");
-        return;
-    }
-    if (usuarioActual?.rol === "profesor") {
-        cerrarMenuUsuarioProfesor();
-        mostrarSeccionProfesor("ayuda");
-        return;
+let superAdminData = { users: [], roles: [], permissions: [], matrix: {}, settings: {} };
+let superAdminTabConfigured = false;
+let superAdminNavigation = [];
+let superAdminCurrentSection = "inicio";
+
+function configurarSuperAdmin() {
+    if (!superAdminTabConfigured) {
+        document.querySelectorAll("[data-superadmin-tab]").forEach(tab => tab.addEventListener("click", () => mostrarSeccionSuperAdmin(tab.dataset.superadminTab)));
+        superAdminTabConfigured = true;
     }
     llenarUsuariosSuperAdmin(); llenarRolesSuperAdmin(); llenarConfiguracionSuperAdmin();
 }
@@ -11763,17 +12873,33 @@ function mostrarValidacionesSuperAdmin() {
     pendientes.forEach(s => html += `<tr><td>${escaparHTML(s.nombre)}</td><td>${escaparHTML(s.identificacion)}</td><td>${escaparHTML(s.correo)}</td><td>${escaparHTML(s.fechaSolicitud)}</td><td><div class="actions"><button class="success-button" onclick="validarSolicitudSuper(${s.id}, 'aceptada')">✓ Aceptar</button><button class="danger-button" onclick="validarSolicitudSuper(${s.id}, 'rechazada')">✕ Rechazar</button></div></td></tr>`);
     contenedor.innerHTML = html + `</tbody></table></div>`;
 }
-function alternarCambioClaveProfesor(mostrar) {
-    const form=document.getElementById("formularioCambioClaveProfesor");
-    const boton=document.getElementById("botonMostrarCambioClaveProfesor");
-    if(!form || !boton) return;
-    const abrir = typeof mostrar === "boolean" ? mostrar : form.style.display === "none";
-    form.style.display = abrir ? "block" : "none";
-    boton.textContent = abrir ? "Ocultar cambio de contraseña" : "Cambiar contraseña";
-    if(!abrir){
-        ["claveActualProfesor","nuevaClaveProfesor","confirmarClaveProfesor"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
-        const estado=document.getElementById("estadoClaveProfesor"); if(estado){estado.textContent="";estado.className="profile-save-state";}
-    }
+
+async function validarSolicitudSuper(id, estado) {
+    if (!confirm(estado === "aceptada" ? "¿Aceptar esta solicitud de administrador?" : "¿Rechazar esta solicitud de administrador?")) return;
+    try {
+        await api("validate_admin_request", { method: "POST", body: { id, estado } });
+        await abrirSuperAdmin();
+        alert(estado === "aceptada" ? "Administrador aprobado correctamente." : "Solicitud rechazada.");
+    } catch (e) { alert(e.message); }
+}
+
+/* =====================================================
+   NOTIFICACIONES DEL ESTUDIANTE
+====================================================== */
+function obtenerIdsNotificacionesEstudianteLeidas(){try{return JSON.parse(localStorage.getItem("sigho_notificaciones_estudiante_leidas")||"[]");}catch(_){return [];}}
+function guardarIdsNotificacionesEstudianteLeidas(ids){try{localStorage.setItem("sigho_notificaciones_estudiante_leidas",JSON.stringify(ids.slice(-100)));}catch(_){} }
+function actualizarNotificacionesEstudiante(){
+    const lista=document.getElementById("listaNotificacionesEstudiante"),badge=document.getElementById("badgeNotificacionesEstudiante"); if(!lista||!badge)return;
+    const eventos=(registros||[]).slice().sort((a,b)=>String(b.fechaRegistro||b.fecha||"").localeCompare(String(a.fechaRegistro||a.fecha||""))).slice(0,12);
+    const leidas=obtenerIdsNotificacionesEstudianteLeidas();
+    const nuevas=eventos.filter(r=>!leidas.includes(String(r.id))); badge.textContent=String(nuevas.length); badge.style.display=nuevas.length?"flex":"none";
+    if(!eventos.length){lista.innerHTML='<div class="notification-empty">🔔<strong>No hay avisos recientes</strong><span>Cuando haya novedades sobre tus jornadas aparecerán aquí.</span></div>';return;}
+    lista.innerHTML=eventos.map(r=>{const estado=r.estado||"pendiente";const titulo=estado==="aprobada"?"Tu jornada fue aprobada":estado==="rechazada"?"Tu jornada fue rechazada":"Tu jornada está pendiente";const extra=estado==="rechazada"?(r.observacion||r.motivoRechazo||"Revisa la observación del profesor."):estado==="aprobada"?"El profesor revisó y aprobó este registro.":"El profesor aún debe revisar este registro.";return `<button type="button" class="notification-item ${!leidas.includes(String(r.id))?"unread":""}" onclick="abrirNotificacionEstudiante(${Number(r.id)})"><span class="notification-dot">${!leidas.includes(String(r.id))?"•":"✓"}</span><span class="notification-copy"><strong>${escapeHtml(titulo)}</strong><small>${escapeHtml(r.fecha||"")} · ${formatearHoras(r.horas)} h · ${escapeHtml(extra)}</small></span></button>`;}).join("");
+}
+function sincronizarBloqueoScrollNotificaciones(){
+    const notificacionesAbiertas = document.querySelector('.notification-panel.show') || document.querySelector('.notification-backdrop.show');
+    const sidebarAbierto = document.querySelector('.dashboard.has-role-sidebar.mobile-sidebar-open');
+    document.body.style.overflow = (notificacionesAbiertas || sidebarAbierto) ? 'hidden' : '';
 }
 function cerrarPanelNotificacionesEstudiante(){const panel=document.getElementById("panelNotificacionesEstudiante"),backdrop=document.getElementById("backdropNotificacionesEstudiante"),boton=document.querySelector("#estudiante .notification-button");panel?.classList.remove("show");backdrop?.classList.remove("show");boton?.setAttribute("aria-expanded","false");sincronizarBloqueoScrollNotificaciones();}
 function toggleNotificacionesEstudiante(evento){evento?.stopPropagation();const panel=document.getElementById("panelNotificacionesEstudiante"),backdrop=document.getElementById("backdropNotificacionesEstudiante"),boton=document.querySelector("#estudiante .notification-button");if(!panel)return;const abrir=!panel.classList.contains("show");cerrarPanelNotificacionesEstudiante();document.querySelectorAll(".more-menu-dropdown.show, .notification-panel.show").forEach(el=>{if(el!==panel)el.classList.remove("show")});if(abrir){panel.classList.add("show");backdrop?.classList.add("show");boton?.setAttribute("aria-expanded","true");actualizarNotificacionesEstudiante();}sincronizarBloqueoScrollNotificaciones();}
@@ -11832,10 +12958,12 @@ function actualizarNotificacionesProfesor(pendientes) {
 
 function cerrarPanelNotificacionesProfesor(){const panel=document.getElementById("panelNotificacionesProfesor"),backdrop=document.getElementById("backdropNotificacionesProfesor"),boton=document.querySelector("#profesor .notification-button");panel?.classList.remove("show");backdrop?.classList.remove("show");boton?.setAttribute("aria-expanded","false");sincronizarBloqueoScrollNotificaciones();}
 
-    if (loginActivo && objetivo.matches("#correoLogin, #clave")) {
-        evento.preventDefault();
-        iniciarSesion();
-    }
+function toggleNotificacionesProfesor(evento) {
+    evento?.stopPropagation();
+    const panel = document.getElementById("panelNotificacionesProfesor");
+    const backdrop = document.getElementById("backdropNotificacionesProfesor");
+    const boton = document.querySelector("#profesor .notification-button");
+    if (!panel) return;
 
     const abrir = !panel.classList.contains("show");
     cerrarPanelNotificacionesProfesor();
@@ -12030,6 +13158,391 @@ function abrirMisDatos() {
     modal.classList.add("show");
 }
 
+function abrirAyuda() {
+    if (usuarioActual?.rol === "superadmin") {
+        document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
+        mostrarSeccionSuperAdmin("ayuda");
+        return;
+    }
+    if (usuarioActual?.rol === "profesor") {
+        cerrarMenuUsuarioProfesor();
+        mostrarSeccionProfesor("ayuda");
+        return;
+    }
+    if (usuarioActual?.rol === "estudiante") {
+        document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
+        mostrarSeccionEstudiante("ayuda");
+        return;
+    }
+    document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
+    if (!usuarioActual) return;
+    const modal = document.getElementById("modalAyuda");
+    const titulo = document.getElementById("modalAyudaTitulo");
+    const subtitulo = document.getElementById("modalAyudaSubtitulo");
+    const contenido = document.getElementById("modalAyudaContenido");
+    if (!modal || !contenido) return;
+
+    const ayudas = {
+        administrador: {
+            titulo: "Ayuda para administradores",
+            subtitulo: "Guía rápida para gestionar SIGHO",
+            contenido: `
+                <div class="help-admin-intro">
+                    <strong>¿Qué puedes hacer desde este panel?</strong><br>
+                    Gestiona profesores, revisa solicitudes, consulta el progreso de los estudiantes y controla las funciones generales del sistema.
+                </div>
+                <div class="help-admin-grid">
+                    <article class="help-admin-card"><div class="help-admin-icon">👥</div><h4>Gestión de profesores</h4><p>Administra la información de los docentes y define su área de trabajo.</p><ul><li>Selecciona o actualiza la <strong>sede asignada</strong>.</li><li>Selecciona o actualiza el <strong>proyecto asignado</strong>.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">📊</div><h4>Progreso de estudiantes</h4><p>Consulta cómo avanza cada estudiante con sus horas de servicio social.</p><ul><li>Revisa horas aprobadas y horas faltantes.</li><li>Consulta el porcentaje de avance y utiliza los filtros por grado.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">📩</div><h4>Solicitudes de profesores / Admin</h4><p>Aquí se reúnen las solicitudes relacionadas con el personal docente.</p><ul><li>Aprueba o rechaza nuevos registros de profesores.</li><li>Revisa las solicitudes de profesores que desean el rol de Administrador.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">🎓</div><h4>Solicitudes de estudiantes</h4><p>Este módulo es independiente de las solicitudes de profesores.</p><ul><li>Revisa los datos de cada estudiante.</li><li>Acepta o rechaza su solicitud de registro.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">⚙️</div><h4>Sistema</h4><p>Consulta las funciones generales y el estado del sistema. Utiliza estas opciones para tareas administrativas globales cuando sea necesario.</p></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">🔒</div><h4>Buenas prácticas</h4><p>Antes de aceptar una solicitud, verifica cuidadosamente los datos. Mantén actualizada la sede de cada profesor para que pueda revisar correctamente a sus estudiantes.</p></article>
+                </div>`
+        },
+        superadmin: { titulo:"Ayuda para Super Admin", subtitulo:"Control general de SIGHO", contenido:`<div class="help-animation"><div class="help-icon">💡</div><strong>¿Cómo funciona tu panel?</strong><p>El Super Admin tiene el nivel más alto de control y puede revisar las solicitudes para crear administradores.</p></div>` },
+        estudiante: { titulo:"Ayuda para estudiantes", subtitulo:"Tu espacio para registrar y controlar el servicio social", contenido:`<div class="help-animation"><div class="help-icon">💡</div><strong>¿Cómo funciona tu panel?</strong><p>Aquí puedes registrar cada jornada de servicio social, describir lo que realizaste y adjuntar la evidencia correspondiente. Los registros quedan pendientes hasta que un profesor los revise. En «Mis registros» puedes consultar qué jornadas fueron aceptadas o rechazadas y cuántas horas te faltan.</p></div>` }
+    };
+
+    const ayuda = ayudas[usuarioActual.rol] || ayudas.estudiante;
+    titulo.innerText = ayuda.titulo;
+    subtitulo.innerText = ayuda.subtitulo;
+    contenido.innerHTML = ayuda.contenido + '<button class="modal-close" onclick="cerrarModales()">Cerrar</button>';
+    modal.classList.add("show");
+}
+
+async function actualizarEstadoSolicitudAdminProfesor() {
+    if (usuarioActual?.rol !== "profesor") return;
+    const boton = document.getElementById("botonSolicitudAdminProfesor");
+    if (!boton) return;
+    try {
+        const data = await api("professor_profile");
+        const estado = data.profile?.solicitudAdminEstado || "";
+        if (estado === "pendiente") {
+            boton.disabled = true;
+            boton.textContent = "Solicitud de Admin pendiente";
+            boton.title = "Tu solicitud ya está pendiente de revisión por un Administrador.";
+        } else {
+            boton.disabled = false;
+            boton.textContent = "Solicitar rol de Administrador";
+            boton.title = "Solicitar permisos de Administrador";
+        }
+    } catch (_) {
+        boton.disabled = false;
+        boton.textContent = "Solicitar rol de Administrador";
+    }
+}
+
+async function solicitarPermisosAdministrador(){
+    if(usuarioActual?.rol!=="profesor") return;
+    const boton=document.getElementById("botonSolicitudAdminProfesor");
+    if(boton?.disabled) return;
+    if(!confirm("¿Deseas enviar una solicitud para obtener permisos de Administrador?")) return;
+    if(boton){ boton.disabled=true; boton.textContent="Enviando solicitud..."; }
+    try{
+        const data=await api("request_admin_permission",{method:"POST",body:{}});
+        mostrarToastProfesor("Solicitud enviada con éxito. Espera la aprobación del administrador.");
+        if(boton){ boton.disabled=true; boton.textContent="Solicitud de Admin pendiente"; }
+    }catch(e){
+        if(boton){ boton.disabled=false; boton.textContent="Solicitar rol de Administrador"; }
+        mostrarToastProfesor(e.message,true);
+    }
+}
+
+async function cargarPerfilProfesor() {
+    if (!usuarioActual || usuarioActual.rol !== "profesor") return;
+    try {
+        const data = await api("professor_profile");
+        const p = data.profile || {};
+        const campos = {
+            profesorPerfilNombres: p.nombres || "",
+            profesorPerfilApellidos: p.apellidos || "",
+            profesorPerfilCorreo: p.correo || usuarioActual.correo || "",
+            profesorPerfilTelefono: p.telefono || usuarioActual.telefono || "",
+            profesorPerfilProyectoEditable: p.proyecto || usuarioActual.proyecto || "",
+            profesorPerfilRol: "Profesor",
+            profesorPerfilIdentificacion: p.identificacion || usuarioActual.identificacion || "",
+            profesorPerfilSede: p.sede || usuarioActual.sede || "Sin asignar",
+            profesorPerfilProyecto: p.proyecto || usuarioActual.proyecto || "Sin asignar"
+        };
+        Object.entries(campos).forEach(([id, value]) => { const el=document.getElementById(id); if(el) el.value=value; });
+        guardarSnapshotPerfilProfesor();
+        establecerEdicionPerfilProfesor(false);
+        actualizarEstadoSolicitudAdminProfesor();
+        const estado=document.getElementById("estadoPerfilProfesor"); if(estado){estado.textContent="Modo lectura"; estado.className="profile-save-state";}
+    } catch (e) {
+        const estado=document.getElementById("estadoPerfilProfesor"); if(estado){estado.textContent=e.message; estado.className="profile-save-state error";}
+    }
+}
+
+function establecerEdicionPerfilProfesor(editar) {
+    ["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono","profesorPerfilProyectoEditable"].forEach(id => {
+        const el=document.getElementById(id); if(el) el.disabled=!editar;
+    });
+    document.getElementById("editarPerfilProfesorBtn")?.toggleAttribute("hidden", editar);
+    const guardar=document.getElementById("guardarPerfilProfesorBtn"); if(guardar) guardar.disabled=!editar;
+}
+function activarEdicionPerfilProfesor(){ establecerEdicionPerfilProfesor(true); }
+function configurarEdicionPerfilProfesor(){
+    const campos=["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono"];
+    campos.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el && el.dataset.edicionConfigurada!=="1"){
+            el.dataset.edicionConfigurada="1";
+            el.addEventListener("input",()=>{
+                if(id === "profesorPerfilNombres" || id === "profesorPerfilApellidos") {
+                    el.value = el.value.replace(/[^\p{L} ]/gu, "").replace(/ {2,}/g, " ").replace(/^ +/g, "").slice(0,60);
+                } else if(id === "profesorPerfilCorreo") {
+                    el.value = el.value.replace(/\s/g, "");
+                } else if(id === "profesorPerfilTelefono") {
+                    const numero = el.value.replace(/\D/g, "").slice(0,10);
+                    el.value = numero.length > 6 ? `${numero.slice(0,3)} ${numero.slice(3,6)} ${numero.slice(6)}` : numero.length > 3 ? `${numero.slice(0,3)} ${numero.slice(3)}` : numero;
+                }
+                actualizarEstadoPerfilProfesor();
+            });
+            el.addEventListener("blur",()=>{
+                if(id === "profesorPerfilNombres" || id === "profesorPerfilApellidos") el.value=capitalizarNombreCompleto(el.value).slice(0,60);
+                if(id === "profesorPerfilCorreo") el.value=el.value.replace(/\s/g, "").trim();
+                actualizarEstadoPerfilProfesor();
+            });
+            el.addEventListener("change",actualizarEstadoPerfilProfesor);
+        }
+    });
+}
+
+let snapshotPerfilProfesor = "";
+function obtenerDatosPerfilProfesor() {
+    return {
+        nombres: capitalizarNombreCompleto(document.getElementById("profesorPerfilNombres")?.value || "").slice(0, 60),
+        apellidos: capitalizarNombreCompleto(document.getElementById("profesorPerfilApellidos")?.value || "").slice(0, 60),
+        correo: document.getElementById("profesorPerfilCorreo")?.value.trim().toLowerCase() || "",
+        telefono: document.getElementById("profesorPerfilTelefono")?.value.trim() || "",
+    };
+}
+function guardarSnapshotPerfilProfesor() {
+    snapshotPerfilProfesor = JSON.stringify(obtenerDatosPerfilProfesor());
+    actualizarEstadoPerfilProfesor();
+}
+function actualizarEstadoPerfilProfesor() {
+    const btn=document.getElementById("guardarPerfilProfesorBtn");
+    const estado=document.getElementById("estadoPerfilProfesor");
+    const cambiado=JSON.stringify(obtenerDatosPerfilProfesor()) !== snapshotPerfilProfesor;
+    if(btn) btn.disabled=!cambiado;
+    if(estado && cambiado){estado.textContent="Hay cambios sin guardar"; estado.className="profile-save-state";}
+    else if(estado && !estado.classList.contains("success") && !estado.classList.contains("error")) estado.textContent="Sin cambios pendientes";
+}
+async function guardarPerfilProfesor() {
+    const datos=obtenerDatosPerfilProfesor();
+    const regexNombreProfesor=/^[\p{L}]+(?: [\p{L}]+)*$/u;
+    const regexCorreoInstitucional=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
+    if(!datos.nombres || !datos.apellidos || !datos.correo || !datos.telefono){ mostrarToastProfesor("Completa todos los campos editables.", true); return; }
+    if(datos.nombres.length < 2 || datos.nombres.length > 60 || datos.apellidos.length < 2 || datos.apellidos.length > 60 || !regexNombreProfesor.test(datos.nombres) || !regexNombreProfesor.test(datos.apellidos)){ mostrarToastProfesor("Nombres y apellidos deben tener entre 2 y 60 caracteres, con solo letras y espacios sencillos.", true); return; }
+    if(!regexCorreoInstitucional.test(datos.correo)){ mostrarToastProfesor("El correo debe usar el dominio institucional y no contener espacios.", true); return; }
+    const telefonoProfesor = datos.telefono.replace(/\D/g, "");
+    const todosIgualesTelefono = /^(\d)\1{9}$/.test(telefonoProfesor);
+    const secuenciasTelefono = ["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
+    if(!/^3\d{9}$/.test(telefonoProfesor) || todosIgualesTelefono || secuenciasTelefono.includes(telefonoProfesor)){
+        mostrarToastProfesor("El teléfono debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.", true);
+        return;
+    }
+    datos.telefono = telefonoProfesor;
+    try{
+        const data=await api("update_professor_profile",{method:"POST",body:datos});
+        usuarioActual=normalizarUsuario(data.user);
+try { guardarSesionSigho(usuarioActual); } catch (_) {}
+        const nombreCompletoProfesor=(usuarioActual.nombre||"Profesor").trim();
+        const primerNombreProfesor=nombreCompletoProfesor.split(/\s+/)[0] || "Profesor";
+        document.getElementById("nombrePerfilProfesorHeader")?.replaceChildren(document.createTextNode(primerNombreProfesor));
+        establecerEdicionPerfilProfesor(false);
+        guardarSnapshotPerfilProfesor();
+        const estado=document.getElementById("estadoPerfilProfesor"); if(estado){estado.textContent="Datos guardados correctamente"; estado.className="profile-save-state success";}
+        mostrarToastProfesor("Datos actualizados correctamente.");
+    }catch(e){mostrarToastProfesor(e.message,true);}
+}
+function alternarCambioClaveProfesor(mostrar) {
+    const form=document.getElementById("formularioCambioClaveProfesor");
+    const boton=document.getElementById("botonMostrarCambioClaveProfesor");
+    if(!form || !boton) return;
+    const abrir = typeof mostrar === "boolean" ? mostrar : form.style.display === "none";
+    form.style.display = abrir ? "block" : "none";
+    boton.textContent = abrir ? "Ocultar cambio de contraseña" : "Cambiar contraseña";
+    if(!abrir){
+        ["claveActualProfesor","nuevaClaveProfesor","confirmarClaveProfesor"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+        const estado=document.getElementById("estadoClaveProfesor"); if(estado){estado.textContent="";estado.className="profile-save-state";}
+    }
+}
+
+async function cambiarClaveProfesor(){
+    const claveActual=document.getElementById("claveActualProfesor")?.value||"";
+    const nuevaClave=document.getElementById("nuevaClaveProfesor")?.value||"";
+    const confirmarClave=document.getElementById("confirmarClaveProfesor")?.value||"";
+    const estado=document.getElementById("estadoClaveProfesor");
+    if(!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(nuevaClave)){
+        if(estado){estado.textContent="La nueva contraseña debe tener mínimo 8 caracteres, con mayúscula, minúscula y número.";estado.className="profile-save-state error";}
+        return;
+    }
+    if(nuevaClave!==confirmarClave){
+        if(estado){estado.textContent="La confirmación de la nueva contraseña no coincide.";estado.className="profile-save-state error";}
+        return;
+    }
+    try{
+        await api("change_professor_password",{method:"POST",body:{claveActual,nuevaClave,confirmarClave}});
+        ["claveActualProfesor","nuevaClaveProfesor","confirmarClaveProfesor"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+        if(estado){estado.textContent="Contraseña actualizada correctamente";estado.className="profile-save-state success";}
+        mostrarToastProfesor("Contraseña actualizada correctamente.");
+        alternarCambioClaveProfesor(false);
+    }catch(e){if(estado){estado.textContent=e.message;estado.className="profile-save-state error";} }
+}
+function mostrarToastProfesor(mensaje,error=false){
+    const toast=document.getElementById("toastProfesor"); if(!toast)return;
+    toast.textContent=mensaje; toast.style.borderLeftColor=error?"#c44747":"#2fa45a"; toast.style.color=error?"#9b3030":"#315b42";
+    toast.classList.add("show"); clearTimeout(window._toastSigho); window._toastSigho=setTimeout(()=>toast.classList.remove("show"),3200);
+}
+
+document.addEventListener("keydown", (evento) => {
+    if (evento.key !== "Enter") {
+        if (evento.key === "Escape") cerrarModales();
+        return;
+    }
+
+    const objetivo = evento.target;
+    if (!(objetivo instanceof HTMLElement)) return;
+
+    const loginActivo = document.getElementById("login")?.classList.contains("active");
+    const solicitudActiva = document.getElementById("solicitud")?.classList.contains("active");
+
+    if (loginActivo && objetivo.matches("#correoLogin, #clave")) {
+        evento.preventDefault();
+        iniciarSesion();
+    }
+
+    if (solicitudActiva && objetivo.matches("#claveSolicitud, #claveSolicitudProfesor")) {
+        const rol = document.getElementById("rolSolicitud")?.value;
+        if (rol) {
+            evento.preventDefault();
+            enviarSolicitud();
+        }
+    }
+});
+
+function capitalizarNombreCompleto(valor) {
+    return String(valor || "")
+        .replace(/\s+/g, " ")
+        .trimStart()
+        .split(" ")
+        .map(palabra => palabra ? palabra.charAt(0).toLocaleUpperCase("es-CO") + palabra.slice(1).toLocaleLowerCase("es-CO") : "")
+        .join(" ");
+}
+
+function configurarValidacionSolicitudProfesor() {
+    const correo = document.getElementById("correoSolicitud");
+    const telefono = document.getElementById("telefonoProfesorSolicitud");
+    const identificacion = document.getElementById("identificacionSolicitud");
+    const clave = document.getElementById("claveSolicitudProfesor");
+
+    if (correo && correo.dataset.validacionProfesorConfigurada !== "1") {
+        correo.dataset.validacionProfesorConfigurada = "1";
+        correo.addEventListener("input", () => {
+            /* Mantener exactamente las mayúsculas/minúsculas que escribe el usuario. */
+        });
+        correo.addEventListener("blur", () => {
+            correo.value = correo.value.replace(/\s/g, "").trim();
+            correo.classList.toggle("campo-error", !correo.checkValidity());
+        });
+        correo.addEventListener("input", () => correo.classList.remove("campo-error"));
+    }
+
+    if (telefono && telefono.dataset.validacionProfesorConfigurada !== "1") {
+        telefono.dataset.validacionProfesorConfigurada = "1";
+        telefono.addEventListener("input", () => {
+            const digitos = telefono.value.replace(/\D/g, "").slice(0, 10);
+            telefono.value = digitos.length > 6
+                ? `${digitos.slice(0,3)} ${digitos.slice(3,6)} ${digitos.slice(6)}`
+                : digitos.length > 3
+                    ? `${digitos.slice(0,3)} ${digitos.slice(3)}`
+                    : digitos;
+        });
+    }
+
+    if (identificacion && identificacion.dataset.validacionProfesorConfigurada !== "1") {
+        identificacion.dataset.validacionProfesorConfigurada = "1";
+        identificacion.addEventListener("input", () => {
+            identificacion.value = identificacion.value.replace(/[<>"']/g, "").slice(0, 60);
+        });
+    }
+
+    if (clave && clave.dataset.validacionProfesorConfigurada !== "1") {
+        clave.dataset.validacionProfesorConfigurada = "1";
+        clave.addEventListener("input", () => {
+            clave.value = clave.value.replace(/\s/g, "");
+        });
+    }
+}
+
+function mostrarErrorCampo(input, mensaje) {
+        if (!input) return;
+        const formGroup = input.closest('.form-group');
+        if (!formGroup) return;
+        let errorNode = formGroup.querySelector('.field-error-message');
+        if (!errorNode) {
+            errorNode = document.createElement('small');
+            errorNode.className = 'field-error-message';
+            formGroup.appendChild(errorNode);
+        }
+        const texto = (mensaje || '').trim();
+        errorNode.textContent = texto;
+        errorNode.style.display = texto ? 'block' : 'none';
+        input.classList.toggle('campo-error', !!texto);
+    }
+
+    function limpiarErrorCampo(input) {
+        if (!input) return;
+        const formGroup = input.closest('.form-group');
+        if (!formGroup) return;
+        const errorNode = formGroup.querySelector('.field-error-message');
+        if (errorNode) {
+            errorNode.textContent = '';
+            errorNode.style.display = 'none';
+        }
+        input.classList.remove('campo-error');
+        input.setCustomValidity('');
+    }
+
+    function validarDocumentoSegunTipo() {
+        const tipo = document.getElementById('tipoDocumento')?.value || '';
+        const input = document.getElementById('numeroDocumento');
+        if (!input) return;
+
+        const valor = String(input.value || '').replace(/\D/g, '');
+        const limite = tipo === 'PPT' ? 8 : 10;
+        input.maxLength = limite;
+        input.value = valor.slice(0, limite);
+
+        let mensaje = '';
+        let valido = true;
+
+        if (!tipo) {
+            valido = false;
+            mensaje = 'Selecciona el tipo de documento.';
+        } else if (tipo === 'Tarjeta de identidad') {
+            valido = /^\d{10}$/.test(valor);
+            mensaje = valido ? '' : 'La tarjeta de identidad debe tener exactamente 10 dígitos.';
+        } else if (tipo === 'Cédula de ciudadanía') {
+            valido = /^\d{7,10}$/.test(valor);
+            mensaje = valido ? '' : 'La cédula debe tener entre 7 y 10 dígitos.';
+        } else if (tipo === 'PPT') {
+            valido = /^\d{6,8}$/.test(valor);
+            mensaje = valido ? '' : 'El PPT debe tener entre 6 y 8 dígitos.';
+        }
+
+        input.setCustomValidity(mensaje);
+        if (valor && !valido) {
+            mostrarErrorCampo(input, mensaje);
+        } else {
+            limpiarErrorCampo(input);
+        }
+    }
+
     function configurarValidacionesGenericasCampos() {
         const campos = document.querySelectorAll('#solicitud input, #solicitud select, #solicitud textarea');
         campos.forEach(input => {
@@ -12145,7 +13658,6 @@ function abrirMisDatos() {
         input.addEventListener('blur', validar);
         validar();
     }
-}
 
     // Todos los nombres y apellidos usan la misma regla: letras, espacios sencillos
     // y capitalización automática. Los campos opcionales pueden permanecer vacíos.
@@ -14205,7 +15717,6 @@ body.dark-mode .check-option {
     background: #1e293b !important;
     color: #f1f5f9 !important;
     border-color: #334155 !important;
-    box-shadow: none !important;
 }
 
 html.dark-mode .check-option:has(input[type="checkbox"]:checked),
@@ -14250,7 +15761,6 @@ body.dark-mode {
     --border-input: #334155 !important;
     color-scheme: dark !important;
 }
-</style>
 
 html.dark-mode,
 html.dark-mode body,
@@ -14370,7 +15880,6 @@ html.dark-mode .icon,
 body.dark-mode .icon {
     background: #1e293b !important;
     color: #f8fafc !important;
-    border-color: #334155 !important;
 }
 
 /* Todos los campos de formulario, incluidos componentes dinámicos */
@@ -14469,16 +15978,6 @@ body.dark-mode .notification-item {
     background-color: #172334 !important;
     color: #f8fafc !important;
     border-color: #334155 !important;
-    -webkit-text-fill-color: #ffffff !important;
-    color-scheme: dark !important;
-}
-
-html.dark-mode input::placeholder,
-html.dark-mode textarea::placeholder,
-body.dark-mode input::placeholder,
-body.dark-mode textarea::placeholder {
-    color: #94a3b8 !important;
-    opacity: 1 !important;
 }
 
 html.dark-mode .notification-item:hover,
@@ -14594,14 +16093,6 @@ body.dark-mode .solicitud-comprobante {
     border: 1px solid #334155;
     box-shadow: 0 18px 50px rgba(0,0,0,.45);
 }
-</style>
-<style id="sigho-comprobante-dark-v13">
-<style id="sigho-comprobante-dark-v13">
-/* =========================================================
-   COMPROBANTES / RESÚMENES DE SOLICITUD EN MODO OSCURO
-   Cubre los modales existentes y bloques que puedan ser
-   generados dinámicamente por JavaScript.
-   ========================================================= */
 
 
 /* Cabeceras y cuerpos internos */
@@ -15156,7 +16647,6 @@ input[type="text"].password-universal-visible {
     }
 }
 </style>
-
 <style id="sigho-login-eye-visible-v47">
 /* LOGIN: cuando la clave está visible, ninguna máscara de seguridad debe permanecer activa. */
 #clave[type="text"] {
@@ -15198,7 +16688,6 @@ input[type="text"].password-universal-visible {
     #btnTogglePassword { width: 48px !important; height: 48px !important; min-width: 48px !important; min-height: 48px !important; right: 2px !important; }
 }
 </style>
-
 <script id="sigho-final-password-sync-v40">
 (function () {
     const EYE_OPEN = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
@@ -15227,35 +16716,12 @@ input[type="text"].password-universal-visible {
 
     window.sighoRestablecerOjosUniversales = resetUniversalEyes;
 
-
     document.addEventListener('focusin', function (event) {
         const target = event.target;
         if (!target || !target.matches || !target.matches('input[type="password"]')) return;
         // Solo en estado oculto. Nunca volver a aplicar la máscara si el login está visible.
         target.style.webkitTextSecurity = 'disc';
         target.style.textSecurity = 'disc';
-      
-    function syncLoginEye() {
-        const input = document.getElementById('clave');
-        const button = document.getElementById('btnTogglePassword');
-        const icon = document.getElementById('iconEye');
-        if (!input || !button || !icon) return;
-        const visible = input.type === 'text';
-        icon.innerHTML = visible ? EYE_OPEN : EYE_OFF;
-        button.setAttribute('aria-pressed', visible ? 'true' : 'false');
-        button.setAttribute('aria-label', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
-        button.setAttribute('title', visible ? 'Ocultar contraseña' : 'Mostrar contraseña');
-    }
-    // El HTML puede cambiar de pantalla sin recargar; mantener el estado visual coherente.
-    document.addEventListener('click', function (event) {
-        const target = event.target.closest('#btnTogglePassword');
-        if (target) setTimeout(syncLoginEye, 0);
-    });
-
-    document.addEventListener('focusin', function (event) {
-        if (event.target.matches && event.target.matches('input[type="password"]')) {
-            event.target.style.webkitTextSecurity = 'disc';
-        }
     });
 
     if (document.readyState === 'loading') {
@@ -15801,5 +17267,502 @@ body.dark-mode textarea[disabled].campo-error {
     }
 })();
 </script>
+
+<script id="sigho-xbox-splash-js">
+(function () {
+    "use strict";
+
+    /* =========================================================
+       SIGHO — TEMPORIZACIÓN DEL SPLASH
+       A los 3.5 s comienza el fade-out.
+       El fade dura 850 ms y luego el splash desaparece.
+       ========================================================= */
+
+    const splash = document.getElementById("sigho-splash");
+    const startupAudio = document.getElementById("sigho-startup-audio");
+
+    if (!splash) return;
+
+    const SPLASH_HOLD_TIME = 3500;
+    const FADE_OUT_TIME = 850;
+    const STARTUP_AUDIO_FALLBACK_TIME = 4442;
+
+    let closed = false;
+    let splashTimer = null;
+    let fadeTimer = null;
+
+    if (startupAudio) {
+        startupAudio.volume = 0.55;
+        startupAudio.preload = "auto";
+    }
+
+    function limpiarAudio() {
+        if (!startupAudio) return;
+
+        try {
+            startupAudio.pause();
+            startupAudio.currentTime = 0;
+            startupAudio.removeAttribute("src");
+            startupAudio.load();
+        } catch (_) {}
+    }
+
+    function ocultarSplash() {
+        if (closed) return;
+        closed = true;
+
+        if (splashTimer) {
+            window.clearTimeout(splashTimer);
+            splashTimer = null;
+        }
+
+        document.documentElement.classList.remove("sigho-fouc-pending");
+
+        /* Comienza el fade-out suave exactamente al terminar los 3.5 s. */
+        splash.classList.add("sigho-splash-hidden");
+
+        fadeTimer = window.setTimeout(function () {
+            limpiarAudio();
+
+            if (splash && splash.parentNode) {
+                splash.remove();
+            }
+        }, FADE_OUT_TIME + 50);
+    }
+
+    function finalizarCarga() {
+        if (closed) return;
+
+        const startedAt = Number(window.__sighoSplashStartedAt);
+        if (!startedAt) return;
+
+        const elapsed = performance.now() - startedAt;
+        const remaining = Math.max(0, SPLASH_HOLD_TIME - elapsed);
+
+        if (splashTimer) {
+            window.clearTimeout(splashTimer);
+        }
+
+        splashTimer = window.setTimeout(ocultarSplash, remaining);
+    }
+
+    /* El cronómetro comienza únicamente después del clic de aceptación. */
+    window.addEventListener("sigho-audio-unlocked", function () {
+        finalizarCarga();
+    }, { once: true });
+
+    /*
+     * El audio dura 4.442 s. El requisito visual, sin embargo,
+     * pide comenzar el fade a los 3.5 s. Esta metadata se conserva
+     * únicamente como respaldo/información y nunca retrasa el fade.
+     */
+    if (startupAudio) {
+        startupAudio.addEventListener("loadedmetadata", function () {
+            const duration = startupAudio.duration;
+            if (Number.isFinite(duration) && duration > 0) {
+                window.__sighoStartupAudioDetectedDuration = Math.ceil(duration * 1000);
+            } else {
+                window.__sighoStartupAudioDetectedDuration = STARTUP_AUDIO_FALLBACK_TIME;
+            }
+        });
+    }
+})();
+</script>
+
+
+<script id="sigho-global-login-audio">
+(function () {
+    "use strict";
+
+    /* =========================================================
+       SIGHO — SONIDO DE INICIO DE SESIÓN
+       Funciona para Estudiante, Profesor, Administrador y
+       Super Admin porque se expone como función global y se
+       ejecuta después de una autenticación correcta.
+       ========================================================= */
+
+    const SOUND_LOGIN = "sonidos/Iniciar sesión.mp3";
+    const loginAudio = new Audio(SOUND_LOGIN);
+    loginAudio.preload = "auto";
+    loginAudio.volume = 0.35;
+
+    window.sighoPlayLoginSound = function () {
+        if (window.__sighoAudioUnlocked !== true) return;
+
+        try {
+            loginAudio.currentTime = 0;
+            const playPromise = loginAudio.play();
+
+            if (playPromise && typeof playPromise.catch === "function") {
+                playPromise.catch(function () {});
+            }
+        } catch (_) {}
+    };
+})();
+</script>
+
+<script id="sigho-global-navigation-audio">
+(function () {
+    "use strict";
+
+    /* =========================================================
+       SIGHO — SONIDO GLOBAL DE NAVEGACIÓN / HOVER
+       V4 — Funciona en todos los roles y también en elementos
+       creados dinámicamente después de abrir un panel.
+       ========================================================= */
+
+    const NAV_SOUND_PRIMARY = "sonidos/navegacion.mp3";
+    const NAV_SOUND_FALLBACK = "sonidos/hover-menu.mp3";
+    const NAV_VOLUME = 0.20;
+
+    /*
+     * Se usa UN único reproductor para evitar múltiples sonidos
+     * simultáneos al recorrer rápidamente el menú.
+     */
+    const hoverSound = new Audio(NAV_SOUND_PRIMARY);
+    hoverSound.preload = "auto";
+    hoverSound.volume = NAV_VOLUME;
+
+    let activeSoundSource = NAV_SOUND_PRIMARY;
+    let fallbackAttempted = false;
+
+    /*
+     * Selector global: cubre los sidebars de roles, navs normales,
+     * enlaces, botones y elementos con role="menuitem".
+     */
+    const HOVER_SELECTOR = [
+        ".sidebar a",
+        ".sidebar button",
+        ".sidebar-nav a",
+        ".sidebar-nav button",
+        ".sidebar-nav .menu-item",
+        ".role-sidebar a",
+        ".role-sidebar button",
+        ".role-sidebar .menu-item",
+        ".nav-link",
+        ".menu-item",
+        "nav a",
+        "nav button",
+        "[role=\"menuitem\"]"
+    ].join(", ");
+
+    function audioDesbloqueado() {
+        return window.__sighoAudioUnlocked === true;
+    }
+
+    function cambiarAFallback() {
+        if (fallbackAttempted || activeSoundSource === NAV_SOUND_FALLBACK) {
+            return;
+        }
+
+        fallbackAttempted = true;
+        activeSoundSource = NAV_SOUND_FALLBACK;
+
+        try {
+            hoverSound.src = NAV_SOUND_FALLBACK;
+            hoverSound.preload = "auto";
+            hoverSound.load();
+        } catch (_) {}
+    }
+
+    /*
+     * Reproduce inmediatamente el sonido de hover.
+     * currentTime = 0 hace que cada entrada comience desde el inicio.
+     */
+    function reproducirHover() {
+        if (!audioDesbloqueado()) return;
+
+        try {
+            hoverSound.pause();
+            hoverSound.currentTime = 0;
+
+            const playPromise = hoverSound.play();
+
+            if (playPromise && typeof playPromise.then === "function") {
+                playPromise
+                    .then(function () {
+                        /* Reproducción correcta. */
+                    })
+                    .catch(function () {
+                        /*
+                         * Si navegacion.mp3 no existe o no puede reproducirse,
+                         * cambiamos automáticamente a hover-menu.mp3.
+                         */
+                        if (activeSoundSource === NAV_SOUND_PRIMARY) {
+                            cambiarAFallback();
+
+                            try {
+                                hoverSound.currentTime = 0;
+                                const fallbackPromise = hoverSound.play();
+                                if (fallbackPromise && typeof fallbackPromise.catch === "function") {
+                                    fallbackPromise.catch(function () {});
+                                }
+                            } catch (_) {}
+                        }
+                    });
+            }
+        } catch (_) {
+            if (activeSoundSource === NAV_SOUND_PRIMARY) {
+                cambiarAFallback();
+            }
+        }
+    }
+
+    /*
+     * Instala mouseenter DIRECTAMENTE en cada opción.
+     * mouseenter no burbujea, por eso no dependemos de una delegación
+     * tradicional con bubbling. Esto evita problemas con SVG, spans,
+     * iconos internos y cambios de contenido.
+     */
+    function instalarHoverEnElemento(elemento) {
+        if (!(elemento instanceof HTMLElement)) return;
+        if (elemento.dataset.sighoHoverAudio === "1") return;
+
+        elemento.dataset.sighoHoverAudio = "1";
+        elemento.addEventListener("mouseenter", reproducirHover, false);
+    }
+
+    function escanearHoverGlobal(raiz) {
+        if (!raiz) return;
+
+        if (raiz instanceof HTMLElement && raiz.matches(HOVER_SELECTOR)) {
+            instalarHoverEnElemento(raiz);
+        }
+
+        if (raiz.querySelectorAll) {
+            raiz.querySelectorAll(HOVER_SELECTOR).forEach(instalarHoverEnElemento);
+        }
+    }
+
+    /*
+     * Primera carga: instala el sonido en todos los menús ya existentes.
+     */
+    function inicializarHoverGlobal() {
+        escanearHoverGlobal(document);
+    }
+
+    /*
+     * MutationObserver: cuando SIGHO cambia de panel, genera botones,
+     * tablas o sidebars nuevos, el sonido se instala automáticamente.
+     */
+    const observer = new MutationObserver(function (mutaciones) {
+        for (const mutacion of mutaciones) {
+            for (const nodo of mutacion.addedNodes) {
+                if (nodo.nodeType === Node.ELEMENT_NODE) {
+                    escanearHoverGlobal(nodo);
+                }
+            }
+        }
+    });
+
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", inicializarHoverGlobal, { once: true });
+    } else {
+        inicializarHoverGlobal();
+    }
+
+    /* API global opcional para cualquier módulo de SIGHO. */
+    window.sighoPlayNavigationSound = reproducirHover;
+    window.sighoInitNavigationAudio = inicializarHoverGlobal;
+
+})();
+</script>
+
+<!-- ============================================================
+     SIGHO — WELCOME LOADER DE LOGIN
+     Se activa únicamente tras autenticación correcta y permanece
+     por encima del sitio hasta completar la transición.
+     ============================================================ -->
+<div id="welcome-loader"
+     class="sigho-login-welcome-loader"
+     aria-hidden="true"
+     aria-live="polite">
+    <div class="sigho-welcome-stage">
+        <div class="sigho-welcome-crest-wrap" aria-hidden="true">
+            <img
+                class="sigho-welcome-crest"
+                src="escudo_jjfh.jpg"
+                alt=""
+            >
+        </div>
+
+        <div class="sigho-welcome-copy">
+            <h1 class="sigho-welcome-title">¡BIENVENIDO!</h1>
+            <p class="sigho-welcome-subtitle">
+                Accediendo al Sistema de Gestión SIGHO...
+            </p>
+            <p class="sigho-welcome-user" id="welcome-user-name"></p>
+        </div>
+    </div>
+</div>
+
+<script id="sigho-login-welcome-controller-v1">
+(function () {
+    "use strict";
+
+    /* =========================================================
+       SIGHO — CONTROLADOR DE BIENVENIDA POST-LOGIN
+       ========================================================= */
+
+    const WELCOME_DURATION = 2500;
+    const WELCOME_FADE = 500;
+    const SOUND_LOGIN = "sonidos/Iniciar sesión.mp3";
+
+    let welcomeInProgress = false;
+    let welcomeAudio = null;
+
+    function desbloquearContextoAudio() {
+        try {
+            const AudioContextClass =
+                window.AudioContext || window.webkitAudioContext;
+
+            if (!AudioContextClass) return;
+
+            if (!window.__sighoAudioContext) {
+                window.__sighoAudioContext = new AudioContextClass();
+            }
+
+            const ctx = window.__sighoAudioContext;
+            if (ctx.state === "suspended") {
+                const resumePromise = ctx.resume();
+                if (resumePromise && typeof resumePromise.catch === "function") {
+                    resumePromise.catch(function () {});
+                }
+            }
+        } catch (_) {
+            /* El audio HTML5 seguirá intentando reproducirse. */
+        }
+
+        /* El aviso institucional ya autorizó el audio para la sesión. */
+        window.__sighoAudioUnlocked = true;
+    }
+
+    function obtenerNombre(usuario) {
+        if (!usuario) return "";
+
+        return String(
+            usuario.nombre ||
+            usuario.nombreUsuario ||
+            usuario.usuario ||
+            ""
+        ).trim();
+    }
+
+    function reproducirSonidoBienvenida() {
+        try {
+            /* Reutilizar el controlador global existente cuando está disponible. */
+            if (typeof window.sighoPlayLoginSound === "function") {
+                window.sighoPlayLoginSound();
+                return;
+            }
+
+            welcomeAudio = new Audio(SOUND_LOGIN);
+            welcomeAudio.preload = "auto";
+            welcomeAudio.volume = 0.35;
+            welcomeAudio.currentTime = 0;
+
+            const playPromise = welcomeAudio.play();
+            if (playPromise && typeof playPromise.then === "function") {
+                playPromise
+                    .then(function () {})
+                    .catch(function () {
+                        /* Nunca bloquear el login por un fallo de audio. */
+                    });
+            }
+        } catch (_) {
+            /* El loader continúa aunque el audio falle. */
+        }
+    }
+
+    function mostrarLoader(usuario) {
+        const loader = document.getElementById("welcome-loader");
+        if (!loader) return null;
+
+        const nombre = obtenerNombre(usuario);
+        const nombreNode = document.getElementById("welcome-user-name");
+
+        if (nombreNode) {
+            nombreNode.textContent = nombre ? nombre : "";
+        }
+
+        loader.style.display = "flex";
+        loader.classList.remove("is-closing");
+
+        /* Forzar reflow para que la entrada sea visible siempre. */
+        void loader.offsetWidth;
+
+        loader.classList.add("is-active");
+        loader.setAttribute("aria-hidden", "false");
+
+        return loader;
+    }
+
+    function cerrarLoader(loader) {
+        if (!loader) return Promise.resolve();
+
+        return new Promise(function (resolve) {
+            loader.classList.add("is-closing");
+
+            window.setTimeout(function () {
+                loader.classList.remove("is-active", "is-closing");
+                loader.setAttribute("aria-hidden", "true");
+                loader.style.display = "none";
+                resolve();
+            }, WELCOME_FADE);
+        });
+    }
+
+    /*
+     * Esta función es llamada DESPUÉS de una autenticación correcta.
+     * Devuelve una Promise para que iniciarSesion() pueda esperar el
+     * final del loader antes de abrir el panel correspondiente.
+     */
+    window.sighoIniciarBienvenidaLogin = function (usuario) {
+        if (welcomeInProgress) {
+            return Promise.resolve();
+        }
+
+        welcomeInProgress = true;
+
+        desbloquearContextoAudio();
+
+        const loader = mostrarLoader(usuario);
+
+        /* El sonido se dispara junto con el inicio visual. */
+        reproducirSonidoBienvenida();
+
+        if (!loader) {
+            welcomeInProgress = false;
+            return Promise.resolve();
+        }
+
+        /* 2.5 s de bienvenida + 0.5 s de fade-out. */
+        return new Promise(function (resolve) {
+            window.setTimeout(function () {
+                cerrarLoader(loader).then(function () {
+                    welcomeInProgress = false;
+                    resolve();
+                });
+            }, WELCOME_DURATION);
+        });
+    };
+
+    /* Permitir cerrar la bienvenida en caso de un flujo externo. */
+    window.sighoCerrarBienvenidaLogin = function () {
+        const loader = document.getElementById("welcome-loader");
+        if (!loader) return;
+
+        cerrarLoader(loader).then(function () {
+            welcomeInProgress = false;
+        });
+    };
+})();
+</script>
+
 </body>
 </html>
