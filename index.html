@@ -347,6 +347,19 @@
         #estudiante .notification-empty span { font-size:12px; }
         .teacher-admin-card select:disabled, #profesor #profesorPerfilProyectoEditable:disabled { background:#edf0f1; color:#7c888c; cursor:not-allowed; opacity:1; }
         .teacher-admin-card .assignment-grid select { width:100%; min-height:42px; box-sizing:border-box; }
+        /* Zona fija: se presenta como un campo estático, sin flecha ni interacción. */
+        .teacher-admin-card .assignment-grid select.zona-fija {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: none !important;
+            cursor: default;
+            pointer-events: none;
+            padding-right: 14px;
+        }
+        .teacher-admin-card .assignment-grid select.zona-fija::-ms-expand {
+            display: none;
+        }
 
         .back {
             border: none;
@@ -15071,10 +15084,34 @@ async function cargarProfesoresAdmin() {
     }
 }
 
+const zonasPorSede = {
+    "Central JM": [
+        "Cancha central",
+        "Cancha punta cana",
+        "Baños hombres",
+        "Baños mujeres",
+        "Pasillos bloque 1",
+        "Pasillos bloque 2",
+        "Pasillos bloque uno 2 piso",
+        "Pasillos bloque dos segundo piso"
+    ],
+    "San Francisco Club": ["Apoyo docentes"],
+    "Picaleña": ["Apoyo docentes"],
+    "Secundino Porras Cruz": ["Apoyo docentes"],
+    "San Martín": ["Apoyo docentes"],
+    "Bello Horizonte": ["Apoyo docentes"]
+};
+
+const sedesApoyoDocentes = [
+    "San Francisco Club",
+    "Picaleña",
+    "Secundino Porras Cruz",
+    "San Martín",
+    "Bello Horizonte"
+];
+
 function zonasDisponiblesPorSede(sede) {
-    return sede === "Central JM"
-        ? ["Cancha central", "Cancha punta cana", "Baños hombres", "Baños mujeres", "Pasillos bloque 1", "Pasillos bloque 2", "Pasillos bloque uno 2 piso", "Pasillos bloque dos segundo piso"]
-        : ["Próximamente"];
+    return zonasPorSede[sede] || ["Próximamente"];
 }
 
 function opcionesZonaProfesor(sede, zonaSeleccionada = "") {
@@ -15086,7 +15123,25 @@ function opcionesZonaProfesor(sede, zonaSeleccionada = "") {
 function actualizarZonasProfesor(id, zonaSeleccionada = "") {
     const sede = document.getElementById(`sedeProf_${id}`)?.value || "";
     const selector = document.getElementById(`zonaProf_${id}`);
-    if (selector) selector.innerHTML = opcionesZonaProfesor(sede, zonaSeleccionada || selector.value);
+    if (!selector) return;
+
+    const sedeConZonaFija = sedesApoyoDocentes.includes(sede);
+
+    if (sedeConZonaFija) {
+        // Estas sedes solo permiten "Apoyo docentes" y se muestran como campo estático.
+        selector.innerHTML = '<option value="Apoyo docentes" selected>Apoyo docentes</option>';
+        selector.value = "Apoyo docentes";
+        selector.disabled = true;
+        selector.classList.add("zona-fija", "is-disabled");
+        selector.setAttribute("aria-disabled", "true");
+        return;
+    }
+
+    // Las demás sedes conservan su selector desplegable normal.
+    selector.disabled = false;
+    selector.removeAttribute("aria-disabled");
+    selector.classList.remove("zona-fija", "is-disabled");
+    selector.innerHTML = opcionesZonaProfesor(sede, zonaSeleccionada || selector.value);
 }
 
 async function asignarProfesor(id) {
