@@ -922,7 +922,7 @@ try {
             $user = require_roles(['estudiante']);
             $pdo = db();
             ensure_student_application_table($pdo);
-            $st = $pdo->prepare('SELECT u.email, u.first_name, u.last_name, u.identification, s.id AS student_id, s.grade AS student_grade, s.modality, s.target_hours, sa.grade AS application_grade, sa.service_shift AS application_shift, sa.phone, sa.residence_address, sa.eps, sa.guardian_name, sa.guardian_phone FROM users u LEFT JOIN students s ON s.user_id = u.id LEFT JOIN student_applications sa ON sa.id = (SELECT MAX(sa2.id) FROM student_applications sa2 WHERE sa2.student_id = s.id OR sa2.user_id = u.id) WHERE u.id = ? LIMIT 1');
+            $st = $pdo->prepare('SELECT u.email, u.first_name, u.last_name, u.identification, s.id AS student_id, s.grade AS student_grade, s.modality, s.target_hours, sa.grade AS application_grade, sa.service_shift AS application_shift, sa.phone, sa.residence_address, sa.eps, sa.guardian_name, sa.guardian_phone, sa.guardian_phone_type FROM users u LEFT JOIN students s ON s.user_id = u.id LEFT JOIN student_applications sa ON sa.id = (SELECT MAX(sa2.id) FROM student_applications sa2 WHERE sa2.student_id = s.id OR sa2.user_id = u.id) WHERE u.id = ? LIMIT 1');
             $st->execute([(int)$user['id']]);
             $p = $st->fetch() ?: [];
             $gradoPerfil = trim((string)($p['student_grade'] ?? ''));
@@ -943,7 +943,7 @@ try {
                 'modalidad'=>$p['modality'] ?? '',
                 'metaHoras'=>$p['target_hours'] ?? null,
                 'telefono'=>$p['phone'] ?? '', 'direccion'=>$p['residence_address'] ?? '',
-                'eps'=>$p['eps'] ?? '', 'nombreAcudiente'=>$p['guardian_name'] ?? '', 'telefonoAcudiente'=>$p['guardian_phone'] ?? ''
+                'eps'=>$p['eps'] ?? '', 'nombreAcudiente'=>$p['guardian_name'] ?? '', 'tipoTelefonoAcudiente'=>$p['guardian_phone_type'] ?? '', 'telefonoAcudiente'=>$p['guardian_phone'] ?? ''
             ]]);
 
         case 'update_student_profile':
@@ -954,19 +954,53 @@ try {
             $direccion = trim((string)($d['direccion'] ?? ''));
             $eps = trim((string)($d['eps'] ?? ''));
             $acudiente = capitalizarNombre((string)($d['nombreAcudiente'] ?? ''));
+            $tipoTelefonoAcudiente = trim((string)($d['tipoTelefonoAcudiente'] ?? ''));
             $telAcudiente = trim((string)($d['telefonoAcudiente'] ?? ''));
             $epsSeleccionada = trim((string)($d['epsSeleccionada'] ?? ''));
             if (!$correo || !filter_var($correo, FILTER_VALIDATE_EMAIL)) fail('Escribe un correo electrónico válido.');
-            if (!$telefono || !$direccion || !$eps || !$acudiente || !$telAcudiente) fail('Completa todos los datos editables.');
+            if (!$telefono || !$direccion || !$eps || !$acudiente || !$tipoTelefonoAcudiente || !$telAcudiente) fail('Completa todos los datos editables.');
             $telefono = preg_replace('/\D+/', '', $telefono);
             $telAcudiente = preg_replace('/\D+/', '', $telAcudiente);
             if (!preg_match('/^3\d{9}$/', $telefono)) fail('El celular debe tener exactamente 10 dígitos y comenzar por 3.');
             if (preg_match('/^(\d)\1{9}$/', $telefono) || $telefono === '1234567890') fail('El celular no puede tener todos sus dígitos iguales ni ser la secuencia 1234567890.');
             if (mb_strlen($direccion, 'UTF-8') > 100) fail('La dirección puede tener máximo 100 caracteres.');
-            if (mb_strlen($eps, 'UTF-8') > 60) fail('La EPS puede tener máximo 60 caracteres.');
-            if ($epsSeleccionada === 'Otro' && !preg_match('/^[\p{L}]+(?: [\p{L}]+)*$/u', $eps)) fail('La EPS de "Otro" solo puede contener letras y espacios sencillos.');
-            if (!preg_match('/^[\p{L}]+(?: [\p{L}]+)*$/u', $acudiente) || mb_strlen($acudiente, 'UTF-8') > 60) fail('El nombre del acudiente debe contener solo letras y espacios sencillos, máximo 60 caracteres.');
-            if (!preg_match('/^\d{7,10}$/', $telAcudiente)) fail('El teléfono del acudiente debe tener entre 7 y 10 dígitos.');
+            if (mb_strlen($eps, 'UTF-8') > 150 || $eps !== $epsSeleccionada) fail('Selecciona una opción válida de Seguridad Social.');
+            $epsPermitidas = [
+                'Nueva EPS', 'EPS Sanitas', 'EPS Sura', 'Salud Total EPS', 'Compensar EPS',
+                'E.P.S. Famisanar', 'Aliansalud EPS', 'Servicio Occidental de Salud (S.O.S.)',
+                'Salud Mía EPS', 'Coosalud', 'Mutual Ser', 'Capital Salud EPS', 'Savia Salud EPS',
+                'Asmet Salud', 'Emssanar', 'Cajacopi Atlántico', 'Capresoca', 'Comfachocó',
+                'Comfaoriente', 'Comfenalco Valle', 'EPS Familiar de Colombia', 'Anas Wayuu EPSI',
+                'Asociación Indígena del Cauca (AIC)', 'Dusakawi EPSI', 'Mallamas EPSI', 'Pijaos Salud EPSI'
+            ];
+            $regimenesPermitidos = [
+                'Fuerzas Militares / Policía Nacional',
+                'FOMAG (Fondo Nacional de Prestaciones Sociales del Magisterio - Profesores)',
+                'Ecopetrol',
+                'Universidades Públicas (Salud Propia)'
+            ];
+            $sisbenValido = preg_match('/^Sisbén Grupo ([A-D]), Subgrupo (\d{1,2})$/u', $eps, $grupoSisben);
+            if ($sisbenValido) {
+                $maximosSisben = ['A' => 5, 'B' => 7, 'C' => 18, 'D' => 21];
+                $sisbenValido = (int)$grupoSisben[2] >= 1 && (int)$grupoSisben[2] <= $maximosSisben[$grupoSisben[1]];
+            }
+            $seguridadSocialValida = in_array($eps, $epsPermitidas, true) || in_array($eps, $regimenesPermitidos, true) || $sisbenValido;
+            if (!$seguridadSocialValida) {
+                $pdoValidacion = db();
+                ensure_student_application_table($pdoValidacion);
+                $st = $pdoValidacion->prepare('SELECT eps FROM student_applications WHERE user_id = ? OR student_id = (SELECT id FROM students WHERE user_id = ? LIMIT 1) ORDER BY id DESC LIMIT 1');
+                $st->execute([(int)$user['id'], (int)$user['id']]);
+                $seguridadSocialValida = $eps === trim((string)($st->fetchColumn() ?: ''));
+            }
+            if (!$seguridadSocialValida) fail('Selecciona una opción válida de Seguridad Social.');
+            if (!preg_match('/^[\p{L}]+(?: [\p{L}]+)*$/u', $acudiente) || mb_strlen($acudiente, 'UTF-8') < 2 || mb_strlen($acudiente, 'UTF-8') > 60) fail('El nombre del acudiente debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.');
+            if (!in_array($tipoTelefonoAcudiente, ['fijo', 'celular'], true)) fail('Selecciona si el teléfono del acudiente es fijo o celular.');
+            if ($tipoTelefonoAcudiente === 'celular') {
+                if (!preg_match('/^3\d{9}$/', $telAcudiente) || preg_match('/^(\d)\1{9}$/', $telAcudiente) || $telAcudiente === '1234567890') fail('El celular del acudiente debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890.');
+            } else {
+                $restoFijo = substr($telAcudiente, 3);
+                if (!preg_match('/^60[1-8][2-8]\d{6}$/', $telAcudiente) || preg_match('/^(\d)\1{6}$/', $restoFijo)) fail('El teléfono fijo del acudiente debe cumplir el formato de registro y no tener los siete dígitos finales iguales.');
+            }
             $pdo = db();
             $st = $pdo->prepare('SELECT id FROM users WHERE LOWER(email)=? AND id<>?');
             $st->execute([$correo,(int)$user['id']]);
@@ -990,11 +1024,11 @@ try {
                 $st->execute();
                 $tieneUpdatedAt = (int)$st->fetchColumn() > 0;
                 if ($tieneUpdatedAt) {
-                    $st = $pdo->prepare('UPDATE student_applications SET phone=?, residence_address=?, eps=?, guardian_name=?, guardian_phone=?, updated_at=CURRENT_TIMESTAMP WHERE id=?');
+                    $st = $pdo->prepare('UPDATE student_applications SET phone=?, residence_address=?, eps=?, guardian_name=?, guardian_phone=?, guardian_phone_type=?, updated_at=CURRENT_TIMESTAMP WHERE id=?');
                 } else {
-                    $st = $pdo->prepare('UPDATE student_applications SET phone=?, residence_address=?, eps=?, guardian_name=?, guardian_phone=? WHERE id=?');
+                    $st = $pdo->prepare('UPDATE student_applications SET phone=?, residence_address=?, eps=?, guardian_name=?, guardian_phone=?, guardian_phone_type=? WHERE id=?');
                 }
-                $st->execute([$telefono,$direccion,$eps,$acudiente,$telAcudiente,$applicationId]);
+                $st->execute([$telefono,$direccion,$eps,$acudiente,$telAcudiente,$tipoTelefonoAcudiente,$applicationId]);
                 $pdo->commit();
             } catch (PDOException $e) {
                 if ($pdo->inTransaction()) $pdo->rollBack();
