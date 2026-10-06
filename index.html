@@ -8319,6 +8319,165 @@ body.sigho-awaiting-terms #sigho-splash * {
 
 </style>
 
+
+<style id="sigho-xbox-welcome-banner-refresh-v1">
+/* ============================================================
+   SIGHO — XBOX WELCOME TOAST
+   Banner flotante de bienvenida. No bloquea la interfaz.
+   ============================================================ */
+#xbox-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translate(-50%, 100px);
+    z-index: 999999 !important;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    width: min(440px, calc(100vw - 32px));
+    min-height: 74px;
+    padding: 12px 20px 12px 14px;
+
+    color: #fff;
+    background: rgba(16, 23, 32, .88);
+    border: 1px solid rgba(148, 163, 184, .20);
+    border-radius: 50px;
+    box-shadow: 0 0 20px rgba(16, 185, 129, .40), 0 15px 40px rgba(0,0,0,.30);
+    -webkit-backdrop-filter: blur(10px) saturate(1.15);
+    backdrop-filter: blur(10px) saturate(1.15);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+}
+
+#xbox-toast.show {
+    visibility: visible;
+    pointer-events: none;
+    animation: xboxPopUp 4s cubic-bezier(.175,.885,.32,1.275) both;
+}
+
+.xbox-avatar-circle {
+    width: 50px;
+    height: 50px;
+    flex: 0 0 50px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,.90);
+    border: 1px solid rgba(255,255,255,.30);
+    box-shadow: 0 0 12px rgba(0,0,0,.40);
+    overflow: hidden;
+}
+
+.xbox-avatar-circle svg {
+    width: 30px;
+    height: 30px;
+    display: block;
+    color: #475569;
+}
+
+.xbox-avatar-circle svg * {
+    vector-effect: non-scaling-stroke;
+}
+
+.xbox-welcome-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.xbox-welcome-title,
+.xbox-title {
+    margin: 0;
+    color: #6ee7b7;
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+#xbox-gamertag {
+    margin: 0;
+    color: #fff;
+    font-size: 16px;
+    line-height: 1.35;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#xbox-role {
+    margin: 0;
+    color: rgba(226,232,240,.72);
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+@keyframes xboxPopUp {
+    0% {
+        transform: translate(-50%, 100px) scale(.96);
+        opacity: 0;
+    }
+    9% {
+        transform: translate(-50%, -5px) scale(1.01);
+        opacity: 1;
+    }
+    15% {
+        transform: translate(-50%, 2px) scale(1);
+        opacity: 1;
+    }
+    22%, 82% {
+        transform: translate(-50%, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, 100px) scale(.98);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    #xbox-toast {
+        bottom: 18px;
+        width: calc(100vw - 24px);
+        min-height: 68px;
+        padding: 10px 16px 10px 12px;
+        gap: 11px;
+    }
+    .xbox-avatar-circle {
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
+    }
+    #xbox-gamertag { font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #xbox-toast.show {
+        animation: none;
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+</style>
+
+
+<style id="sigho-xbox-toast-zindex-v3">
+/* El toast debe quedar por encima del Splash, sin bloquear clics. */
+#xbox-toast {
+    z-index: 999999 !important;
+    pointer-events: none !important;
+}
+</style>
+
 </head>
 <body class="sigho-awaiting-terms">
 
@@ -8335,6 +8494,27 @@ body.sigho-awaiting-terms #sigho-splash * {
         </p>
         <button class="sigho-terms-action" id="sigho-terms-accept" type="button">Aceptar y Continuar</button>
         <p class="sigho-terms-note">Al continuar se habilitan los sonidos y la experiencia de arranque de SIGHO.</p>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     SIGHO — XBOX WELCOME TOAST
+     Se muestra únicamente después de un inicio de sesión exitoso
+     y una vez finalizado el Splash Screen.
+     ========================================================= -->
+<div id="xbox-toast" aria-live="polite" aria-atomic="true">
+    <div class="xbox-avatar-circle" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Usuario">
+            <circle cx="12" cy="8" r="3.25"></circle>
+            <path d="M5.25 19.25c.9-3.1 3.2-4.75 6.75-4.75s5.85 1.65 6.75 4.75"></path>
+        </svg>
+    </div>
+
+    <div class="xbox-welcome-copy">
+        <p class="xbox-welcome-title">¡Bienvenido de nuevo!</p>
+        <p id="xbox-gamertag">SIGHO</p>
+        <span id="xbox-role"></span>
     </div>
 </div>
 
@@ -10761,7 +10941,20 @@ async function iniciarSesion() {
     try {
         const data = await api("login", { method: "POST", body: { correo, clave } });
         usuarioActual = normalizarUsuario(data.user);
-try { guardarSesionSigho(usuarioActual); } catch (_) {}
+
+        try {
+            guardarSesionSigho(usuarioActual);
+        } catch (_) {}
+
+        /*
+         * Marca esta navegación como un inicio de sesión REAL.
+         * La bandera se conserva para compatibilidad con el flujo existente;
+         * el disparo real del banner depende de que el Splash haya terminado.
+         */
+        try {
+            sessionStorage.setItem("justLoggedIn", "1");
+        } catch (_) {}
+
         mensaje.style.display = "none";
 
         /* Sonido de bienvenida: el audio ya fue desbloqueado al aceptar
@@ -10771,10 +10964,22 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         }
 
         await cargarDatosPorRol();
-        if (usuarioActual.rol === "estudiante") abrirEstudiante();
-        else if (usuarioActual.rol === "profesor") abrirProfesor();
-        else if (usuarioActual.rol === "administrador") abrirAdministrador();
-        else abrirSuperAdmin();
+        if (usuarioActual.rol === "estudiante") await abrirEstudiante();
+        else if (usuarioActual.rol === "profesor") await abrirProfesor();
+        else if (usuarioActual.rol === "administrador") await abrirAdministrador();
+        else await abrirSuperAdmin();
+
+        /*
+         * Si el login ocurre cuando el Splash todavía está visible,
+         * el banner queda pendiente y será disparado 1 s después de su
+         * ocultamiento. Si el Splash ya terminó, se muestra ahora.
+         */
+        if (typeof window.__sighoTryShowXboxWelcome === "function" &&
+            window.__sighoSplashFinished === true) {
+            try {
+                window.__sighoTryShowXboxWelcome();
+            } catch (_) {}
+        }
     } catch (error) {
         mensaje.style.display = "block";
         mensaje.innerText = error.message;
@@ -17069,6 +17274,40 @@ body.dark-mode textarea[disabled].campo-error {
         } catch (_) {}
     }
 
+    /*
+     * Los callbacks registrados aquí solo se liberan cuando el Splash
+     * ya terminó y fue retirado del DOM.
+     */
+    let splashFinished = false;
+    const splashFinishedCallbacks = [];
+
+    window.sighoOnSplashFinished = function (callback) {
+        if (typeof callback !== "function") return;
+
+        if (splashFinished || window.__sighoSplashFinished === true || !splash.isConnected) {
+            window.requestAnimationFrame(function () {
+                callback();
+            });
+            return;
+        }
+
+        splashFinishedCallbacks.push(callback);
+    };
+
+    function notificarFinSplash() {
+        /* Este punto se alcanza DESPUÉS de splash.remove(). */
+        splashFinished = true;
+        window.__sighoSplashFinished = true;
+
+        const callbacks = splashFinishedCallbacks.splice(0);
+        callbacks.forEach(function (callback) {
+            try {
+                callback();
+            } catch (_) {}
+        });
+
+    }
+
     function ocultarSplash() {
         if (closed) return;
         closed = true;
@@ -17086,9 +17325,31 @@ body.dark-mode textarea[disabled].campo-error {
         fadeTimer = window.setTimeout(function () {
             limpiarAudio();
 
+            /*
+             * El Splash se oculta por completo aquí.
+             * El banner se programa 1000 ms después de este punto para
+             * evitar cualquier solapamiento visual con la pantalla de carga.
+             */
+            splash.style.display = "none";
+
             if (splash && splash.parentNode) {
                 splash.remove();
             }
+
+            notificarFinSplash();
+
+            /*
+             * Se espera 1 segundo DESPUÉS de display:none/remove().
+             * Luego se consulta la sesión y se muestra el banner con nombre
+             * y rol dinámicos, sin depender de un usuario fijo.
+             */
+            window.setTimeout(function () {
+                if (typeof window.__sighoTryShowXboxWelcome === "function") {
+                    try {
+                        window.__sighoTryShowXboxWelcome();
+                    } catch (_) {}
+                }
+            }, 1000);
         }, FADE_OUT_TIME + 50);
     }
 
@@ -17231,5 +17492,657 @@ body.dark-mode textarea[disabled].campo-error {
     }, false);
 })();
 </script>
+
+<script id="sigho-internal-history-v2">
+(function () {
+    "use strict";
+
+    /* =========================================================
+       SIGHO — HISTORIAL INTERNO / BOTÓN ATRÁS DEL NAVEGADOR v2
+       SOLO controla el historial de vistas internas.
+       No modifica validaciones, tema, botones, sonidos ni API.
+       ========================================================= */
+
+    const HISTORY_KEY = "__sigho_internal_history_v2__";
+    let aplicandoHistorial = false;
+    let operacionRolActiva = false;
+    let controladorListo = false;
+    let ultimaClaveRuta = "";
+
+    function obtenerUsuarioActual() {
+        try {
+            if (typeof usuarioActual !== "undefined" && usuarioActual) return usuarioActual;
+        } catch (_) {}
+
+        try {
+            if (typeof window.recuperarSesionSigho === "function") {
+                const usuario = window.recuperarSesionSigho();
+                if (usuario) return usuario;
+            }
+        } catch (_) {}
+
+        return null;
+    }
+
+    function sesionIniciada() {
+        const usuario = obtenerUsuarioActual();
+        return !!(usuario && usuario.rol);
+    }
+
+    function rolActual() {
+        const usuario = obtenerUsuarioActual();
+        return usuario ? String(usuario.rol || "").toLowerCase() : "";
+    }
+
+    function rutaPublica(nombre) {
+        return {
+            type: "public",
+            screen: nombre,
+            authenticated: false,
+            role: ""
+        };
+    }
+
+    function rutaProtegida(rol, section) {
+        return {
+            type: "protected",
+            screen: rol,
+            section: section || "inicio",
+            authenticated: true,
+            role: rol
+        };
+    }
+
+    function claveRuta(route) {
+        if (!route) return "";
+        return [
+            route.type || "",
+            route.screen || "",
+            route.section || "",
+            route.role || ""
+        ].join("|");
+    }
+
+    function estadoRuta(route, extra) {
+        return Object.assign({
+            [HISTORY_KEY]: true,
+            version: 2,
+            route: route
+        }, extra || {});
+    }
+
+    function rutaDesdeDOM() {
+        const activa = document.querySelector(".screen.active");
+        const id = activa?.id || "home";
+
+        if (id === "estudiante") return rutaProtegida("estudiante", "inicio");
+        if (id === "profesor") return rutaProtegida("profesor", "inicio");
+        if (id === "administrador") return rutaProtegida("administrador", "inicio");
+        if (id === "superAdmin") return rutaProtegida("superadmin", "inicio");
+        if (id === "solicitud") return rutaPublica("solicitud");
+        if (id === "login") return rutaPublica("login");
+        return rutaPublica("home");
+    }
+
+    function reemplazarEstadoActual(route) {
+        const state = estadoRuta(route, { root: true });
+        history.replaceState(state, "", location.href);
+        ultimaClaveRuta = claveRuta(route);
+    }
+
+    function registrarRuta(route) {
+        if (!controladorListo || aplicandoHistorial || !route) return;
+
+        const key = claveRuta(route);
+        if (key === ultimaClaveRuta) return;
+
+        history.pushState(estadoRuta(route), "", location.href);
+        ultimaClaveRuta = key;
+    }
+
+    function seccionEstudianteVisible() {
+        const mapa = {
+            panelInicioEstudiante: "inicio",
+            seccionRegistrar: "registrar",
+            seccionRegistros: "registros",
+            seccionPerfilEstudiante: "datos",
+            seccionAyudaEstudiante: "ayuda"
+        };
+        for (const [id, section] of Object.entries(mapa)) {
+            const el = document.getElementById(id);
+            if (el && el.style.display !== "none") return section;
+        }
+        return "inicio";
+    }
+
+    function seccionProfesorVisible() {
+        const mapa = {
+            panelInicioProfesor: "inicio",
+            seccionPendientesProfesor: "pendientes",
+            seccionHistorialProfesor: "historial",
+            seccionEstudiantesProfesor: "estudiantes",
+            seccionDatosProfesor: "datos",
+            seccionAyudaProfesor: "ayuda"
+        };
+        for (const [id, section] of Object.entries(mapa)) {
+            const el = document.getElementById(id);
+            if (el && el.style.display !== "none") return section;
+        }
+        return "inicio";
+    }
+
+    function rutaEstudianteActual() {
+        return rutaProtegida("estudiante", seccionEstudianteVisible());
+    }
+
+    function rutaProfesorActual() {
+        return rutaProtegida("profesor", seccionProfesorVisible());
+    }
+
+    function rutaAdministradorActual(nombre) {
+        return rutaProtegida("administrador", nombre || "inicio");
+    }
+
+    function rutaSuperAdminActual(nombre) {
+        return rutaProtegida("superadmin", nombre || "inicio");
+    }
+
+    function evitarRetrocesoFueraDeLaAplicacion() {
+        const state = history.state;
+        const route = state && state[HISTORY_KEY] ? state.route : null;
+        const autenticado = sesionIniciada();
+
+        /* Con sesión iniciada no se permiten estados públicos anteriores
+           (login/solicitud/home) una vez dentro de un panel protegido. */
+        if (autenticado && route && route.type === "public") {
+            history.forward();
+            return true;
+        }
+
+        /* Sin sesión no se debe poder reabrir por historial un panel protegido. */
+        if (!autenticado && route && route.type === "protected") {
+            history.forward();
+            return true;
+        }
+
+        return false;
+    }
+
+    async function aplicarRuta(route) {
+        if (!route) return;
+
+        aplicandoHistorial = true;
+        try {
+            if (route.type === "public") {
+                if (route.screen === "login") {
+                    mostrarLogin();
+                } else if (route.screen === "solicitud") {
+                    mostrarSolicitud();
+                } else {
+                    volverInicio();
+                }
+                return;
+            }
+
+            const rol = String(route.screen || route.role || "").toLowerCase();
+            const section = route.section || "inicio";
+
+            if (rol === "estudiante") {
+                await window.__sighoOriginalAbrirEstudiante();
+                window.__sighoOriginalMostrarSeccionEstudiante(section);
+            } else if (rol === "profesor") {
+                await window.__sighoOriginalAbrirProfesor();
+                window.__sighoOriginalMostrarSeccionProfesor(section);
+            } else if (rol === "administrador") {
+                await window.__sighoOriginalAbrirAdministrador();
+                window.__sighoOriginalMostrarSeccionAdministrador(section);
+            } else if (rol === "superadmin") {
+                await window.__sighoOriginalAbrirSuperAdmin();
+                window.__sighoOriginalMostrarSeccionSuperAdmin(section, false);
+            } else {
+                volverInicio();
+            }
+        } finally {
+            aplicandoHistorial = false;
+        }
+    }
+
+    function envolverFuncion(nombre, registrar) {
+        const original = window[nombre];
+        if (typeof original !== "function") return null;
+
+        const envuelta = function () {
+            const args = arguments;
+            const resultado = original.apply(this, args);
+
+            if (!registrar || aplicandoHistorial) return resultado;
+
+            const registrarResultado = function () {
+                registrar(args);
+            };
+
+            if (resultado && typeof resultado.then === "function") {
+                resultado.then(function () {
+                    if (!aplicandoHistorial && !operacionRolActiva) registrarResultado();
+                }).catch(function () {});
+            } else if (!operacionRolActiva) {
+                registrarResultado();
+            }
+
+            return resultado;
+        };
+
+        window[nombre] = envuelta;
+        return { original, envuelta };
+    }
+
+    function envolverAperturaRol(nombre, construirRuta) {
+        const original = window[nombre];
+        if (typeof original !== "function") return;
+
+        window[nombre] = function () {
+            if (aplicandoHistorial) return original.apply(this, arguments);
+
+            operacionRolActiva = true;
+            let resultado;
+            try {
+                resultado = original.apply(this, arguments);
+            } catch (error) {
+                operacionRolActiva = false;
+                throw error;
+            }
+
+            const finalizar = function () {
+                operacionRolActiva = false;
+                if (!aplicandoHistorial) registrarRuta(construirRuta());
+            };
+
+            if (resultado && typeof resultado.then === "function") {
+                resultado.then(finalizar).catch(function () {
+                    operacionRolActiva = false;
+                });
+            } else {
+                finalizar();
+            }
+
+            return resultado;
+        };
+    }
+
+    function instalarEnvoltorios() {
+        /* Guardar las versiones originales para reproducir una ruta desde popstate. */
+        window.__sighoOriginalAbrirEstudiante = window.abrirEstudiante;
+        window.__sighoOriginalAbrirProfesor = window.abrirProfesor;
+        window.__sighoOriginalAbrirAdministrador = window.abrirAdministrador;
+        window.__sighoOriginalAbrirSuperAdmin = window.abrirSuperAdmin;
+        window.__sighoOriginalMostrarSeccionEstudiante = window.mostrarSeccionEstudiante;
+        window.__sighoOriginalMostrarSeccionProfesor = window.mostrarSeccionProfesor;
+        window.__sighoOriginalMostrarSeccionAdministrador = window.mostrarSeccionAdministrador;
+        window.__sighoOriginalMostrarSeccionSuperAdmin = window.mostrarSeccionSuperAdmin;
+
+        envolverFuncion("mostrarLogin", function () {
+            registrarRuta(rutaPublica("login"));
+        });
+        envolverFuncion("mostrarSolicitud", function () {
+            registrarRuta(rutaPublica("solicitud"));
+        });
+        envolverFuncion("volverInicio", function () {
+            registrarRuta(rutaPublica("home"));
+        });
+
+        envolverAperturaRol("abrirEstudiante", function () {
+            return rutaEstudianteActual();
+        });
+        envolverAperturaRol("abrirProfesor", function () {
+            return rutaProfesorActual();
+        });
+        envolverAperturaRol("abrirAdministrador", function () {
+            const section = (typeof superAdminCurrentSection !== "undefined" ? "inicio" : "inicio");
+            return rutaAdministradorActual(section);
+        });
+        envolverAperturaRol("abrirSuperAdmin", function () {
+            const section = typeof superAdminCurrentSection !== "undefined" ? superAdminCurrentSection : "inicio";
+            return rutaSuperAdminActual(section);
+        });
+
+    }
+
+    function instalarSeccionesManualmente() {
+        /* Las cuatro funciones de sección se envuelven aquí porque algunas
+           son llamadas directamente desde el HTML mediante onclick/data.
+           No se reemplaza su implementación; solo se registra el estado. */
+
+        const oldStudent = window.mostrarSeccionEstudiante;
+        const oldTeacher = window.mostrarSeccionProfesor;
+        const oldAdmin = window.mostrarSeccionAdministrador;
+        const oldSuper = window.mostrarSeccionSuperAdmin;
+
+        if (typeof oldStudent === "function") {
+            window.mostrarSeccionEstudiante = function (section) {
+                const result = oldStudent.apply(this, arguments);
+                if (!aplicandoHistorial && !operacionRolActiva) registrarRuta(rutaProtegida("estudiante", section || "inicio"));
+                return result;
+            };
+        }
+        if (typeof oldTeacher === "function") {
+            window.mostrarSeccionProfesor = function (section) {
+                const result = oldTeacher.apply(this, arguments);
+                if (!aplicandoHistorial && !operacionRolActiva) registrarRuta(rutaProtegida("profesor", section || "inicio"));
+                return result;
+            };
+        }
+        if (typeof oldAdmin === "function") {
+            window.mostrarSeccionAdministrador = function (section) {
+                const result = oldAdmin.apply(this, arguments);
+                if (!aplicandoHistorial && !operacionRolActiva) registrarRuta(rutaProtegida("administrador", section || "inicio"));
+                return result;
+            };
+        }
+        if (typeof oldSuper === "function") {
+            window.mostrarSeccionSuperAdmin = function (section, registrar) {
+                const result = oldSuper.apply(this, arguments);
+                if (!aplicandoHistorial && !operacionRolActiva && registrar !== false) registrarRuta(rutaProtegida("superadmin", section || "inicio"));
+                return result;
+            };
+        }
+
+        /* Las referencias originales usadas por aplicarRuta deben apuntar a las
+           implementaciones sin envoltorio. */
+        window.__sighoOriginalMostrarSeccionEstudiante = oldStudent;
+        window.__sighoOriginalMostrarSeccionProfesor = oldTeacher;
+        window.__sighoOriginalMostrarSeccionAdministrador = oldAdmin;
+        window.__sighoOriginalMostrarSeccionSuperAdmin = oldSuper;
+    }
+
+    function prepararHistorial() {
+        if (controladorListo) return;
+        controladorListo = true;
+        const route = rutaDesdeDOM();
+        reemplazarEstadoActual(route);
+
+        /* Un segundo estado idéntico funciona como protector de entrada/salida.
+           Las vistas internas posteriores se añaden con pushState. */
+        history.pushState(estadoRuta(route, { guard: true }), "", location.href);
+    }
+
+    window.addEventListener("popstate", async function () {
+        if (!controladorListo) {
+            prepararHistorial();
+            return;
+        }
+
+        if (evitarRetrocesoFueraDeLaAplicacion()) return;
+
+        const state = history.state;
+        const route = state && state[HISTORY_KEY] ? state.route : null;
+
+        /* Si el navegador intenta salir de un estado no perteneciente a SIGHO,
+           reemplazamos el destino con la vista segura actual. */
+        if (!route) {
+            const segura = sesionIniciada()
+                ? rutaProtegida(rolActual(), "inicio")
+                : rutaPublica("home");
+            history.pushState(estadoRuta(segura, { guard: true }), "", location.href);
+            ultimaClaveRuta = claveRuta(segura);
+            await aplicarRuta(segura);
+            return;
+        }
+
+        ultimaClaveRuta = claveRuta(route);
+        await aplicarRuta(route);
+    });
+
+    function iniciar() {
+        if (controladorListo) return;
+        instalarEnvoltorios();
+        instalarSeccionesManualmente();
+        prepararHistorial();
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () {
+            /* Dar prioridad al arranque normal de sesión del archivo existente. */
+            setTimeout(iniciar, 0);
+        }, { once: true });
+    } else {
+        setTimeout(iniciar, 0);
+    }
+})();
+</script>
+
+<script id="sigho-xbox-welcome-refresh-controller-v1">
+/* ============================================================
+   SIGHO — CONTROL GLOBAL DEL BANNER XBOX
+   - Inicio de sesión exitoso (una sola vez).
+   - Solo se dispara cuando sessionStorage.justLoggedIn = "1".
+   ============================================================ */
+(function () {
+    "use strict";
+
+    const WELCOME_AUDIO_PRIMARY = "sonidos/welcome.mp3";
+    const WELCOME_AUDIO_FALLBACK = "sonidos/Iniciar sesión.mp3";
+    const WELCOME_VISIBLE_MS = 4000;
+
+    let bannerTimer = null;
+    let activeAudio = null;
+
+    function obtenerUsuarioGuardado() {
+        /* 1) Variable global */
+        try {
+            if (window.usuarioActual && typeof window.usuarioActual === "object") {
+                return window.usuarioActual;
+            }
+        } catch (_) {}
+
+        /* 2) localStorage — clave utilizada por SIGHO */
+        try {
+            const raw = localStorage.getItem("sigho_user");
+            if (raw) {
+                const usuario = JSON.parse(raw);
+                if (usuario && typeof usuario === "object") return usuario;
+            }
+        } catch (_) {}
+
+        /* 3) sessionStorage — respaldo */
+        try {
+            const claves = ["sigho_user", "usuarioActual", "usuario", "sessionUser"];
+            for (const clave of claves) {
+                const raw = sessionStorage.getItem(clave);
+                if (!raw) continue;
+                try {
+                    const usuario = JSON.parse(raw);
+                    if (usuario && typeof usuario === "object") return usuario;
+                } catch (_) {
+                    if (raw.trim()) return { nombre: raw.trim() };
+                }
+            }
+        } catch (_) {}
+
+        return null;
+    }
+
+    function normalizarRol(rol) {
+        const original = String(rol || "").trim();
+        const valor = original
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[_-]+/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+        const mapa = {
+            estudiante: "Estudiante",
+            alumno: "Estudiante",
+            profesor: "Profesor",
+            docente: "Profesor",
+            administrador: "Administrador",
+            admin: "Administrador",
+            superadmin: "Super Admin",
+            "super admin": "Super Admin",
+            "super administrador": "Super Admin",
+            "super administrator": "Super Admin"
+        };
+
+        return mapa[valor] || original;
+    }
+
+    function reproducirSonidoBienvenida() {
+        try {
+            if (activeAudio) {
+                try {
+                    activeAudio.pause();
+                    activeAudio.currentTime = 0;
+                } catch (_) {}
+            }
+
+            activeAudio = new Audio(WELCOME_AUDIO_PRIMARY);
+            activeAudio.preload = "auto";
+            activeAudio.volume = 0.22;
+            activeAudio.currentTime = 0;
+
+            const intento = activeAudio.play();
+            if (intento && typeof intento.catch === "function") {
+                intento.catch(function () {
+                    /*
+                     * En una recarga el navegador puede bloquear autoplay.
+                     * Probamos el sonido secundario y, si también es bloqueado,
+                     * dejamos que el banner siga apareciendo normalmente.
+                     */
+                    try {
+                        activeAudio = new Audio(WELCOME_AUDIO_FALLBACK);
+                        activeAudio.preload = "auto";
+                        activeAudio.volume = 0.22;
+                        activeAudio.currentTime = 0;
+                        const fallbackPromise = activeAudio.play();
+                        if (fallbackPromise && typeof fallbackPromise.catch === "function") {
+                            fallbackPromise.catch(function () {});
+                        }
+                    } catch (_) {}
+                });
+            }
+        } catch (_) {
+            /* El sonido nunca debe impedir la animación. */
+        }
+    }
+
+    function limpiarBanner() {
+        const banner = document.getElementById("xbox-toast");
+        if (!banner) return;
+
+        banner.classList.remove("show");
+        banner.style.animation = "none";
+        banner.style.opacity = "0";
+        banner.style.visibility = "hidden";
+        banner.style.pointerEvents = "none";
+
+        window.requestAnimationFrame(function () {
+            if (banner) banner.style.animation = "";
+        });
+    }
+
+    function mostrarAnimacionXbox(nombreUsuario) {
+        const banner = document.getElementById("xbox-toast");
+        if (!banner) return;
+
+        /*
+         * Consumir la bandera INMEDIATAMENTE al ejecutar la función.
+         * De esta forma un refresh posterior no vuelve a disparar
+         * ni el banner ni el sonido.
+         */
+        try {
+            sessionStorage.removeItem("justLoggedIn");
+        } catch (_) {}
+
+        /*
+         * Usuario dinámico: primero se recupera el objeto completo desde
+         * localStorage/sessionStorage y desde allí se extraen nombre y rol.
+         * El argumento solo queda como respaldo para llamadas antiguas.
+         */
+        const usuario = obtenerUsuarioGuardado() || {};
+        const nombre = String(
+            usuario.nombre ||
+            usuario.name ||
+            nombreUsuario ||
+            "SIGHO"
+        ).trim() || "SIGHO";
+        const rol = normalizarRol(
+            usuario.rol ||
+            usuario.role ||
+            usuario.tipoRol ||
+            usuario.tipo ||
+            ""
+        );
+
+        const gamertag = document.getElementById("xbox-gamertag");
+        const roleNode = document.getElementById("xbox-role");
+
+        if (gamertag) gamertag.textContent = nombre;
+        if (roleNode) roleNode.textContent = rol || "Usuario";
+
+        if (bannerTimer !== null) {
+            clearTimeout(bannerTimer);
+            bannerTimer = null;
+        }
+
+        banner.classList.remove("show");
+        banner.style.animation = "none";
+        banner.style.opacity = "0";
+        banner.style.visibility = "hidden";
+        banner.style.pointerEvents = "none";
+
+        /* Reinicio limpio de la animación en el siguiente frame. */
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                banner.style.animation = "";
+                banner.style.visibility = "visible";
+                banner.style.pointerEvents = "none";
+                banner.classList.add("show");
+
+                reproducirSonidoBienvenida();
+
+                bannerTimer = window.setTimeout(function () {
+                    banner.classList.remove("show");
+                    banner.style.visibility = "hidden";
+                    banner.style.opacity = "0";
+                    banner.style.pointerEvents = "none";
+                    bannerTimer = null;
+                }, WELCOME_VISIBLE_MS);
+            });
+        });
+    }
+
+    window.mostrarAnimacionXbox = mostrarAnimacionXbox;
+
+    /*
+     * ÚNICO puente hacia el banner:
+     * - Requiere una sesión válida guardada en localStorage/sessionStorage.
+     * - Requiere que el Splash haya terminado por completo.
+     * - Se invoca al terminar la transición del Splash.
+     * - También funciona inmediatamente después de un login cuando el
+     *   Splash ya terminó.
+     *
+     * Esto permite mostrar el banner tanto en el primer inicio de sesión
+     * como al refrescar la página dentro de cualquier panel protegido.
+     */
+    window.__sighoTryShowXboxWelcome = function () {
+        if (window.__sighoSplashFinished !== true) return;
+        if (typeof window.mostrarAnimacionXbox !== "function") return;
+
+        const usuario = obtenerUsuarioGuardado();
+        if (!usuario || typeof usuario !== "object") return;
+
+        /* mostrarAnimacionXbox() obtiene por sí misma nombre y rol dinámicos. */
+        window.mostrarAnimacionXbox();
+    };
+
+    /*
+     * No mostramos el banner antes del fin real del Splash.
+     * Al refrescar, el usuario persistido será detectado cuando el Splash
+     * termine; después de un login, el mismo puente se reutiliza.
+     */
+})();
+</script>
+
 </body>
 </html>
