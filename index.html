@@ -17231,5 +17231,422 @@ body.dark-mode textarea[disabled].campo-error {
     }, false);
 })();
 </script>
+
+<script id="sigho-internal-history-v2">
+(function () {
+    "use strict";
+
+    /* =========================================================
+       SIGHO — HISTORIAL INTERNO / BOTÓN ATRÁS DEL NAVEGADOR v2
+       SOLO controla el historial de vistas internas.
+       No modifica validaciones, tema, botones, sonidos ni API.
+       ========================================================= */
+
+    const HISTORY_KEY = "__sigho_internal_history_v2__";
+    let aplicandoHistorial = false;
+    let operacionRolActiva = false;
+    let controladorListo = false;
+    let ultimaClaveRuta = "";
+
+    function obtenerUsuarioActual() {
+        try {
+            if (typeof usuarioActual !== "undefined" && usuarioActual) return usuarioActual;
+        } catch (_) {}
+
+        try {
+            if (typeof window.recuperarSesionSigho === "function") {
+                const usuario = window.recuperarSesionSigho();
+                if (usuario) return usuario;
+            }
+        } catch (_) {}
+
+        return null;
+    }
+
+    function sesionIniciada() {
+        const usuario = obtenerUsuarioActual();
+        return !!(usuario && usuario.rol);
+    }
+
+    function rolActual() {
+        const usuario = obtenerUsuarioActual();
+        return usuario ? String(usuario.rol || "").toLowerCase() : "";
+    }
+
+    function rutaPublica(nombre) {
+        return {
+            type: "public",
+            screen: nombre,
+            authenticated: false,
+            role: ""
+        };
+    }
+
+    function rutaProtegida(rol, section) {
+        return {
+            type: "protected",
+            screen: rol,
+            section: section || "inicio",
+            authenticated: true,
+            role: rol
+        };
+    }
+
+    function claveRuta(route) {
+        if (!route) return "";
+        return [
+            route.type || "",
+            route.screen || "",
+            route.section || "",
+            route.role || ""
+        ].join("|");
+    }
+
+    function estadoRuta(route, extra) {
+        return Object.assign({
+            [HISTORY_KEY]: true,
+            version: 2,
+            route: route
+        }, extra || {});
+    }
+
+    function rutaDesdeDOM() {
+        const activa = document.querySelector(".screen.active");
+        const id = activa?.id || "home";
+
+        if (id === "estudiante") return rutaProtegida("estudiante", "inicio");
+        if (id === "profesor") return rutaProtegida("profesor", "inicio");
+        if (id === "administrador") return rutaProtegida("administrador", "inicio");
+        if (id === "superAdmin") return rutaProtegida("superadmin", "inicio");
+        if (id === "solicitud") return rutaPublica("solicitud");
+        if (id === "login") return rutaPublica("login");
+        return rutaPublica("home");
+    }
+
+    function reemplazarEstadoActual(route) {
+        const state = estadoRuta(route, { root: true });
+        history.replaceState(state, "", location.href);
+        ultimaClaveRuta = claveRuta(route);
+    }
+
+    function registrarRuta(route) {
+        if (!controladorListo || aplicandoHistorial || !route) return;
+
+        const key = claveRuta(route);
+        if (key === ultimaClaveRuta) return;
+
+        history.pushState(estadoRuta(route), "", location.href);
+        ultimaClaveRuta = key;
+    }
+
+    function seccionEstudianteVisible() {
+        const mapa = {
+            panelInicioEstudiante: "inicio",
+            seccionRegistrar: "registrar",
+            seccionRegistros: "registros",
+            seccionPerfilEstudiante: "datos",
+            seccionAyudaEstudiante: "ayuda"
+        };
+        for (const [id, section] of Object.entries(mapa)) {
+            const el = document.getElementById(id);
+            if (el && el.style.display !== "none") return section;
+        }
+        return "inicio";
+    }
+
+    function seccionProfesorVisible() {
+        const mapa = {
+            panelInicioProfesor: "inicio",
+            seccionPendientesProfesor: "pendientes",
+            seccionHistorialProfesor: "historial",
+            seccionEstudiantesProfesor: "estudiantes",
+            seccionDatosProfesor: "datos",
+            seccionAyudaProfesor: "ayuda"
+        };
+        for (const [id, section] of Object.entries(mapa)) {
+            const el = document.getElementById(id);
+            if (el && el.style.display !== "none") return section;
+        }
+        return "inicio";
+    }
+
+    function rutaEstudianteActual() {
+        return rutaProtegida("estudiante", seccionEstudianteVisible());
+    }
+
+    function rutaProfesorActual() {
+        return rutaProtegida("profesor", seccionProfesorVisible());
+    }
+
+    function rutaAdministradorActual(nombre) {
+        return rutaProtegida("administrador", nombre || "inicio");
+    }
+
+    function rutaSuperAdminActual(nombre) {
+        return rutaProtegida("superadmin", nombre || "inicio");
+    }
+
+    function evitarRetrocesoFueraDeLaAplicacion() {
+        const state = history.state;
+        const route = state && state[HISTORY_KEY] ? state.route : null;
+        const autenticado = sesionIniciada();
+
+        /* Con sesión iniciada no se permiten estados públicos anteriores
+           (login/solicitud/home) una vez dentro de un panel protegido. */
+        if (autenticado && route && route.type === "public") {
+            history.forward();
+            return true;
+        }
+
+        /* Sin sesión no se debe poder reabrir por historial un panel protegido. */
+        if (!autenticado && route && route.type === "protected") {
+            history.forward();
+            return true;
+        }
+
+        return false;
+    }
+
+    async function aplicarRuta(route) {
+        if (!route) return;
+
+        aplicandoHistorial = true;
+        try {
+            if (route.type === "public") {
+                if (route.screen === "login") {
+                    mostrarLogin();
+                } else if (route.screen === "solicitud") {
+                    mostrarSolicitud();
+                } else {
+                    volverInicio();
+                }
+                return;
+            }
+
+            const rol = String(route.screen || route.role || "").toLowerCase();
+            const section = route.section || "inicio";
+
+            if (rol === "estudiante") {
+                await window.__sighoOriginalAbrirEstudiante();
+                window.__sighoOriginalMostrarSeccionEstudiante(section);
+            } else if (rol === "profesor") {
+                await window.__sighoOriginalAbrirProfesor();
+                window.__sighoOriginalMostrarSeccionProfesor(section);
+            } else if (rol === "administrador") {
+                await window.__sighoOriginalAbrirAdministrador();
+                window.__sighoOriginalMostrarSeccionAdministrador(section);
+            } else if (rol === "superadmin") {
+                await window.__sighoOriginalAbrirSuperAdmin();
+                window.__sighoOriginalMostrarSeccionSuperAdmin(section, false);
+            } else {
+                volverInicio();
+            }
+        } finally {
+            aplicandoHistorial = false;
+        }
+    }
+
+    function envolverFuncion(nombre, registrar) {
+        const original = window[nombre];
+        if (typeof original !== "function") return null;
+
+        const envuelta = function () {
+            const args = arguments;
+            const resultado = original.apply(this, args);
+
+            if (!registrar || aplicandoHistorial) return resultado;
+
+            const registrarResultado = function () {
+                registrar(args);
+            };
+
+            if (resultado && typeof resultado.then === "function") {
+                resultado.then(function () {
+                    if (!aplicandoHistorial && !operacionRolActiva) registrarResultado();
+                }).catch(function () {});
+            } else if (!operacionRolActiva) {
+                registrarResultado();
+            }
+
+            return resultado;
+        };
+
+        window[nombre] = envuelta;
+        return { original, envuelta };
+    }
+
+    function envolverAperturaRol(nombre, construirRuta) {
+        const original = window[nombre];
+        if (typeof original !== "function") return;
+
+        window[nombre] = function () {
+            if (aplicandoHistorial) return original.apply(this, arguments);
+
+            operacionRolActiva = true;
+            let resultado;
+            try {
+                resultado = original.apply(this, arguments);
+            } catch (error) {
+                operacionRolActiva = false;
+                throw error;
+            }
+
+            const finalizar = function () {
+                operacionRolActiva = false;
+                if (!aplicandoHistorial) registrarRuta(construirRuta());
+            };
+
+            if (resultado && typeof resultado.then === "function") {
+                resultado.then(finalizar).catch(function () {
+                    operacionRolActiva = false;
+                });
+            } else {
+                finalizar();
+            }
+
+            return resultado;
+        };
+    }
+
+    function instalarEnvoltorios() {
+        /* Guardar las versiones originales para reproducir una ruta desde popstate. */
+        window.__sighoOriginalAbrirEstudiante = window.abrirEstudiante;
+        window.__sighoOriginalAbrirProfesor = window.abrirProfesor;
+        window.__sighoOriginalAbrirAdministrador = window.abrirAdministrador;
+        window.__sighoOriginalAbrirSuperAdmin = window.abrirSuperAdmin;
+        window.__sighoOriginalMostrarSeccionEstudiante = window.mostrarSeccionEstudiante;
+        window.__sighoOriginalMostrarSeccionProfesor = window.mostrarSeccionProfesor;
+        window.__sighoOriginalMostrarSeccionAdministrador = window.mostrarSeccionAdministrador;
+        window.__sighoOriginalMostrarSeccionSuperAdmin = window.mostrarSeccionSuperAdmin;
+
+        envolverFuncion("mostrarLogin", function () {
+            registrarRuta(rutaPublica("login"));
+        });
+        envolverFuncion("mostrarSolicitud", function () {
+            registrarRuta(rutaPublica("solicitud"));
+        });
+        envolverFuncion("volverInicio", function () {
+            registrarRuta(rutaPublica("home"));
+        });
+
+        envolverAperturaRol("abrirEstudiante", function () {
+            return rutaEstudianteActual();
+        });
+        envolverAperturaRol("abrirProfesor", function () {
+            return rutaProfesorActual();
+        });
+        envolverAperturaRol("abrirAdministrador", function () {
+            const section = (typeof superAdminCurrentSection !== "undefined" ? "inicio" : "inicio");
+            return rutaAdministradorActual(section);
+        });
+        envolverAperturaRol("abrirSuperAdmin", function () {
+            const section = typeof superAdminCurrentSection !== "undefined" ? superAdminCurrentSection : "inicio";
+            return rutaSuperAdminActual(section);
+        });
+
+    }
+
+    function instalarSeccionesManualmente() {
+        /* Las cuatro funciones de sección se envuelven aquí porque algunas
+           son llamadas directamente desde el HTML mediante onclick/data.
+           No se reemplaza su implementación; solo se registra el estado. */
+
+        const oldStudent = window.mostrarSeccionEstudiante;
+        const oldTeacher = window.mostrarSeccionProfesor;
+        const oldAdmin = window.mostrarSeccionAdministrador;
+        const oldSuper = window.mostrarSeccionSuperAdmin;
+
+        if (typeof oldStudent === "function") {
+            window.mostrarSeccionEstudiante = function (section) {
+                const result = oldStudent.apply(this, arguments);
+                if (!aplicandoHistorial && !operacionRolActiva) registrarRuta(rutaProtegida("estudiante", section || "inicio"));
+                return result;
+            };
+        }
+        if (typeof oldTeacher === "function") {
+            window.mostrarSeccionProfesor = function (section) {
+                const result = oldTeacher.apply(this, arguments);
+                if (!aplicandoHistorial && !operacionRolActiva) registrarRuta(rutaProtegida("profesor", section || "inicio"));
+                return result;
+            };
+        }
+        if (typeof oldAdmin === "function") {
+            window.mostrarSeccionAdministrador = function (section) {
+                const result = oldAdmin.apply(this, arguments);
+                if (!aplicandoHistorial && !operacionRolActiva) registrarRuta(rutaProtegida("administrador", section || "inicio"));
+                return result;
+            };
+        }
+        if (typeof oldSuper === "function") {
+            window.mostrarSeccionSuperAdmin = function (section, registrar) {
+                const result = oldSuper.apply(this, arguments);
+                if (!aplicandoHistorial && !operacionRolActiva && registrar !== false) registrarRuta(rutaProtegida("superadmin", section || "inicio"));
+                return result;
+            };
+        }
+
+        /* Las referencias originales usadas por aplicarRuta deben apuntar a las
+           implementaciones sin envoltorio. */
+        window.__sighoOriginalMostrarSeccionEstudiante = oldStudent;
+        window.__sighoOriginalMostrarSeccionProfesor = oldTeacher;
+        window.__sighoOriginalMostrarSeccionAdministrador = oldAdmin;
+        window.__sighoOriginalMostrarSeccionSuperAdmin = oldSuper;
+    }
+
+    function prepararHistorial() {
+        if (controladorListo) return;
+        controladorListo = true;
+        const route = rutaDesdeDOM();
+        reemplazarEstadoActual(route);
+
+        /* Un segundo estado idéntico funciona como protector de entrada/salida.
+           Las vistas internas posteriores se añaden con pushState. */
+        history.pushState(estadoRuta(route, { guard: true }), "", location.href);
+    }
+
+    window.addEventListener("popstate", async function () {
+        if (!controladorListo) {
+            prepararHistorial();
+            return;
+        }
+
+        if (evitarRetrocesoFueraDeLaAplicacion()) return;
+
+        const state = history.state;
+        const route = state && state[HISTORY_KEY] ? state.route : null;
+
+        /* Si el navegador intenta salir de un estado no perteneciente a SIGHO,
+           reemplazamos el destino con la vista segura actual. */
+        if (!route) {
+            const segura = sesionIniciada()
+                ? rutaProtegida(rolActual(), "inicio")
+                : rutaPublica("home");
+            history.pushState(estadoRuta(segura, { guard: true }), "", location.href);
+            ultimaClaveRuta = claveRuta(segura);
+            await aplicarRuta(segura);
+            return;
+        }
+
+        ultimaClaveRuta = claveRuta(route);
+        await aplicarRuta(route);
+    });
+
+    function iniciar() {
+        if (controladorListo) return;
+        instalarEnvoltorios();
+        instalarSeccionesManualmente();
+        prepararHistorial();
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () {
+            /* Dar prioridad al arranque normal de sesión del archivo existente. */
+            setTimeout(iniciar, 0);
+        }, { once: true });
+    } else {
+        setTimeout(iniciar, 0);
+    }
+})();
+</script>
 </body>
 </html>
