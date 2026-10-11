@@ -1,0 +1,29 @@
+Correos
+
+Estudiante de prueba: estudiante@gmail.com
+Profesor de prueba: profesor@iejosejoaquinflorezhernandez.edu.co
+Administrador de prueba: admin@iejosejoaquinflorezhernandez.edu.co
+Super Admin: admintotaljjfh@gmail.com
+Juan: juanprueba@gmail.com
+Carlos: carlosmartinez@iejosejoaquinflorezhernandez.edu.co
+Sans: sansrestrepo101@gmail.com
+Maria: mariafernandaramiresciclov@gmail.com
+Sara: sarasofiasanchezopsina116@gmail.com
+David: davidmontero@iejosejoaquinflorezhernandez.edu.co
+Felipe: felipecastro@iejosejoaquinflorezhernandez.edu.co
+
+Las contraseñas de prueba:
+
+Estudiante: ESTUDIANTE123
+Profesor: PROFESOR123
+Administrador: ADMIN123
+Super Admin: ADMINDELOSADMIN1223
+Juan: juan123
+Carlos: Profesor123
+Sans: Sans1234
+Maria: Maria123
+Sara: Sara1234
+David: David123
+Felipe: Felipe12
+
+http://localhost/jjfh/index.html
