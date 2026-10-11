@@ -639,6 +639,11 @@ try {
                 if (!in_array($proyecto, $proyectosPermitidos, true)) {
                     fail('El proyecto seleccionado no es válido.');
                 }
+                $sedesConProyectosLibres = ['Central JT', 'Central JM', 'Central J.N.'];
+                if (!in_array($sede, $sedesConProyectosLibres, true) &&
+                    $proyecto !== 'Acompañamiento a un docente de transición o primaria') {
+                    fail('Para la sede seleccionada, el único proyecto permitido es Acompañamiento a un docente de transición o primaria.');
+                }
                 $regexTextoOtro = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
                 $epsSeleccionada = trim((string)($d['epsSeleccionada'] ?? ''));
                 $seguridadSocialTipo = trim((string)($d['seguridadSocialTipo'] ?? ''));
@@ -888,8 +893,15 @@ try {
             try {
                 $st = $pdo->prepare('UPDATE users SET first_name=?, last_name=?, email=? WHERE id=?');
                 $st->execute([$nombres, $apellidos, $correo, (int)$user['id']]);
-                $st = $pdo->prepare('UPDATE staff SET phone=? WHERE user_id=?');
-                $st->execute([$telefono, (int)$user['id']]);
+                $st = $pdo->prepare('SELECT id FROM staff WHERE user_id=? LIMIT 1');
+                $st->execute([(int)$user['id']]);
+                if ($st->fetchColumn()) {
+                    $st = $pdo->prepare('UPDATE staff SET phone=? WHERE user_id=?');
+                    $st->execute([$telefono, (int)$user['id']]);
+                } else {
+                    $st = $pdo->prepare('INSERT INTO staff (user_id, staff_code, phone) VALUES (?,?,?)');
+                    $st->execute([(int)$user['id'], (string)($user['identificacion'] ?? ''), $telefono]);
+                }
                 $pdo->commit();
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) $pdo->rollBack();

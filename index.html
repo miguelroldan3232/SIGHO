@@ -213,9 +213,10 @@
 
         .fecha-edad-grid { display:grid; grid-template-columns:minmax(0,1fr) 92px; gap:8px; align-items:stretch; }
         .edad-calculada { display:flex; flex-direction:column; justify-content:center; align-items:center; border:1px solid #d7e1e3; border-radius:10px; background:#f4f8f8; color:#718492; min-height:46px; }
+        .edad-calculada[hidden] { display:none !important; }
         .edad-calculada span { font-size:11px; }
         .edad-calculada strong { color:#1769aa; font-size:18px; line-height:1.2; }
-        @media (max-width:520px) { .fecha-edad-grid { grid-template-columns:1fr 78px; } }
+        @media (max-width:520px) { .fecha-edad-grid { grid-template-columns:minmax(0,1fr) 78px !important; } }
 
         input,
         select,
@@ -3806,7 +3807,7 @@ body:has(.dashboard-screen.active) .container {
     .auth-hero p{font-size:12px;}
     .auth-card .section{padding:13px 12px;margin-top:18px;}
     .auth-card .section h3{font-size:16px;}
-    .fecha-edad-grid{grid-template-columns:1fr!important;}
+    .fecha-edad-grid{grid-template-columns:minmax(0,1fr) 78px!important;}
     .edad-calculada{min-height:44px;}
 
     /* Vista previa de evidencia: nunca debe provocar scroll horizontal */
@@ -9025,16 +9026,16 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <label>Fecha de nacimiento <span class="required">*</span></label>
 <div class="fecha-edad-grid">
 <input aria-describedby="ayudaFechaNacimiento" autocomplete="bday" disabled="" id="fechaNacimiento" required="" type="date"/>
-<div aria-live="polite" class="edad-calculada">
+<div aria-live="polite" class="edad-calculada" hidden="">
 <span>Edad</span>
 <strong id="edadCalculada">-</strong>
 </div>
 </div>
-<small class="field-help" id="ayudaFechaNacimiento">Selecciona primero el grado para conocer el rango permitido.</small>
+<small aria-live="polite" class="field-help" id="ayudaFechaNacimiento">Selecciona primero el grado para conocer el rango permitido.</small>
 </div>
 <div class="form-group">
 <label>Número celular <span class="required">*</span></label>
-<input aria-describedby="ayudaTelefonoSolicitud" autocomplete="tel" id="telefonoSolicitud" inputmode="numeric" maxlength="12" placeholder="300 123 4567" required="" type="tel"/>
+<input aria-describedby="ayudaTelefonoSolicitud" autocomplete="tel" id="telefonoSolicitud" inputmode="numeric" maxlength="12" pattern="3\d{2} \d{3} \d{4}" placeholder="300 123 4567" required="" type="tel"/>
 <small class="field-help" id="ayudaTelefonoSolicitud">10 dígitos. Debe iniciar en 3. No se permiten ceros iniciales, números repetidos ni la secuencia 1234567890.</small>
 </div>
 </div>
@@ -9195,7 +9196,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="form-group">
 <label>Proyecto <span class="required">*</span></label>
-<select id="proyectoSolicitud">
+<select id="proyectoSolicitud" required="">
 <option disabled="" selected="" value="">Seleccionar proyecto</option>
 <option value="Educación Física / Tiempo Libre">Educación Física / Tiempo Libre</option>
 <option value="Proyecto Ambiental">Proyecto Ambiental</option>
@@ -9204,6 +9205,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <option value="Acompañamiento a un docente de transición o primaria">Acompañamiento a un docente de transición o primaria</option>
 <option value="Eventos especiales">Eventos especiales</option>
 </select>
+<small class="field-help" id="ayudaProyectoSolicitud" aria-live="polite">Selecciona primero la sede para conocer los proyectos permitidos.</small>
 </div>
 <div class="form-group" id="grupoDiasServicio">
 <label>Días en los que realizará el servicio social <span class="required">*</span></label>
@@ -9251,7 +9253,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="form-group">
 <label>Teléfono de contacto <span class="required">*</span></label>
-<input aria-describedby="ayudaTelefonoProfesorSolicitud" autocomplete="tel" id="telefonoProfesorSolicitud" inputmode="numeric" maxlength="12" pattern="3\d{9}" placeholder="300 123 4567" required="" type="tel"/>
+<input aria-describedby="ayudaTelefonoProfesorSolicitud" autocomplete="tel" id="telefonoProfesorSolicitud" inputmode="numeric" maxlength="12" pattern="3\d{2} \d{3} \d{4}" placeholder="300 123 4567" required="" type="tel"/>
 <small class="field-help" id="ayudaTelefonoProfesorSolicitud">Celular de 10 dígitos que comienza en 3. No se permiten números repetidos ni secuencias consecutivas.</small>
 <small class="field-help">Número de celular de 10 dígitos.</small>
 </div>
@@ -9504,18 +9506,19 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="profile-card-head">
 <div><strong>Datos de contacto</strong><span>Puedes corregir estos datos cuando sea necesario.</span></div>
 </div>
-<div class="form-group"><label>Correo para acceder a SIGHO <span class="required">*</span></label><input disabled="" id="perfilCorreo" placeholder="Correo para acceder a SIGHO" type="email"/><small class="field-help">Debe ser el correo asociado a tu cuenta.</small></div>
-<div class="form-group"><label>Número celular</label><input disabled="" id="perfilTelefono" inputmode="numeric" maxlength="12" pattern="\d{3} \d{3} \d{4}" placeholder="300 123 4567" type="tel"/></div>
-<div class="form-group"><label>Dirección de residencia</label><input disabled="" id="perfilDireccion" maxlength="100" placeholder="Dirección completa" type="text"/></div>
+<div class="form-group"><label>Correo para acceder a SIGHO <span class="required">*</span></label><input autocomplete="email" disabled="" id="perfilCorreo" placeholder="Correo para acceder a SIGHO" required="" type="email"/><small class="field-help">Escribe un correo electrónico válido.</small></div>
+<div class="form-group"><label>Número celular <span class="required">*</span></label><input autocomplete="tel" disabled="" id="perfilTelefono" inputmode="numeric" maxlength="12" pattern="3\d{2} \d{3} \d{4}" placeholder="300 123 4567" required="" type="tel"/><small class="field-help">10 dígitos. Debe iniciar en 3; no se permiten números repetidos ni la secuencia 1234567890.</small></div>
+<div class="form-group"><label>Dirección de residencia <span class="required">*</span></label><input autocomplete="street-address" disabled="" id="perfilDireccion" maxlength="100" placeholder="Dirección completa" required="" type="text"/><small class="field-help">La dirección puede tener máximo 100 caracteres.</small></div>
 <div class="form-group">
-<label for="perfilEps">Seguridad Social</label>
-<select disabled="" id="perfilEps">
+<label for="perfilEps">Seguridad Social <span class="required">*</span></label>
+<select disabled="" id="perfilEps" required="">
 <option disabled="" selected="" value="">Seleccionar Seguridad Social</option>
 </select>
+<small class="field-help">Selecciona el mismo tipo y opción de Seguridad Social que en la solicitud de acceso.</small>
 </div>
-<div class="form-group"><label>Nombre del acudiente</label><input disabled="" id="perfilAcudiente" maxlength="60" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" placeholder="Nombre completo" type="text"/></div>
-<div class="form-group"><label for="perfilTipoTelefonoAcudiente">Tipo de línea del acudiente</label><select disabled="" id="perfilTipoTelefonoAcudiente"><option value="">Seleccionar tipo de línea</option><option value="fijo">Teléfono fijo</option><option value="celular">Número celular</option></select></div>
-<div class="form-group"><label>Teléfono del acudiente</label><input disabled="" id="perfilTelefonoAcudiente" inputmode="numeric" maxlength="10" pattern="\d{7,10}" placeholder="7 a 10 dígitos" type="tel"/></div>
+<div class="form-group"><label>Nombre del acudiente <span class="required">*</span></label><input autocomplete="name" disabled="" id="perfilAcudiente" maxlength="60" minlength="2" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" placeholder="Nombre completo" required="" type="text"/><small class="field-help">Entre 2 y 60 caracteres; solo letras y un espacio entre palabras.</small></div>
+<div class="form-group"><label for="perfilTipoTelefonoAcudiente">Tipo de línea del acudiente <span class="required">*</span></label><select disabled="" id="perfilTipoTelefonoAcudiente" required=""><option value="">Seleccionar tipo de línea</option><option value="fijo">Teléfono fijo</option><option value="celular">Número celular</option></select><small class="field-help">Selecciona si el teléfono del acudiente es fijo o celular.</small></div>
+<div class="form-group"><label>Teléfono del acudiente <span class="required">*</span></label><input autocomplete="tel" disabled="" id="perfilTelefonoAcudiente" inputmode="numeric" maxlength="12" placeholder="Selecciona el tipo de línea" required="" type="tel"/><small class="field-help" id="ayudaPerfilTelefonoAcudiente">Primero selecciona el tipo de línea.</small></div>
 <div class="profile-actions">
 <button class="secondary-button" id="editarPerfilEstudianteBtn" onclick="activarEdicionPerfilEstudiante()" type="button">Editar mis datos</button>
 <button class="secondary-button" hidden="" id="cancelarPerfilEstudianteBtn" onclick="cancelarEdicionPerfilEstudiante()" type="button">Cancelar</button>
@@ -9760,12 +9763,14 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="form-row two-columns">
 <div class="form-group">
-<label for="profesorPerfilNombres">Nombres</label>
-<input autocomplete="given-name" disabled="" id="profesorPerfilNombres" placeholder="Nombres del profesor" type="text"/>
+<label for="profesorPerfilNombres">Nombres <span class="required">*</span></label>
+<input autocomplete="given-name" disabled="" id="profesorPerfilNombres" maxlength="60" minlength="2" placeholder="Nombres del profesor" required="" type="text"/>
+<small class="field-help">Entre 2 y 60 caracteres; solo letras y un espacio entre palabras.</small>
 </div>
 <div class="form-group">
-<label for="profesorPerfilApellidos">Apellidos</label>
-<input autocomplete="family-name" disabled="" id="profesorPerfilApellidos" placeholder="Apellidos del profesor" type="text"/>
+<label for="profesorPerfilApellidos">Apellidos <span class="required">*</span></label>
+<input autocomplete="family-name" disabled="" id="profesorPerfilApellidos" maxlength="60" minlength="2" placeholder="Apellidos del profesor" required="" type="text"/>
+<small class="field-help">Entre 2 y 60 caracteres; solo letras y un espacio entre palabras.</small>
 </div>
 </div>
 <div class="form-row two-columns">
@@ -9775,19 +9780,20 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <small class="field-help">La asignación del proyecto corresponde al Administrador.</small>
 </div>
 <div class="form-group">
-<label for="profesorPerfilCorreo">Correo institucional</label>
-<input autocomplete="email" disabled="" id="profesorPerfilCorreo" placeholder="profesor@iejosejoaquinflorezhernandez.edu.co" type="email"/>
+<label for="profesorPerfilCorreo">Correo institucional <span class="required">*</span></label>
+<input autocomplete="email" disabled="" id="profesorPerfilCorreo" placeholder="profesor@iejosejoaquinflorezhernandez.edu.co" required="" type="email"/>
 <small class="field-help">Debe conservar el dominio institucional @iejosejoaquinflorezhernandez.edu.co.</small>
 </div>
 <div class="form-group">
-<label for="profesorPerfilTelefono">Teléfono de contacto</label>
-<input aria-describedby="ayudaProfesorPerfilTelefono" autocomplete="tel" disabled="" id="profesorPerfilTelefono" inputmode="numeric" maxlength="12" pattern="3\d{9}" placeholder="300 123 4567" type="tel"/>
+<label for="profesorPerfilTelefono">Teléfono de contacto <span class="required">*</span></label>
+<input aria-describedby="ayudaProfesorPerfilTelefono" autocomplete="tel" disabled="" id="profesorPerfilTelefono" inputmode="numeric" maxlength="12" pattern="3\d{2} \d{3} \d{4}" placeholder="300 123 4567" required="" type="tel"/>
 <small class="field-help" id="ayudaProfesorPerfilTelefono">Celular de 10 dígitos que comienza en 3. No se permiten números repetidos ni secuencias consecutivas.</small>
 </div>
 </div>
 <div class="profile-actions">
 <span class="profile-save-state" id="estadoPerfilProfesor">Modo lectura</span>
 <button class="secondary-button" id="editarPerfilProfesorBtn" onclick="activarEdicionPerfilProfesor()" type="button">Editar mis datos</button>
+<button class="secondary-button" hidden="" id="cancelarPerfilProfesorBtn" onclick="cancelarEdicionPerfilProfesor()" type="button">Cancelar</button>
 <button class="main-button" disabled="" id="guardarPerfilProfesorBtn" onclick="guardarPerfilProfesor()" type="button">Guardar cambios</button>
 </div>
 </div>
@@ -10997,6 +11003,7 @@ async function iniciarSesion() {
         mensaje.style.display = "block";
         mensaje.innerText = error.message;
     }
+}
 
 
     /* =====================================================
@@ -11416,11 +11423,6 @@ if (inputClave && btnToggle && iconEye) {
     });
 }
 
-async function iniciarSesion() {
-    const correo = document.getElementById("correoLogin").value.trim().toLowerCase();
-    const clave = document.getElementById("clave").value;
-    const mensaje = document.getElementById("mensajeLogin");
-
 function renderizarEvidencia(r) {
     if (r.evidenciaUrl) {
         return `<a class="evidence-link" href="${escaparHTML(r.evidenciaUrl)}">Ver</a>`;
@@ -11429,58 +11431,104 @@ function renderizarEvidencia(r) {
 
 function limpiarErroresFormulario(contenedor) {
     if (!contenedor) return;
-    contenedor.querySelectorAll(".campo-error").forEach(el=>el.classList.remove("campo-error"));
-}
-function marcarCamposSolicitudInvalidos(rol) {
-    const contenedor = rol === "estudiante" ? document.getElementById("camposSolicitudEstudiante") : document.getElementById("camposSolicitudPersonal");
-    if (!contenedor) return false;
-    let hayError=false;
-    contenedor.querySelectorAll("input, select, textarea").forEach(el=>{
-        if (el.disabled || el.offsetParent===null) return;
-        const vacioObligatorio = el.required && !String(el.value || "").trim();
-        const invalido = vacioObligatorio || !el.checkValidity();
-        el.classList.toggle("campo-error", invalido);
-        if (vacioObligatorio) {
-            mostrarErrorCampo(el, "Este campo es obligatorio.");
-            el.setCustomValidity("Este campo es obligatorio.");
-        } else if (!invalido) {
-            limpiarErrorCampo(el);
-        }
-        if (invalido) hayError=true;
+    contenedor.querySelectorAll("input,select,textarea").forEach(el=>{
+        el.classList.remove("campo-error");
+        el.setCustomValidity("");
+        el.removeAttribute("aria-invalid");
+        const error=el.closest(".form-group")?.querySelector(".field-error-message");
+        if(error){error.textContent="";error.style.display="none";}
     });
-    return hayError;
+}
+let campoSolicitudPendiente=null;
+function marcarCamposSolicitudInvalidos(rol) {
+    campoSolicitudPendiente=null;
+    if(rol==="estudiante"){
+        const celular=document.getElementById("telefonoSolicitud");
+        if(celular && celular.offsetParent!==null) validarCelularSIGHO(celular);
+        const tipoAcudiente=document.getElementById("tipoTelefonoAcudiente")?.value;
+        const telefonoAcudiente=document.getElementById("telefonoAcudiente");
+        if(telefonoAcudiente && telefonoAcudiente.offsetParent!==null && tipoAcudiente){
+            if(tipoAcudiente==="fijo") validarTelefonoFijoAcudiente(telefonoAcudiente);
+            else validarCelularSIGHO(telefonoAcudiente);
+        }
+    }else if(rol==="profesor"){
+        const celular=document.getElementById("telefonoProfesorSolicitud");
+        if(celular && celular.offsetParent!==null) validarCelularSIGHO(celular);
+    }
+    const campos=Array.from(document.querySelectorAll(
+        "#solicitud input, #solicitud select, #solicitud textarea"
+    ));
+    for(const el of campos){
+        if(el.disabled || el.offsetParent===null) continue;
+        const vacioObligatorio=el.required && !String(el.value || "").trim();
+        const invalido=vacioObligatorio || !el.checkValidity();
+        if(!invalido){
+            el.classList.remove("campo-error");
+            continue;
+        }
+        el.classList.add("campo-error");
+        el.setAttribute("aria-invalid","true");
+        if(vacioObligatorio){
+            el.setCustomValidity("Este campo es obligatorio.");
+            mostrarErrorCampo(el,"Este campo es obligatorio.");
+        }else{
+            mostrarErrorCampo(el,el.validationMessage || "Revisa el valor ingresado.");
+        }
+        if(!campoSolicitudPendiente) campoSolicitudPendiente=el;
+    }
+    if(rol==="estudiante" && !validarDiasServicio()){
+        campoSolicitudPendiente=campoSolicitudPendiente || document.querySelector('input[name="diasServicio"]');
+    }
+    if(campoSolicitudPendiente) enfocarCampoSolicitud(campoSolicitudPendiente);
+    return campoSolicitudPendiente;
+}
+function enfocarCampoSolicitud(campo) {
+    if(typeof campo==="string") campo=document.getElementById(campo);
+    if(!campo) return;
+    const objetivo=campo.id==="grupoDiasServicio" ? campo : (campo.closest(".form-group") || campo);
+    window.setTimeout(()=>{
+        objetivo.scrollIntoView({behavior:"smooth",block:"center"});
+        if(campo.matches?.("input,select,textarea,button")){
+            try{campo.focus({preventScroll:true});}catch(_){campo.focus();}
+        }else{
+            const primerControl=objetivo.querySelector("input:not(:disabled),select:not(:disabled),textarea:not(:disabled)");
+            primerControl?.focus({preventScroll:true});
+        }
+    },0);
+}
+function marcarErrorCampoSolicitud(campo,texto) {
+    if(typeof campo==="string") campo=document.getElementById(campo);
+    if(campo){
+        campoSolicitudPendiente=campo;
+        campo.classList.add("campo-error");
+        campo.setAttribute("aria-invalid","true");
+        campo.setCustomValidity(texto);
+        mostrarErrorCampo(campo,texto);
+    }
+    return campo;
 }
 function validarDiasServicio() {
     const grupo = document.getElementById("grupoDiasServicio");
     const dias = document.querySelectorAll('input[name="diasServicio"]:checked');
     const invalido = dias.length === 0;
     if (grupo) grupo.classList.toggle("campo-error", invalido);
+    const control=document.querySelector('input[name="diasServicio"]');
+    if(control){
+        if(invalido) mostrarErrorCampo(control,"Selecciona al menos un día de servicio social.");
+        else limpiarErrorCampo(control);
+    }
     return !invalido;
 }
 
-function configurarErroresCamposSolicitud() {
-    const contenedor=document.getElementById("solicitud"); if(!contenedor || contenedor.dataset.erroresConfigurados==="1") return;
-    contenedor.dataset.erroresConfigurados="1";
-    contenedor.addEventListener("input", e=>{
-        if(e.target.matches("input,select,textarea")) e.target.classList.remove("campo-error");
-    });
-    contenedor.addEventListener("change", e=>{
-        if(e.target.matches("input,select,textarea")) e.target.classList.remove("campo-error");
-        if(e.target.matches('input[name="diasServicio"]')) validarDiasServicio();
-    });
-    contenedor.addEventListener("blur", e=>{
-        if(e.target.matches("input,select,textarea") && !e.target.disabled)
-            e.target.classList.toggle("campo-error",!e.target.checkValidity());
-    },true);
-}
-
-function mostrarErrorSolicitud(texto) {
+function mostrarErrorSolicitud(texto,campo) {
     const mensaje = document.getElementById("mensajeSolicitud");
     if (!mensaje) return;
     mensaje.className = "message error-message solicitud-feedback";
     mensaje.textContent = texto;
     mensaje.style.display = "block";
-    mensaje.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const destino=campoSolicitudPendiente || campo;
+    if(destino) enfocarCampoSolicitud(destino);
+    else mensaje.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 async function enviarSolicitud() {
@@ -11489,26 +11537,28 @@ async function enviarSolicitud() {
     const claveEstudiante = document.getElementById("claveSolicitud")?.value || "";
     const claveProfesor = document.getElementById("claveSolicitudProfesor")?.value || "";
     const clave = rol === "estudiante" ? claveEstudiante : claveProfesor;
-    limpiarErroresFormulario(rol === "estudiante" ? document.getElementById("camposSolicitudEstudiante") : document.getElementById("camposSolicitudPersonal"));
-    configurarErroresCamposSolicitud();
+    limpiarErroresFormulario(document.getElementById("solicitud"));
+    window.configurarErroresCamposSolicitud();
     marcarCamposSolicitudInvalidos(rol);
 
     if (!rol || !["estudiante", "profesor"].includes(rol)) {
-        mostrarErrorSolicitud("Selecciona si la solicitud corresponde a Estudiante o Profesor.");
+        mostrarErrorSolicitud("Selecciona si la solicitud corresponde a Estudiante o Profesor.","rolSolicitud");
         return;
     }
     if (!clave) {
-        mostrarErrorSolicitud("Completa la contraseña antes de enviar la solicitud.");
+        mostrarErrorSolicitud("Completa la contraseña antes de enviar la solicitud.",rol==="estudiante"?"claveSolicitud":"claveSolicitudProfesor");
         return;
     }
 
     if (rol === "estudiante") {
         if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(clave)) {
-            mostrarErrorSolicitud("La contraseña del estudiante debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
+            const texto="La contraseña del estudiante debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.";
+            marcarErrorCampoSolicitud("claveSolicitud",texto);
+            mostrarErrorSolicitud(texto,"claveSolicitud");
             return;
         }
     } else if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(clave)) {
-        mostrarErrorSolicitud("La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
+        mostrarErrorSolicitud("La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.","claveSolicitudProfesor");
         return;
     }
 
@@ -11558,40 +11608,46 @@ async function enviarSolicitud() {
         }
 
         if (seguridadSocialTipo === "sisben" && !document.getElementById("sisbenNumeroSolicitud").value) {
-            mostrarErrorSolicitud("Selecciona el subgrupo Sisbén.");
+            mostrarErrorSolicitud("Selecciona el subgrupo Sisbén.","sisbenNumeroSolicitud");
             return;
         }
 
         if (diasServicio.length === 0) {
             validarDiasServicio();
-            mostrarErrorSolicitud("Selecciona al menos un día en el que realizarás el servicio social.");
+            mostrarErrorSolicitud("Selecciona al menos un día en el que realizarás el servicio social.","grupoDiasServicio");
             return;
         }
         validarDiasServicio();
 
         const regexNombre = /^[\p{L}]+(?: [\p{L}]+)*$/u;
-        const validarNombre = (valor, etiqueta, obligatorio = true, maximo = 30) => {
+        const validarNombre = (valor, etiqueta, id, obligatorio = true, maximo = 30) => {
             if (!valor && !obligatorio) return true;
             if (valor.length < 2 || valor.length > maximo || !regexNombre.test(valor)) {
-                mostrarErrorSolicitud(`${etiqueta} debe contener solo letras y espacios sencillos, entre 2 y ${maximo} caracteres.`);
+                const texto=`${etiqueta} debe contener solo letras y espacios sencillos, entre 2 y ${maximo} caracteres.`;
+                marcarErrorCampoSolicitud(id,texto);
+                mostrarErrorSolicitud(texto,id);
                 return false;
             }
             return true;
         };
-        if (!validarNombre(primerApellido, "El primer apellido") ||
-            !validarNombre(segundoApellido, "El segundo apellido", false) ||
-            !validarNombre(primerNombre, "El primer nombre") ||
-            !validarNombre(segundoNombre, "El segundo nombre", false)) return;
+        if (!validarNombre(primerApellido, "El primer apellido","primerApellido") ||
+            !validarNombre(segundoApellido, "El segundo apellido","segundoApellido",false) ||
+            !validarNombre(primerNombre, "El primer nombre","primerNombre") ||
+            !validarNombre(segundoNombre, "El segundo nombre","segundoNombre",false)) return;
 
         if (!/^\d{8,10}$/.test(numeroDocumento)) {
-            mostrarErrorSolicitud("El número de documento no cumple el formato del tipo seleccionado.");
+            const texto="El número de documento no cumple el formato del tipo seleccionado.";
+            marcarErrorCampoSolicitud("numeroDocumento",texto);
+            mostrarErrorSolicitud(texto,"numeroDocumento");
             return;
         }
 
         const anioNumerico = Number(anioServicio);
         const anioActualSolicitud = new Date().getFullYear();
         if (!Number.isInteger(anioNumerico) || anioNumerico < anioActualSolicitud || anioNumerico > anioActualSolicitud + 3) {
-            mostrarErrorSolicitud(`El año de servicio social debe estar entre ${anioActualSolicitud} y ${anioActualSolicitud + 3}.`);
+            const texto=`El año de servicio social debe estar entre ${anioActualSolicitud} y ${anioActualSolicitud + 3}.`;
+            marcarErrorCampoSolicitud("anioServicio",texto);
+            mostrarErrorSolicitud(texto,"anioServicio");
             return;
         }
 
@@ -11601,16 +11657,22 @@ async function enviarSolicitud() {
         const cumpleEsteAnio = new Date(hoy.getFullYear(), fechaNacimientoObj.getMonth(), fechaNacimientoObj.getDate());
         if (hoy < cumpleEsteAnio) edad--;
         if (!Number.isFinite(edad)) {
-            mostrarErrorSolicitud("La fecha de nacimiento no es válida.");
+            const texto="La fecha de nacimiento no es válida.";
+            marcarErrorCampoSolicitud("fechaNacimiento",texto);
+            mostrarErrorSolicitud(texto,"fechaNacimiento");
             return;
         }
         if (grado === "Ciclo V") {
             if (edad < 18 || edad > 40) {
-                mostrarErrorSolicitud("Para Ciclo V la edad del estudiante debe estar entre 18 y 40 años.");
+                const texto="Para Ciclo V la edad del estudiante debe estar entre 18 y 40 años.";
+                marcarErrorCampoSolicitud("fechaNacimiento",texto);
+                mostrarErrorSolicitud(texto,"fechaNacimiento");
                 return;
             }
         } else if (edad < 14 || edad > 19) {
-            mostrarErrorSolicitud("Para 10° y 11° la edad del estudiante debe estar entre 14 y 19 años.");
+            const texto="Para 10° y 11° la edad del estudiante debe estar entre 14 y 19 años.";
+            marcarErrorCampoSolicitud("fechaNacimiento",texto);
+            mostrarErrorSolicitud(texto,"fechaNacimiento");
             return;
         }
 
@@ -11618,32 +11680,44 @@ async function enviarSolicitud() {
         if (tipoDocumento !== "PPT") {
             // 14–17 años: TI obligatoria.
             if (edad < 18 && tipoDocumento !== "Tarjeta de identidad") {
-                mostrarErrorSolicitud("Para estudiantes menores de 18 años se requiere Tarjeta de identidad.");
+                const texto="Para estudiantes menores de 18 años se requiere Tarjeta de identidad.";
+                marcarErrorCampoSolicitud("tipoDocumento",texto);
+                mostrarErrorSolicitud(texto,"tipoDocumento");
                 return;
             }
             // 18 años: TI o CC.
             if (edad === 18 && tipoDocumento !== "Tarjeta de identidad" && tipoDocumento !== "Cédula de ciudadanía") {
-                mostrarErrorSolicitud("A los 18 años puedes seleccionar Tarjeta de identidad o Cédula de ciudadanía.");
+                const texto="A los 18 años puedes seleccionar Tarjeta de identidad o Cédula de ciudadanía.";
+                marcarErrorCampoSolicitud("tipoDocumento",texto);
+                mostrarErrorSolicitud(texto,"tipoDocumento");
                 return;
             }
             // 19 años: únicamente CC.
             if (edad === 19 && tipoDocumento !== "Cédula de ciudadanía") {
-                mostrarErrorSolicitud("A los 19 años se requiere Cédula de ciudadanía.");
+                const texto="A los 19 años se requiere Cédula de ciudadanía.";
+                marcarErrorCampoSolicitud("tipoDocumento",texto);
+                mostrarErrorSolicitud(texto,"tipoDocumento");
                 return;
             }
         }
 
         if (!/^\d{10}$/.test(telefono.replace(/\D/g, ""))) {
-            mostrarErrorSolicitud("El celular del estudiante debe tener exactamente 10 dígitos.");
+            const texto="El celular del estudiante debe tener exactamente 10 dígitos.";
+            marcarErrorCampoSolicitud("telefonoSolicitud",texto);
+            mostrarErrorSolicitud(texto,"telefonoSolicitud");
             return;
         }
         if (direccion.length > 100) {
-            mostrarErrorSolicitud("La dirección puede tener máximo 100 caracteres.");
+            const texto="La dirección puede tener máximo 100 caracteres.";
+            marcarErrorCampoSolicitud("direccionSolicitud",texto);
+            mostrarErrorSolicitud(texto,"direccionSolicitud");
             return;
         }
-        if (!validarNombre(nombreAcudiente, "El nombre completo del acudiente", true, 60)) return;
+        if (!validarNombre(nombreAcudiente, "El nombre completo del acudiente","nombreAcudiente",true,60)) return;
         if (!tipoTelefonoAcudiente) {
-            mostrarErrorSolicitud("Selecciona el tipo de línea del acudiente.");
+            const texto="Selecciona el tipo de línea del acudiente.";
+            marcarErrorCampoSolicitud("tipoTelefonoAcudiente",texto);
+            mostrarErrorSolicitud(texto,"tipoTelefonoAcudiente");
             return;
         }
 
@@ -11653,27 +11727,38 @@ async function enviarSolicitud() {
             : validarCelularSIGHO(telefonoAcudienteElemento);
 
         if (!telefonoAcudienteValido) {
-            mostrarErrorSolicitud(telefonoAcudienteElemento.validationMessage || "El número de contacto del acudiente no es válido.");
+            const texto=telefonoAcudienteElemento.validationMessage || "El número de contacto del acudiente no es válido.";
+            marcarErrorCampoSolicitud(telefonoAcudienteElemento,texto);
+            mostrarErrorSolicitud(texto,telefonoAcudienteElemento);
             return;
         }
         if (grado === "Ciclo V" && modalidad === "tecnico") {
-            mostrarErrorSolicitud("Ciclo V no puede seleccionar la modalidad Técnica.");
+            const texto="Ciclo V no puede seleccionar la modalidad Técnica.";
+            marcarErrorCampoSolicitud("modalidadSolicitud",texto);
+            mostrarErrorSolicitud(texto,"modalidadSolicitud");
             return;
         }
         const jornadaEsperada = grado === "Ciclo V" ? "JN" : "JM";
         if (jornada !== jornadaEsperada) {
-            mostrarErrorSolicitud("La jornada se asigna automáticamente según el grado seleccionado.");
+            const texto="La jornada se asigna automáticamente según el grado seleccionado.";
+            marcarErrorCampoSolicitud("jornadaSolicitud",texto);
+            mostrarErrorSolicitud(texto,"jornadaSolicitud");
             return;
         }
 
         if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
-            mostrarErrorSolicitud("Escribe un correo electrónico válido.");
+            const texto="Escribe un correo electrónico válido.";
+            marcarErrorCampoSolicitud("correoSolicitudEstudiante",texto);
+            mostrarErrorSolicitud(texto,"correoSolicitudEstudiante");
             return;
         }
 
         const regexTextoOtro = /^[\p{L}]+(?: [\p{L}]+)*$/u;
         if (eps.length > 150) {
-            mostrarErrorSolicitud("La opción de Seguridad Social puede tener máximo 150 caracteres.");
+            const campoEps=seguridadSocialTipo==="eps"?"epsSolicitud":seguridadSocialTipo==="especial"?"regimenEspecialSolicitud":"sisbenNumeroSolicitud";
+            const texto="La opción de Seguridad Social puede tener máximo 150 caracteres.";
+            marcarErrorCampoSolicitud(campoEps,texto);
+            mostrarErrorSolicitud(texto,campoEps);
             return;
         }
 
@@ -11686,7 +11771,9 @@ async function enviarSolicitud() {
 
         const correoEstudiante = correo;
         if (!correoEstudiante) {
-            mostrarErrorSolicitud("Para la solicitud del estudiante también debes indicar un correo electrónico.");
+            const texto="Para la solicitud del estudiante también debes indicar un correo electrónico.";
+            marcarErrorCampoSolicitud("correoSolicitudEstudiante",texto);
+            mostrarErrorSolicitud(texto,"correoSolicitudEstudiante");
             return;
         }
 
@@ -11735,26 +11822,36 @@ async function enviarSolicitud() {
             return;
         }
         if (!regexNombreProfesor.test(nombre)) {
-            mostrarErrorSolicitud("Los nombres solo pueden contener letras y un espacio sencillo entre palabras.");
+            const texto="Los nombres solo pueden contener letras y un espacio sencillo entre palabras.";
+            marcarErrorCampoSolicitud("nombre",texto);
+            mostrarErrorSolicitud(texto,"nombre");
             return;
         }
         if (!regexNombreProfesor.test(apellido)) {
-            mostrarErrorSolicitud("Los apellidos solo pueden contener letras y un espacio sencillo entre palabras.");
+            const texto="Los apellidos solo pueden contener letras y un espacio sencillo entre palabras.";
+            marcarErrorCampoSolicitud("apellido",texto);
+            mostrarErrorSolicitud(texto,"apellido");
             return;
         }
         if (!regexCorreoInstitucional.test(correo)) {
-            mostrarErrorSolicitud("El correo del profesor debe ser institucional, sin espacios, y terminar en @iejosejoaquinflorezhernandez.edu.co.");
+            const texto="El correo del profesor debe ser institucional, sin espacios, y terminar en @iejosejoaquinflorezhernandez.edu.co.";
+            marcarErrorCampoSolicitud("correoSolicitud",texto);
+            mostrarErrorSolicitud(texto,"correoSolicitud");
             return;
         }
 
         const telefonoProfesorElemento = document.getElementById("telefonoProfesorSolicitud");
         if (!validarCelularSIGHO(telefonoProfesorElemento)) {
-            mostrarErrorSolicitud(telefonoProfesorElemento.validationMessage || "El celular del profesor no es válido.");
+            const texto=telefonoProfesorElemento.validationMessage || "El celular del profesor no es válido.";
+            marcarErrorCampoSolicitud(telefonoProfesorElemento,texto);
+            mostrarErrorSolicitud(texto,telefonoProfesorElemento);
             return;
         }
 
         if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(clave)) {
-            mostrarErrorSolicitud("La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.");
+            const texto="La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con al menos una mayúscula, una minúscula y un número.";
+            marcarErrorCampoSolicitud("claveSolicitudProfesor",texto);
+            mostrarErrorSolicitud(texto,"claveSolicitudProfesor");
             return;
         }
 
@@ -11804,6 +11901,7 @@ async function enviarSolicitud() {
         mostrarErrorSolicitud(error.message || "Error desconocido.");
     }
 }
+window.enviarSolicitud = enviarSolicitud;
 
 function configurarSelectorEvidencia() {
     const input = document.getElementById("evidenciaHora");
@@ -11915,11 +12013,6 @@ async function abrirSuperAdmin() {
     }
 }
 
-let superAdminData = { users: [], roles: [], permissions: [], matrix: {}, settings: {} };
-let superAdminTabConfigured = false;
-let superAdminNavigation = [];
-let superAdminCurrentSection = "inicio";
-
 function configurarSuperAdmin() {
     if (!superAdminTabConfigured) {
         document.querySelectorAll("[data-superadmin-tab]").forEach(tab => tab.addEventListener("click", () => mostrarSeccionSuperAdmin(tab.dataset.superadminTab)));
@@ -12011,51 +12104,6 @@ function alternarChatAyuda(rol) {
     chat.style.display = abierto ? "none" : "flex";
     launcher?.setAttribute("aria-expanded", abierto ? "false" : "true");
     if (!abierto) chat.querySelector("input")?.focus();
-}
-
-        body = { rol, nombre, apellido, identificacion, correo, telefono, clave };
-    }
-
-    try {
-        const data = await api("request_access", { method: "POST", body });
-
-        mensaje.style.display = "block";
-        mensaje.innerText = data.message;
-
-        await mostrarConfirmacionSolicitud();
-
-        document.querySelectorAll("#solicitud input, #solicitud select").forEach(el => {
-            if (el.type === "checkbox") el.checked = false;
-            else el.value = "";
-        });
-
-        const estudiante = document.getElementById("camposSolicitudEstudiante");
-        const personal = document.getElementById("camposSolicitudPersonal");
-        if (estudiante) estudiante.style.display = "none";
-        if (personal) personal.style.display = "none";
-        const claveEst = document.getElementById("claveSolicitud");
-        const claveProf = document.getElementById("claveSolicitudProfesor");
-        if (claveEst) claveEst.value = "";
-        if (claveProf) claveProf.value = "";
-        const epsOtroSolicitud = document.getElementById("epsOtroSolicitud");
-        const grupoEpsOtroSolicitud = document.getElementById("grupoEpsOtroSolicitud");
-        const epsSolicitud = document.getElementById("epsSolicitud");
-        if (epsSolicitud) epsSolicitud.value = "";
-        if (epsOtroSolicitud) { epsOtroSolicitud.value = ""; epsOtroSolicitud.disabled = true; epsOtroSolicitud.required = false; }
-        if (grupoEpsOtroSolicitud) grupoEpsOtroSolicitud.style.display = "none";
-
-        const comunes = document.getElementById("camposSolicitudComunes");
-        if (comunes) comunes.style.display = "none";
-        const rolSelect = document.getElementById("rolSolicitud");
-        if (rolSelect) rolSelect.value = "";
-        llenarAniosServicio();
-        configurarJornadaPorGrado();
-        configurarSelectorEvidencia();
-    configurarValidacionCamposOtro();
-        configurarSelectoresEPS();
-    } catch (error) {
-        mostrarErrorSolicitud(error.message || "No fue posible enviar la solicitud.");
-    }
 }
 
 function configurarSelectorEvidencia() {
@@ -12509,6 +12557,10 @@ function activarEdicionPerfilEstudiante() {
 
 function cancelarEdicionPerfilEstudiante() {
     restaurarValoresOriginalesPerfilEstudiante();
+    ["perfilCorreo","perfilTelefono","perfilDireccion","perfilEps","perfilAcudiente","perfilTipoTelefonoAcudiente","perfilTelefonoAcudiente"].forEach(id => {
+        const campo = document.getElementById(id);
+        if (campo) limpiarErrorCampo(campo);
+    });
     establecerEdicionPerfilEstudiante(false);
     const mensaje = document.getElementById("mensajePerfil");
     if (mensaje) {
@@ -12520,29 +12572,71 @@ function cancelarEdicionPerfilEstudiante() {
 async function guardarPerfilEstudiante() {
     const botonGuardar = document.getElementById("guardarPerfilEstudianteBtn");
     const mensaje = document.getElementById("mensajePerfil");
-    const correo = document.getElementById("perfilCorreo").value.trim().toLowerCase();
-    const telefono = document.getElementById("perfilTelefono").value.trim();
-    const direccion = document.getElementById("perfilDireccion").value.trim();
-    const epsSeleccionada = document.getElementById("perfilEps").value;
+    const correoInput = document.getElementById("perfilCorreo");
+    const telefonoInput = document.getElementById("perfilTelefono");
+    const direccionInput = document.getElementById("perfilDireccion");
+    const epsInput = document.getElementById("perfilEps");
+    const acudienteInput = document.getElementById("perfilAcudiente");
+    const tipoTelefonoInput = document.getElementById("perfilTipoTelefonoAcudiente");
+    const telefonoAcudienteInput = document.getElementById("perfilTelefonoAcudiente");
+    const correo = correoInput.value.trim().toLowerCase();
+    const telefono = telefonoInput.value.trim();
+    const direccion = direccionInput.value.trim();
+    const epsSeleccionada = epsInput.value;
     const eps = epsSeleccionada.trim();
-    const nombreAcudiente = document.getElementById("perfilAcudiente").value.trim();
-    const tipoTelefonoAcudiente = document.getElementById("perfilTipoTelefonoAcudiente").value;
-    const telefonoAcudiente = document.getElementById("perfilTelefonoAcudiente").value.trim();
+    const nombreAcudiente = acudienteInput.value.trim();
+    const tipoTelefonoAcudiente = tipoTelefonoInput.value;
+    const telefonoAcudiente = telefonoAcudienteInput.value.trim();
     const regexNombre = /^[\p{L}]+(?: [\p{L}]+)*$/u;
     const telefonoDigitos = telefono.replace(/\D/g, "");
     const telefonoAcudienteDigitos = telefonoAcudiente.replace(/\D/g, "");
+    const errores = [];
 
-    if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) { alert("Escribe un correo electrónico válido."); return; }
-    if (!/^3\d{9}$/.test(telefonoDigitos) || /^(\d)\1{9}$/.test(telefonoDigitos) || telefonoDigitos === "1234567890") { alert("El celular debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890."); return; }
-    if (direccion.length > 100) { alert("La dirección puede tener máximo 100 caracteres."); return; }
-    if (!eps) { alert("Selecciona una opción válida de Seguridad Social."); return; }
-    if (nombreAcudiente.length < 2 || !regexNombre.test(nombreAcudiente) || nombreAcudiente.length > 60) { alert("El nombre del acudiente debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres."); return; }
-    if (!["fijo", "celular"].includes(tipoTelefonoAcudiente)) { alert("Selecciona el tipo de línea del acudiente."); return; }
+    function validarCampo(input, valido, texto) {
+        input.setCustomValidity(valido ? "" : texto);
+        if (valido) {
+            limpiarErrorCampo(input);
+        } else {
+            mostrarErrorCampo(input, texto);
+            errores.push(input);
+        }
+    }
+
+    validarCampo(correoInput, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo), "Escribe un correo electrónico válido.");
+    validarCampo(
+        telefonoInput,
+        /^3\d{9}$/.test(telefonoDigitos) && !/^(\d)\1{9}$/.test(telefonoDigitos) && telefonoDigitos !== "1234567890",
+        "El celular debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890."
+    );
+    validarCampo(direccionInput, !!direccion && direccion.length <= 100, "Escribe una dirección de residencia de máximo 100 caracteres.");
+    validarCampo(epsInput, !!eps, "Selecciona una opción válida de Seguridad Social.");
+    validarCampo(
+        acudienteInput,
+        nombreAcudiente.length >= 2 && nombreAcudiente.length <= 60 && regexNombre.test(nombreAcudiente),
+        "El nombre del acudiente debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres."
+    );
+    validarCampo(tipoTelefonoInput, ["fijo", "celular"].includes(tipoTelefonoAcudiente), "Selecciona el tipo de línea del acudiente.");
+
+    let telefonoAcudienteValido = false;
     if (tipoTelefonoAcudiente === "celular") {
-        if (!/^3\d{9}$/.test(telefonoAcudienteDigitos) || /^(\d)\1{9}$/.test(telefonoAcudienteDigitos) || telefonoAcudienteDigitos === "1234567890") { alert("El celular del acudiente debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890."); return; }
-    } else {
+        telefonoAcudienteValido = /^3\d{9}$/.test(telefonoAcudienteDigitos) && !/^(\d)\1{9}$/.test(telefonoAcudienteDigitos) && telefonoAcudienteDigitos !== "1234567890";
+        validarCampo(telefonoAcudienteInput, telefonoAcudienteValido, "El celular del acudiente debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890.");
+    } else if (tipoTelefonoAcudiente === "fijo") {
         const ultimosDigitos = telefonoAcudienteDigitos.slice(3);
-        if (!/^60[1-8][2-8]\d{6}$/.test(telefonoAcudienteDigitos) || /^(\d)\1{6}$/.test(ultimosDigitos)) { alert("El teléfono fijo del acudiente debe tener un indicativo regional válido y 7 dígitos finales cuyo primero esté entre 2 y 8; estos no pueden ser todos iguales."); return; }
+        telefonoAcudienteValido = /^60[1-8][2-8]\d{6}$/.test(telefonoAcudienteDigitos) && !/^(\d)\1{6}$/.test(ultimosDigitos);
+        validarCampo(telefonoAcudienteInput, telefonoAcudienteValido, "El teléfono fijo debe tener un indicativo regional válido y 7 dígitos finales cuyo primero esté entre 2 y 8; estos no pueden ser todos iguales.");
+    } else {
+        validarCampo(telefonoAcudienteInput, false, "Selecciona el tipo de línea antes de ingresar el teléfono del acudiente.");
+    }
+
+    if (errores.length) {
+        errores[0].focus();
+        if (mensaje) {
+            mensaje.style.display = "block";
+            mensaje.className = "message auth-error-message";
+            mensaje.textContent = "Revisa los campos marcados antes de guardar.";
+        }
+        return;
     }
 
     const body = {
@@ -12567,14 +12661,18 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 
         if (mensaje) {
             mensaje.style.display = "block";
+            mensaje.className = "message";
             mensaje.innerText = data.message || "Cambios guardados correctamente.";
         }
         guardarValoresOriginalesPerfilEstudiante();
         establecerEdicionPerfilEstudiante(false);
-        alert(data.message || "Tus datos fueron actualizados correctamente.");
     } catch (e) {
         if (botonGuardar) { botonGuardar.disabled = false; botonGuardar.textContent = "Guardar cambios"; }
-        alert(e.message || "No se pudieron guardar los cambios.");
+        if (mensaje) {
+            mensaje.style.display = "block";
+            mensaje.className = "message auth-error-message";
+            mensaje.textContent = e.message || "No se pudieron guardar los cambios.";
+        }
     } finally {
         if (botonGuardar) botonGuardar.textContent = "Guardar cambios";
     }
@@ -13256,15 +13354,76 @@ async function cargarPerfilProfesor() {
 }
 
 function establecerEdicionPerfilProfesor(editar) {
-    ["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono","profesorPerfilProyectoEditable"].forEach(id => {
+    ["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono"].forEach(id => {
         const el=document.getElementById(id); if(el) el.disabled=!editar;
     });
     document.getElementById("editarPerfilProfesorBtn")?.toggleAttribute("hidden", editar);
+    document.getElementById("cancelarPerfilProfesorBtn")?.toggleAttribute("hidden", !editar);
     const guardar=document.getElementById("guardarPerfilProfesorBtn"); if(guardar) guardar.disabled=!editar;
 }
-function activarEdicionPerfilProfesor(){ establecerEdicionPerfilProfesor(true); }
+function activarEdicionPerfilProfesor(){
+    guardarSnapshotPerfilProfesor();
+    establecerEdicionPerfilProfesor(true);
+    const estado=document.getElementById("estadoPerfilProfesor");
+    if(estado){estado.textContent="Editando datos"; estado.className="profile-save-state";}
+}
+function cancelarEdicionPerfilProfesor(){
+    try {
+        const originales=JSON.parse(snapshotPerfilProfesor || "{}");
+        const campos={
+            profesorPerfilNombres:originales.nombres,
+            profesorPerfilApellidos:originales.apellidos,
+            profesorPerfilCorreo:originales.correo,
+            profesorPerfilTelefono:originales.telefono
+        };
+        Object.entries(campos).forEach(([id,valor])=>{
+            const campo=document.getElementById(id);
+            if(campo) {
+                campo.value=valor || "";
+                limpiarErrorCampo(campo);
+                campo.setCustomValidity("");
+                campo.removeAttribute("aria-invalid");
+            }
+        });
+    } catch (e) {
+        console.error("No se pudieron restaurar los datos originales del perfil del profesor.", e);
+    }
+    establecerEdicionPerfilProfesor(false);
+    const estado=document.getElementById("estadoPerfilProfesor");
+    if(estado){estado.textContent="Modo lectura"; estado.className="profile-save-state";}
+    actualizarEstadoPerfilProfesor();
+}
 function configurarEdicionPerfilProfesor(){
     const campos=["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono"];
+    const regexNombre=/^[\p{L}]+(?: [\p{L}]+)*$/u;
+    const regexCorreo=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
+    const secuenciasTelefono=["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
+
+    function validarCampo(campo, mostrarVacio=false) {
+        if(!campo || campo.disabled) return true;
+        let valido=false;
+        let mensaje="";
+        if(campo.id==="profesorPerfilNombres" || campo.id==="profesorPerfilApellidos") {
+            const valor=campo.value.trim();
+            valido=valor.length>=2 && valor.length<=60 && regexNombre.test(valor);
+            mensaje=`${campo.id==="profesorPerfilNombres"?"Los nombres":"Los apellidos"} deben tener entre 2 y 60 caracteres, con solo letras y un espacio sencillo entre palabras.`;
+        } else if(campo.id==="profesorPerfilCorreo") {
+            valido=regexCorreo.test(campo.value.trim());
+            mensaje="Escribe un correo válido que termine en @iejosejoaquinflorezhernandez.edu.co.";
+        } else if(campo.id==="profesorPerfilTelefono") {
+            const digitos=campo.value.replace(/\D/g,"");
+            valido=/^3\d{9}$/.test(digitos) && !/^(\d)\1{9}$/.test(digitos) && !secuenciasTelefono.includes(digitos);
+            mensaje="El teléfono debe tener 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.";
+        }
+        const valorVacio=!campo.value.trim();
+        const debeMostrar=!valido && (!valorVacio || mostrarVacio);
+        campo.setCustomValidity(valido || !debeMostrar ? "" : mensaje);
+        campo.setAttribute("aria-invalid", debeMostrar ? "true" : "false");
+        if(valido || !debeMostrar) limpiarErrorCampo(campo);
+        else mostrarErrorCampo(campo,mensaje);
+        return valido;
+    }
+
     campos.forEach(id=>{
         const el=document.getElementById(id);
         if(el && el.dataset.edicionConfigurada!=="1"){
@@ -13278,11 +13437,13 @@ function configurarEdicionPerfilProfesor(){
                     const numero = el.value.replace(/\D/g, "").slice(0,10);
                     el.value = numero.length > 6 ? `${numero.slice(0,3)} ${numero.slice(3,6)} ${numero.slice(6)}` : numero.length > 3 ? `${numero.slice(0,3)} ${numero.slice(3)}` : numero;
                 }
+                validarCampo(el);
                 actualizarEstadoPerfilProfesor();
             });
             el.addEventListener("blur",()=>{
                 if(id === "profesorPerfilNombres" || id === "profesorPerfilApellidos") el.value=capitalizarNombreCompleto(el.value).slice(0,60);
                 if(id === "profesorPerfilCorreo") el.value=el.value.replace(/\s/g, "").trim();
+                validarCampo(el,true);
                 actualizarEstadoPerfilProfesor();
             });
             el.addEventListener("change",actualizarEstadoPerfilProfesor);
@@ -13313,20 +13474,41 @@ function actualizarEstadoPerfilProfesor() {
 }
 async function guardarPerfilProfesor() {
     const datos=obtenerDatosPerfilProfesor();
+    const estado=document.getElementById("estadoPerfilProfesor");
     const regexNombreProfesor=/^[\p{L}]+(?: [\p{L}]+)*$/u;
     const regexCorreoInstitucional=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
-    if(!datos.nombres || !datos.apellidos || !datos.correo || !datos.telefono){ mostrarToastProfesor("Completa todos los campos editables.", true); return; }
-    if(datos.nombres.length < 2 || datos.nombres.length > 60 || datos.apellidos.length < 2 || datos.apellidos.length > 60 || !regexNombreProfesor.test(datos.nombres) || !regexNombreProfesor.test(datos.apellidos)){ mostrarToastProfesor("Nombres y apellidos deben tener entre 2 y 60 caracteres, con solo letras y espacios sencillos.", true); return; }
-    if(!regexCorreoInstitucional.test(datos.correo)){ mostrarToastProfesor("El correo debe usar el dominio institucional y no contener espacios.", true); return; }
     const telefonoProfesor = datos.telefono.replace(/\D/g, "");
     const todosIgualesTelefono = /^(\d)\1{9}$/.test(telefonoProfesor);
     const secuenciasTelefono = ["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
-    if(!/^3\d{9}$/.test(telefonoProfesor) || todosIgualesTelefono || secuenciasTelefono.includes(telefonoProfesor)){
-        mostrarToastProfesor("El teléfono debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.", true);
+    const validaciones=[
+        ["profesorPerfilNombres",datos.nombres.length>=2 && datos.nombres.length<=60 && regexNombreProfesor.test(datos.nombres),"Los nombres deben tener entre 2 y 60 caracteres, con solo letras y un espacio sencillo entre palabras."],
+        ["profesorPerfilApellidos",datos.apellidos.length>=2 && datos.apellidos.length<=60 && regexNombreProfesor.test(datos.apellidos),"Los apellidos deben tener entre 2 y 60 caracteres, con solo letras y un espacio sencillo entre palabras."],
+        ["profesorPerfilCorreo",regexCorreoInstitucional.test(datos.correo),"Escribe un correo válido que termine en @iejosejoaquinflorezhernandez.edu.co."],
+        ["profesorPerfilTelefono",/^3\d{9}$/.test(telefonoProfesor) && !todosIgualesTelefono && !secuenciasTelefono.includes(telefonoProfesor),"El teléfono debe tener 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva."]
+    ];
+    const errores=[];
+    validaciones.forEach(([id,valido,mensaje])=>{
+        const campo=document.getElementById(id);
+        if(!campo)return;
+        campo.setCustomValidity(valido?"":mensaje);
+        campo.setAttribute("aria-invalid",valido?"false":"true");
+        if(valido)limpiarErrorCampo(campo);
+        else {mostrarErrorCampo(campo,mensaje); errores.push(campo);}
+    });
+    if(errores.length){
+        errores[0].focus();
+        if(estado){estado.textContent="Revisa los campos marcados antes de guardar."; estado.className="profile-save-state error";}
+        return;
+    }
+    if(!datos.nombres || !datos.apellidos || !datos.correo || !telefonoProfesor){
+        mostrarToastProfesor("Completa todos los campos editables.", true);
         return;
     }
     datos.telefono = telefonoProfesor;
+    const boton=document.getElementById("guardarPerfilProfesorBtn");
     try{
+        if(boton){boton.disabled=true; boton.textContent="Guardando...";}
+        if(estado){estado.textContent="Guardando cambios..."; estado.className="profile-save-state";}
         const data=await api("update_professor_profile",{method:"POST",body:datos});
         usuarioActual=normalizarUsuario(data.user);
 try { guardarSesionSigho(usuarioActual); } catch (_) {}
@@ -13335,9 +13517,15 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         document.getElementById("nombrePerfilProfesorHeader")?.replaceChildren(document.createTextNode(primerNombreProfesor));
         establecerEdicionPerfilProfesor(false);
         guardarSnapshotPerfilProfesor();
-        const estado=document.getElementById("estadoPerfilProfesor"); if(estado){estado.textContent="Datos guardados correctamente"; estado.className="profile-save-state success";}
+        if(estado){estado.textContent="Datos guardados correctamente"; estado.className="profile-save-state success";}
         mostrarToastProfesor("Datos actualizados correctamente.");
-    }catch(e){mostrarToastProfesor(e.message,true);}
+    }catch(e){
+        if(estado){estado.textContent=e.message || "No se pudieron guardar los cambios."; estado.className="profile-save-state error";}
+        if(boton)boton.disabled=false;
+        mostrarToastProfesor(e.message || "No se pudieron guardar los cambios.",true);
+    }finally{
+        if(boton)boton.textContent="Guardar cambios";
+    }
 }
 function alternarCambioClaveProfesor(mostrar) {
     const form=document.getElementById("formularioCambioClaveProfesor");
@@ -13670,7 +13858,7 @@ function mostrarErrorCampo(input, mensaje) {
         });
 
         el.addEventListener("blur", () => {
-            el.value = capitalizarNombreCompleto(el.value).slice(0, Number(el.maxLength) > 0 ? Number(el.maxLength) : 60);
+            el.value = capitalizarNombreCompleto(el.value.trim()).slice(0, Number(el.maxLength) > 0 ? Number(el.maxLength) : 60);
             if (!el.value || /^[\p{L}]+(?: [\p{L}]+)*$/u.test(el.value)) {
                 el.setCustomValidity("");
                 limpiarErrorCampo(el);
@@ -13843,17 +14031,124 @@ function mostrarErrorCampo(input, mensaje) {
     const perfilTelAcudiente = document.getElementById("perfilTelefonoAcudiente");
     if (perfilTelAcudiente && perfilTelAcudiente.dataset.validacionConfigurada !== "1") {
         perfilTelAcudiente.dataset.validacionConfigurada = "1";
-        perfilTelAcudiente.addEventListener("input", () => { perfilTelAcudiente.value = perfilTelAcudiente.value.replace(/\D/g, "").slice(0, 10); });
+        const tipoPerfil = document.getElementById("perfilTipoTelefonoAcudiente");
+        const ayudaPerfil = document.getElementById("ayudaPerfilTelefonoAcudiente");
+        const actualizarTelefonoPerfil = () => {
+            const digitos = perfilTelAcudiente.value.replace(/\D/g, "").slice(0, 10);
+            if (tipoPerfil?.value === "celular") {
+                perfilTelAcudiente.maxLength = 12;
+                perfilTelAcudiente.placeholder = "300 123 4567";
+                perfilTelAcudiente.value = formatearCelularSIGHO(digitos);
+                if (ayudaPerfil) ayudaPerfil.textContent = "Celular de 10 dígitos que comienza en 3. No se permiten números repetidos ni la secuencia 1234567890.";
+            } else if (tipoPerfil?.value === "fijo") {
+                perfilTelAcudiente.maxLength = 11;
+                perfilTelAcudiente.placeholder = "601 2345678";
+                perfilTelAcudiente.value = digitos.length > 3 ? `${digitos.slice(0, 3)} ${digitos.slice(3)}` : digitos;
+                if (ayudaPerfil) ayudaPerfil.textContent = "Teléfono fijo de 10 dígitos: 60, indicativo regional del 1 al 8 y 7 dígitos finales.";
+            } else {
+                perfilTelAcudiente.placeholder = "Selecciona el tipo de línea";
+                if (ayudaPerfil) ayudaPerfil.textContent = "Primero selecciona el tipo de línea.";
+            }
+        };
+        const validarTelefonoPerfil = (mostrarVacio = false) => {
+            if (perfilTelAcudiente.disabled) return true;
+            const tipo = tipoPerfil?.value || "";
+            const digitos = perfilTelAcudiente.value.replace(/\D/g, "");
+            let valido = false;
+            let texto = "Selecciona el tipo de línea antes de ingresar el teléfono del acudiente.";
+            if (tipo === "celular") {
+                valido = /^3\d{9}$/.test(digitos) && !/^(\d)\1{9}$/.test(digitos) && digitos !== "1234567890";
+                texto = "El celular del acudiente debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890.";
+            } else if (tipo === "fijo") {
+                const resto = digitos.slice(3);
+                valido = /^60[1-8][2-8]\d{6}$/.test(digitos) && !/^(\d)\1{6}$/.test(resto);
+                texto = "El teléfono fijo debe tener un indicativo regional válido y 7 dígitos finales cuyo primero esté entre 2 y 8; estos no pueden ser todos iguales.";
+            }
+            const vacio = !digitos.length;
+            perfilTelAcudiente.setCustomValidity(valido || (vacio && !mostrarVacio) ? "" : texto);
+            if (valido || (vacio && !mostrarVacio)) limpiarErrorCampo(perfilTelAcudiente);
+            else mostrarErrorCampo(perfilTelAcudiente, texto);
+            return valido;
+        };
+        perfilTelAcudiente.addEventListener("input", () => {
+            actualizarTelefonoPerfil();
+            if (perfilTelAcudiente.value.trim()) validarTelefonoPerfil();
+            else limpiarErrorCampo(perfilTelAcudiente);
+        });
+        perfilTelAcudiente.addEventListener("blur", () => validarTelefonoPerfil(true));
+        tipoPerfil?.addEventListener("change", () => {
+            actualizarTelefonoPerfil();
+            validarTelefonoPerfil();
+        });
+        actualizarTelefonoPerfil();
     }
     const perfilDireccion = document.getElementById("perfilDireccion");
-    if (perfilDireccion) perfilDireccion.addEventListener("input", () => { perfilDireccion.value = perfilDireccion.value.slice(0, 100); });
+    if (perfilDireccion) {
+        perfilDireccion.addEventListener("input", () => {
+            perfilDireccion.value = perfilDireccion.value.slice(0, 100);
+            const valor = perfilDireccion.value.trim();
+            if (valor) {
+                perfilDireccion.setCustomValidity("");
+                limpiarErrorCampo(perfilDireccion);
+            }
+        });
+        perfilDireccion.addEventListener("blur", () => {
+            perfilDireccion.value = perfilDireccion.value.replace(/\s+$/g, "");
+            if (!perfilDireccion.value.trim()) {
+                perfilDireccion.setCustomValidity("Escribe una dirección de residencia.");
+                mostrarErrorCampo(perfilDireccion, "Escribe una dirección de residencia.");
+            } else {
+                perfilDireccion.setCustomValidity("");
+                limpiarErrorCampo(perfilDireccion);
+            }
+        });
+    }
     const perfilAcudiente = document.getElementById("perfilAcudiente");
     if (perfilAcudiente && perfilAcudiente.dataset.validacionNombreConfigurada !== "1") {
         perfilAcudiente.dataset.validacionNombreConfigurada = "1";
         perfilAcudiente.addEventListener("input", () => {
             perfilAcudiente.value = capitalizarNombreCompleto(perfilAcudiente.value.replace(/[^\p{L}\s]/gu, "").replace(/\s+/g, " ").replace(/^ /, "")).slice(0, 60);
+            if (perfilAcudiente.value.trim().length >= 2 && /^[\p{L}]+(?: [\p{L}]+)*$/u.test(perfilAcudiente.value.trim())) {
+                perfilAcudiente.setCustomValidity("");
+                limpiarErrorCampo(perfilAcudiente);
+            }
         });
-        perfilAcudiente.addEventListener("blur", () => { perfilAcudiente.value = capitalizarNombreCompleto(perfilAcudiente.value).slice(0, 60); });
+        perfilAcudiente.addEventListener("blur", () => {
+            perfilAcudiente.value = capitalizarNombreCompleto(perfilAcudiente.value.trim()).slice(0, 60);
+            const valido = perfilAcudiente.value.length >= 2 && /^[\p{L}]+(?: [\p{L}]+)*$/u.test(perfilAcudiente.value);
+            perfilAcudiente.setCustomValidity(valido ? "" : "El nombre del acudiente debe contener solo letras y espacios sencillos, entre 2 y 60 caracteres.");
+            if (valido) limpiarErrorCampo(perfilAcudiente);
+            else mostrarErrorCampo(perfilAcudiente, perfilAcudiente.validationMessage);
+        });
+    }
+
+    const perfilCorreo = document.getElementById("perfilCorreo");
+    if (perfilCorreo) {
+        const validarCorreoPerfil = () => {
+            if (perfilCorreo.disabled) return;
+            perfilCorreo.value = perfilCorreo.value.trim().toLowerCase();
+            const valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(perfilCorreo.value);
+            perfilCorreo.setCustomValidity(valido ? "" : "Escribe un correo electrónico válido.");
+            if (valido) limpiarErrorCampo(perfilCorreo);
+            else if (perfilCorreo.value || document.activeElement !== perfilCorreo) mostrarErrorCampo(perfilCorreo, perfilCorreo.validationMessage);
+        };
+        perfilCorreo.addEventListener("input", validarCorreoPerfil);
+        perfilCorreo.addEventListener("blur", validarCorreoPerfil);
+    }
+
+    const perfilTelefono = document.getElementById("perfilTelefono");
+    if (perfilTelefono) {
+        const validarTelefonoPerfilPrincipal = () => {
+            if (perfilTelefono.disabled) return;
+            const digitos = perfilTelefono.value.replace(/\D/g, "");
+            const valido = /^3\d{9}$/.test(digitos) && !/^(\d)\1{9}$/.test(digitos) && digitos !== "1234567890";
+            const texto = "El celular debe tener 10 dígitos, comenzar por 3 y no ser un número repetido ni la secuencia 1234567890.";
+            perfilTelefono.setCustomValidity(valido ? "" : texto);
+            if (valido) limpiarErrorCampo(perfilTelefono);
+            else if (digitos || document.activeElement !== perfilTelefono) mostrarErrorCampo(perfilTelefono, texto);
+        };
+        perfilTelefono.addEventListener("input", validarTelefonoPerfilPrincipal);
+        perfilTelefono.addEventListener("blur", validarTelefonoPerfilPrincipal);
     }
 
     const direccion = document.getElementById("direccionSolicitud");
@@ -13876,6 +14171,44 @@ function mostrarErrorCampo(input, mensaje) {
     const fecha = document.getElementById("fechaNacimiento");
     const grado = document.getElementById("gradoSolicitud");
     const tipoDocumento = document.getElementById("tipoDocumento");
+    const sedeSolicitud = document.getElementById("sedeSolicitud");
+    const proyectoSolicitud = document.getElementById("proyectoSolicitud");
+
+    const actualizarProyectoSegunSede = () => {
+        if (!sedeSolicitud || !proyectoSolicitud) return;
+        const sedesConProyectosLibres = ["Central JT", "Central JM", "Central J.N."];
+        const proyectoObligatorio = "Acompañamiento a un docente de transición o primaria";
+        const requiereAcompanamiento = !!sedeSolicitud.value &&
+            !sedesConProyectosLibres.includes(sedeSolicitud.value);
+        const ayudaProyecto = document.getElementById("ayudaProyectoSolicitud");
+
+        if (requiereAcompanamiento) {
+            proyectoSolicitud.value = proyectoObligatorio;
+            [...proyectoSolicitud.options].forEach(opcion => {
+                if (opcion.value) opcion.disabled = opcion.value !== proyectoObligatorio;
+            });
+            if (ayudaProyecto) {
+                ayudaProyecto.textContent = "En esta sede, el único proyecto disponible es Acompañamiento a un docente de transición o primaria.";
+            }
+            return;
+        }
+
+        [...proyectoSolicitud.options].forEach(opcion => {
+            if (opcion.value) opcion.disabled = false;
+        });
+        if (!sedeSolicitud.value) proyectoSolicitud.value = "";
+        if (ayudaProyecto) {
+            ayudaProyecto.textContent = sedeSolicitud.value
+                ? "Puedes seleccionar cualquiera de los proyectos disponibles para esta sede."
+                : "Selecciona primero la sede para conocer los proyectos permitidos.";
+        }
+    };
+
+    if (sedeSolicitud && sedeSolicitud.dataset.proyectoConfigurado !== "1") {
+        sedeSolicitud.dataset.proyectoConfigurado = "1";
+        sedeSolicitud.addEventListener("change", actualizarProyectoSegunSede);
+    }
+    actualizarProyectoSegunSede();
 
     const calcularEdad = valor => {
         if (!valor) return null;
@@ -13890,20 +14223,64 @@ function mostrarErrorCampo(input, mensaje) {
     };
 
     const validarFechaNacimiento = () => {
-        if (!fecha || fecha.disabled) return;
+        if (!fecha) return;
         const edadVista = document.getElementById("edadCalculada");
-        if (!fecha.value) {
-            fecha.setCustomValidity("");
+        const tarjetaEdad = edadVista?.closest(".edad-calculada");
+        const ocultarEdad = () => {
+            if (tarjetaEdad) tarjetaEdad.hidden = true;
             if (edadVista) edadVista.textContent = "-";
+        };
+        const actualizarAyuda = (mensaje, esError = false) => {
+            const ayuda = document.getElementById("ayudaFechaNacimiento");
+            if (!ayuda) return;
+            ayuda.textContent = mensaje;
+            ayuda.classList.toggle("field-error-message", esError);
+        };
+        if (fecha.disabled) {
+            ocultarEdad();
+            actualizarAyuda("Selecciona primero el grado para habilitar la fecha de nacimiento.");
             return;
         }
-        const formatoValido = /^\d{4}-\d{2}-\d{2}$/.test(fecha.value);
-        const dentroDelRango = formatoValido &&
+        if (!fecha.value) {
+            fecha.setCustomValidity("");
+            ocultarEdad();
+            actualizarAyuda(`Selecciona una fecha válida para el rango de edad permitido (${grado?.value === "Ciclo V" ? "18 y 40 años" : "14 y 19 años"}).`);
+            return;
+        }
+        const partesFecha = /^([1-9]\d{3})-(\d{2})-(\d{2})$/.exec(fecha.value);
+        let fechaCalendarioValida = false;
+        if (partesFecha) {
+            const anio = Number(partesFecha[1]);
+            const mes = Number(partesFecha[2]);
+            const dia = Number(partesFecha[3]);
+            const fechaCalendario = new Date(0);
+            fechaCalendario.setUTCHours(0, 0, 0, 0);
+            fechaCalendario.setUTCFullYear(anio, mes - 1, dia);
+            fechaCalendarioValida = fechaCalendario.getUTCFullYear() === anio &&
+                fechaCalendario.getUTCMonth() === mes - 1 &&
+                fechaCalendario.getUTCDate() === dia;
+        }
+        const dentroDelRango = fechaCalendarioValida &&
             (!fecha.min || fecha.value >= fecha.min) &&
             (!fecha.max || fecha.value <= fecha.max);
-        fecha.setCustomValidity(dentroDelRango ? "" : "La fecha de nacimiento no está completa o no corresponde al rango permitido.");
         const edad = calcularEdad(fecha.value);
-        if (edadVista) edadVista.textContent = edad === null ? "-" : `${edad} años`;
+        const rangoEdad = grado?.value === "Ciclo V" ? "18 y 40 años" : "14 y 19 años";
+        const fechaValidada = dentroDelRango && edad !== null;
+        fecha.setCustomValidity(fechaValidada
+            ? ""
+            : fechaCalendarioValida
+                ? `La edad debe estar entre ${rangoEdad} para el grado seleccionado.`
+                : "Ingresa una fecha válida con año de cuatro dígitos (AAAA).");
+        if (fechaValidada) {
+            if (tarjetaEdad) tarjetaEdad.hidden = false;
+            if (edadVista) edadVista.textContent = `${edad} años`;
+            actualizarAyuda(`Fecha válida para ${grado.value}; edad permitida: entre ${rangoEdad}.`);
+        } else {
+            ocultarEdad();
+            actualizarAyuda(fechaCalendarioValida
+                ? `La fecha está fuera del rango permitido. La edad debe estar entre ${rangoEdad} para ${grado?.value || "el grado seleccionado"}.`
+                : "La fecha no es válida. Verifica el día, el mes y el año de cuatro dígitos (AAAA).", true);
+        }
     };
 
     const actualizarRangoFechaNacimiento = () => {
@@ -13961,7 +14338,7 @@ function mostrarErrorCampo(input, mensaje) {
             if (!fecha || !fecha.value) return;
 
             const edad = calcularEdad(fecha.value);
-            if (edad === null) return;
+            if (edad === null || !fecha.checkValidity()) return;
 
             // La fecha propone el documento correspondiente, pero el usuario
             // puede cambiarlo manualmente después.
@@ -13975,6 +14352,7 @@ function mostrarErrorCampo(input, mensaje) {
     if (grado) {
         grado.addEventListener("change", () => {
             actualizarRangoFechaNacimiento();
+            validarFechaNacimiento();
             actualizarTipoDocumentoPorEdad();
         });
     }
@@ -14014,7 +14392,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     configurarSelectoresEPS();
     configurarEdicionPerfilProfesor();
     configurarValidacionesFormularioEstudiante();
-    configurarErroresCamposSolicitud();
+    window.configurarErroresCamposSolicitud();
     actualizarIndicadoresObligatorios(document);
     configurarAyudaEstudiante();
     actualizarCamposSolicitud();
@@ -15168,7 +15546,7 @@ async function asignarProfesor(id) {
 // Ajustes finales de interfaz y validaciones
 document.addEventListener("DOMContentLoaded",()=>{
     llenarAniosServicio();
-    configurarErroresCamposSolicitud();
+    window.configurarErroresCamposSolicitud();
     configurarSelectorEvidencia();
 });
 
@@ -15178,6 +15556,28 @@ window.mostrarSolicitud = mostrarSolicitud;
 window.iniciarSesion = iniciarSesion;
 </script>
 <script id="fix-definitivo-horas">
+window.configurarErroresCamposSolicitud = function () {
+    const contenedor = document.getElementById("solicitud");
+    if (!contenedor || contenedor.dataset.erroresConfigurados === "1") return;
+    contenedor.dataset.erroresConfigurados = "1";
+    contenedor.addEventListener("input", event => {
+        if (event.target.matches("input,select,textarea")) event.target.classList.remove("campo-error");
+    });
+    contenedor.addEventListener("change", event => {
+        if (event.target.matches("input,select,textarea")) event.target.classList.remove("campo-error");
+        if (event.target.matches('input[name="diasServicio"]')) {
+            const grupo = document.getElementById("grupoDiasServicio");
+            const dias = document.querySelectorAll('input[name="diasServicio"]:checked');
+            if (grupo) grupo.classList.toggle("campo-error", dias.length === 0);
+        }
+    });
+    contenedor.addEventListener("blur", event => {
+        if (event.target.matches("input,select,textarea") && !event.target.disabled) {
+            event.target.classList.toggle("campo-error", !event.target.checkValidity());
+        }
+    }, true);
+};
+
 document.addEventListener("DOMContentLoaded", function () {
     const horas = document.getElementById("horasRealizadas");
     if (!horas || horas.dataset.fixDefinitivo === "1") return;
@@ -17245,6 +17645,17 @@ body[data-theme="dark"] .field-error-message {
     font-weight: 500 !important;
 }
 
+#ayudaFechaNacimiento.field-error-message {
+    color: #dc3545 !important;
+    font-weight: 500 !important;
+}
+html.dark-mode #ayudaFechaNacimiento.field-error-message,
+body.dark-mode #ayudaFechaNacimiento.field-error-message,
+html[data-theme="dark"] #ayudaFechaNacimiento.field-error-message,
+body[data-theme="dark"] #ayudaFechaNacimiento.field-error-message {
+    color: #ff6b6b !important;
+}
+
 /* Campos informativos: aunque estén dentro de un contenedor que tenga otro error,
    readonly/disabled no deben conservar un borde o fondo de validación. */
 input[readonly].campo-error,
@@ -18196,6 +18607,109 @@ body.dark-mode textarea[disabled].campo-error {
      * Al refrescar, el usuario persistido será detectado cuando el Splash
      * termine; después de un login, el mismo puente se reutiliza.
      */
+})();
+</script>
+
+<script id="sigho-password-eye-hold-to-reveal">
+(function () {
+    'use strict';
+
+    const selector = '#btnTogglePassword, .password-universal-toggle, .profesor-password-toggle';
+    let botonActivo = null;
+
+    function obtenerCampo(boton) {
+        if (boton.id === 'btnTogglePassword') return document.getElementById('clave');
+        const id = boton.getAttribute('data-password-target');
+        return id
+            ? document.getElementById(id)
+            : boton.closest('.password-universal-wrapper, .profesor-password-wrapper, .password-input-wrapper')?.querySelector('input');
+    }
+
+    function actualizarBoton(boton, visible) {
+        const etiqueta = visible ? 'Ocultar contraseña' : 'Mostrar contraseña';
+        boton.setAttribute('aria-pressed', visible ? 'true' : 'false');
+        boton.setAttribute('aria-label', etiqueta);
+        boton.setAttribute('title', etiqueta);
+
+        const icono = boton.id === 'btnTogglePassword'
+            ? document.getElementById('iconEye')
+            : boton.querySelector('svg, .profesor-password-eye');
+        if (icono) {
+            icono.innerHTML = visible
+                ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>'
+                : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        }
+    }
+
+    function revelar(boton) {
+        const input = obtenerCampo(boton);
+        if (!input) return;
+        botonActivo = boton;
+        input.type = 'text';
+        input.classList.add('password-universal-visible');
+        input.style.removeProperty('-webkit-text-security');
+        input.style.removeProperty('text-security');
+        input.style.removeProperty('-webkit-text-fill-color');
+        input.style.removeProperty('color');
+        input.style.removeProperty('text-shadow');
+        input.style.removeProperty('caret-color');
+        actualizarBoton(boton, true);
+    }
+
+    function ocultar(boton) {
+        if (!boton) return;
+        const input = obtenerCampo(boton);
+        if (input) {
+            input.type = 'password';
+            input.classList.remove('password-universal-visible');
+            input.style.setProperty('-webkit-text-security', 'disc', 'important');
+            input.style.setProperty('text-security', 'disc', 'important');
+        }
+        actualizarBoton(boton, false);
+        if (botonActivo === boton) botonActivo = null;
+    }
+
+    document.addEventListener('pointerdown', function (event) {
+        const boton = event.target.closest?.(selector);
+        if (!boton || event.button !== 0) return;
+        event.preventDefault();
+        revelar(boton);
+    }, true);
+
+    window.addEventListener('pointerup', function () {
+        ocultar(botonActivo);
+    }, true);
+    window.addEventListener('pointercancel', function () {
+        ocultar(botonActivo);
+    }, true);
+    window.addEventListener('blur', function () {
+        ocultar(botonActivo);
+    });
+
+    document.addEventListener('pointerout', function (event) {
+        if (!botonActivo) return;
+        const boton = event.target.closest?.(selector);
+        if (boton === botonActivo && !boton.contains(event.relatedTarget)) ocultar(boton);
+    }, true);
+
+    document.addEventListener('keydown', function (event) {
+        if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return;
+        const boton = event.target.closest?.(selector);
+        if (!boton) return;
+        event.preventDefault();
+        revelar(boton);
+    }, true);
+
+    window.addEventListener('keyup', function (event) {
+        if (event.key === ' ' || event.key === 'Enter') ocultar(botonActivo);
+    }, true);
+
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest?.(selector)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+    }, true);
 })();
 </script>
 
