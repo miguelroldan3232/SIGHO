@@ -16183,17 +16183,22 @@ async function cargarProfesoresAdmin() {
     }
 }
 
+const zonasCentral = [
+    "Cancha central",
+    "Cancha punta cana",
+    "Baños hombres",
+    "Baños mujeres",
+    "Pasillos bloque 1",
+    "Pasillos bloque 2",
+    "Pasillos bloque uno 2 piso",
+    "Pasillos bloque dos segundo piso"
+];
+
 const zonasPorSede = {
-    "Central JM": [
-        "Cancha central",
-        "Cancha punta cana",
-        "Baños hombres",
-        "Baños mujeres",
-        "Pasillos bloque 1",
-        "Pasillos bloque 2",
-        "Pasillos bloque uno 2 piso",
-        "Pasillos bloque dos segundo piso"
-    ],
+    "Central JM": zonasCentral,
+    "Central JT": zonasCentral,
+    "Central J.N.": zonasCentral,
+    "Central JN": zonasCentral,
     "San Francisco Club": ["Apoyo docentes"],
     "Picaleña": ["Apoyo docentes"],
     "Secundino Porras Cruz": ["Apoyo docentes"],
