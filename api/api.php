@@ -1,4 +1,9 @@
 <?php
+session_set_cookie_params([
+    'httponly' => true,
+    'samesite' => 'Lax',
+    'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+]);
 session_start();
 require_once __DIR__ . '/config.php';
 
@@ -38,6 +43,66 @@ function fail(string $message, int $status = 400): never {
     respond(['ok' => false, 'message' => $message], $status);
 }
 
+function ensure_login_attempt_table(): void {
+    static $ready = false;
+    if ($ready) return;
+    db()->exec("CREATE TABLE IF NOT EXISTS login_attempts (
+        email VARCHAR(190) NOT NULL,
+        ip_address VARCHAR(45) NOT NULL,
+        attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+        window_started_at DATETIME NOT NULL,
+        locked_until DATETIME NULL,
+        PRIMARY KEY (email, ip_address),
+        INDEX idx_login_attempts_locked_until (locked_until)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    $ready = true;
+}
+
+function login_ip_address(): string {
+    return substr((string)($_SERVER['REMOTE_ADDR'] ?? 'unknown'), 0, 45);
+}
+
+function check_login_rate_limit(string $email, string $ip): void {
+    ensure_login_attempt_table();
+    $st = db()->prepare('SELECT attempts, window_started_at, locked_until FROM login_attempts WHERE email=? AND ip_address=?');
+    $st->execute([$email, $ip]);
+    $attempt = $st->fetch();
+    if (!$attempt) return;
+
+    $now = new DateTimeImmutable();
+    if (!empty($attempt['locked_until']) && new DateTimeImmutable($attempt['locked_until']) > $now) {
+        fail('Demasiados intentos. Espera 15 minutos antes de volver a intentarlo.', 429);
+    }
+    if (new DateTimeImmutable($attempt['window_started_at']) < $now->modify('-15 minutes')) {
+        db()->prepare('DELETE FROM login_attempts WHERE email=? AND ip_address=?')->execute([$email, $ip]);
+    }
+}
+
+function record_login_failure(string $email, string $ip): void {
+    ensure_login_attempt_table();
+    $pdo = db();
+    $st = $pdo->prepare('SELECT attempts, window_started_at FROM login_attempts WHERE email=? AND ip_address=?');
+    $st->execute([$email, $ip]);
+    $attempt = $st->fetch();
+    $now = new DateTimeImmutable();
+
+    if (!$attempt || new DateTimeImmutable($attempt['window_started_at']) < $now->modify('-15 minutes')) {
+        $st = $pdo->prepare('INSERT INTO login_attempts (email, ip_address, attempts, window_started_at, locked_until) VALUES (?,?,1,NOW(),NULL) ON DUPLICATE KEY UPDATE attempts=1, window_started_at=NOW(), locked_until=NULL');
+        $st->execute([$email, $ip]);
+        return;
+    }
+
+    $attempts = (int)$attempt['attempts'] + 1;
+    $lockedUntil = $attempts >= 5 ? $now->modify('+15 minutes')->format('Y-m-d H:i:s') : null;
+    $st = $pdo->prepare('UPDATE login_attempts SET attempts=?, locked_until=? WHERE email=? AND ip_address=?');
+    $st->execute([$attempts, $lockedUntil, $email, $ip]);
+}
+
+function clear_login_failures(string $email, string $ip): void {
+    ensure_login_attempt_table();
+    db()->prepare('DELETE FROM login_attempts WHERE email=? AND ip_address=?')->execute([$email, $ip]);
+}
+
 function capitalizarNombre(string $valor): string {
     $valor = trim(preg_replace('/\s+/u', ' ', $valor));
     if ($valor === '') return '';
@@ -50,7 +115,7 @@ function capitalizarNombre(string $valor): string {
 
 
 function institutional_domain(): string {
-    return 'iejosejoaquinflorezhernandez.edu.co';
+    return ltrim(strtolower(get_setting('dominio_institucional', 'iejosejoaquinflorezhernandez.edu.co')), '@');
 }
 
 function is_institutional_email(string $email): bool {
@@ -213,34 +278,82 @@ function ensure_superadmin_tables(PDO $pdo): void {
         CONSTRAINT fk_role_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
         CONSTRAINT fk_role_permissions_permission FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS system_settings (
+        setting_key VARCHAR(80) NOT NULL PRIMARY KEY,
+        setting_value VARCHAR(255) NOT NULL DEFAULT '',
+        description VARCHAR(255) NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     $permissions = [
-        ['dashboard', 'Ver inicio', 'Consultar el resumen del sistema'],
-        ['users.view', 'Ver usuarios', 'Consultar cuentas y estados'],
-        ['users.manage', 'Administrar usuarios', 'Crear, editar y desactivar usuarios'],
-        ['roles.manage', 'Administrar roles', 'Asignar roles a las cuentas'],
-        ['permissions.manage', 'Administrar permisos', 'Activar permisos por rol'],
-        ['settings.manage', 'Administrar configuración', 'Modificar la configuración general']
+        ['dashboard', 'Ver inicio', 'Consultar el resumen del sistema', ['estudiante', 'profesor', 'administrador', 'superadmin']],
+        ['users.view', 'Ver usuarios', 'Consultar cuentas y estados', ['profesor', 'administrador', 'superadmin']],
+        ['users.manage', 'Administrar usuarios', 'Crear, editar y desactivar usuarios', ['administrador', 'superadmin']],
+        ['roles.manage', 'Administrar roles', 'Asignar roles a las cuentas', ['administrador', 'superadmin']],
+        ['permissions.manage', 'Administrar permisos', 'Activar permisos por rol', ['superadmin']],
+        ['settings.manage', 'Administrar configuración', 'Modificar la configuración general', ['superadmin']],
+        ['teachers.assign', 'Asignar sede y proyecto', 'Asignar sede y proyecto a los profesores', ['administrador', 'superadmin']],
+        ['requests.manage', 'Validar solicitudes', 'Aceptar o rechazar solicitudes de estudiantes y profesores', ['administrador', 'superadmin']],
+        ['records.reset', 'Reiniciar registros', 'Eliminar todos los registros de horas', ['administrador', 'superadmin']]
     ];
-    $insert = $pdo->prepare('INSERT IGNORE INTO permissions (code, name, description) VALUES (?,?,?)');
-    foreach ($permissions as $permission) $insert->execute($permission);
-    $defaults = [
-        'estudiante' => ['dashboard'],
-        'profesor' => ['dashboard', 'users.view'],
-        'administrador' => ['dashboard', 'users.view', 'users.manage', 'roles.manage'],
-        'superadmin' => ['dashboard', 'users.view', 'users.manage', 'roles.manage', 'permissions.manage', 'settings.manage']
-    ];
+    $exists = $pdo->prepare('SELECT id FROM permissions WHERE code = ?');
+    $insert = $pdo->prepare('INSERT INTO permissions (code, name, description) VALUES (?,?,?)');
     $roleQuery = $pdo->prepare('SELECT id FROM roles WHERE code = ?');
-    $permissionQuery = $pdo->prepare('SELECT id FROM permissions WHERE code = ?');
     $link = $pdo->prepare('INSERT IGNORE INTO role_permissions (role_id, permission_id, enabled) VALUES (?,?,1)');
-    foreach ($defaults as $roleCode => $codes) {
-        $roleQuery->execute([$roleCode]);
-        $roleId = (int)$roleQuery->fetchColumn();
-        foreach ($codes as $code) {
-            $permissionQuery->execute([$code]);
-            $permissionId = (int)$permissionQuery->fetchColumn();
-            if ($roleId && $permissionId) $link->execute([$roleId, $permissionId]);
+    foreach ($permissions as [$code, $name, $description, $roles]) {
+        $exists->execute([$code]);
+        if ($exists->fetchColumn()) continue;
+        $insert->execute([$code, $name, $description]);
+        $permissionId = (int)$pdo->lastInsertId();
+        foreach ($roles as $roleCode) {
+            $roleQuery->execute([$roleCode]);
+            $roleId = (int)$roleQuery->fetchColumn();
+            if ($roleId) $link->execute([$roleId, $permissionId]);
         }
     }
+
+    $defaults = [
+        ['dominio_institucional', 'iejosejoaquinflorezhernandez.edu.co', 'Dominio del correo institucional'],
+        ['horas_academico', '120', 'Meta de horas · modalidad académica'],
+        ['horas_tecnico', '100', 'Meta de horas · modalidad técnica']
+    ];
+    $settingExists = $pdo->prepare('SELECT COUNT(*) FROM system_settings WHERE setting_key = ?');
+    $settingInsert = $pdo->prepare('INSERT INTO system_settings (setting_key, setting_value, description) VALUES (?,?,?)');
+    foreach ($defaults as [$key, $value, $description]) {
+        $settingExists->execute([$key]);
+        if (!(int)$settingExists->fetchColumn()) $settingInsert->execute([$key, $value, $description]);
+    }
+}
+
+function get_setting(string $key, string $default = ''): string {
+    static $cache = [];
+    if (!array_key_exists($key, $cache)) {
+        try {
+            $st = db()->prepare('SELECT setting_value FROM system_settings WHERE setting_key = ? LIMIT 1');
+            $st->execute([$key]);
+            $value = $st->fetchColumn();
+            $cache[$key] = ($value === false || $value === '') ? $default : (string)$value;
+        } catch (Throwable $e) {
+            $cache[$key] = $default;
+        }
+    }
+    return $cache[$key];
+}
+
+function has_permission(string $code): bool {
+    static $ready = false;
+    $user = current_user();
+    if (!$user) return false;
+    if ($user['rol'] === 'superadmin') return true;
+    if (!$ready) {
+        ensure_superadmin_tables(db());
+        $ready = true;
+    }
+    $st = db()->prepare('SELECT COUNT(*) FROM role_permissions rp JOIN roles r ON r.id = rp.role_id JOIN permissions p ON p.id = rp.permission_id WHERE r.code = ? AND p.code = ? AND rp.enabled = 1');
+    $st->execute([$user['rol'], $code]);
+    return (int)$st->fetchColumn() > 0;
+}
+
+function require_permission(string $code): void {
+    if (!has_permission($code)) fail('Tu rol no tiene el permiso necesario para realizar esta acción.', 403);
 }
 
 function superadmin_user_payload(array $row): array {
@@ -463,12 +576,33 @@ function handle_evidence(int $id): never {
     exit;
 }
 
+function delete_evidence_files(array $paths): void {
+    $evidenceDirectory = realpath(EVIDENCE_DIR);
+    if ($evidenceDirectory === false) return;
+
+    foreach (array_unique($paths) as $relativePath) {
+        if (!is_string($relativePath) || !str_starts_with($relativePath, 'uploads/evidence/')) continue;
+        $filePath = realpath($evidenceDirectory . DIRECTORY_SEPARATOR . basename($relativePath));
+        if ($filePath !== false && dirname($filePath) === $evidenceDirectory && is_file($filePath)) {
+            @unlink($filePath);
+        }
+    }
+}
+
 $action = $_GET['action'] ?? '';
 
 try {
     switch ($action) {
         case 'session':
             respond(['ok' => true, 'user' => current_user()]);
+
+        case 'public_settings':
+            ensure_superadmin_tables(db());
+            respond(['ok' => true, 'settings' => [
+                'dominioInstitucional' => institutional_domain(),
+                'horasAcademico' => (int)get_setting('horas_academico', '120'),
+                'horasTecnico' => (int)get_setting('horas_tecnico', '100')
+            ]]);
 
         case 'login':
             // El frontend envía JSON con correo y clave.
@@ -481,14 +615,17 @@ try {
             $correo = strtolower(trim((string)($d['correo'] ?? $d['email'] ?? '')));
             $clave = (string)($d['clave'] ?? $d['password'] ?? '');
             $rolSolicitado = trim((string)($d['rol'] ?? ''));
+            $ip = login_ip_address();
 
             if (!$correo || !$clave) fail('Completa todos los campos.');
+            check_login_rate_limit($correo, $ip);
 
             $st = db()->prepare("SELECT u.*, r.code AS role_code FROM users u JOIN roles r ON r.id = u.role_id WHERE LOWER(u.email) = ? AND u.status = 'activo'");
             $st->execute([$correo]);
             $u = $st->fetch();
 
             if (!$u || !password_verify($clave, $u['password_hash'])) {
+                record_login_failure($correo, $ip);
                 fail('Correo o clave incorrectos.', 401);
             }
 
@@ -497,7 +634,7 @@ try {
             // se sigue validando. El frontend actual puede omitirlo.
             $rol = $u['role_code'];
             if ($rolSolicitado !== '' && $rolSolicitado !== $rol) {
-
+                record_login_failure($correo, $ip);
                 fail('Correo, clave o rol incorrectos.', 401);
             }
 
@@ -510,6 +647,7 @@ try {
             if ($rol === 'estudiante' && !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
                 fail('El estudiante debe usar un correo electrónico válido.');
             }
+            clear_login_failures($correo, $ip);
             $payload = user_payload($u);
             $_SESSION['user'] = $payload;
             session_regenerate_id(true);
@@ -870,8 +1008,8 @@ try {
                         INSERT INTO student_applications
                         (access_request_id, service_year, first_surname, second_surname, first_name, second_name,
                          document_type, document_number, grade, birth_date, residence_address, phone, eps,
-                         guardian_name, guardian_phone, service_site, project, project_other, service_days, service_shift)
-                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                         guardian_name, guardian_phone, guardian_phone_type, service_site, project, project_other, service_days, service_shift)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                     ');
                     $st->execute([
                         $accessRequestId,
@@ -1271,6 +1409,7 @@ try {
 
         case 'assign_teacher':
             $user = require_roles(['administrador']);
+            require_permission('teachers.assign');
             $d = json_input();
             $staffId = (int)($d['staffId'] ?? 0);
             $sede = trim((string)($d['sede'] ?? ''));
@@ -1298,34 +1437,12 @@ try {
             if ((int)$st->fetchColumn() > 0) fail('Tu cuenta ya tiene permisos de Administrador.');
             $st = $pdo->prepare("INSERT INTO access_requests (identification, first_name, last_name, email, password_hash, requested_role_id, status, service_project) SELECT u.identification,u.first_name,u.last_name,u.email,u.password_hash,r.id,'pendiente',s.service_project FROM users u JOIN roles r ON r.code='administrador' LEFT JOIN staff s ON s.user_id=u.id WHERE u.id=?");
             $st->execute([(int)$user['id']]);
-            respond(['ok'=>true,'message'=>'Solicitud de permisos de Administrador enviada al panel administrativo.']);
-
-        case 'validate_admin_request_by_admin':
-            $admin = require_roles(['administrador']);
-            $d = json_input();
-            $id = (int)($d['id'] ?? 0);
-            $status = (string)($d['estado'] ?? '');
-            if (!$id || !in_array($status,['aceptada','rechazada'],true)) fail('Solicitud inválida.');
-            $pdo = db();
-            $pdo->beginTransaction();
-            try {
-                $st=$pdo->prepare("SELECT ar.*, r.code AS role_code FROM access_requests ar JOIN roles r ON r.id=ar.requested_role_id WHERE ar.id=? AND ar.status='pendiente' FOR UPDATE");
-                $st->execute([$id]); $r=$st->fetch();
-                if(!$r || $r['role_code']!=='administrador') fail('Solicitud de Administrador no encontrada.');
-                if($status==='aceptada'){
-                    $roleId=(int)$pdo->query("SELECT id FROM roles WHERE code='administrador'")->fetchColumn();
-                    $st=$pdo->prepare("UPDATE users SET role_id=? WHERE LOWER(email)=LOWER(?) AND status='activo'");
-                    $st->execute([$roleId,$r['email']]);
-                    if ($st->rowCount() < 1) fail('No se encontró la cuenta del profesor solicitante.');
-                }
-                $st=$pdo->prepare('UPDATE access_requests SET status=?, validated_by=?, validated_at=NOW() WHERE id=?');
-                $st->execute([$status,(int)$admin['id'],$id]);
-                $pdo->commit();
-            }catch(Throwable $e){ if($pdo->inTransaction())$pdo->rollBack(); throw $e; }
-            respond(['ok'=>true,'message'=>$status==='aceptada'?'Permisos de Administrador concedidos correctamente.':'Solicitud de Administrador rechazada.']);
+            respond(['ok'=>true,'message'=>'Solicitud enviada. Un Super Admin la revisará.']);
 
         case 'admin_data':
             require_roles(['administrador']);
+            require_permission('users.view');
+            require_permission('requests.manage');
             $pdo = db();
             $users = [];
             $st = $pdo->query("SELECT u.*, r.code AS role_code FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code IN ('estudiante','profesor') ORDER BY u.first_name, u.last_name");
@@ -1339,11 +1456,12 @@ try {
                 'profesores' => $profesores,
                 'records' => get_records(),
                 'requests' => array_merge(pending_requests('estudiante'), pending_requests('profesor')),
-                'adminRequests' => pending_requests('administrador')
+                'adminRequests' => []
             ]);
 
         case 'validate_request':
             require_roles(['administrador']);
+            require_permission('requests.manage');
             $d = json_input();
             $id = (int)($d['id'] ?? 0);
             $status = (string)($d['estado'] ?? '');
@@ -1366,7 +1484,9 @@ try {
                     $st->execute([$r['identification'],$r['first_name'],$r['last_name'],$r['email'],$r['password_hash'],$roleId]);
                     $userId = (int)$pdo->lastInsertId();
                     if ($r['role_code'] === 'estudiante') {
-                        $target = $r['modality'] === 'tecnico' ? 100 : 120;
+                        $target = $r['modality'] === 'tecnico'
+                            ? (int)get_setting('horas_tecnico', '100')
+                            : (int)get_setting('horas_academico', '120');
                         $st = $pdo->prepare('INSERT INTO students (user_id, student_code, grade, modality, technical_program, target_hours) VALUES (?,?,?,?,?,?)');
                         $st->execute([$userId,$r['identification'],$r['grade'],$r['modality'],$r['technical_program'],$target]);
                         $studentId = (int)$pdo->lastInsertId();
@@ -1402,16 +1522,35 @@ try {
             $d = json_input();
             $id = (int)($d['id'] ?? 0);
             $identificacion = trim((string)($d['identificacion'] ?? ''));
-            $nombres = trim((string)($d['nombres'] ?? ''));
-            $apellidos = trim((string)($d['apellidos'] ?? ''));
+            $nombres = capitalizarNombre((string)($d['nombres'] ?? ''));
+            $apellidos = capitalizarNombre((string)($d['apellidos'] ?? ''));
             $correo = strtolower(trim((string)($d['correo'] ?? '')));
             $rol = trim((string)($d['rol'] ?? ''));
             $estado = trim((string)($d['estado'] ?? 'activo'));
             $clave = (string)($d['clave'] ?? '');
-            if (!$identificacion || !$nombres || !$apellidos || !filter_var($correo, FILTER_VALIDATE_EMAIL)) fail('Completa identificación, nombres, apellidos y un correo válido.');
-            if (!in_array($rol, ['estudiante','profesor','administrador'], true)) fail('El rol seleccionado no es válido.');
-            if (!in_array($estado, ['activo','inactivo'], true)) fail('El estado seleccionado no es válido.');
+            if (!$identificacion || !$nombres || !$apellidos || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                fail('Completa identificación, nombres, apellidos y un correo válido.');
+            }
+            if (!in_array($rol, ['estudiante', 'profesor', 'administrador'], true)) fail('El rol seleccionado no es válido.');
+            if (!in_array($estado, ['activo', 'inactivo'], true)) fail('El estado seleccionado no es válido.');
+            if (mb_strlen($identificacion, 'UTF-8') > 60 || preg_match('/[<>"\']/u', $identificacion)) {
+                fail('La identificación contiene caracteres no permitidos o es demasiado larga.');
+            }
+            $regexNombre = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+            foreach (['Los nombres' => $nombres, 'Los apellidos' => $apellidos] as $etiqueta => $valor) {
+                if (mb_strlen($valor, 'UTF-8') < 2 || mb_strlen($valor, 'UTF-8') > 60 || !preg_match($regexNombre, $valor)) {
+                    fail($etiqueta . ' solo pueden contener letras y un espacio sencillo entre palabras.');
+                }
+            }
+            if (in_array($rol, ['profesor', 'administrador'], true) && !is_institutional_email($correo)) {
+                fail('Los profesores y administradores deben usar un correo @' . institutional_domain() . '.');
+            }
+            $regexClave = '/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/';
+            if ($clave !== '' && !preg_match($regexClave, $clave)) {
+                fail('La contraseña debe tener mínimo 8 caracteres, sin espacios, con mayúscula, minúscula y número.');
+            }
             $pdo = db();
+            ensure_optional_columns($pdo);
             $roleStatement = $pdo->prepare('SELECT id FROM roles WHERE code = ?');
             $roleStatement->execute([$rol]);
             $roleId = (int)$roleStatement->fetchColumn();
@@ -1421,28 +1560,61 @@ try {
                 if (!$existing) fail('Usuario no encontrado.', 404);
                 if ((int)$existing['id'] === (int)$admin['id']) fail('No puedes modificar tu propia cuenta desde esta sección.');
                 if ($existing['role_code'] === 'superadmin') fail('Las cuentas de Super Admin están protegidas.');
+                $rolActual = $existing['role_code'];
+                if ($rol !== $rolActual && ($rol === 'estudiante' || $rolActual === 'estudiante')) {
+                    fail('No se puede convertir un estudiante en personal ni al contrario. Usa el flujo de solicitudes.');
+                }
                 $duplicate = $pdo->prepare('SELECT COUNT(*) FROM users WHERE (email = ? OR identification = ?) AND id <> ?');
                 $duplicate->execute([$correo, $identificacion, $id]);
                 if ((int)$duplicate->fetchColumn()) fail('El correo o la identificación ya pertenecen a otra cuenta.');
-                $sql = 'UPDATE users SET identification=?, first_name=?, last_name=?, email=?, role_id=?, status=?';
-                $params = [$identificacion, $nombres, $apellidos, $correo, $roleId, $estado];
-                if ($clave !== '') { $sql .= ', password_hash=?'; $params[] = password_hash($clave, PASSWORD_DEFAULT); }
-                $sql .= ' WHERE id=?'; $params[] = $id;
-                $pdo->prepare($sql)->execute($params);
+                $pdo->beginTransaction();
+                try {
+                    $sql = 'UPDATE users SET identification=?, first_name=?, last_name=?, email=?, role_id=?, status=?';
+                    $params = [$identificacion, $nombres, $apellidos, $correo, $roleId, $estado];
+                    if ($clave !== '') {
+                        $sql .= ', password_hash=?';
+                        $params[] = password_hash($clave, PASSWORD_DEFAULT);
+                    }
+                    $sql .= ' WHERE id=?';
+                    $params[] = $id;
+                    $pdo->prepare($sql)->execute($params);
+
+                    if ($rol === 'estudiante') {
+                        $pdo->prepare('UPDATE students SET student_code=? WHERE user_id=?')->execute([$identificacion, $id]);
+                    } else {
+                        $staffQuery = $pdo->prepare('SELECT COUNT(*) FROM staff WHERE user_id=?');
+                        $staffQuery->execute([$id]);
+                        $position = $rol === 'administrador' ? 'Docente Administrador' : 'Docente';
+                        if ((int)$staffQuery->fetchColumn()) {
+                            $pdo->prepare('UPDATE staff SET staff_code=?, position=? WHERE user_id=?')->execute([$identificacion, $position, $id]);
+                        } else {
+                            $pdo->prepare('INSERT INTO staff (user_id, staff_code, position) VALUES (?,?,?)')->execute([$id, $identificacion, $position]);
+                        }
+                    }
+                    $pdo->commit();
+                } catch (Throwable $e) {
+                    if ($pdo->inTransaction()) $pdo->rollBack();
+                    throw $e;
+                }
             } else {
-                if (!$clave || strlen($clave) < 8) fail('La contraseña debe tener mínimo 8 caracteres.');
+                if ($rol === 'estudiante') {
+                    fail('Los estudiantes se registran mediante la solicitud de acceso para conservar su ficha completa.');
+                }
+                if ($clave === '') fail('La contraseña es obligatoria para crear la cuenta.');
                 $duplicate = $pdo->prepare('SELECT COUNT(*) FROM users WHERE email = ? OR identification = ?');
                 $duplicate->execute([$correo, $identificacion]);
                 if ((int)$duplicate->fetchColumn()) fail('El correo o la identificación ya pertenecen a otra cuenta.');
-                $pdo->prepare('INSERT INTO users (identification, first_name, last_name, email, password_hash, role_id, status) VALUES (?,?,?,?,?,?,?)')
-                    ->execute([$identificacion, $nombres, $apellidos, $correo, password_hash($clave, PASSWORD_DEFAULT), $roleId, $estado]);
-                $newUserId = (int)$pdo->lastInsertId();
-                if ($rol === 'estudiante') {
-                    $pdo->prepare('INSERT INTO students (user_id, student_code, grade, modality, technical_program, target_hours) VALUES (?,?,?,?,?,?)')
-                        ->execute([$newUserId, $identificacion, null, 'academico', null, 120]);
-                } elseif (in_array($rol, ['profesor', 'administrador'], true)) {
+                $pdo->beginTransaction();
+                try {
+                    $pdo->prepare('INSERT INTO users (identification, first_name, last_name, email, password_hash, role_id, status) VALUES (?,?,?,?,?,?,?)')
+                        ->execute([$identificacion, $nombres, $apellidos, $correo, password_hash($clave, PASSWORD_DEFAULT), $roleId, $estado]);
+                    $newUserId = (int)$pdo->lastInsertId();
                     $pdo->prepare('INSERT INTO staff (user_id, staff_code, position) VALUES (?,?,?)')
                         ->execute([$newUserId, $identificacion, $rol === 'administrador' ? 'Docente Administrador' : 'Docente']);
+                    $pdo->commit();
+                } catch (Throwable $e) {
+                    if ($pdo->inTransaction()) $pdo->rollBack();
+                    throw $e;
                 }
             }
             respond(['ok' => true, 'data' => superadmin_snapshot()]);
@@ -1477,10 +1649,33 @@ try {
             $settings = json_input()['settings'] ?? [];
             if (!is_array($settings)) fail('Configuración inválida.');
             $pdo = db();
-            $statement = $pdo->prepare('UPDATE system_settings SET setting_value=? WHERE setting_key=?');
+            ensure_superadmin_tables($pdo);
+            $cleanSettings = [];
             foreach ($settings as $key => $value) {
-                if (!preg_match('/^[a-zA-Z0-9_]+$/', (string)$key)) continue;
-                $statement->execute([trim((string)$value), (string)$key]);
+                $key = (string)$key;
+                $value = trim((string)$value);
+                if (!preg_match('/^[a-zA-Z0-9_]+$/', $key) || mb_strlen($value, 'UTF-8') > 255) continue;
+                if ($key === 'dominio_institucional') {
+                    $value = ltrim(strtolower($value), '@');
+                    if (!preg_match('/^(?:[a-z0-9-]+\\.)+[a-z]{2,}$/', $value)) {
+                        fail('El dominio institucional no es válido (ejemplo: colegio.edu.co).');
+                    }
+                    $st = $pdo->prepare("SELECT COUNT(*) FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code IN ('profesor','administrador') AND LOWER(u.email) NOT LIKE ?");
+                    $st->execute(['%@' . $value]);
+                    $usersWithoutDomain = (int)$st->fetchColumn();
+                    if ($usersWithoutDomain > 0) {
+                        fail("No se puede cambiar el dominio: {$usersWithoutDomain} cuenta(s) de profesor o administrador quedarían sin acceso. Actualiza primero sus correos.");
+                    }
+                }
+                if (in_array($key, ['horas_academico', 'horas_tecnico'], true)
+                    && (!ctype_digit($value) || (int)$value < 1 || (int)$value > 500)) {
+                    fail('Las metas de horas deben ser números enteros entre 1 y 500.');
+                }
+                $cleanSettings[$key] = $value;
+            }
+            $statement = $pdo->prepare('UPDATE system_settings SET setting_value=? WHERE setting_key=?');
+            foreach ($cleanSettings as $key => $value) {
+                $statement->execute([$value, $key]);
             }
             respond(['ok' => true, 'data' => superadmin_snapshot()]);
 
@@ -1498,11 +1693,21 @@ try {
                 if(!$r || $r['role_code']!=='administrador') fail('Solicitud no encontrada o no corresponde a administrador.');
                 if($status==='aceptada'){
                     $roleId=(int)$pdo->query("SELECT id FROM roles WHERE code='administrador'")->fetchColumn();
-                    $st=$pdo->prepare("INSERT INTO users (identification, first_name, last_name, email, password_hash, role_id, status) VALUES (?,?,?,?,?,?, 'activo')");
-                    $st->execute([$r['identification'],$r['first_name'],$r['last_name'],$r['email'],$r['password_hash'],$roleId]);
-                    $userId=(int)$pdo->lastInsertId();
-                    $st=$pdo->prepare("INSERT INTO staff (user_id, staff_code, position) VALUES (?,?, 'Docente Administrador')");
-                    $st->execute([$userId,$r['identification']]);
+                    $st=$pdo->prepare("SELECT u.id FROM users u JOIN roles rr ON rr.id=u.role_id WHERE LOWER(u.email)=LOWER(?) AND u.status='activo' AND rr.code='profesor' FOR UPDATE");
+                    $st->execute([$r['email']]);
+                    $userId=(int)$st->fetchColumn();
+                    if (!$userId) fail('No se encontró la cuenta activa del profesor solicitante.');
+                    $st=$pdo->prepare('UPDATE users SET role_id=? WHERE id=?');
+                    $st->execute([$roleId,$userId]);
+                    $st=$pdo->prepare('SELECT COUNT(*) FROM staff WHERE user_id=?');
+                    $st->execute([$userId]);
+                    if ((int)$st->fetchColumn() > 0) {
+                        $st=$pdo->prepare("UPDATE staff SET position='Docente Administrador' WHERE user_id=?");
+                        $st->execute([$userId]);
+                    } else {
+                        $st=$pdo->prepare("INSERT INTO staff (user_id, staff_code, position) VALUES (?,?, 'Docente Administrador')");
+                        $st->execute([$userId,$r['identification']]);
+                    }
                 }
                 $st=$pdo->prepare('UPDATE access_requests SET status=?, validated_by=?, validated_at=NOW() WHERE id=?');
                 $st->execute([$status,(int)require_login()['id'],$id]);
@@ -1512,14 +1717,25 @@ try {
 
         case 'reset_records':
             require_roles(['administrador']);
+            require_permission('records.reset');
             $pdo=db();
-            $pdo->exec('DELETE FROM hour_records');
+            $evidencePaths = $pdo->query("SELECT evidence_path FROM hour_records WHERE evidence_path IS NOT NULL AND evidence_path <> ''")->fetchAll(PDO::FETCH_COLUMN);
+            $pdo->beginTransaction();
+            try {
+                $pdo->exec('DELETE FROM hour_records');
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
+            }
+            delete_evidence_files($evidencePaths);
             respond(['ok'=>true]);
 
         case 'evidence':
             handle_evidence((int)($_GET['id'] ?? 0));
 case 'pending_requests':
     require_roles(['administrador']);
+    require_permission('requests.manage');
 
     $requests = pending_requests('estudiante');
 
