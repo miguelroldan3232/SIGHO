@@ -2139,16 +2139,26 @@
 .superadmin-help-chat input { min-height:44px; }
 .superadmin-help-chat button { flex:0 0 auto; border:0; border-radius:9px; padding:0 18px; background:#0d3f70; color:#fff; cursor:pointer; font-weight:700; }
 .superadmin-help-answer { margin-top:16px; padding:18px; border-left:4px solid #2fa45a; border-radius:10px; background:#f1f8f4; color:#45636d; line-height:1.6; }
-.ai-chat-window { min-height:250px; max-height:420px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding:18px; margin-bottom:14px; border:1px solid #dce8ef; border-radius:14px; background:#f7fafc; }
-.ai-message { max-width:85%; padding:11px 14px; border-radius:12px; font-size:13px; line-height:1.5; }
-.ai-message-bot { align-self:flex-start; background:#e8f4ec; color:#315b42; border:1px solid #c8e4d1; }
-.ai-message-user { align-self:flex-end; background:#0d3f70; color:#fff; }
+.superadmin-chat { gap:12px; }
+.superadmin-chat-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; color:#173f5f; }
+.superadmin-chat-toolbar > button { width:auto; min-height:34px; padding:6px 10px; border:1px solid #d6e5ed; border-radius:8px; background:#f7fafc; color:#36566b; font-size:12px; }
+.superadmin-chat-messages { display:flex; flex-direction:column; gap:10px; min-height:90px; max-height:min(330px,42vh); overflow-y:auto; padding:4px; overscroll-behavior:contain; }
+.superadmin-chat-message { max-width:88%; padding:10px 13px; border:1px solid #dce8ef; border-radius:12px; color:#36566b; background:#f4f8fa; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }
+.superadmin-chat-message-user { align-self:flex-end; border-color:#0d3f70; background:#0d3f70; color:#fff; }
+.superadmin-chat-message-assistant { align-self:flex-start; }
+.superadmin-chat-message-error { align-self:flex-start; border-color:#e3b8b8; background:#fff5f5; color:#913737; }
+.superadmin-chat-message-error button { width:auto; min-height:32px; margin-top:8px; padding:5px 10px; border:1px solid #c98282; border-radius:7px; background:#fff; color:#913737; }
+.superadmin-chat-loading { align-self:flex-start; color:#718492; font-size:12px; }
+.superadmin-chat-form { display:flex; align-items:stretch; gap:8px; }
+.superadmin-chat-form input { flex:1; min-width:0; min-height:44px; }
+.superadmin-chat-form button { width:auto; min-width:76px; padding:0 14px; border:0; border-radius:9px; background:#0d3f70; color:#fff; font-weight:700; cursor:pointer; }
+.superadmin-chat-form button:disabled { opacity:.55; cursor:wait; }
+.superadmin-chat-status { color:#718492; font-size:12px; }
+.superadmin-chat-status:empty { display:none; }
+.superadmin-chat [hidden] { display:none !important; }
 .role-help-chat { position:fixed; right:22px; bottom:88px; z-index:499; display:none; flex-direction:column; align-items:stretch; gap:9px; width:min(460px,calc(100vw - 36px)); max-height:min(520px,70vh); overflow-y:auto; margin:0; padding:16px; border:1px solid #dce8ef; border-radius:14px; background:#fff; box-shadow:0 12px 30px rgba(8,43,76,.2); }
 .ai-conversation { display:flex; flex-direction:column; gap:8px; max-height:210px; overflow-y:auto; padding:4px 2px; }
 .ai-conversation:empty { display:none; }
-.ai-message { max-width:88%; padding:9px 11px; border-radius:11px; font-size:12px; line-height:1.45; white-space:pre-wrap; }
-.ai-message-user { align-self:flex-end; background:#0d3f70; color:#fff; }
-.ai-message-bot { align-self:flex-start; background:#e8f4ec; color:#315b42; border:1px solid #c8e4d1; }
 .role-help-chat input { width:100%; min-height:46px; }
 .role-help-chat button { flex:0 0 auto; width:100%; min-height:42px; border:0; border-radius:9px; padding:0 18px; background:#0d3f70; color:#fff; cursor:pointer; font-weight:700; }
 .ai-quick-title { display:block; margin:0 0 7px; color:#718492; font-size:11px; font-weight:700; }
@@ -2163,9 +2173,45 @@
 .role-help-answer { margin-bottom:18px; padding:16px; border-left:4px solid #2fa45a; border-radius:10px; background:#f1f8f4; color:#45636d; line-height:1.6; }
 .sidebar-ai-icon { width:27px; height:27px; display:grid; place-items:center; flex:0 0 27px; border-radius:9px; background:linear-gradient(135deg,#2fa45a,#1769aa); color:#fff; font-size:15px; box-shadow:0 4px 10px rgba(23,105,170,.22); }
 .ai-help-launcher:hover { transform:translateY(-2px) scale(1.04); }
-@media (max-width:760px) { .ai-help-launcher { right:14px; bottom:16px; } .role-help-chat { right:14px; bottom:78px; width:calc(100vw - 28px); } }
+@media (max-width:760px) { .ai-help-launcher { right:14px; bottom:16px; } .role-help-chat { right:14px; bottom:78px; width:calc(100vw - 28px); } .superadmin-chat-messages { max-height:45vh; } .superadmin-chat-form { gap:6px; } .superadmin-chat-form button { min-width:68px; padding:0 10px; } }
 @keyframes superadminReveal { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
-@media (max-width:760px) { .superadmin-shell { grid-template-columns:1fr; } .superadmin-nav { padding:14px; } .superadmin-brand { padding-bottom:14px; } .superadmin-tab { display:inline-block; width:calc(50% - 5px); } .superadmin-tab-help { margin-top:0; } .superadmin-logout { margin-top:10px; width:100%; } .superadmin-main { padding:22px 14px; } .superadmin-main .dashboard-header { margin:0 0 20px; padding:18px; } .superadmin-form { grid-template-columns:1fr; } .superadmin-form .wide { grid-column:auto; } .superadmin-user-tools { align-items:stretch; flex-direction:column; } .superadmin-user-count { margin-left:0; padding:0; } .superadmin-help-grid { grid-template-columns:1fr; } .superadmin-help-chat,.role-help-chat { flex-direction:column; } .superadmin-help-chat button,.role-help-chat button { min-height:42px; } .superadmin-home-quick { align-items:flex-start; flex-direction:column; } .superadmin-home-quick button { width:100%; } .ai-message { max-width:100%; } }
+@media (max-width:760px) { .superadmin-shell { grid-template-columns:1fr; } .superadmin-nav { padding:14px; } .superadmin-brand { padding-bottom:14px; } .superadmin-tab { display:inline-block; width:calc(50% - 5px); } .superadmin-tab-help { margin-top:0; } .superadmin-logout { margin-top:10px; width:100%; } .superadmin-main { padding:22px 14px; } .superadmin-main .dashboard-header { margin:0 0 20px; padding:18px; } .superadmin-form { grid-template-columns:1fr; } .superadmin-form .wide { grid-column:auto; } .superadmin-user-tools { align-items:stretch; flex-direction:column; } .superadmin-user-count { margin-left:0; padding:0; } .superadmin-help-grid { grid-template-columns:1fr; } .superadmin-help-chat,.role-help-chat { flex-direction:column; } .superadmin-help-chat button,.role-help-chat button { min-height:42px; } .superadmin-home-quick { align-items:flex-start; flex-direction:column; } .superadmin-home-quick button { width:100%; } }
+
+html.dark-mode #superAdmin,
+body.dark-mode #superAdmin,
+html.dark-mode .superadmin-main,
+body.dark-mode .superadmin-main {
+    background: #0b1329 !important;
+    color: #f8fafc !important;
+}
+html.dark-mode .superadmin-main .dashboard-header,
+html.dark-mode .superadmin-form,
+html.dark-mode .superadmin-user-tools,
+html.dark-mode .superadmin-home-quick,
+html.dark-mode .superadmin-help-grid button,
+html.dark-mode .superadmin-help-answer,
+body.dark-mode .superadmin-main .dashboard-header,
+body.dark-mode .superadmin-form,
+body.dark-mode .superadmin-user-tools,
+body.dark-mode .superadmin-home-quick,
+body.dark-mode .superadmin-help-grid button,
+body.dark-mode .superadmin-help-answer {
+    background: #172334 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+html.dark-mode .superadmin-main .dashboard-header h2,
+html.dark-mode .superadmin-section-head h3,
+html.dark-mode .superadmin-home-quick strong,
+body.dark-mode .superadmin-main .dashboard-header h2,
+body.dark-mode .superadmin-section-head h3,
+body.dark-mode .superadmin-home-quick strong {
+    color: #ffffff !important;
+}
+
+#superAdmin.dashboard-screen { height: 100vh; overflow: hidden; }
+#superAdmin .superadmin-shell { height: 100vh; min-height: 0; }
+#superAdmin .superadmin-main { height: 100vh; overflow-y: auto; box-sizing: border-box; }
 
 
 /* =========================================================
@@ -7050,7 +7096,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                 <button class="logout superadmin-logout" onclick="cerrarSesion()">Cerrar sesión</button>
             </aside>
             <main class="superadmin-main">
-                <div class="dashboard-header"><div><h2 id="tituloSuperAdmin">Plantel de Super Admin</h2><p>Administración exclusiva del sistema</p></div><div class="dashboard-tools"><button class="more-menu-button" onclick="toggleUserMenu(this)" aria-label="Más opciones" title="Más opciones">⋮</button><div class="more-menu-dropdown"><button onclick="abrirMisDatos()">👤 Mis datos</button><button onclick="cerrarSesion()">↪ Cerrar sesión</button></div></div></div>
+                <div class="dashboard-header"><div><h2 id="tituloSuperAdmin">Plantel de Super Admin</h2><p>Administración exclusiva del sistema</p></div><button type="button" class="secondary-button" onclick="volverSeccionSuperAdmin()">← Volver</button><div class="dashboard-tools"><button class="more-menu-button" onclick="toggleUserMenu(this)" aria-label="Más opciones" title="Más opciones">⋮</button><div class="more-menu-dropdown"><button onclick="abrirMisDatos()">👤 Mis datos</button><button onclick="cerrarSesion()">↪ Cerrar sesión</button></div></div></div>
                 <section id="superadminPanelInicio" class="superadmin-panel role-home-section">
                     <div class="role-kpis superadmin-kpis"><div class="role-kpi"><span>🎓</span><div><small>Estudiantes registrados</small><strong id="superadminCountStudents">0</strong></div></div><div class="role-kpi"><span>👥</span><div><small>Profesores registrados</small><strong id="superadminCountTeachers">0</strong></div></div><div class="role-kpi"><span>🔐</span><div><small>Administradores registrados</small><strong id="superadminCountAdmins">0</strong></div></div></div>
                     <div class="assignment-banner superadmin-assignment-banner"><span class="quick-icon">🛡️</span><div><strong>Control general del sistema</strong><p>Administra usuarios, roles, permisos y configuración desde una sola consola.</p></div></div>
@@ -7060,91 +7106,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                 <section id="superadminPanelUsuarios" class="superadmin-panel" hidden><div class="superadmin-section-head"><div><h3>Usuarios</h3><p>Crear, editar, activar o desactivar cuentas.</p></div><button class="main-button superadmin-action" onclick="abrirFormularioUsuario()">+ Crear usuario</button></div><div class="superadmin-user-tools"><div class="form-group"><label for="superadminUserSearch">Buscar usuario</label><input id="superadminUserSearch" type="search" placeholder="Nombre, correo o identificación" oninput="filtrarUsuariosSuperAdmin()"></div><div class="form-group"><label for="superadminUserRoleFilter">Filtrar por rol</label><select id="superadminUserRoleFilter" onchange="filtrarUsuariosSuperAdmin()"><option value="todos">Todos los usuarios</option><option value="estudiante">Solo estudiantes</option><option value="profesor">Solo profesores</option><option value="administrador">Solo administradores</option></select></div><span id="superadminUserCount" class="superadmin-user-count"></span></div><div id="superadminUserForm"></div><div id="superadminUsersTable"></div></section>
                 <section id="superadminPanelPermisos" class="superadmin-panel" hidden><div class="superadmin-section-head"><div><h3>Roles y permisos</h3><p>Asigna permisos a cada rol del sistema.</p></div><select id="superadminRoleSelect" onchange="mostrarMatrizPermisos()"></select></div><div id="superadminPermissionsTable"></div><button class="main-button superadmin-action" onclick="guardarPermisosSuperAdmin()">Guardar permisos</button></section>
                 <section id="superadminPanelConfiguracion" class="superadmin-panel" hidden><div class="superadmin-section-head"><div><h3>Configuración general</h3><p>Valores generales usados por SIGHO.</p></div></div><div id="superadminSettingsForm"></div><button class="main-button superadmin-action" onclick="guardarConfiguracionSuperAdmin()">Guardar configuración</button></section>
-                <section id="superadminPanelAyuda" class="superadmin-panel" hidden><div class="superadmin-section-head"><div><h3>Ayuda de SIGHO</h3><p>Consulta la ayuda y abre la IA cuando tengas una duda.</p></div></div><div class="security-box"><strong>Centro de ayuda</strong><br>Encuentra respuestas rápidas o conversa con la IA de SIGHO.</div><button type="button" class="ai-help-launcher" onclick="alternarChatAyuda('superadmin')" aria-controls="chatAyudaSuperadmin" aria-expanded="false"><span class="ai-help-launcher-icon">🤖</span><span class="ai-help-launcher-text"><strong>IA SIGHO</strong><small>Resolver dudas</small></span></button><div id="chatAyudaSuperadmin" class="role-help-chat"><button type="button" class="ai-help-close" onclick="alternarChatAyuda('superadmin')">Cerrar</button><span class="ai-quick-title">Preguntas frecuentes</span><div class="ai-quick-questions"><button type="button" onclick="preguntaRapidaSuperAdmin('¿Cómo administro usuarios?')">Usuarios</button><button type="button" onclick="preguntaRapidaSuperAdmin('¿Cómo asigno permisos?')">Permisos</button><button type="button" onclick="preguntaRapidaSuperAdmin('¿Qué puedo configurar?')">Configuración</button></div><input id="superadminHelpQuestion" type="text" placeholder="Escribe tu duda para la IA..." onkeydown="if(event.key==='Enter') consultarAyudaSuperAdmin()"><button type="button" onclick="consultarAyudaSuperAdmin()">Preguntar</button><div id="superadminHelpAnswer" class="superadmin-help-answer">Selecciona una pregunta para ver la orientación.</div></div><div class="superadmin-help-grid"><button type="button" onclick="mostrarAyudaSuperAdmin('usuarios')">¿Cómo administro usuarios?</button><button type="button" onclick="mostrarAyudaSuperAdmin('permisos')">¿Cómo asigno permisos?</button><button type="button" onclick="mostrarAyudaSuperAdmin('configuracion')">¿Qué puedo configurar?</button><button type="button" onclick="mostrarAyudaSuperAdmin('volver')">¿Cómo regreso?</button></div></section>
+                <section id="superadminPanelAyuda" class="superadmin-panel" hidden><div class="superadmin-section-head"><div><h3>Ayuda de SIGHO</h3><p>Consulta el asistente y continúa la conversación mientras navegas por sus respuestas.</p></div></div><div class="security-box"><strong>Centro de ayuda</strong><br>Escribe una pregunta o empieza por uno de los temas frecuentes.</div><button type="button" class="ai-help-launcher" onclick="alternarChatAyuda('superadmin')" aria-controls="chatAyudaSuperadmin" aria-expanded="false"><span class="ai-help-launcher-icon">🤖</span><span class="ai-help-launcher-text"><strong>IA SIGHO</strong><small>Resolver dudas</small></span></button><div id="chatAyudaSuperadmin" class="role-help-chat superadmin-chat" aria-label="Chat de ayuda SIGHO"><button type="button" class="ai-help-close" onclick="alternarChatAyuda('superadmin')">Cerrar</button><div class="superadmin-chat-toolbar"><strong>Asistente SIGHO</strong><button type="button" id="superadminFaqToggle" onclick="alternarPreguntasFrecuentesSuperAdmin()" aria-expanded="true">Preguntas frecuentes</button></div><div id="superadminChatFaqs" class="ai-quick-questions"><button type="button" onclick="preguntaRapidaSuperAdmin('¿Cómo administro usuarios?')">Usuarios</button><button type="button" onclick="preguntaRapidaSuperAdmin('¿Cómo asigno permisos?')">Permisos</button><button type="button" onclick="preguntaRapidaSuperAdmin('¿Qué puedo configurar?')">Configuración</button></div><div id="superadminChatMessages" class="superadmin-chat-messages" role="log" aria-live="polite" aria-relevant="additions text"></div><form id="superadminChatForm" class="superadmin-chat-form" onsubmit="enviarMensajeSuperAdmin(event)"><input id="superadminHelpQuestion" type="text" placeholder="Escribe tu pregunta..." autocomplete="off" aria-label="Pregunta para la ayuda SIGHO"><button id="superadminChatSend" type="submit">Enviar</button></form><div id="superadminChatStatus" class="superadmin-chat-status" role="status" aria-live="polite"></div></div></section>
             </main>
-        </div>
-
-        <!-- Legacy Super Admin markup removed; the console above owns this screen. -->
-        <div hidden>
-
-            <div class="dashboard-header">
-
-                <div>
-
-                    <h2>
-                        Super Admin
-                    </h2>
-
-                    <p>
-                        Control general del sistema
-                    </p>
-
-                </div>
-
-                <div class="dashboard-tools">
-                    <button class="more-menu-button" onclick="toggleUserMenu(this)" aria-label="Más opciones" title="Más opciones">⋮</button>
-                    <div class="more-menu-dropdown">
-                        <button onclick="abrirMisDatos()">👤 Mis datos</button>
-                        <button onclick="cerrarSesion()">↪ Cerrar sesión</button>
-                    </div>
-                </div>
-
-            </div>
-
-
-            <div class="security-box">
-
-                🔐 El Super Admin tiene control general sobre
-                administradores, usuarios y configuración del sistema.
-
-            </div>
-
-            <div class="section admin-section" style="margin-top:24px;">
-                <h3>Validaciones de administradores</h3>
-                <p class="section-description">Solo el Super Admin puede aceptar o rechazar solicitudes para crear cuentas de administrador.</p>
-                <div id="tablaValidacionesSuperAdmin"></div>
-            </div>
-
-            <div class="cards">
-
-                <div class="card">
-
-                    <div class="card-title">
-                        Usuarios registrados
-                    </div>
-
-                    <div class="card-number">
-                        4
-                    </div>
-
-                </div>
-
-                <div class="card">
-
-                    <div class="card-title">
-                        Administradores
-                    </div>
-
-                    <div class="card-number">
-                        1
-                    </div>
-
-                </div>
-
-                <div class="card">
-
-                    <div class="card-title">
-                        Estado del sistema
-                    </div>
-
-                    <div class="card-number">
-                        ✓
-                    </div>
-
-                </div>
-
-            </div>
-
         </div>
 
     </section>
@@ -7208,8 +7171,9 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
     ====================================================== */
 
     // Meta de horas según la modalidad del estudiante.
-    const HORAS_NORMAL = 120;
-    const HORAS_TECNICO = 100;
+    let HORAS_NORMAL = 120;
+    let HORAS_TECNICO = 100;
+    let DOMINIO_INSTITUCIONAL = "iejosejoaquinflorezhernandez.edu.co";
 
     // Los datos reales se cargan desde PHP + MySQL.
     let usuarios = [];
@@ -7260,6 +7224,27 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 
     // Dejamos la función disponible globalmente para los botones del HTML.
     window.api = api;
+
+    async function cargarConfiguracionPublica() {
+        try {
+            const data = await api("public_settings");
+            const settings = data.settings || {};
+            if (settings.horasAcademico) HORAS_NORMAL = Number(settings.horasAcademico);
+            if (settings.horasTecnico) HORAS_TECNICO = Number(settings.horasTecnico);
+            if (settings.dominioInstitucional) DOMINIO_INSTITUCIONAL = settings.dominioInstitucional;
+            const correoSolicitud = document.getElementById("correoSolicitud");
+            if (correoSolicitud) correoSolicitud.placeholder = `ejemplo@${DOMINIO_INSTITUCIONAL}`;
+            const dominioAyuda = document.querySelector("#camposSolicitudPersonal .field-help strong");
+            if (dominioAyuda) dominioAyuda.textContent = `@${DOMINIO_INSTITUCIONAL}`;
+            const correoPerfil = document.getElementById("profesorPerfilCorreo");
+            if (correoPerfil) correoPerfil.placeholder = `profesor@${DOMINIO_INSTITUCIONAL}`;
+        } catch (_) {}
+    }
+
+    function patronCorreoInstitucional() {
+        const dominio = DOMINIO_INSTITUCIONAL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        return new RegExp("^[^\\s@]+@" + dominio + "$", "i");
+    }
 
     // Normaliza los datos recibidos del API para que el resto de SIGHO
     // trabaje siempre con la misma estructura.
@@ -8055,7 +8040,7 @@ async function enviarSolicitud() {
         const correo = document.getElementById("correoSolicitud").value.replace(/\s/g, "").trim().toLowerCase();
         const telefono = document.getElementById("telefonoProfesorSolicitud")?.value.replace(/\D/g, "").slice(0, 10) || "";
         const regexNombreProfesor = /^[\p{L}]+(?: [\p{L}]+)*$/u;
-        const regexCorreoInstitucional = /^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
+        const regexCorreoInstitucional = patronCorreoInstitucional();
 
         if (!nombre || !apellido || !identificacion || !correo || !telefono) {
             mostrarErrorSolicitud("Completa todos los campos obligatorios del profesor.");
@@ -8070,7 +8055,7 @@ async function enviarSolicitud() {
             return;
         }
         if (!regexCorreoInstitucional.test(correo)) {
-            mostrarErrorSolicitud("El correo del profesor debe ser institucional, sin espacios, y terminar en @iejosejoaquinflorezhernandez.edu.co.");
+            mostrarErrorSolicitud(`El correo del profesor debe usar el dominio institucional @${DOMINIO_INSTITUCIONAL}.`);
             return;
         }
 
@@ -8639,6 +8624,14 @@ async function abrirAdministrador() {
     mostrarSeccionAdministrador("inicio");
 }
 
+function actualizarContadoresSuperAdmin() {
+    const usuarios = superAdminData.users || [];
+    const contar = rol => usuarios.filter(usuario => usuario.rol === rol).length;
+    document.getElementById("superadminCountStudents").textContent = contar("estudiante");
+    document.getElementById("superadminCountTeachers").textContent = contar("profesor");
+    document.getElementById("superadminCountAdmins").textContent = contar("administrador");
+}
+
 async function abrirSuperAdmin() {
     try {
         const data = await api("superadmin_data");
@@ -8648,10 +8641,9 @@ async function abrirSuperAdmin() {
         superAdminCurrentSection = "inicio";
         ocultarPantallas();
         document.getElementById("superAdmin").classList.add("active");
-        document.getElementById("superadminCountStudents").textContent = data.counts?.estudiantes ?? 0;
-        document.getElementById("superadminCountTeachers").textContent = data.counts?.profesores ?? 0;
-        document.getElementById("superadminCountAdmins").textContent = data.counts?.administradores ?? 0;
         configurarSuperAdmin();
+        actualizarContadoresSuperAdmin();
+        mostrarSeccionSuperAdmin("inicio", false);
         mostrarValidacionesSuperAdmin();
     } catch (e) {
         const login = document.getElementById("login");
@@ -8670,6 +8662,66 @@ let superAdminData = { users: [], roles: [], permissions: [], matrix: {}, settin
 let superAdminTabConfigured = false;
 let superAdminNavigation = [];
 let superAdminCurrentSection = "inicio";
+const SUPERADMIN_CHAT_STORAGE_KEY = "sigho_superadmin_chat_history";
+let superAdminChatHistory = cargarHistorialChatSuperAdmin();
+let superAdminChatPending = false;
+
+function cargarHistorialChatSuperAdmin() {
+    try {
+        const history = JSON.parse(sessionStorage.getItem(SUPERADMIN_CHAT_STORAGE_KEY) || "[]");
+        return Array.isArray(history)
+            ? history.filter(message => ["user", "assistant", "error"].includes(message.role) && typeof message.content === "string").slice(-80)
+            : [];
+    } catch (_) {
+        return [];
+    }
+}
+
+function guardarHistorialChatSuperAdmin() {
+    try {
+        sessionStorage.setItem(SUPERADMIN_CHAT_STORAGE_KEY, JSON.stringify(superAdminChatHistory.slice(-80)));
+    } catch (_) {}
+}
+
+function renderizarChatSuperAdmin() {
+    const messages = document.getElementById("superadminChatMessages");
+    const faqs = document.getElementById("superadminChatFaqs");
+    const faqToggle = document.getElementById("superadminFaqToggle");
+    const sendButton = document.getElementById("superadminChatSend");
+    const input = document.getElementById("superadminHelpQuestion");
+    if (!messages) return;
+
+    messages.replaceChildren();
+    for (const message of superAdminChatHistory) {
+        const bubble = document.createElement("div");
+        bubble.className = `superadmin-chat-message superadmin-chat-message-${message.role}`;
+        bubble.textContent = message.content;
+        if (message.role === "error") {
+            const retry = document.createElement("button");
+            retry.type = "button";
+            retry.textContent = "Reintentar";
+            retry.addEventListener("click", reintentarUltimaRespuestaSuperAdmin);
+            bubble.appendChild(document.createElement("br"));
+            bubble.appendChild(retry);
+        }
+        messages.appendChild(bubble);
+    }
+
+    if (superAdminChatPending) {
+        const loading = document.createElement("div");
+        loading.className = "superadmin-chat-loading";
+        loading.setAttribute("role", "status");
+        loading.textContent = "SIGHO está preparando una respuesta...";
+        messages.appendChild(loading);
+    }
+
+    const conversationStarted = superAdminChatHistory.some(message => message.role === "user");
+    if (faqs && conversationStarted) faqs.hidden = true;
+    if (faqToggle) faqToggle.setAttribute("aria-expanded", String(faqs ? !faqs.hidden : false));
+    if (sendButton) sendButton.disabled = superAdminChatPending;
+    if (input) input.disabled = superAdminChatPending;
+    messages.scrollTop = messages.scrollHeight;
+}
 
 function configurarSuperAdmin() {
     if (!superAdminTabConfigured) {
@@ -8700,50 +8752,49 @@ function volverSeccionSuperAdmin() {
     }
 }
 
-function mostrarAyudaSuperAdmin(tema) {
-    const respuestas = {
-        usuarios: "En Usuarios puedes crear cuentas, editar sus datos, cambiar el rol, activar o desactivar cuentas y filtrar por nombre, correo, identificación o rol.",
-        permisos: "En Roles y permisos selecciona un rol y activa solo los permisos que necesita. Estudiante, Profesor y Administrador tienen permisos diferentes; el Super Admin conserva el control completo.",
-        configuracion: "En Configuración puedes actualizar los valores generales que utiliza SIGHO, como el dominio institucional y las metas de horas.",
-        volver: "Usa Volver al inicio en el menú de puntos o el botón Atrás del navegador. Las evidencias ahora se abren en la misma pestaña para que puedas regresar normalmente."
-    };
-    const answer = document.getElementById("superadminHelpAnswer");
-    if (answer) answer.textContent = respuestas[tema] || "Selecciona una pregunta.";
-}
-
 function consultarAyudaRol(rol) {
     const input = document.getElementById(`preguntaAyuda${rol.charAt(0).toUpperCase()}${rol.slice(1)}`);
     const answer = document.getElementById(`respuestaAyuda${rol.charAt(0).toUpperCase()}${rol.slice(1)}`);
-    const pregunta = (input?.value || "").trim().toLowerCase();
-    const respuestas = {
-        estudiante: {
-            registro: "Para registrar una jornada entra a Registrar horas, completa fecha, entrada, salida, descripción y adjunta la evidencia. El registro quedará pendiente hasta que un profesor lo revise.",
-            hora: "Las horas solo se suman como aprobadas cuando el profesor acepta el registro. Las jornadas pendientes o rechazadas no cuentan como aprobadas.",
-            cuenta: "En Mis datos puedes consultar y actualizar la información permitida de tu perfil. Si olvidaste tu contraseña, solicita ayuda al administrador.",
-            general: "Puedo orientarte sobre registrar horas, evidencias, estados de tus jornadas, progreso y datos de tu cuenta."
-        },
-        profesor: {
-            registro: "En Registros pendientes revisa fecha, horario, actividad y evidencia. Después puedes aceptar o rechazar la jornada y dejar una observación.",
-            estudiante: "En Mis estudiantes ves únicamente los estudiantes relacionados con tu sede y proyecto asignados.",
-            cuenta: "En Mis datos puedes actualizar los campos permitidos y cambiar tu contraseña desde Seguridad de la cuenta.",
-            general: "Puedo orientarte sobre registros pendientes, estudiantes asignados, historial, observaciones y tu perfil."
-        },
-        administrador: {
-            profesor: "En Gestión de profesores puedes consultar y asignar la sede y el proyecto de cada docente.",
-            solicitud: "En Solicitudes puedes revisar y aceptar o rechazar solicitudes de estudiantes, profesores y permisos de Administrador.",
-            progreso: "En Progreso de estudiantes puedes consultar horas aprobadas, faltantes y porcentaje de avance.",
-            general: "Puedo orientarte sobre profesores, solicitudes, progreso, historial y funciones generales del sistema."
-        }
-    };
-    const contenido = respuestas[rol] || {};
-    let respuesta = contenido.general;
-    if (pregunta.includes("registro") || pregunta.includes("jornada") || pregunta.includes("evidencia")) respuesta = contenido.registro || respuesta;
-    else if (pregunta.includes("hora") || pregunta.includes("progreso")) respuesta = contenido.hora || contenido.progreso || respuesta;
-    else if (pregunta.includes("estudiante")) respuesta = contenido.estudiante || respuesta;
-    else if (pregunta.includes("profesor")) respuesta = contenido.profesor || respuesta;
-    else if (pregunta.includes("solicitud")) respuesta = contenido.solicitud || respuesta;
-    else if (pregunta.includes("cuenta") || pregunta.includes("contraseña") || pregunta.includes("perfil")) respuesta = contenido.cuenta || respuesta;
-    if (answer) answer.textContent = pregunta ? respuesta : "Escribe una pregunta para recibir orientación.";
+    const pregunta = (input?.value || "").trim().toLocaleLowerCase("es-CO").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (!answer) return;
+    if (!pregunta) {
+        answer.textContent = "Escribe una pregunta y te orientaré sobre el uso de SIGHO.";
+        return;
+    }
+
+    const esSaludo = /^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal)(\b|[!?.])/.test(pregunta);
+    if (esSaludo) {
+        answer.textContent = `¡Hola! Soy la ayuda de SIGHO. ¿Qué necesitas hacer en tu panel de ${rol}?`;
+        return;
+    }
+    if (/\b(gracias|muchas gracias)\b/.test(pregunta)) {
+        answer.textContent = "¡Con gusto! Puedes preguntarme sobre las opciones disponibles en tu panel de SIGHO.";
+        return;
+    }
+
+    let respuesta = "";
+    if (rol === "estudiante") {
+        if (/registro|jornada|evidencia|foto|imagen/.test(pregunta)) respuesta = "Para registrar una jornada, abre Registrar horas, completa los datos y adjunta una imagen JPG o JPEG. Quedará pendiente hasta que el profesor la revise.";
+        else if (/hora|progreso|meta|faltante|aprobada/.test(pregunta)) respuesta = `Tu modalidad ${usuarioActual?.esTecnico ? "técnica" : "académica"} requiere ${obtenerMetaHorasEstudiante()} horas. Solo cuentan como aprobadas las jornadas aceptadas por el profesor.`;
+        else if (/solicitud|acceso|cuenta|contrasena|clave|perfil|dato/.test(pregunta)) respuesta = "En Mis datos puedes consultar la información de tu cuenta. Las solicitudes nuevas deben ser aprobadas por un administrador antes de poder iniciar sesión.";
+        else if (/rechaz|observacion|pendiente|estado/.test(pregunta)) respuesta = "En Mis registros puedes revisar el estado de cada jornada y leer la observación del profesor si fue rechazada.";
+        else respuesta = "Puedo ayudarte con registrar jornadas, evidencias, estados, horas y datos de tu cuenta. Cuéntame cuál de esas tareas quieres hacer.";
+    } else if (rol === "profesor") {
+        if (/registro|jornada|revis|evidencia|aprobar|rechaz/.test(pregunta)) respuesta = "En Registros pendientes revisa la actividad y evidencia. Puedes aprobarla o rechazarla y dejar una observación para el estudiante.";
+        else if (/estudiante|asignad|sede|proyecto/.test(pregunta)) respuesta = "En Mis estudiantes aparecen los estudiantes asociados a tu sede y proyecto asignados por el administrador.";
+        else if (/hora|historial/.test(pregunta)) respuesta = "En Historial puedes consultar las jornadas revisadas y sus estados. Las horas aprobadas son las que cuentan para el estudiante.";
+        else if (/cuenta|perfil|contrasena|clave|dato/.test(pregunta)) respuesta = "En Mis datos puedes actualizar tu información permitida y cambiar la contraseña desde Seguridad de la cuenta.";
+        else respuesta = "Puedo ayudarte con revisar jornadas, evidencias, estudiantes asignados, historial y datos de tu cuenta. ¿Qué necesitas hacer?";
+    } else if (rol === "administrador") {
+        if (/profesor|docente|sede|proyecto/.test(pregunta)) respuesta = "En Gestión de profesores puedes consultar docentes y asignarles una sede y un proyecto.";
+        else if (/solicitud|acceso|aprobar|validar|rechaz/.test(pregunta)) respuesta = "En Solicitudes puedes revisar las fichas y aceptar o rechazar solicitudes de estudiantes y profesores.";
+        else if (/hora|progreso|meta|estudiante/.test(pregunta)) respuesta = "En Progreso de estudiantes puedes comparar las horas aprobadas, faltantes y el porcentaje de avance de cada estudiante.";
+        else if (/historial|registro|jornada/.test(pregunta)) respuesta = "En Historial puedes filtrar las jornadas revisadas por profesor y estado.";
+        else respuesta = "Puedo ayudarte con profesores, solicitudes, progreso, historial y gestión del sistema. ¿Qué sección quieres consultar?";
+    } else {
+        respuesta = "Puedo orientar sobre usuarios, roles, permisos, configuración y solicitudes de administrador.";
+    }
+    answer.textContent = respuesta;
 }
 
 function preguntaRapidaAyuda(rol, pregunta) {
@@ -8761,49 +8812,135 @@ function alternarChatAyuda(rol) {
     const abierto = chat.style.display === "flex";
     chat.style.display = abierto ? "none" : "flex";
     launcher?.setAttribute("aria-expanded", abierto ? "false" : "true");
-    if (!abierto) chat.querySelector("input")?.focus();
+    if (!abierto) {
+        if (rol === "superadmin") renderizarChatSuperAdmin();
+        chat.querySelector("input")?.focus();
+    }
 }
 
-function consultarAyudaSuperAdmin() {
-    const input = document.getElementById("superadminHelpQuestion");
-    const pregunta = (input?.value || "").trim().toLowerCase();
-    if (!pregunta) {
-        mostrarAyudaSuperAdmin("usuarios");
-        return;
-    }
-    if (pregunta.includes("permiso") || pregunta.includes("rol")) mostrarAyudaSuperAdmin("permisos");
-    else if (pregunta.includes("config") || pregunta.includes("meta") || pregunta.includes("dominio")) mostrarAyudaSuperAdmin("configuracion");
-    else if (pregunta.includes("volver") || pregunta.includes("regresar") || pregunta.includes("atrás") || pregunta.includes("atras")) mostrarAyudaSuperAdmin("volver");
-    else mostrarAyudaSuperAdmin("usuarios");
+function alternarPreguntasFrecuentesSuperAdmin() {
+    const faqs = document.getElementById("superadminChatFaqs");
+    const toggle = document.getElementById("superadminFaqToggle");
+    if (!faqs) return;
+    faqs.hidden = !faqs.hidden;
+    toggle?.setAttribute("aria-expanded", String(!faqs.hidden));
 }
 
 function preguntaRapidaSuperAdmin(pregunta) {
     const input = document.getElementById("superadminHelpQuestion");
-    if (input) input.value = pregunta;
-    consultarAyudaSuperAdmin();
+    if (!input || superAdminChatPending) return;
+    input.value = pregunta;
+    enviarConsultaChatSuperAdmin(pregunta);
 }
 
-function preguntarIaSuperAdmin() {
-    const input = document.getElementById("superadminAiQuestion");
-    const windowChat = document.getElementById("superadminAiMessages");
-    const pregunta = (input?.value || "").trim();
-    if (!pregunta || !windowChat) return;
-    const userMessage = document.createElement("div");
-    userMessage.className = "ai-message ai-message-user";
-    userMessage.textContent = pregunta;
-    windowChat.appendChild(userMessage);
-    const texto = pregunta.toLowerCase();
-    let respuesta = "Puedo ayudarte con usuarios, roles, permisos, configuración y navegación del panel Super Admin.";
-    if (texto.includes("usuario") || texto.includes("profesor") || texto.includes("estudiante") || texto.includes("admin")) respuesta = "En Usuarios puedes buscar por nombre, correo o identificación, filtrar por rol, crear cuentas, editar datos y desactivar usuarios.";
-    else if (texto.includes("permiso") || texto.includes("rol")) respuesta = "En Roles y permisos selecciona el rol y activa solo los permisos que necesita. Cada rol tiene una configuración diferente.";
-    else if (texto.includes("config") || texto.includes("meta") || texto.includes("dominio")) respuesta = "En Configuración puedes modificar los valores generales de SIGHO, como dominio institucional y metas de horas.";
-    else if (texto.includes("volver") || texto.includes("regresar") || texto.includes("naveg")) respuesta = "Usa las opciones de la barra lateral para cambiar de sección. El botón Atrás del navegador también conserva la navegación de páginas abiertas.";
-    const botMessage = document.createElement("div");
-    botMessage.className = "ai-message ai-message-bot";
-    botMessage.textContent = respuesta;
-    windowChat.appendChild(botMessage);
+function normalizarPreguntaChatSuperAdmin(pregunta) {
+    return String(pregunta || "")
+        .trim()
+        .toLocaleLowerCase("es-CO")
+        .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/^[¿¡?!\s]+/, "");
+}
+
+function temaPreguntaChatSuperAdmin(pregunta) {
+    if (/usuario|cuenta|buscar|crear|editar|desactiv/.test(pregunta)) return "usuarios";
+    if (/permiso|rol|acceso/.test(pregunta)) return "permisos";
+    if (/config|meta|dominio|hora/.test(pregunta)) return "configuracion";
+    if (/solicitud|valid|aprob|rechaz/.test(pregunta)) return "solicitudes";
+    if (/volver|regresar|atras|naveg/.test(pregunta)) return "navegacion";
+    return "";
+}
+
+function generarRespuestaChatSuperAdmin(pregunta, historialAnterior) {
+    const texto = normalizarPreguntaChatSuperAdmin(pregunta);
+    const esSaludo = /^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal)(\b|[!?.])/.test(texto);
+    if (esSaludo) {
+        return "¡Hola! Soy el asistente de ayuda de SIGHO. Puedo orientarte sobre usuarios, permisos, configuración, metas y solicitudes de Administrador. ¿Qué necesitas hacer?";
+    }
+    if (/\b(gracias|muchas gracias)\b/.test(texto)) {
+        return "¡Con gusto! Puedes seguir preguntándome; mantendré el contexto de esta conversación.";
+    }
+
+    const temasAnteriores = [...historialAnterior]
+        .filter(message => message.role === "user")
+        .reverse()
+        .map(message => temaPreguntaChatSuperAdmin(normalizarPreguntaChatSuperAdmin(message.content)))
+        .filter(Boolean);
+    let tema = temaPreguntaChatSuperAdmin(texto);
+    const esSeguimiento = /^(y eso|eso|por que|porque|como asi|mas|amplia|explica|dime mas|cual|cuales|como funciona)\b/.test(texto);
+    if (!tema && esSeguimiento) tema = temasAnteriores[0] || "";
+
+    const respuestas = {
+        usuarios: "En Usuarios puedes buscar cuentas por nombre, correo o identificación, filtrar por rol y crear, editar o desactivar cuentas. Las cuentas Super Admin están protegidas y los estudiantes conservan su flujo de solicitud.",
+        permisos: "En Roles y permisos selecciona un rol y activa los permisos que necesita. El Super Admin conserva control completo; los cambios afectan las acciones disponibles para ese rol.",
+        configuracion: `En Configuración puedes revisar el dominio institucional y las metas: ${HORAS_NORMAL} horas académicas y ${HORAS_TECNICO} técnicas. Los valores se validan antes de guardarse.`,
+        solicitudes: "Las solicitudes para obtener permisos de Administrador se revisan desde el panel Super Admin. Al aprobarla se promueve la cuenta existente del profesor; no se crea una cuenta duplicada.",
+        navegacion: "Usa las pestañas del menú lateral para cambiar de sección. El botón Volver recupera la sección anterior y Cerrar sesión regresa al inicio.",
+    };
+
+    if (tema) {
+        const respuesta = respuestas[tema];
+        if (esSeguimiento && temasAnteriores[0] === tema) {
+            return `Sobre ${tema}, ${respuesta.charAt(0).toLocaleLowerCase("es-CO") + respuesta.slice(1)}`;
+        }
+        return respuesta;
+    }
+
+    return "No tengo una respuesta específica para esa consulta todavía. Puedo orientarte sobre usuarios, roles y permisos, configuración, metas de horas, solicitudes de Administrador o navegación del panel. ¿Cuál de esos temas se acerca más a lo que necesitas?";
+}
+
+async function procesarRespuestaChatSuperAdmin(pregunta) {
+    if (superAdminChatPending) return;
+    superAdminChatPending = true;
+    guardarHistorialChatSuperAdmin();
+    renderizarChatSuperAdmin();
+    const messages = document.getElementById("superadminChatMessages");
+    messages?.scrollIntoView({ block: "nearest" });
+
+    try {
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        const answer = generarRespuestaChatSuperAdmin(pregunta, superAdminChatHistory.slice(0, -1));
+        superAdminChatHistory.push({ role: "assistant", content: answer });
+    } catch (_) {
+        superAdminChatHistory.push({ role: "error", content: "No se pudo preparar la respuesta. Comprueba la conexión e inténtalo de nuevo." });
+    } finally {
+        superAdminChatPending = false;
+        guardarHistorialChatSuperAdmin();
+        renderizarChatSuperAdmin();
+        document.getElementById("superadminHelpQuestion")?.focus();
+    }
+}
+
+function enviarConsultaChatSuperAdmin(pregunta) {
+    const texto = String(pregunta || "").trim();
+    if (!texto || superAdminChatPending) return;
+    superAdminChatHistory.push({ role: "user", content: texto });
+    guardarHistorialChatSuperAdmin();
+    procesarRespuestaChatSuperAdmin(texto);
+}
+
+function enviarMensajeSuperAdmin(event) {
+    event.preventDefault();
+    const input = document.getElementById("superadminHelpQuestion");
+    if (!input || superAdminChatPending) return;
+    const pregunta = input.value.trim();
+    if (!pregunta) return;
     input.value = "";
-    windowChat.scrollTop = windowChat.scrollHeight;
+    enviarConsultaChatSuperAdmin(pregunta);
+}
+
+function reintentarUltimaRespuestaSuperAdmin() {
+    if (superAdminChatPending) return;
+    const lastUserMessage = [...superAdminChatHistory].reverse().find(message => message.role === "user");
+    if (!lastUserMessage) return;
+    while (superAdminChatHistory.at(-1)?.role === "error") superAdminChatHistory.pop();
+    guardarHistorialChatSuperAdmin();
+    procesarRespuestaChatSuperAdmin(lastUserMessage.content);
+}
+
+function consultarAyudaSuperAdmin() {
+    const input = document.getElementById("superadminHelpQuestion");
+    if (input) enviarConsultaChatSuperAdmin(input.value);
 }
 
 function llenarUsuariosSuperAdmin() {
@@ -8833,13 +8970,13 @@ function filtrarUsuariosSuperAdmin() {
     });
     const count = document.getElementById("superadminUserCount");
     if (count) count.textContent = `${users.length} usuario${users.length === 1 ? "" : "s"}`;
-    cont.innerHTML = `<div class="table-container"><table class="superadmin-users-table"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.length ? users.map(user => `<tr><td>${escaparHTML(user.nombre)}</td><td>${escaparHTML(user.correo)}</td><td>${escaparHTML(user.rol)}</td><td><span class="status ${user.estado === "activo" ? "approved" : "rejected"}">${escaparHTML(user.estado)}</span></td><td><div class="actions"><button class="secondary-button" onclick="abrirFormularioUsuario(${user.id})">Editar</button><button class="danger-button" onclick="eliminarUsuarioSuperAdmin(${user.id})">Desactivar</button></div></td></tr>`).join("") : `<tr><td colspan="5">No hay usuarios que coincidan con el filtro.</td></tr>`}</tbody></table></div>`;
+    cont.innerHTML = `<div class="table-container"><table class="superadmin-users-table"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.length ? users.map(user => `<tr><td>${escaparHTML(user.nombre)}</td><td>${escaparHTML(user.correo)}</td><td>${escaparHTML(user.rol)}</td><td><span class="status ${user.estado === "activo" ? "approved" : "rejected"}">${escaparHTML(user.estado)}</span></td><td>${user.rol === "superadmin" ? "—" : `<div class="actions"><button class="secondary-button" onclick="abrirFormularioUsuario(${user.id})">Editar</button><button class="danger-button" onclick="eliminarUsuarioSuperAdmin(${user.id})">Desactivar</button></div>`}</td></tr>`).join("") : `<tr><td colspan="5">No hay usuarios que coincidan con el filtro.</td></tr>`}</tbody></table></div>`;
 }
 
 function abrirFormularioUsuario(id = 0) {
     const user = (superAdminData.users || []).find(item => Number(item.id) === Number(id)); const cont = document.getElementById("superadminUserForm"); if (!cont) return;
-    cont.innerHTML = `<button type="button" class="secondary-button superadmin-back-button" onclick="cancelarFormularioUsuarioSuperAdmin()">← Volver a Usuarios</button><form class="superadmin-form" onsubmit="guardarUsuarioSuperAdmin(event)"><input type="hidden" id="superadminUserId" value="${user?.id || ""}"><div class="form-group"><label>Identificación</label><input id="superadminIdentificacion" required value="${escaparHTML(user?.identificacion || "")}"></div><div class="form-group"><label>Nombres</label><input id="superadminNombres" required value="${escaparHTML(user?.nombres || "")}"></div><div class="form-group"><label>Apellidos</label><input id="superadminApellidos" required value="${escaparHTML(user?.apellidos || "")}"></div><div class="form-group"><label>Correo</label><input id="superadminCorreo" type="email" required value="${escaparHTML(user?.correo || "")}"></div><div class="form-group"><label>Rol</label><select id="superadminRol"><option value="estudiante">Estudiante</option><option value="profesor">Profesor</option><option value="administrador">Administrador</option></select></div><div class="form-group"><label>Estado</label><select id="superadminEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div><div class="form-group wide"><label>${user ? "Nueva contraseña (opcional)" : "Contraseña"}</label><input id="superadminClave" type="password" ${user ? "" : "required"} minlength="8"></div><div class="superadmin-form-actions"><button class="main-button superadmin-action" type="submit">Guardar usuario</button><button class="secondary-button" type="button" onclick="cancelarFormularioUsuarioSuperAdmin()">Cancelar</button></div></form>`;
-    document.getElementById("superadminRol").value = user?.rol || "estudiante"; document.getElementById("superadminEstado").value = user?.estado || "activo";
+    cont.innerHTML = `<button type="button" class="secondary-button superadmin-back-button" onclick="cancelarFormularioUsuarioSuperAdmin()">← Volver a Usuarios</button><form class="superadmin-form" onsubmit="guardarUsuarioSuperAdmin(event)"><input type="hidden" id="superadminUserId" value="${user?.id || ""}"><div class="form-group"><label>Identificación</label><input id="superadminIdentificacion" required value="${escaparHTML(user?.identificacion || "")}"></div><div class="form-group"><label>Nombres</label><input id="superadminNombres" required value="${escaparHTML(user?.nombres || "")}"></div><div class="form-group"><label>Apellidos</label><input id="superadminApellidos" required value="${escaparHTML(user?.apellidos || "")}"></div><div class="form-group"><label>Correo</label><input id="superadminCorreo" type="email" required value="${escaparHTML(user?.correo || "")}"></div><div class="form-group"><label>Rol</label><select id="superadminRol" ${user?.rol === "estudiante" ? "disabled" : ""}>${user?.rol === "estudiante" ? '<option value="estudiante">Estudiante</option>' : ""}<option value="profesor">Profesor</option><option value="administrador">Administrador</option></select></div><div class="form-group"><label>Estado</label><select id="superadminEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div><div class="form-group wide"><label>${user ? "Nueva contraseña (opcional)" : "Contraseña"}</label><input id="superadminClave" type="password" ${user ? "" : "required"} minlength="8"></div><div class="superadmin-form-actions"><button class="main-button superadmin-action" type="submit">Guardar usuario</button><button class="secondary-button" type="button" onclick="cancelarFormularioUsuarioSuperAdmin()">Cancelar</button></div></form>`;
+    document.getElementById("superadminRol").value = user?.rol || "profesor"; document.getElementById("superadminEstado").value = user?.estado || "activo";
 }
 
 function cancelarFormularioUsuarioSuperAdmin() {
@@ -8847,8 +8984,45 @@ function cancelarFormularioUsuarioSuperAdmin() {
 }
 
 async function guardarUsuarioSuperAdmin(event) {
-    event.preventDefault(); const body = { id: Number(document.getElementById("superadminUserId").value || 0), identificacion: document.getElementById("superadminIdentificacion").value, nombres: document.getElementById("superadminNombres").value, apellidos: document.getElementById("superadminApellidos").value, correo: document.getElementById("superadminCorreo").value, rol: document.getElementById("superadminRol").value, estado: document.getElementById("superadminEstado").value, clave: document.getElementById("superadminClave").value };
-    try { const result = await api("superadmin_user_save", { method: "POST", body }); superAdminData = result.data; document.getElementById("superadminUserForm").innerHTML = ""; llenarUsuariosSuperAdmin(); alert("Usuario guardado correctamente."); } catch (e) { alert(e.message); }
+    event.preventDefault();
+    const claveNueva = document.getElementById("superadminClave").value;
+    const correoNuevo = document.getElementById("superadminCorreo").value.trim().toLowerCase();
+    const rolNuevo = document.getElementById("superadminRol").value;
+    const idEditando = Number(document.getElementById("superadminUserId").value || 0);
+    const regexClave = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/;
+    if ((!idEditando || claveNueva) && !regexClave.test(claveNueva)) {
+        alert("La contraseña debe tener mínimo 8 caracteres, sin espacios, con mayúscula, minúscula y número.");
+        return;
+    }
+    if (["profesor", "administrador"].includes(rolNuevo) && !patronCorreoInstitucional().test(correoNuevo)) {
+        alert(`El correo debe terminar en @${DOMINIO_INSTITUCIONAL}.`);
+        return;
+    }
+    const regexNombre = /^[\p{L}]+(?: [\p{L}]+)*$/u;
+    const nombresVal = document.getElementById("superadminNombres").value.trim();
+    const apellidosVal = document.getElementById("superadminApellidos").value.trim();
+    if (!regexNombre.test(nombresVal) || !regexNombre.test(apellidosVal)) {
+        alert("Nombres y apellidos solo pueden contener letras y espacios sencillos.");
+        return;
+    }
+    const body = {
+        id: idEditando,
+        identificacion: document.getElementById("superadminIdentificacion").value,
+        nombres: nombresVal,
+        apellidos: apellidosVal,
+        correo: correoNuevo,
+        rol: rolNuevo,
+        estado: document.getElementById("superadminEstado").value,
+        clave: claveNueva
+    };
+    try {
+        const result = await api("superadmin_user_save", { method: "POST", body });
+        superAdminData = result.data;
+        document.getElementById("superadminUserForm").innerHTML = "";
+        llenarUsuariosSuperAdmin();
+        actualizarContadoresSuperAdmin();
+        alert("Usuario guardado correctamente.");
+    } catch (e) { alert(e.message); }
 }
 
 async function eliminarUsuarioSuperAdmin(id) {
@@ -8875,12 +9049,12 @@ async function guardarPermisosSuperAdmin() {
 
 function llenarConfiguracionSuperAdmin() {
     const cont = document.getElementById("superadminSettingsForm"); if (!cont) return;
-    cont.innerHTML = `<div class="superadmin-form">${Object.entries(superAdminData.settings || {}).map(([key, item]) => `<div class="form-group wide"><label>${escaparHTML(item.descripcion || key)}</label><input data-setting-key="${escaparHTML(key)}" value="${escaparHTML(item.valor || "")}"></div>`).join("")}</div>`;
+    cont.innerHTML = `<div class="superadmin-form">${Object.entries(superAdminData.settings || {}).map(([key, item]) => `<div class="form-group wide"><label>${escaparHTML(item.descripcion || key)}</label><input data-setting-key="${escaparHTML(key)}" ${key.startsWith("horas_") ? 'type="number" min="1" max="500" step="1"' : ""} value="${escaparHTML(item.valor || "")}"></div>`).join("")}</div>`;
 }
 
 async function guardarConfiguracionSuperAdmin() {
     const settings = {}; document.querySelectorAll("[data-setting-key]").forEach(input => { settings[input.dataset.settingKey] = input.value; });
-    try { const result = await api("superadmin_settings_save", { method: "POST", body: { settings } }); superAdminData = result.data; llenarConfiguracionSuperAdmin(); alert("Configuración guardada correctamente."); } catch (e) { alert(e.message); }
+    try { const result = await api("superadmin_settings_save", { method: "POST", body: { settings } }); superAdminData = result.data; await cargarConfiguracionPublica(); llenarConfiguracionSuperAdmin(); alert("Configuración guardada correctamente."); } catch (e) { alert(e.message); }
 }
 
 function mostrarValidacionesSuperAdmin() {
@@ -9068,6 +9242,10 @@ function detenerActualizacionProfesorTiempoReal() {
 }
 
 async function cerrarSesion() {
+    if (usuarioActual?.rol === "superadmin") {
+        superAdminChatHistory = [];
+        try { sessionStorage.removeItem(SUPERADMIN_CHAT_STORAGE_KEY); } catch (_) {}
+    }
     try { limpiarSesionSigho(); } catch (_) {}
     // Invalidamos inmediatamente cualquier consulta pendiente de
     // "Mis estudiantes" antes de cerrar la sesión.
@@ -9260,7 +9438,7 @@ async function solicitarPermisosAdministrador(){
     if(boton){ boton.disabled=true; boton.textContent="Enviando solicitud..."; }
     try{
         const data=await api("request_admin_permission",{method:"POST",body:{}});
-        mostrarToastProfesor("Solicitud enviada con éxito. Espera la aprobación del administrador.");
+        mostrarToastProfesor("Solicitud enviada con éxito. Espera la aprobación del Super Admin.");
         if(boton){ boton.disabled=true; boton.textContent="Solicitud de Admin pendiente"; }
     }catch(e){
         if(boton){ boton.disabled=false; boton.textContent="Solicitar rol de Administrador"; }
@@ -9353,10 +9531,10 @@ function actualizarEstadoPerfilProfesor() {
 async function guardarPerfilProfesor() {
     const datos=obtenerDatosPerfilProfesor();
     const regexNombreProfesor=/^[\p{L}]+(?: [\p{L}]+)*$/u;
-    const regexCorreoInstitucional=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
+    const regexCorreoInstitucional=patronCorreoInstitucional();
     if(!datos.nombres || !datos.apellidos || !datos.correo || !datos.telefono){ mostrarToastProfesor("Completa todos los campos editables.", true); return; }
     if(!regexNombreProfesor.test(datos.nombres) || !regexNombreProfesor.test(datos.apellidos)){ mostrarToastProfesor("Nombres y apellidos solo pueden contener letras y espacios sencillos.", true); return; }
-    if(!regexCorreoInstitucional.test(datos.correo)){ mostrarToastProfesor("El correo debe usar el dominio institucional y no contener espacios.", true); return; }
+    if(!regexCorreoInstitucional.test(datos.correo)){ mostrarToastProfesor(`El correo debe usar el dominio institucional @${DOMINIO_INSTITUCIONAL} y no contener espacios.`, true); return; }
     const telefonoProfesor = datos.telefono.replace(/\D/g, "");
     const todosIgualesTelefono = /^(\d)\1{9}$/.test(telefonoProfesor);
     const secuenciasTelefono = ["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
@@ -10041,6 +10219,7 @@ function configurarValidacionesFormularioEstudiante() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+    await cargarConfiguracionPublica();
     llenarAniosServicio();
     configurarValidacionesFormularioEstudiante();
     configurarValidacionSolicitudProfesor();
@@ -10076,8 +10255,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             await abrirAdministrador();
         } else if (usuarioActual.rol === "superadmin") {
             await abrirSuperAdmin();
-        }
-
         }
     } catch (_) {}
 });
@@ -10608,7 +10785,7 @@ function calcularHoras(entrada, salida) {
 
 function obtenerMetaHorasEstudiante(estudiante = usuarioActual) {
     if (!estudiante || estudiante.rol !== "estudiante") return HORAS_NORMAL;
-    return estudiante.esTecnico ? HORAS_TECNICO : HORAS_NORMAL;
+    return Number(estudiante.metaHoras) || (estudiante.esTecnico ? HORAS_TECNICO : HORAS_NORMAL);
 }
 
 function obtenerEstudiantes() {
@@ -10619,6 +10796,7 @@ function obtenerEstudiantes() {
             nombre: u.nombre,
             correo: u.correo,
             esTecnico: !!u.esTecnico,
+            metaHoras: u.metaHoras,
             programaTecnico: u.programaTecnico || "",
             grado: u.grado || ""
         };
@@ -10686,10 +10864,10 @@ function mostrarProgresoEstudiantes(estudiantes) {
             .filter(r => r.correoEstudiante === estudiante.correo && r.estado === "aprobada")
             .reduce((total, r) => total + Number(r.horas), 0);
 
-        const metaHoras = estudiante.esTecnico ? HORAS_TECNICO : HORAS_NORMAL;
+        const metaHoras = Number(estudiante.metaHoras) || (estudiante.esTecnico ? HORAS_TECNICO : HORAS_NORMAL);
         const faltantes = Math.max(0, metaHoras - aprobadas);
         const porcentaje = Math.min(100, (aprobadas / metaHoras) * 100);
-        const modalidad = estudiante.esTecnico ? "Técnica · 100 horas" : "Académico · 120 horas";
+        const modalidad = `${estudiante.esTecnico ? "Técnica" : "Académico"} · ${metaHoras} horas`;
 
         html += `
             <tr>
