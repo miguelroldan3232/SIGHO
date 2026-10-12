@@ -311,15 +311,23 @@ function ensure_superadmin_tables(PDO $pdo): void {
     }
 
     $defaults = [
-        ['dominio_institucional', 'iejosejoaquinflorezhernandez.edu.co', 'Dominio del correo institucional'],
-        ['horas_academico', '120', 'Meta de horas · modalidad académica'],
-        ['horas_tecnico', '100', 'Meta de horas · modalidad técnica']
+        ['dominio_institucional', null, 'iejosejoaquinflorezhernandez.edu.co', 'Dominio del correo institucional'],
+        ['horas_academico', 'meta_horas_academico', '120', 'Meta de horas · modalidad académica'],
+        ['horas_tecnico', 'meta_horas_tecnico', '100', 'Meta de horas · modalidad técnica'],
+        ['tamano_max_evidencia_mb', null, '5', 'Tamaño máximo de evidencia (MB)']
     ];
     $settingExists = $pdo->prepare('SELECT COUNT(*) FROM system_settings WHERE setting_key = ?');
+    $legacyValue = $pdo->prepare('SELECT setting_value FROM system_settings WHERE setting_key = ? LIMIT 1');
     $settingInsert = $pdo->prepare('INSERT INTO system_settings (setting_key, setting_value, description) VALUES (?,?,?)');
-    foreach ($defaults as [$key, $value, $description]) {
+    foreach ($defaults as [$key, $legacyKey, $defaultValue, $description]) {
         $settingExists->execute([$key]);
-        if (!(int)$settingExists->fetchColumn()) $settingInsert->execute([$key, $value, $description]);
+        if ((int)$settingExists->fetchColumn()) continue;
+        $value = $defaultValue;
+        if ($legacyKey !== null) {
+            $legacyValue->execute([$legacyKey]);
+            $value = (string)($legacyValue->fetchColumn() ?: $defaultValue);
+        }
+        $settingInsert->execute([$key, $value, $description]);
     }
 }
 
@@ -382,7 +390,9 @@ function superadmin_snapshot(): array {
     $matrix = [];
     foreach ($links as $link) $matrix[(int)$link['role_id']][(int)$link['permission_id']] = (bool)$link['enabled'];
     $settings = [];
+    $obsoleteSettingKeys = ['meta_horas_academico', 'meta_horas_tecnico'];
     foreach ($pdo->query('SELECT setting_key, setting_value, description FROM system_settings ORDER BY setting_key')->fetchAll() as $setting) {
+        if (in_array($setting['setting_key'], $obsoleteSettingKeys, true)) continue;
         $settings[$setting['setting_key']] = ['valor' => $setting['setting_value'], 'descripcion' => $setting['description'] ?? ''];
     }
     $count = function (string $role) use ($pdo): int {
@@ -601,7 +611,8 @@ try {
             respond(['ok' => true, 'settings' => [
                 'dominioInstitucional' => institutional_domain(),
                 'horasAcademico' => (int)get_setting('horas_academico', '120'),
-                'horasTecnico' => (int)get_setting('horas_tecnico', '100')
+                'horasTecnico' => (int)get_setting('horas_tecnico', '100'),
+                'tamanoMaxEvidenciaMb' => (int)get_setting('tamano_max_evidencia_mb', '5')
             ]]);
 
         case 'login':
@@ -1314,7 +1325,9 @@ try {
             }
             $file = $_FILES['evidencia'];
             if ((int)$file['size'] <= 0) fail('La evidencia está vacía.');
-            if ((int)$file['size'] > 5 * 1024 * 1024) fail('La evidencia debe pesar máximo 5 MB.');
+            $maxEvidenceMb = max(1, min(20, (int)get_setting('tamano_max_evidencia_mb', '5')));
+            $maxEvidenceBytes = $maxEvidenceMb * 1024 * 1024;
+            if ((int)$file['size'] > $maxEvidenceBytes) fail("La evidencia debe pesar máximo {$maxEvidenceMb} MB.");
 
             $finfo = new finfo(FILEINFO_MIME_TYPE);
             $mime = $finfo->file($file['tmp_name']);
@@ -1639,9 +1652,17 @@ try {
             if ($role->fetchColumn() === 'superadmin') fail('Los permisos del Super Admin no se pueden modificar.');
             $pdo = db();
             ensure_superadmin_tables($pdo);
-            $pdo->prepare('DELETE FROM role_permissions WHERE role_id=?')->execute([$roleId]);
-            $insert = $pdo->prepare('INSERT INTO role_permissions (role_id, permission_id, enabled) VALUES (?,?,1)');
-            foreach ($values as $permissionId) $insert->execute([$roleId, (int)$permissionId]);
+            $permissionIds = array_values(array_unique(array_filter(array_map('intval', $values), static fn(int $id): bool => $id > 0)));
+            $pdo->beginTransaction();
+            try {
+                $pdo->prepare('DELETE FROM role_permissions WHERE role_id=?')->execute([$roleId]);
+                $insert = $pdo->prepare('INSERT INTO role_permissions (role_id, permission_id, enabled) VALUES (?,?,1)');
+                foreach ($permissionIds as $permissionId) $insert->execute([$roleId, $permissionId]);
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
+            }
             respond(['ok' => true, 'data' => superadmin_snapshot()]);
 
         case 'superadmin_settings_save':
@@ -1671,11 +1692,22 @@ try {
                     && (!ctype_digit($value) || (int)$value < 1 || (int)$value > 500)) {
                     fail('Las metas de horas deben ser números enteros entre 1 y 500.');
                 }
+                if ($key === 'tamano_max_evidencia_mb'
+                    && (!ctype_digit($value) || (int)$value < 1 || (int)$value > 20)) {
+                    fail('El tamaño máximo de evidencia debe ser un número entero entre 1 y 20 MB.');
+                }
                 $cleanSettings[$key] = $value;
             }
             $statement = $pdo->prepare('UPDATE system_settings SET setting_value=? WHERE setting_key=?');
-            foreach ($cleanSettings as $key => $value) {
-                $statement->execute([$value, $key]);
+            $pdo->beginTransaction();
+            try {
+                foreach ($cleanSettings as $key => $value) {
+                    $statement->execute([$value, $key]);
+                }
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
             }
             respond(['ok' => true, 'data' => superadmin_snapshot()]);
 
