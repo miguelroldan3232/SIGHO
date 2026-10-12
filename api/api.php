@@ -1,9 +1,4 @@
 <?php
-session_set_cookie_params([
-    'httponly' => true,
-    'samesite' => 'Lax',
-    'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
-]);
 session_start();
 require_once __DIR__ . '/config.php';
 
@@ -43,114 +38,9 @@ function fail(string $message, int $status = 400): never {
     respond(['ok' => false, 'message' => $message], $status);
 }
 
-function ensure_login_attempt_table(): void {
-    static $ready = false;
-    if ($ready) return;
-
-    db()->exec("CREATE TABLE IF NOT EXISTS login_attempts (
-        email VARCHAR(190) NOT NULL,
-        ip_address VARCHAR(45) NOT NULL,
-        attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
-        window_started_at DATETIME NOT NULL,
-        locked_until DATETIME NULL,
-        PRIMARY KEY (email, ip_address),
-        INDEX idx_login_attempts_locked_until (locked_until)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-    $ready = true;
-}
-
-function login_ip_address(): string {
-    return substr((string)($_SERVER['REMOTE_ADDR'] ?? 'unknown'), 0, 45);
-}
-
-function check_login_rate_limit(string $email, string $ip): void {
-    ensure_login_attempt_table();
-
-    $st = db()->prepare(
-        'SELECT attempts, window_started_at, locked_until
-         FROM login_attempts WHERE email=? AND ip_address=?'
-    );
-    $st->execute([$email, $ip]);
-    $attempt = $st->fetch();
-
-    if (!$attempt) return;
-
-    $now = new DateTimeImmutable();
-
-    if (
-        !empty($attempt['locked_until']) &&
-        new DateTimeImmutable($attempt['locked_until']) > $now
-    ) {
-        fail(
-            'Demasiados intentos. Espera 15 minutos antes de volver a intentarlo.',
-            429
-        );
-    }
-
-    if (
-        new DateTimeImmutable($attempt['window_started_at'])
-        < $now->modify('-15 minutes')
-    ) {
-        db()->prepare(
-            'DELETE FROM login_attempts WHERE email=? AND ip_address=?'
-        )->execute([$email, $ip]);
-    }
-}
-
-function record_login_failure(string $email, string $ip): void {
-    ensure_login_attempt_table();
-    $pdo = db();
-
-    $st = $pdo->prepare(
-        'SELECT attempts, window_started_at
-         FROM login_attempts WHERE email=? AND ip_address=?'
-    );
-    $st->execute([$email, $ip]);
-    $attempt = $st->fetch();
-    $now = new DateTimeImmutable();
-
-    if (
-        !$attempt ||
-        new DateTimeImmutable($attempt['window_started_at'])
-        < $now->modify('-15 minutes')
-    ) {
-        $st = $pdo->prepare(
-            'INSERT INTO login_attempts
-             (email, ip_address, attempts, window_started_at, locked_until)
-             VALUES (?, ?, 1, NOW(), NULL)
-             ON DUPLICATE KEY UPDATE
-             attempts=1, window_started_at=NOW(), locked_until=NULL'
-        );
-        $st->execute([$email, $ip]);
-        return;
-    }
-
-    $attempts = (int)$attempt['attempts'] + 1;
-    $lockedUntil = $attempts >= 5
-        ? $now->modify('+15 minutes')->format('Y-m-d H:i:s')
-        : null;
-
-    $st = $pdo->prepare(
-        'UPDATE login_attempts
-         SET attempts=?, locked_until=?
-         WHERE email=? AND ip_address=?'
-    );
-    $st->execute([$attempts, $lockedUntil, $email, $ip]);
-}
-
-function clear_login_failures(string $email, string $ip): void {
-    ensure_login_attempt_table();
-
-    db()->prepare(
-        'DELETE FROM login_attempts WHERE email=? AND ip_address=?'
-    )->execute([$email, $ip]);
-}
-
 function ensure_email_verification_table(PDO $pdo): void {
     static $ready = false;
     if ($ready) return;
-
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS account_email_verifications (
             user_id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
@@ -163,14 +53,12 @@ function ensure_email_verification_table(PDO $pdo): void {
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     ");
-
     $ready = true;
 }
 
 function ensure_record_evidence_table(PDO $pdo): void {
     static $ready = false;
     if ($ready) return;
-
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS hour_record_evidence (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -182,88 +70,52 @@ function ensure_record_evidence_table(PDO $pdo): void {
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             INDEX idx_hour_record_evidence_record (record_id),
             CONSTRAINT fk_hour_record_evidence_record
-                FOREIGN KEY (record_id)
-                REFERENCES hour_records(id) ON DELETE CASCADE
+                FOREIGN KEY (record_id) REFERENCES hour_records(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     ");
-
     $ready = true;
 }
 
 function email_verified(int $userId): bool {
     $pdo = db();
     ensure_email_verification_table($pdo);
-
-    $st = $pdo->prepare(
-        'SELECT verified_at
-         FROM account_email_verifications WHERE user_id = ?'
-    );
+    $st = $pdo->prepare('SELECT verified_at FROM account_email_verifications WHERE user_id = ?');
     $st->execute([$userId]);
     $verifiedAt = $st->fetchColumn();
-
     return $verifiedAt === false || $verifiedAt !== null;
 }
 
 function create_email_verification(PDO $pdo, int $userId): string {
-    $code = (string) random_int(10000000, 99999999);
-
-    $st = $pdo->prepare(
-        'INSERT INTO account_email_verifications
-         (user_id, code_hash, expires_at)
-         VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 MINUTE))'
-    );
+    $code = (string)random_int(10000000, 99999999);
+    $st = $pdo->prepare('INSERT INTO account_email_verifications (user_id, code_hash, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 MINUTE))');
     $st->execute([$userId, password_hash($code, PASSWORD_DEFAULT)]);
-
     return $code;
 }
 
 function configured_mailer(): \PHPMailer\PHPMailer\PHPMailer {
-    $autoload = dirname(__DIR__) . DIRECTORY_SEPARATOR
-        . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
+    $autoload = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
     if (!is_file($autoload)) {
-        throw new RuntimeException(
-            'Falta instalar PHPMailer. Ejecuta composer install en el servidor.'
-        );
+        throw new RuntimeException('Falta instalar PHPMailer. Ejecuta composer install en el servidor.');
     }
-
     require_once $autoload;
 
-    $host = trim((string) getenv('SIGHO_SMTP_HOST'));
-    $from = trim((string) getenv('SIGHO_MAIL_FROM'));
-
+    $host = trim((string)getenv('SIGHO_SMTP_HOST'));
+    $from = trim((string)getenv('SIGHO_MAIL_FROM'));
     if ($host === '' || $from === '') {
-        throw new RuntimeException(
-            'El envío de correo no está configurado: define SIGHO_SMTP_HOST y SIGHO_MAIL_FROM.'
-        );
+        throw new RuntimeException('El envío de correo no está configurado: define SIGHO_SMTP_HOST y SIGHO_MAIL_FROM.');
     }
-
     if (!filter_var($from, FILTER_VALIDATE_EMAIL)) {
-        throw new RuntimeException(
-            'SIGHO_MAIL_FROM debe contener una dirección de correo válida.'
-        );
+        throw new RuntimeException('SIGHO_MAIL_FROM debe contener una dirección de correo válida.');
     }
-
-    $portValue = (string) (getenv('SIGHO_SMTP_PORT') ?: '587');
-    $port = filter_var(
-        $portValue,
-        FILTER_VALIDATE_INT,
-        ['options' => ['min_range' => 1, 'max_range' => 65535]]
-    );
-
+    $portValue = (string)(getenv('SIGHO_SMTP_PORT') ?: '587');
+    $port = filter_var($portValue, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 65535]]);
     if ($port === false) {
-        throw new RuntimeException(
-            'SIGHO_SMTP_PORT debe ser un número entre 1 y 65535.'
-        );
+        throw new RuntimeException('SIGHO_SMTP_PORT debe ser un número entre 1 y 65535.');
     }
-
-    $username = (string) getenv('SIGHO_SMTP_USERNAME');
-    $password = (string) getenv('SIGHO_SMTP_PASSWORD');
-
+    $username = (string)getenv('SIGHO_SMTP_USERNAME');
+    $password = (string)getenv('SIGHO_SMTP_PASSWORD');
     if (($username === '') !== ($password === '')) {
-        throw new RuntimeException(
-            'Configura SIGHO_SMTP_USERNAME y SIGHO_SMTP_PASSWORD juntos, o deja ambos vacíos.'
-        );
+        throw new RuntimeException('Configura SIGHO_SMTP_USERNAME y SIGHO_SMTP_PASSWORD juntos, o deja ambos vacíos.');
     }
 
     $mailer = new \PHPMailer\PHPMailer\PHPMailer(true);
@@ -271,56 +123,31 @@ function configured_mailer(): \PHPMailer\PHPMailer\PHPMailer {
     $mailer->Host = $host;
     $mailer->Port = $port;
     $mailer->SMTPAuth = $username !== '';
-
     if ($mailer->SMTPAuth) {
         $mailer->Username = $username;
         $mailer->Password = $password;
     }
-
-    $encryption = strtolower(
-        trim((string) (getenv('SIGHO_SMTP_ENCRYPTION') ?: 'tls'))
-    );
-
+    $encryption = strtolower(trim((string)(getenv('SIGHO_SMTP_ENCRYPTION') ?: 'tls')));
     if ($encryption === 'tls') {
-        $mailer->SMTPSecure =
-            \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        $mailer->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
     } elseif ($encryption === 'ssl') {
-        $mailer->SMTPSecure =
-            \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+        $mailer->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
     } elseif ($encryption !== 'none') {
-        throw new RuntimeException(
-            'SIGHO_SMTP_ENCRYPTION debe ser tls, ssl o none.'
-        );
+        throw new RuntimeException('SIGHO_SMTP_ENCRYPTION debe ser tls, ssl o none.');
     }
-
-    $fromName = trim(
-        (string) (getenv('SIGHO_MAIL_FROM_NAME') ?: 'SIGHO')
-    );
-
+    $fromName = trim((string)(getenv('SIGHO_MAIL_FROM_NAME') ?: 'SIGHO'));
     $mailer->setFrom($from, $fromName);
     $mailer->CharSet = 'UTF-8';
-
     return $mailer;
 }
 
-function send_identity_email(
-    string $email,
-    string $name,
-    string $role,
-    string $code
-): void {
+function send_identity_email(string $email, string $name, string $role, string $code): void {
     $mailer = configured_mailer();
     $mailer->addAddress($email, $name);
     $mailer->isHTML(true);
     $mailer->Subject = 'Bienvenido a SIGHO - confirma tu correo';
-
-    $safeName = htmlspecialchars(
-        $name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'
-    );
-    $safeRole = htmlspecialchars(
-        $role, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'
-    );
-
+    $safeName = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeRole = htmlspecialchars($role, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $mailer->Body = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#18314f">'
         . '<div style="text-align:center;padding:24px;background:#f2f7fc;border-radius:16px">'
         . '<img src="cid:sigho-logo" alt="SIGHO" style="width:84px;height:auto">'
@@ -331,104 +158,43 @@ function send_identity_email(
         . '<p>El código vence en 30 minutos. Si tú no solicitaste esta cuenta, elige “No fui yo” en SIGHO y la cuenta se eliminará.</p>'
         . '<p style="font-size:13px;color:#62758b">Este mensaje fue enviado automáticamente por SIGHO. No respondas a este correo.</p>'
         . '</div></div>';
-
-    $mailer->AltBody =
-        "Hola {$name}, tu solicitud de acceso a SIGHO fue aprobada como {$role}. "
+    $mailer->AltBody = "Hola {$name}, tu solicitud de acceso a SIGHO fue aprobada como {$role}. "
         . "Inicia sesión y escribe este código para confirmar tu correo: {$code}. "
         . "El código vence en 30 minutos. Si tú no solicitaste la cuenta, elige “No fui yo” para eliminarla.";
-
     $logo = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'escudo_jjfh.jpg';
-
-    if (is_file($logo)) {
-        $mailer->addEmbeddedImage(
-            $logo, 'sigho-logo', 'escudo_jjfh.jpg'
-        );
-    }
-
+    if (is_file($logo)) $mailer->addEmbeddedImage($logo, 'sigho-logo', 'escudo_jjfh.jpg');
     $mailer->send();
 }
 
-function notify_admins_of_unrecognized_account(
-    PDO $pdo,
-    string $name,
-    string $email,
-    string $role
-): bool {
+function notify_admins_of_unrecognized_account(PDO $pdo, string $name, string $email, string $role): bool {
     $recipients = [];
-
-    $st = $pdo->query("
-        SELECT u.email, u.first_name, u.last_name
-        FROM users u
-        JOIN roles r ON r.id = u.role_id
-        WHERE u.status = 'activo'
-        AND r.code IN ('administrador', 'superadmin')
-    ");
-
+    $st = $pdo->query("SELECT u.email, u.first_name, u.last_name FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code IN ('administrador','superadmin')");
     foreach ($st->fetchAll() as $admin) {
         if (filter_var($admin['email'], FILTER_VALIDATE_EMAIL)) {
-            $recipients[] = [
-                $admin['email'],
-                trim($admin['first_name'] . ' ' . $admin['last_name'])
-            ];
+            $recipients[] = [$admin['email'], trim($admin['first_name'] . ' ' . $admin['last_name'])];
         }
     }
-
-    $extraRecipients = array_filter(
-        array_map(
-            'trim',
-            explode(',', (string) getenv('SIGHO_MAIL_ADMIN_CC'))
-        )
-    );
-
+    $extraRecipients = array_filter(array_map('trim', explode(',', (string)getenv('SIGHO_MAIL_ADMIN_CC'))));
     foreach ($extraRecipients as $recipient) {
-        if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
-            $recipients[] = [
-                $recipient,
-                'Administrador SIGHO'
-            ];
-        }
+        if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) $recipients[] = [$recipient, 'Administrador SIGHO'];
     }
-
-    $recipients = array_values(
-        array_unique($recipients, SORT_REGULAR)
-    );
-
+    $recipients = array_values(array_unique($recipients, SORT_REGULAR));
     if (!$recipients) return false;
 
     $mailer = configured_mailer();
-
-    foreach ($recipients as [$address, $recipientName]) {
-        $mailer->addAddress($address, $recipientName);
-    }
-
+    foreach ($recipients as [$address, $recipientName]) $mailer->addAddress($address, $recipientName);
     $mailer->isHTML(true);
     $mailer->Subject = 'SIGHO: cuenta no reconocida eliminada';
-
-    $safeName = htmlspecialchars(
-        $name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'
-    );
-    $safeEmail = htmlspecialchars(
-        $email, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'
-    );
-    $safeRole = htmlspecialchars(
-        $role, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'
-    );
-
+    $safeName = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeEmail = htmlspecialchars($email, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeRole = htmlspecialchars($role, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $mailer->Body = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#18314f">'
-        . '<h2>Reporte de seguridad de cuenta</h2>'
-        . '<p>El destinatario del correo de verificación indicó que no reconoce este registro.</p>'
-        . '<p><strong>Nombre:</strong> ' . $safeName
-        . '<br><strong>Correo:</strong> ' . $safeEmail
-        . '<br><strong>Rol solicitado:</strong> ' . $safeRole
-        . '</p><p>La cuenta y sus datos asociados fueron eliminados.</p></div>';
-
-    $mailer->AltBody =
-        "El usuario {$name} ({$email}), rol {$role}, indicó que no reconoce el registro. La cuenta y sus datos asociados fueron eliminados.";
-
+        . '<h2>Reporte de seguridad de cuenta</h2><p>El destinatario del correo de verificación indicó que no reconoce este registro.</p>'
+        . '<p><strong>Nombre:</strong> ' . $safeName . '<br><strong>Correo:</strong> ' . $safeEmail
+        . '<br><strong>Rol solicitado:</strong> ' . $safeRole . '</p><p>La cuenta y sus datos asociados fueron eliminados.</p></div>';
+    $mailer->AltBody = "El usuario {$name} ({$email}), rol {$role}, indicó que no reconoce el registro. La cuenta y sus datos asociados fueron eliminados.";
     $mailer->send();
-
     return true;
-}
 }
 
 function capitalizarNombre(string $valor): string {
@@ -443,7 +209,7 @@ function capitalizarNombre(string $valor): string {
 
 
 function institutional_domain(): string {
-    return ltrim(strtolower(get_setting('dominio_institucional', 'iejosejoaquinflorezhernandez.edu.co')), '@');
+    return 'iejosejoaquinflorezhernandez.edu.co';
 }
 
 function is_institutional_email(string $email): bool {
@@ -594,232 +360,6 @@ function find_user_by_id(int $id): ?array {
     return $row ?: null;
 }
 
-function ensure_superadmin_tables(PDO $pdo): void {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS permissions (
-        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        code VARCHAR(80) NOT NULL UNIQUE,
-        name VARCHAR(120) NOT NULL,
-        description VARCHAR(255) NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-    $pdo->exec("CREATE TABLE IF NOT EXISTS role_permissions (
-        role_id TINYINT UNSIGNED NOT NULL,
-        permission_id INT UNSIGNED NOT NULL,
-        enabled TINYINT(1) NOT NULL DEFAULT 0,
-        PRIMARY KEY (role_id, permission_id),
-        CONSTRAINT fk_role_permissions_role
-            FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
-        CONSTRAINT fk_role_permissions_permission
-            FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-    $pdo->exec("CREATE TABLE IF NOT EXISTS system_settings (
-        setting_key VARCHAR(80) NOT NULL PRIMARY KEY,
-        setting_value VARCHAR(255) NOT NULL DEFAULT '',
-        description VARCHAR(255) NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-    $permissions = [
-        ['dashboard', 'Ver inicio', 'Consultar el resumen del sistema', ['estudiante', 'profesor', 'administrador', 'superadmin']],
-        ['users.view', 'Ver usuarios', 'Consultar cuentas y estados', ['profesor', 'administrador', 'superadmin']],
-        ['users.manage', 'Administrar usuarios', 'Crear, editar y desactivar usuarios', ['administrador', 'superadmin']],
-        ['roles.manage', 'Administrar roles', 'Asignar roles a las cuentas', ['administrador', 'superadmin']],
-        ['permissions.manage', 'Administrar permisos', 'Activar permisos por rol', ['superadmin']],
-        ['settings.manage', 'Administrar configuración', 'Modificar la configuración general', ['superadmin']],
-        ['teachers.assign', 'Asignar sede y proyecto', 'Asignar sede y proyecto a los profesores', ['administrador', 'superadmin']],
-        ['requests.manage', 'Validar solicitudes', 'Aceptar o rechazar solicitudes de estudiantes y profesores', ['administrador', 'superadmin']],
-        ['records.reset', 'Reiniciar registros', 'Eliminar todos los registros de horas', ['administrador', 'superadmin']]
-    ];
-
-    $exists = $pdo->prepare('SELECT id FROM permissions WHERE code = ?');
-    $insert = $pdo->prepare(
-        'INSERT INTO permissions (code, name, description) VALUES (?,?,?)'
-    );
-    $roleQuery = $pdo->prepare('SELECT id FROM roles WHERE code = ?');
-    $link = $pdo->prepare(
-        'INSERT IGNORE INTO role_permissions (role_id, permission_id, enabled) VALUES (?,?,1)'
-    );
-
-    foreach ($permissions as [$code, $name, $description, $roles]) {
-        $exists->execute([$code]);
-        if ($exists->fetchColumn()) continue;
-
-        $insert->execute([$code, $name, $description]);
-        $permissionId = (int)$pdo->lastInsertId();
-
-        foreach ($roles as $roleCode) {
-            $roleQuery->execute([$roleCode]);
-            $roleId = (int)$roleQuery->fetchColumn();
-
-            if ($roleId) {
-                $link->execute([$roleId, $permissionId]);
-            }
-        }
-    }
-
-    $defaults = [
-        ['dominio_institucional', null, 'iejosejoaquinflorezhernandez.edu.co', 'Dominio del correo institucional'],
-        ['horas_academico', 'meta_horas_academico', '120', 'Meta de horas · modalidad académica'],
-        ['horas_tecnico', 'meta_horas_tecnico', '100', 'Meta de horas · modalidad técnica'],
-        ['tamano_max_evidencia_mb', null, '5', 'Tamaño máximo de evidencia (MB)']
-    ];
-
-    $settingExists = $pdo->prepare(
-        'SELECT COUNT(*) FROM system_settings WHERE setting_key = ?'
-    );
-    $legacyValue = $pdo->prepare(
-        'SELECT setting_value FROM system_settings WHERE setting_key = ? LIMIT 1'
-    );
-    $settingInsert = $pdo->prepare(
-        'INSERT INTO system_settings (setting_key, setting_value, description) VALUES (?,?,?)'
-    );
-
-    foreach ($defaults as [$key, $legacyKey, $defaultValue, $description]) {
-        $settingExists->execute([$key]);
-
-        if ((int)$settingExists->fetchColumn()) continue;
-
-        $value = $defaultValue;
-
-        if ($legacyKey !== null) {
-            $legacyValue->execute([$legacyKey]);
-            $legacy = $legacyValue->fetchColumn();
-            $value = ($legacy === false || $legacy === '')
-                ? $defaultValue
-                : (string)$legacy;
-        }
-
-        $settingInsert->execute([$key, $value, $description]);
-    }
-}
-
-function get_setting(string $key, string $default = ''): string {
-    static $cache = [];
-
-    if (!array_key_exists($key, $cache)) {
-        try {
-            $st = db()->prepare(
-                'SELECT setting_value FROM system_settings WHERE setting_key = ? LIMIT 1'
-            );
-            $st->execute([$key]);
-            $value = $st->fetchColumn();
-
-            $cache[$key] = ($value === false || $value === '')
-                ? $default
-                : (string)$value;
-        } catch (Throwable $e) {
-            $cache[$key] = $default;
-        }
-    }
-
-    return $cache[$key];
-}
-
-function has_permission(string $code): bool {
-    static $ready = false;
-
-    $user = current_user();
-    if (!$user) return false;
-    if ($user['rol'] === 'superadmin') return true;
-
-    if (!$ready) {
-        ensure_superadmin_tables(db());
-        $ready = true;
-    }
-
-    $st = db()->prepare(
-        'SELECT COUNT(*)
-         FROM role_permissions rp
-         JOIN roles r ON r.id = rp.role_id
-         JOIN permissions p ON p.id = rp.permission_id
-         WHERE r.code = ? AND p.code = ? AND rp.enabled = 1'
-    );
-    $st->execute([$user['rol'], $code]);
-
-    return (int)$st->fetchColumn() > 0;
-}
-
-function require_permission(string $code): void {
-    if (!has_permission($code)) {
-        fail('Tu rol no tiene el permiso necesario para realizar esta acción.', 403);
-    }
-}
-
-function superadmin_user_payload(array $row): array {
-    return [
-        'id' => (int)$row['id'],
-        'identificacion' => $row['identification'],
-        'nombre' => trim($row['first_name'] . ' ' . $row['last_name']),
-        'nombres' => $row['first_name'],
-        'apellidos' => $row['last_name'],
-        'correo' => $row['email'],
-        'rol' => $row['role_code'],
-        'estado' => $row['status'],
-        'creado' => $row['created_at']
-    ];
-}
-
-function superadmin_snapshot(): array {
-    $pdo = db();
-    ensure_superadmin_tables($pdo);
-
-    $users = [];
-    $st = $pdo->query(
-        "SELECT u.*, r.code AS role_code
-         FROM users u
-         JOIN roles r ON r.id = u.role_id
-         ORDER BY u.first_name, u.last_name"
-    );
-
-    foreach ($st->fetchAll() as $row) {
-        $users[] = superadmin_user_payload($row);
-    }
-
-    $roles = $pdo->query(
-        'SELECT id, code, name, description FROM roles ORDER BY id'
-    )->fetchAll();
-
-    $permissions = $pdo->query(
-        'SELECT id, code, name, description FROM permissions ORDER BY id'
-    )->fetchAll();
-
-    $links = $pdo->query(
-        'SELECT role_id, permission_id, enabled FROM role_permissions'
-    )->fetchAll();
-
-    $matrix = [];
-
-    foreach ($links as $link) {
-        $matrix[(int)$link['role_id']][(int)$link['permission_id']]
-            = (bool)$link['enabled'];
-    }
-
-    $settings = [];
-    $obsoleteSettingKeys = [
-        'meta_horas_academico',
-        'meta_horas_tecnico'
-    ];
-
-    foreach (
-        $pdo->query(
-            'SELECT setting_key, setting_value, description
-             FROM system_settings ORDER BY setting_key'
-        )->fetchAll() as $setting
-    ) {
-        if (in_array($setting['setting_key'], $obsoleteSettingKeys, true)) {
-            continue;
-        }
-
-        $settings[$setting['setting_key']] = [
-            'valor' => $setting['setting_value'],
-            'descripcion' => $setting['description'] ?? ''
-        ];
-    }
-
-    // Continúa aquí con el resto de superadmin_snapshot()
-    // que aparecía después del conflicto en tu archivo original.
-}
-
 function record_payload(array $r, array $evidenceFiles = []): array {
     if (!$evidenceFiles && !empty($r['evidence_path'])) {
         $evidenceFiles[] = [
@@ -828,10 +368,6 @@ function record_payload(array $r, array $evidenceFiles = []): array {
             'tipo' => $r['evidence_mime'] ?? '',
             'url' => 'api/api.php?action=evidence&id=' . (int)$r['id'],
         ];
-    }
-
-    // Conserva aquí el resto original de record_payload().
-}
     }
     $firstEvidence = $evidenceFiles[0] ?? null;
     return [
@@ -1046,19 +582,6 @@ function handle_evidence(int $id): never {
     exit;
 }
 
-function delete_evidence_files(array $paths): void {
-    $evidenceDirectory = realpath(EVIDENCE_DIR);
-    if ($evidenceDirectory === false) return;
-
-    foreach (array_unique($paths) as $relativePath) {
-        if (!is_string($relativePath) || !str_starts_with($relativePath, 'uploads/evidence/')) continue;
-        $filePath = realpath($evidenceDirectory . DIRECTORY_SEPARATOR . basename($relativePath));
-        if ($filePath !== false && dirname($filePath) === $evidenceDirectory && is_file($filePath)) {
-            @unlink($filePath);
-        }
-    }
-}
-
 $action = $_GET['action'] ?? '';
 
 try {
@@ -1071,41 +594,23 @@ try {
             }
             respond(['ok' => true, 'user' => $user]);
 
-        case 'public_settings':
-            ensure_superadmin_tables(db());
-            respond(['ok' => true, 'settings' => [
-                'dominioInstitucional' => institutional_domain(),
-                'horasAcademico' => (int)get_setting('horas_academico', '120'),
-                'horasTecnico' => (int)get_setting('horas_tecnico', '100'),
-                'tamanoMaxEvidenciaMb' => (int)get_setting('tamano_max_evidencia_mb', '5')
-            ]]);
-
         case 'login':
             ensure_email_verification_table(db());
             $d = json_input();
-// Compatibilidad con las versiones del frontend.
-            // Acepta correo/clave y también email/password.
-            $correo = strtolower(trim((string)($d['correo'] ?? $d['email'] ?? '')));
-            $clave = (string)($d['clave'] ?? $d['password'] ?? '');
-            $rolSolicitado = trim((string)($d['rol'] ?? ''));
-            $ip = login_ip_address();
+            $rol = trim((string)($d['rol'] ?? ''));
+            $correo = strtolower(trim((string)($d['correo'] ?? '')));
+            $clave = (string)($d['clave'] ?? '');
             if (!$correo || !$clave) fail('Completa todos los campos.');
-            check_login_rate_limit($correo, $ip);
 
             $st = db()->prepare("SELECT u.*, r.code AS role_code FROM users u JOIN roles r ON r.id = u.role_id WHERE LOWER(u.email) = ? AND u.status = 'activo'");
             $st->execute([$correo]);
             $u = $st->fetch();
             if (!$u || !password_verify($clave, $u['password_hash'])) {
-                record_login_failure($correo, $ip);
                 fail('Correo o clave incorrectos.', 401);
             }
 
-// Validar el rol solicitado, si el frontend lo envía.
-            // El rol real siempre se obtiene de la base de datos.
-            $rol = $u['role_code'];
-
-            if ($rolSolicitado !== '' && $rolSolicitado !== $rol) {
-                record_login_failure($correo, $ip);main
+            $rol = $rol ?: $u['role_code'];
+            if ($u['role_code'] !== $rol) {
                 fail('Correo, clave o rol incorrectos.', 401);
             }
 
@@ -1118,7 +623,6 @@ try {
             if ($rol === 'estudiante' && !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
                 fail('El estudiante debe usar un correo electrónico válido.');
             }
-            clear_login_failures($correo, $ip);
             $payload = user_payload($u);
             $payload['emailVerificada'] = email_verified((int)$u['id']);
             $_SESSION['user'] = $payload;
@@ -1640,7 +1144,7 @@ try {
                         INSERT INTO student_applications
                         (access_request_id, service_year, first_surname, second_surname, first_name, second_name,
                          document_type, document_number, grade, birth_date, residence_address, phone, eps,
-guardian_name, guardian_phone, guardian_phone_type, service_site, project, project_other,
+                         guardian_name, guardian_phone, guardian_phone_type, service_site, project, project_other,
                          service_days, service_shift)
                         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                     ');
@@ -1991,39 +1495,7 @@ guardian_name, guardian_phone, guardian_phone_type, service_site, project, proje
             if ($cantidadEvidencias < 1 || $cantidadEvidencias > 3) {
                 fail('Debes adjuntar de 1 a 3 imágenes como máximo.');
             }
-$file = $_FILES['evidencia'];
 
-            if ((int)$file['size'] <= 0) {
-                fail('La evidencia está vacía.');
-            }
-
-            $maxEvidenceMb = max(
-                1,
-                min(20, (int)get_setting('tamano_max_evidencia_mb', '5'))
-            );
-
-            $maxEvidenceBytes = $maxEvidenceMb * 1024 * 1024;
-
-            if ((int)$file['size'] > $maxEvidenceBytes) {
-                fail("La evidencia debe pesar máximo {$maxEvidenceMb} MB.");
-            }
-
-            if (
-                !isset($file['error'], $file['tmp_name']) ||
-                $file['error'] !== UPLOAD_ERR_OK ||
-                !is_uploaded_file($file['tmp_name'])
-            ) {
-                fail('No se pudo recibir correctamente la evidencia.');
-            }
-
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
-            $mime = $finfo->file($file['tmp_name']);
-
-            $allowed = ['image/jpeg'];
-
-            if (!in_array($mime, $allowed, true)) {
-                fail('Solo se permiten imágenes JPG o JPEG.');
-            }
             if (!is_dir(EVIDENCE_DIR) && !mkdir(EVIDENCE_DIR, 0775, true) && !is_dir(EVIDENCE_DIR)) {
                 fail('No fue posible preparar el almacenamiento de la evidencia.', 500);
             }
@@ -2156,7 +1628,6 @@ $file = $_FILES['evidencia'];
 
         case 'assign_teacher':
             $user = require_roles(['administrador']);
-            require_permission('teachers.assign');
             $d = json_input();
             $staffId = (int)($d['staffId'] ?? 0);
             $sede = trim((string)($d['sede'] ?? ''));
@@ -2184,12 +1655,34 @@ $file = $_FILES['evidencia'];
             if ((int)$st->fetchColumn() > 0) fail('Tu cuenta ya tiene permisos de Administrador.');
             $st = $pdo->prepare("INSERT INTO access_requests (identification, first_name, last_name, email, password_hash, requested_role_id, status, service_project) SELECT u.identification,u.first_name,u.last_name,u.email,u.password_hash,r.id,'pendiente',s.service_project FROM users u JOIN roles r ON r.code='administrador' LEFT JOIN staff s ON s.user_id=u.id WHERE u.id=?");
             $st->execute([(int)$user['id']]);
-            respond(['ok'=>true,'message'=>'Solicitud enviada. Un Super Admin la revisará.']);
+            respond(['ok'=>true,'message'=>'Solicitud de permisos de Administrador enviada al panel administrativo.']);
+
+        case 'validate_admin_request_by_admin':
+            $admin = require_roles(['administrador']);
+            $d = json_input();
+            $id = (int)($d['id'] ?? 0);
+            $status = (string)($d['estado'] ?? '');
+            if (!$id || !in_array($status,['aceptada','rechazada'],true)) fail('Solicitud inválida.');
+            $pdo = db();
+            $pdo->beginTransaction();
+            try {
+                $st=$pdo->prepare("SELECT ar.*, r.code AS role_code FROM access_requests ar JOIN roles r ON r.id=ar.requested_role_id WHERE ar.id=? AND ar.status='pendiente' FOR UPDATE");
+                $st->execute([$id]); $r=$st->fetch();
+                if(!$r || $r['role_code']!=='administrador') fail('Solicitud de Administrador no encontrada.');
+                if($status==='aceptada'){
+                    $roleId=(int)$pdo->query("SELECT id FROM roles WHERE code='administrador'")->fetchColumn();
+                    $st=$pdo->prepare("UPDATE users SET role_id=? WHERE LOWER(email)=LOWER(?) AND status='activo'");
+                    $st->execute([$roleId,$r['email']]);
+                    if ($st->rowCount() < 1) fail('No se encontró la cuenta del profesor solicitante.');
+                }
+                $st=$pdo->prepare('UPDATE access_requests SET status=?, validated_by=?, validated_at=NOW() WHERE id=?');
+                $st->execute([$status,(int)$admin['id'],$id]);
+                $pdo->commit();
+            }catch(Throwable $e){ if($pdo->inTransaction())$pdo->rollBack(); throw $e; }
+            respond(['ok'=>true,'message'=>$status==='aceptada'?'Permisos de Administrador concedidos correctamente.':'Solicitud de Administrador rechazada.']);
 
         case 'admin_data':
             require_roles(['administrador']);
-            require_permission('users.view');
-            require_permission('requests.manage');
             $pdo = db();
             $users = [];
             $st = $pdo->query("SELECT u.*, r.code AS role_code FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code IN ('estudiante','profesor') ORDER BY u.first_name, u.last_name");
@@ -2203,12 +1696,11 @@ $file = $_FILES['evidencia'];
                 'profesores' => $profesores,
                 'records' => get_records(),
                 'requests' => array_merge(pending_requests('estudiante'), pending_requests('profesor')),
-                'adminRequests' => []
+                'adminRequests' => pending_requests('administrador')
             ]);
 
         case 'validate_request':
             require_roles(['administrador']);
-            require_permission('requests.manage');
             $d = json_input();
             $id = (int)($d['id'] ?? 0);
             $status = (string)($d['estado'] ?? '');
@@ -2233,9 +1725,7 @@ $file = $_FILES['evidencia'];
                     $st->execute([$r['identification'],$r['first_name'],$r['last_name'],$r['email'],$r['password_hash'],$roleId]);
                     $userId = (int)$pdo->lastInsertId();
                     if ($r['role_code'] === 'estudiante') {
-                        $target = $r['modality'] === 'tecnico'
-                            ? (int)get_setting('horas_tecnico', '100')
-                            : (int)get_setting('horas_academico', '120');
+                        $target = $r['modality'] === 'tecnico' ? 100 : 120;
                         $st = $pdo->prepare('INSERT INTO students (user_id, student_code, grade, modality, technical_program, target_hours) VALUES (?,?,?,?,?,?)');
                         $st->execute([$userId,$r['identification'],$r['grade'],$r['modality'],$r['technical_program'],$target]);
                         $studentId = (int)$pdo->lastInsertId();
@@ -2292,39 +1782,7 @@ $file = $_FILES['evidencia'];
             $requests = pending_requests('administrador');
             $totalUsers = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE status='activo'")->fetchColumn();
             $totalAdmins = (int)$pdo->query("SELECT COUNT(*) FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code='administrador'")->fetchColumn();
-$snapshot = superadmin_snapshot();
-
-            respond([
-                'ok' => true,
-                'requests' => $requests,
-                'totalUsuarios' => $totalUsers,
-                'totalAdministradores' => $totalAdmins
-            ] + $snapshot);
-
-        case 'superadmin_user_save':
-            // Conserva aquí el código original completo
-            // de guardar usuarios de feature/keli.
-
-        case 'superadmin_user_delete':
-            // Conserva aquí el código original completo
-            // de eliminar usuarios.
-
-        case 'superadmin_user_status':
-            // Conserva aquí el código original completo
-            // de cambiar el estado de usuarios.
-
-        case 'superadmin_permissions_save':
-            // Conserva aquí el código original completo
-            // de guardar permisos.
-
-        case 'superadmin_settings_save':
-            // Conserva aquí el código original completo
-            // de guardar la configuración.
-
-            respond([
-                'ok' => true,
-                'data' => superadmin_snapshot()
-            ]);
+            respond(['ok'=>true,'requests'=>$requests,'totalUsuarios'=>$totalUsers,'totalAdministradores'=>$totalAdmins]);
 
         case 'validate_admin_request':
             require_roles(['superadmin']);
@@ -2340,21 +1798,11 @@ $snapshot = superadmin_snapshot();
                 if(!$r || $r['role_code']!=='administrador') fail('Solicitud no encontrada o no corresponde a administrador.');
                 if($status==='aceptada'){
                     $roleId=(int)$pdo->query("SELECT id FROM roles WHERE code='administrador'")->fetchColumn();
-                    $st=$pdo->prepare("SELECT u.id FROM users u JOIN roles rr ON rr.id=u.role_id WHERE LOWER(u.email)=LOWER(?) AND u.status='activo' AND rr.code='profesor' FOR UPDATE");
-                    $st->execute([$r['email']]);
-                    $userId=(int)$st->fetchColumn();
-                    if (!$userId) fail('No se encontró la cuenta activa del profesor solicitante.');
-                    $st=$pdo->prepare('UPDATE users SET role_id=? WHERE id=?');
-                    $st->execute([$roleId,$userId]);
-                    $st=$pdo->prepare('SELECT COUNT(*) FROM staff WHERE user_id=?');
-                    $st->execute([$userId]);
-                    if ((int)$st->fetchColumn() > 0) {
-                        $st=$pdo->prepare("UPDATE staff SET position='Docente Administrador' WHERE user_id=?");
-                        $st->execute([$userId]);
-                    } else {
-                        $st=$pdo->prepare("INSERT INTO staff (user_id, staff_code, position) VALUES (?,?, 'Docente Administrador')");
-                        $st->execute([$userId,$r['identification']]);
-                    }
+                    $st=$pdo->prepare("INSERT INTO users (identification, first_name, last_name, email, password_hash, role_id, status) VALUES (?,?,?,?,?,?, 'activo')");
+                    $st->execute([$r['identification'],$r['first_name'],$r['last_name'],$r['email'],$r['password_hash'],$roleId]);
+                    $userId=(int)$pdo->lastInsertId();
+                    $st=$pdo->prepare("INSERT INTO staff (user_id, staff_code, position) VALUES (?,?, 'Docente Administrador')");
+                    $st->execute([$userId,$r['identification']]);
                 }
                 $st=$pdo->prepare('UPDATE access_requests SET status=?, validated_by=?, validated_at=NOW() WHERE id=?');
                 $st->execute([$status,(int)require_login()['id'],$id]);
@@ -2364,25 +1812,14 @@ $snapshot = superadmin_snapshot();
 
         case 'reset_records':
             require_roles(['administrador']);
-            require_permission('records.reset');
             $pdo=db();
-            $evidencePaths = $pdo->query("SELECT evidence_path FROM hour_records WHERE evidence_path IS NOT NULL AND evidence_path <> ''")->fetchAll(PDO::FETCH_COLUMN);
-            $pdo->beginTransaction();
-            try {
-                $pdo->exec('DELETE FROM hour_records');
-                $pdo->commit();
-            } catch (Throwable $e) {
-                if ($pdo->inTransaction()) $pdo->rollBack();
-                throw $e;
-            }
-            delete_evidence_files($evidencePaths);
+            $pdo->exec('DELETE FROM hour_records');
             respond(['ok'=>true]);
 
         case 'evidence':
             handle_evidence((int)($_GET['id'] ?? 0));
 case 'pending_requests':
     require_roles(['administrador']);
-    require_permission('requests.manage');
 
     $requests = pending_requests('estudiante');
 
