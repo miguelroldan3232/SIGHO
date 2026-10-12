@@ -38,6 +38,165 @@ function fail(string $message, int $status = 400): never {
     respond(['ok' => false, 'message' => $message], $status);
 }
 
+function ensure_email_verification_table(PDO $pdo): void {
+    static $ready = false;
+    if ($ready) return;
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS account_email_verifications (
+            user_id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
+            code_hash VARCHAR(255) NOT NULL,
+            expires_at DATETIME NOT NULL,
+            attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+            last_sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            verified_at DATETIME NULL,
+            CONSTRAINT fk_email_verification_user
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    $ready = true;
+}
+
+function ensure_record_evidence_table(PDO $pdo): void {
+    static $ready = false;
+    if ($ready) return;
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS hour_record_evidence (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            record_id BIGINT UNSIGNED NOT NULL,
+            original_name VARCHAR(255) NOT NULL,
+            evidence_path VARCHAR(500) NOT NULL,
+            evidence_mime VARCHAR(100) NOT NULL,
+            file_size INT UNSIGNED NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_hour_record_evidence_record (record_id),
+            CONSTRAINT fk_hour_record_evidence_record
+                FOREIGN KEY (record_id) REFERENCES hour_records(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    $ready = true;
+}
+
+function email_verified(int $userId): bool {
+    $pdo = db();
+    ensure_email_verification_table($pdo);
+    $st = $pdo->prepare('SELECT verified_at FROM account_email_verifications WHERE user_id = ?');
+    $st->execute([$userId]);
+    $verifiedAt = $st->fetchColumn();
+    return $verifiedAt === false || $verifiedAt !== null;
+}
+
+function create_email_verification(PDO $pdo, int $userId): string {
+    $code = (string)random_int(10000000, 99999999);
+    $st = $pdo->prepare('INSERT INTO account_email_verifications (user_id, code_hash, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 MINUTE))');
+    $st->execute([$userId, password_hash($code, PASSWORD_DEFAULT)]);
+    return $code;
+}
+
+function configured_mailer(): \PHPMailer\PHPMailer\PHPMailer {
+    $autoload = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+    if (!is_file($autoload)) {
+        throw new RuntimeException('Falta instalar PHPMailer. Ejecuta composer install en el servidor.');
+    }
+    require_once $autoload;
+
+    $host = trim((string)getenv('SIGHO_SMTP_HOST'));
+    $from = trim((string)getenv('SIGHO_MAIL_FROM'));
+    if ($host === '' || $from === '') {
+        throw new RuntimeException('El envío de correo no está configurado: define SIGHO_SMTP_HOST y SIGHO_MAIL_FROM.');
+    }
+    if (!filter_var($from, FILTER_VALIDATE_EMAIL)) {
+        throw new RuntimeException('SIGHO_MAIL_FROM debe contener una dirección de correo válida.');
+    }
+    $portValue = (string)(getenv('SIGHO_SMTP_PORT') ?: '587');
+    $port = filter_var($portValue, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 65535]]);
+    if ($port === false) {
+        throw new RuntimeException('SIGHO_SMTP_PORT debe ser un número entre 1 y 65535.');
+    }
+    $username = (string)getenv('SIGHO_SMTP_USERNAME');
+    $password = (string)getenv('SIGHO_SMTP_PASSWORD');
+    if (($username === '') !== ($password === '')) {
+        throw new RuntimeException('Configura SIGHO_SMTP_USERNAME y SIGHO_SMTP_PASSWORD juntos, o deja ambos vacíos.');
+    }
+
+    $mailer = new \PHPMailer\PHPMailer\PHPMailer(true);
+    $mailer->isSMTP();
+    $mailer->Host = $host;
+    $mailer->Port = $port;
+    $mailer->SMTPAuth = $username !== '';
+    if ($mailer->SMTPAuth) {
+        $mailer->Username = $username;
+        $mailer->Password = $password;
+    }
+    $encryption = strtolower(trim((string)(getenv('SIGHO_SMTP_ENCRYPTION') ?: 'tls')));
+    if ($encryption === 'tls') {
+        $mailer->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+    } elseif ($encryption === 'ssl') {
+        $mailer->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+    } elseif ($encryption !== 'none') {
+        throw new RuntimeException('SIGHO_SMTP_ENCRYPTION debe ser tls, ssl o none.');
+    }
+    $fromName = trim((string)(getenv('SIGHO_MAIL_FROM_NAME') ?: 'SIGHO'));
+    $mailer->setFrom($from, $fromName);
+    $mailer->CharSet = 'UTF-8';
+    return $mailer;
+}
+
+function send_identity_email(string $email, string $name, string $role, string $code): void {
+    $mailer = configured_mailer();
+    $mailer->addAddress($email, $name);
+    $mailer->isHTML(true);
+    $mailer->Subject = 'Bienvenido a SIGHO - confirma tu correo';
+    $safeName = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeRole = htmlspecialchars($role, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $mailer->Body = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#18314f">'
+        . '<div style="text-align:center;padding:24px;background:#f2f7fc;border-radius:16px">'
+        . '<img src="cid:sigho-logo" alt="SIGHO" style="width:84px;height:auto">'
+        . '<h1 style="color:#1259a7;margin-bottom:8px">¡Te damos la bienvenida a SIGHO!</h1>'
+        . '<p>Hola ' . $safeName . ', tu solicitud fue aprobada como ' . $safeRole . '.</p>'
+        . '<p>Para confirmar que reconoces este registro, inicia sesión y escribe este código:</p>'
+        . '<p style="font-size:30px;font-weight:bold;letter-spacing:8px;color:#1259a7">' . $code . '</p>'
+        . '<p>El código vence en 30 minutos. Si tú no solicitaste esta cuenta, elige “No fui yo” en SIGHO y la cuenta se eliminará.</p>'
+        . '<p style="font-size:13px;color:#62758b">Este mensaje fue enviado automáticamente por SIGHO. No respondas a este correo.</p>'
+        . '</div></div>';
+    $mailer->AltBody = "Hola {$name}, tu solicitud de acceso a SIGHO fue aprobada como {$role}. "
+        . "Inicia sesión y escribe este código para confirmar tu correo: {$code}. "
+        . "El código vence en 30 minutos. Si tú no solicitaste la cuenta, elige “No fui yo” para eliminarla.";
+    $logo = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'escudo_jjfh.jpg';
+    if (is_file($logo)) $mailer->addEmbeddedImage($logo, 'sigho-logo', 'escudo_jjfh.jpg');
+    $mailer->send();
+}
+
+function notify_admins_of_unrecognized_account(PDO $pdo, string $name, string $email, string $role): bool {
+    $recipients = [];
+    $st = $pdo->query("SELECT u.email, u.first_name, u.last_name FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code IN ('administrador','superadmin')");
+    foreach ($st->fetchAll() as $admin) {
+        if (filter_var($admin['email'], FILTER_VALIDATE_EMAIL)) {
+            $recipients[] = [$admin['email'], trim($admin['first_name'] . ' ' . $admin['last_name'])];
+        }
+    }
+    $extraRecipients = array_filter(array_map('trim', explode(',', (string)getenv('SIGHO_MAIL_ADMIN_CC'))));
+    foreach ($extraRecipients as $recipient) {
+        if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) $recipients[] = [$recipient, 'Administrador SIGHO'];
+    }
+    $recipients = array_values(array_unique($recipients, SORT_REGULAR));
+    if (!$recipients) return false;
+
+    $mailer = configured_mailer();
+    foreach ($recipients as [$address, $recipientName]) $mailer->addAddress($address, $recipientName);
+    $mailer->isHTML(true);
+    $mailer->Subject = 'SIGHO: cuenta no reconocida eliminada';
+    $safeName = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeEmail = htmlspecialchars($email, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeRole = htmlspecialchars($role, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $mailer->Body = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#18314f">'
+        . '<h2>Reporte de seguridad de cuenta</h2><p>El destinatario del correo de verificación indicó que no reconoce este registro.</p>'
+        . '<p><strong>Nombre:</strong> ' . $safeName . '<br><strong>Correo:</strong> ' . $safeEmail
+        . '<br><strong>Rol solicitado:</strong> ' . $safeRole . '</p><p>La cuenta y sus datos asociados fueron eliminados.</p></div>';
+    $mailer->AltBody = "El usuario {$name} ({$email}), rol {$role}, indicó que no reconoce el registro. La cuenta y sus datos asociados fueron eliminados.";
+    $mailer->send();
+    return true;
+}
+
 function capitalizarNombre(string $valor): string {
     $valor = trim(preg_replace('/\s+/u', ' ', $valor));
     if ($valor === '') return '';
@@ -71,6 +230,9 @@ function current_user(): ?array {
 function require_login(): array {
     $user = current_user();
     if (!$user) fail('Debes iniciar sesión.', 401);
+    if (in_array($user['rol'], ['estudiante', 'profesor'], true) && !email_verified((int)$user['id'])) {
+        fail('Confirma tu correo electrónico antes de usar SIGHO.', 403);
+    }
     return $user;
 }
 
@@ -198,7 +360,16 @@ function find_user_by_id(int $id): ?array {
     return $row ?: null;
 }
 
-function record_payload(array $r): array {
+function record_payload(array $r, array $evidenceFiles = []): array {
+    if (!$evidenceFiles && !empty($r['evidence_path'])) {
+        $evidenceFiles[] = [
+            'id' => null,
+            'nombre' => $r['evidence_original_name'] ?? '',
+            'tipo' => $r['evidence_mime'] ?? '',
+            'url' => 'api/api.php?action=evidence&id=' . (int)$r['id'],
+        ];
+    }
+    $firstEvidence = $evidenceFiles[0] ?? null;
     return [
         'id' => (int)$r['id'],
         'estudiante' => $r['student_name'],
@@ -209,9 +380,10 @@ function record_payload(array $r): array {
         'salida' => !empty($r['exit_time']) ? substr($r['exit_time'], 0, 5) : '',
         'horas' => (float)$r['hours'],
         'descripcion' => $r['activity_description'],
-        'evidencia' => $r['evidence_original_name'] ?? '',
-        'evidenciaTipo' => $r['evidence_mime'] ?? '',
-        'evidenciaUrl' => !empty($r['evidence_path']) ? 'api/api.php?action=evidence&id=' . (int)$r['id'] : '',
+        'evidencia' => $firstEvidence['nombre'] ?? ($r['evidence_original_name'] ?? ''),
+        'evidenciaTipo' => $firstEvidence['tipo'] ?? ($r['evidence_mime'] ?? ''),
+        'evidenciaUrl' => $firstEvidence['url'] ?? '',
+        'evidenciaArchivos' => $evidenceFiles,
         'estado' => $r['status'],
         'observacion' => $r['observation'] ?? '',
         'motivoRechazo' => $r['rejection_reason'] ?? '',
@@ -222,6 +394,8 @@ function record_payload(array $r): array {
 }
 
 function get_records(?int $studentId = null, bool $all = true, ?int $teacherStaffId = null): array {
+    $pdo = db();
+    ensure_record_evidence_table($pdo);
     $sql = "SELECT hr.*, 
                    CONCAT(su.first_name, ' ', su.last_name) AS student_name,
                    su.email AS student_email,
@@ -262,9 +436,29 @@ function get_records(?int $studentId = null, bool $all = true, ?int $teacherStaf
     }
     if ($where) $sql .= ' WHERE ' . implode(' AND ', $where);
     $sql .= ' ORDER BY hr.id DESC';
-    $st = db()->prepare($sql);
+    $st = $pdo->prepare($sql);
     $st->execute($params);
-    return array_map('record_payload', $st->fetchAll());
+    $rows = $st->fetchAll();
+    if (!$rows) return [];
+
+    $recordIds = array_map(static fn(array $row): int => (int)$row['id'], $rows);
+    $placeholders = implode(',', array_fill(0, count($recordIds), '?'));
+    $stEvidence = $pdo->prepare("SELECT id, record_id, original_name, evidence_mime FROM hour_record_evidence WHERE record_id IN ({$placeholders}) ORDER BY id");
+    $stEvidence->execute($recordIds);
+    $evidenceByRecord = [];
+    foreach ($stEvidence->fetchAll() as $file) {
+        $recordId = (int)$file['record_id'];
+        $evidenceByRecord[$recordId][] = [
+            'id' => (int)$file['id'],
+            'nombre' => $file['original_name'],
+            'tipo' => $file['evidence_mime'],
+            'url' => 'api/api.php?action=evidence&id=' . $recordId . '&fileId=' . (int)$file['id'],
+        ];
+    }
+    return array_map(
+        static fn(array $row): array => record_payload($row, $evidenceByRecord[(int)$row['id']] ?? []),
+        $rows
+    );
 }
 
 function pending_requests(string $roleFilter = ''): array {
@@ -357,6 +551,7 @@ function pending_requests(string $roleFilter = ''): array {
 
 function handle_evidence(int $id): never {
     $user = require_login();
+    ensure_record_evidence_table(db());
     $st = db()->prepare("SELECT hr.*, s.user_id AS student_user_id FROM hour_records hr JOIN students s ON s.id = hr.student_id WHERE hr.id = ?");
     $st->execute([$id]);
     $r = $st->fetch();
@@ -364,12 +559,25 @@ function handle_evidence(int $id): never {
     if ($user['rol'] === 'estudiante' && (int)$r['student_user_id'] !== (int)$user['id']) {
         http_response_code(403); exit('No autorizado.');
     }
-    if (!$r['evidence_path']) { http_response_code(404); exit('Este registro no tiene evidencia.'); }
-    $path = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $r['evidence_path']);
+    $fileId = (int)($_GET['fileId'] ?? 0);
+    if ($fileId) {
+        $st = db()->prepare('SELECT original_name, evidence_path, evidence_mime FROM hour_record_evidence WHERE id = ? AND record_id = ?');
+        $st->execute([$fileId, $id]);
+        $evidence = $st->fetch();
+        if (!$evidence) { http_response_code(404); exit('Evidencia no encontrada.'); }
+    } else {
+        $evidence = [
+            'original_name' => $r['evidence_original_name'],
+            'evidence_path' => $r['evidence_path'],
+            'evidence_mime' => $r['evidence_mime'],
+        ];
+    }
+    if (!$evidence['evidence_path']) { http_response_code(404); exit('Este registro no tiene evidencia.'); }
+    $path = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $evidence['evidence_path']);
     if (!is_file($path)) { http_response_code(404); exit('Archivo no encontrado.'); }
-    header('Content-Type: ' . ($r['evidence_mime'] ?: 'application/octet-stream'));
+    header('Content-Type: ' . ($evidence['evidence_mime'] ?: 'application/octet-stream'));
     header('Content-Length: ' . filesize($path));
-    header('Content-Disposition: inline; filename="' . basename($r['evidence_original_name']) . '"');
+    header('Content-Disposition: inline; filename="' . basename($evidence['original_name']) . '"');
     readfile($path);
     exit;
 }
@@ -379,9 +587,15 @@ $action = $_GET['action'] ?? '';
 try {
     switch ($action) {
         case 'session':
-            respond(['ok' => true, 'user' => current_user()]);
+            $user = current_user();
+            if ($user) {
+                $user['emailVerificada'] = email_verified((int)$user['id']);
+                $_SESSION['user'] = $user;
+            }
+            respond(['ok' => true, 'user' => $user]);
 
         case 'login':
+            ensure_email_verification_table(db());
             $d = json_input();
             $rol = trim((string)($d['rol'] ?? ''));
             $correo = strtolower(trim((string)($d['correo'] ?? '')));
@@ -410,9 +624,131 @@ try {
                 fail('El estudiante debe usar un correo electrónico válido.');
             }
             $payload = user_payload($u);
+            $payload['emailVerificada'] = email_verified((int)$u['id']);
             $_SESSION['user'] = $payload;
             session_regenerate_id(true);
             respond(['ok' => true, 'user' => $payload]);
+
+        case 'resend_identity_code':
+            $user = current_user();
+            if (!$user) fail('Debes iniciar sesión.', 401);
+            if (!in_array($user['rol'], ['estudiante', 'profesor'], true)) fail('Esta verificación no aplica a tu cuenta.', 403);
+            $pdo = db();
+            ensure_email_verification_table($pdo);
+            if (email_verified((int)$user['id'])) fail('Tu correo ya está verificado.');
+            $st = $pdo->prepare('SELECT TIMESTAMPDIFF(SECOND, last_sent_at, NOW()) AS seconds_since_sent FROM account_email_verifications WHERE user_id = ?');
+            $st->execute([(int)$user['id']]);
+            $secondsSinceSent = $st->fetchColumn();
+            if ($secondsSinceSent !== false && (int)$secondsSinceSent < 60) {
+                fail('Espera un minuto antes de solicitar otro código.');
+            }
+            $code = (string)random_int(10000000, 99999999);
+            $st = $pdo->prepare('UPDATE account_email_verifications SET code_hash = ?, expires_at = DATE_ADD(NOW(), INTERVAL 30 MINUTE), attempts = 0, last_sent_at = NOW(), verified_at = NULL WHERE user_id = ?');
+            $st->execute([password_hash($code, PASSWORD_DEFAULT), (int)$user['id']]);
+            try {
+                send_identity_email($user['correo'], $user['nombre'], $user['rol'], $code);
+            } catch (Throwable $e) {
+                error_log('SIGHO verification email failed: ' . $e->getMessage());
+                fail('No fue posible enviar el correo. Verifica la configuración SMTP e inténtalo de nuevo más tarde.', 503);
+            }
+            respond(['ok' => true, 'message' => 'Enviamos un nuevo código a tu correo.']);
+
+        case 'verify_identity':
+            $user = current_user();
+            if (!$user) fail('Debes iniciar sesión.', 401);
+            if (!in_array($user['rol'], ['estudiante', 'profesor'], true)) fail('Esta verificación no aplica a tu cuenta.', 403);
+            $d = json_input();
+            $decision = (string)($d['decision'] ?? '');
+            $code = trim((string)($d['codigo'] ?? ''));
+            if (!in_array($decision, ['si', 'no'], true) || !preg_match('/^\d{8}$/', $code)) {
+                fail('Escribe el código de 8 dígitos del correo y selecciona una opción.');
+            }
+            $pdo = db();
+            ensure_email_verification_table($pdo);
+            $st = $pdo->prepare('SELECT code_hash, (expires_at <= NOW()) AS expired, attempts, verified_at FROM account_email_verifications WHERE user_id = ?');
+            $st->execute([(int)$user['id']]);
+            $verification = $st->fetch();
+            if (!$verification || $verification['verified_at'] !== null) fail('El código no está disponible. Solicita uno nuevo.');
+            if ((int)$verification['attempts'] >= 5) fail('Se agotaron los intentos. Solicita un código nuevo.');
+            if ((bool)$verification['expired']) fail('El código venció. Solicita uno nuevo.');
+            if (!password_verify($code, $verification['code_hash'])) {
+                $st = $pdo->prepare('UPDATE account_email_verifications SET attempts = attempts + 1 WHERE user_id = ? AND verified_at IS NULL');
+                $st->execute([(int)$user['id']]);
+                fail('El código no es correcto. Verifícalo e inténtalo de nuevo.');
+            }
+
+            $pdo->beginTransaction();
+            try {
+                $st = $pdo->prepare('SELECT code_hash, (expires_at <= NOW()) AS expired, attempts, verified_at FROM account_email_verifications WHERE user_id = ? FOR UPDATE');
+                $st->execute([(int)$user['id']]);
+                $verification = $st->fetch();
+                if (!$verification || $verification['verified_at'] !== null ||
+                    (int)$verification['attempts'] >= 5 ||
+                    (bool)$verification['expired'] ||
+                    !password_verify($code, $verification['code_hash'])) {
+                    fail('El código ya no es válido. Solicita uno nuevo.');
+                }
+
+                if ($decision === 'si') {
+                    $st = $pdo->prepare('UPDATE account_email_verifications SET verified_at = NOW() WHERE user_id = ?');
+                    $st->execute([(int)$user['id']]);
+                    $pdo->commit();
+                    $_SESSION['user']['emailVerificada'] = true;
+                    respond(['ok' => true, 'verified' => true, 'message' => 'Correo confirmado. Ya puedes usar SIGHO.']);
+                }
+
+                $st = $pdo->prepare('SELECT id FROM access_requests WHERE LOWER(email) = LOWER(?) AND requested_role_id = (SELECT id FROM roles WHERE code = ?) FOR UPDATE');
+                $st->execute([$user['correo'], $user['rol']]);
+                $requestIds = array_map('intval', $st->fetchAll(PDO::FETCH_COLUMN));
+                $st = $pdo->prepare('SELECT id FROM students WHERE user_id = ?');
+                $st->execute([(int)$user['id']]);
+                $studentId = $st->fetchColumn();
+                if ($studentId !== false) {
+                    $st = $pdo->prepare('DELETE FROM student_applications WHERE user_id = ? OR student_id = ?');
+                    $st->execute([(int)$user['id'], (int)$studentId]);
+                } else {
+                    $st = $pdo->prepare('DELETE FROM student_applications WHERE user_id = ?');
+                    $st->execute([(int)$user['id']]);
+                }
+                if ($requestIds) {
+                    $placeholders = implode(',', array_fill(0, count($requestIds), '?'));
+                    $st = $pdo->prepare("DELETE FROM student_applications WHERE access_request_id IN ({$placeholders})");
+                    $st->execute($requestIds);
+                }
+                $st = $pdo->prepare('DELETE rh FROM review_history rh JOIN staff s ON s.id = rh.reviewer_staff_id WHERE s.user_id = ?');
+                $st->execute([(int)$user['id']]);
+                if ($requestIds) {
+                    $placeholders = implode(',', array_fill(0, count($requestIds), '?'));
+                    $st = $pdo->prepare("DELETE FROM access_requests WHERE id IN ({$placeholders})");
+                    $st->execute($requestIds);
+                }
+                $st = $pdo->prepare('DELETE FROM users WHERE id = ?');
+                $st->execute([(int)$user['id']]);
+                if ($st->rowCount() !== 1) fail('No fue posible eliminar la cuenta.');
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
+            }
+
+            $_SESSION = [];
+            session_destroy();
+            try {
+                $notified = notify_admins_of_unrecognized_account($pdo, (string)$user['nombre'], (string)$user['correo'], (string)$user['rol']);
+                $notificationMessage = $notified
+                    ? 'El administrador fue notificado por correo.'
+                    : 'No se encontró un correo de administrador activo para notificar.';
+            } catch (Throwable $e) {
+                error_log('SIGHO unrecognized-account notification failed: ' . $e->getMessage());
+                $notified = false;
+                $notificationMessage = 'No se pudo enviar el aviso al administrador. La cuenta sí fue eliminada.';
+            }
+            respond([
+                'ok' => true,
+                'deleted' => true,
+                'adminNotified' => $notified,
+                'message' => 'La cuenta y sus datos asociados fueron eliminados. ' . $notificationMessage,
+            ]);
 
         case 'logout':
             $_SESSION = [];
@@ -655,9 +991,11 @@ try {
                             'Salud Mía EPS', 'Coosalud', 'Mutual Ser', 'Capital Salud EPS', 'Savia Salud EPS',
                             'Asmet Salud', 'Emssanar', 'Cajacopi Atlántico', 'Capresoca', 'Comfachocó',
                             'Comfaoriente', 'Comfenalco Valle', 'EPS Familiar de Colombia', 'Anas Wayuu EPSI',
-                            'Asociación Indígena del Cauca (AIC)', 'Dusakawi EPSI', 'Mallamas EPSI', 'Pijaos Salud EPSI'
+                            'Asociación Indígena del Cauca (AIC)', 'Dusakawi EPSI', 'Mallamas EPSI', 'Pijaos Salud EPSI',
+                            'Otro'
                         ];
-                        if (!in_array($epsSeleccionada, $epsPermitidas, true) || $eps !== $epsSeleccionada) {
+                        if (!in_array($epsSeleccionada, $epsPermitidas, true) ||
+                            ($epsSeleccionada !== 'Otro' && $eps !== $epsSeleccionada)) {
                             fail('Selecciona una EPS válida.');
                         }
                     } elseif ($seguridadSocialTipo === 'especial') {
@@ -1148,37 +1486,72 @@ try {
 
             if (mb_strlen($descripcion, 'UTF-8') > 1000) fail('La descripción puede tener máximo 1000 caracteres.');
 
-            // Evidencia obligatoria. El servidor valida MIME real, no solo la extensión.
-            if (empty($_FILES['evidencia']) || $_FILES['evidencia']['error'] !== UPLOAD_ERR_OK) {
-                fail('Debes adjuntar una evidencia.');
+            $upload = $_FILES['evidencia'] ?? null;
+            if (!$upload || !isset($upload['name'])) fail('Debes adjuntar al menos una imagen.');
+            if (!is_array($upload['name'])) {
+                $upload = array_map(static fn($value): array => [$value], $upload);
             }
-            $file = $_FILES['evidencia'];
-            if ((int)$file['size'] <= 0) fail('La evidencia está vacía.');
-            if ((int)$file['size'] > 5 * 1024 * 1024) fail('La evidencia debe pesar máximo 5 MB.');
-
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
-            $mime = $finfo->file($file['tmp_name']);
-            $allowed = ['image/jpeg'];
-            if (!in_array($mime, $allowed, true)) fail('Solo se permiten imágenes JPG o JPEG.');
+            $cantidadEvidencias = count($upload['name']);
+            if ($cantidadEvidencias < 1 || $cantidadEvidencias > 3) {
+                fail('Debes adjuntar de 1 a 3 imágenes como máximo.');
+            }
 
             if (!is_dir(EVIDENCE_DIR) && !mkdir(EVIDENCE_DIR, 0775, true) && !is_dir(EVIDENCE_DIR)) {
                 fail('No fue posible preparar el almacenamiento de la evidencia.', 500);
             }
 
-            $extPorMime = ['image/jpeg' => 'jpg'];
-            $stored = bin2hex(random_bytes(16)) . '.' . $extPorMime[$mime];
-            $target = EVIDENCE_DIR . DIRECTORY_SEPARATOR . $stored;
-            if (!move_uploaded_file($file['tmp_name'], $target)) {
-                fail('No fue posible guardar la evidencia.', 500);
-            }
-            $relative = 'uploads/evidence/' . $stored;
-
             $pdo = db();
+            ensure_record_evidence_table($pdo);
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $uploadsValidados = [];
+            for ($i = 0; $i < $cantidadEvidencias; $i++) {
+                $file = [
+                    'name' => $upload['name'][$i] ?? '',
+                    'tmp_name' => $upload['tmp_name'][$i] ?? '',
+                    'error' => $upload['error'][$i] ?? UPLOAD_ERR_NO_FILE,
+                    'size' => $upload['size'][$i] ?? 0,
+                ];
+                if ($file['error'] !== UPLOAD_ERR_OK) {
+                    fail($file['error'] === UPLOAD_ERR_INI_SIZE || $file['error'] === UPLOAD_ERR_FORM_SIZE
+                        ? 'Cada imagen debe pesar máximo 5 MB.'
+                        : 'No se pudo recibir una de las imágenes adjuntas.');
+                }
+                if ((int)$file['size'] <= 0) fail('Una de las imágenes está vacía.');
+                if ((int)$file['size'] > 5 * 1024 * 1024) fail('Cada imagen debe pesar máximo 5 MB.');
+                if (!preg_match('/\.jpe?g$/i', (string)$file['name'])) {
+                    fail('Solo se permiten imágenes JPG o JPEG.');
+                }
+
+                $mime = $finfo->file((string)$file['tmp_name']);
+                if ($mime !== 'image/jpeg') fail('Solo se permiten imágenes JPG o JPEG.');
+                $file['mime'] = $mime;
+                $uploadsValidados[] = $file;
+            }
+
+            $archivosGuardados = [];
+            foreach ($uploadsValidados as $file) {
+                $stored = bin2hex(random_bytes(16)) . '.jpg';
+                $target = EVIDENCE_DIR . DIRECTORY_SEPARATOR . $stored;
+                if (!move_uploaded_file((string)$file['tmp_name'], $target)) {
+                    foreach ($archivosGuardados as $saved) @unlink($saved['target']);
+                    fail('No fue posible guardar una de las imágenes.', 500);
+                }
+                $archivosGuardados[] = [
+                    'nombre' => basename((string)$file['name']),
+                    'path' => 'uploads/evidence/' . $stored,
+                    'mime' => $file['mime'],
+                    'size' => (int)$file['size'],
+                    'target' => $target,
+                ];
+            }
+
             // Las nuevas jornadas ya no usan entrada/salida. Dejamos esas columnas como NULL para conservar compatibilidad con registros antiguos.
             try {
                 $pdo->exec("ALTER TABLE hour_records MODIFY entry_time TIME NULL, MODIFY exit_time TIME NULL");
             } catch (Throwable $e) { /* si ya son NULL o el motor no requiere el cambio, continuamos */ }
             try {
+                $pdo->beginTransaction();
+                $primeraEvidencia = $archivosGuardados[0];
                 $st = $pdo->prepare('INSERT INTO hour_records (student_id, record_date, entry_time, exit_time, hours, activity_description, evidence_original_name, evidence_path, evidence_mime) VALUES (?,?,?,?,?,?,?,?,?)');
                 $st->execute([
                     $studentId,
@@ -1187,18 +1560,24 @@ try {
                     null,
                     $hours,
                     $descripcion,
-                    basename((string)$file['name']),
-                    $relative,
-                    $mime
+                    $primeraEvidencia['nombre'],
+                    $primeraEvidencia['path'],
+                    $primeraEvidencia['mime']
                 ]);
+                $recordId = (int)$pdo->lastInsertId();
+                $stEvidence = $pdo->prepare('INSERT INTO hour_record_evidence (record_id, original_name, evidence_path, evidence_mime, file_size) VALUES (?,?,?,?,?)');
+                foreach ($archivosGuardados as $saved) {
+                    $stEvidence->execute([$recordId, $saved['nombre'], $saved['path'], $saved['mime'], $saved['size']]);
+                }
+                $pdo->commit();
             } catch (Throwable $e) {
-                @unlink($target);
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                foreach ($archivosGuardados as $saved) @unlink($saved['target']);
                 throw $e;
             }
 
-            $id = (int)$pdo->lastInsertId();
             $records = get_records($studentId);
-            $record = array_values(array_filter($records, fn($r) => (int)$r['id'] === $id))[0] ?? null;
+            $record = array_values(array_filter($records, fn($r) => (int)$r['id'] === $recordId))[0] ?? null;
             if (!$record) fail('La jornada fue guardada, pero no fue posible recuperar su información.', 500);
 
             respond([
@@ -1331,6 +1710,8 @@ try {
             // fuera de la transacción porque MySQL puede hacer COMMIT implícito.
             ensure_student_application_table($pdo);
             ensure_optional_columns($pdo);
+            ensure_email_verification_table($pdo);
+            $approvedIdentity = null;
             $pdo->beginTransaction();
             try {
                 $st = $pdo->prepare("SELECT ar.*, r.code AS role_code FROM access_requests ar JOIN roles r ON r.id=ar.requested_role_id WHERE ar.id=? AND ar.status='pendiente' FOR UPDATE");
@@ -1357,6 +1738,13 @@ try {
                         $st = $pdo->prepare('UPDATE staff SET service_site = NULL, service_project = NULL WHERE user_id = ?');
                         $st->execute([$userId]);
                     }
+                    $verificationCode = create_email_verification($pdo, $userId);
+                    $approvedIdentity = [
+                        'email' => (string)$r['email'],
+                        'name' => trim((string)$r['first_name'] . ' ' . (string)$r['last_name']),
+                        'role' => (string)$r['role_code'],
+                        'code' => $verificationCode,
+                    ];
                 }
                 $st = $pdo->prepare('UPDATE access_requests SET status=?, validated_by=?, validated_at=NOW() WHERE id=?');
                 $st->execute([$status, (int)require_login()['id'], $id]);
@@ -1364,7 +1752,29 @@ try {
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) $pdo->rollBack(); throw $e;
             }
-            respond(['ok'=>true]);
+            if ($approvedIdentity !== null) {
+                try {
+                    send_identity_email(
+                        $approvedIdentity['email'],
+                        $approvedIdentity['name'],
+                        $approvedIdentity['role'],
+                        $approvedIdentity['code']
+                    );
+                    respond([
+                        'ok' => true,
+                        'emailSent' => true,
+                        'message' => 'Solicitud aprobada. Enviamos al usuario un correo de bienvenida con el código de verificación.',
+                    ]);
+                } catch (Throwable $e) {
+                    error_log('SIGHO welcome email failed: ' . $e->getMessage());
+                    respond([
+                        'ok' => true,
+                        'emailSent' => false,
+                        'message' => 'La solicitud fue aprobada, pero no se pudo enviar el correo. Verifica SMTP; el usuario puede solicitar un nuevo código.',
+                    ]);
+                }
+            }
+            respond(['ok'=>true,'message'=>'Solicitud rechazada.']);
 
         case 'superadmin_data':
             require_roles(['superadmin']);
