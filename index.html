@@ -8627,7 +8627,7 @@ async function abrirAdministrador() {
 }
 
 function actualizarContadoresSuperAdmin() {
-    const usuarios = superAdminData.users || [];
+    const usuarios = (superAdminData.users || []).filter(usuario => usuario.estado === "activo");
     const contar = rol => usuarios.filter(usuario => usuario.rol === rol).length;
     document.getElementById("superadminCountStudents").textContent = contar("estudiante");
     document.getElementById("superadminCountTeachers").textContent = contar("profesor");
@@ -8972,7 +8972,7 @@ function filtrarUsuariosSuperAdmin() {
     });
     const count = document.getElementById("superadminUserCount");
     if (count) count.textContent = `${users.length} usuario${users.length === 1 ? "" : "s"}`;
-    cont.innerHTML = `<div class="table-container"><table class="superadmin-users-table"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.length ? users.map(user => `<tr><td>${escaparHTML(user.nombre)}</td><td>${escaparHTML(user.correo)}</td><td>${escaparHTML(user.rol)}</td><td><span class="status ${user.estado === "activo" ? "approved" : "rejected"}">${escaparHTML(user.estado)}</span></td><td>${user.rol === "superadmin" ? "—" : `<div class="actions"><button class="secondary-button" onclick="abrirFormularioUsuario(${user.id})">Editar</button><button class="danger-button" onclick="eliminarUsuarioSuperAdmin(${user.id})">Desactivar</button></div>`}</td></tr>`).join("") : `<tr><td colspan="5">No hay usuarios que coincidan con el filtro.</td></tr>`}</tbody></table></div>`;
+    cont.innerHTML = `<div class="table-container"><table class="superadmin-users-table"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.length ? users.map(user => `<tr><td>${escaparHTML(user.nombre)}</td><td>${escaparHTML(user.correo)}</td><td>${escaparHTML(user.rol)}</td><td><span class="status ${user.estado === "activo" ? "approved" : "rejected"}">${escaparHTML(user.estado)}</span></td><td>${user.rol === "superadmin" ? "—" : `<div class="actions"><button class="secondary-button" onclick="abrirFormularioUsuario(${user.id})">Editar</button><button class="${user.estado === "activo" ? "danger-button" : "success-button"}" onclick="cambiarEstadoUsuarioSuperAdmin(${user.id}, '${user.estado}')">${user.estado === "activo" ? "Desactivar" : "Activar"}</button></div>`}</td></tr>`).join("") : `<tr><td colspan="5">No hay usuarios que coincidan con el filtro.</td></tr>`}</tbody></table></div>`;
 }
 
 function abrirFormularioUsuario(id = 0) {
@@ -9030,6 +9030,18 @@ async function guardarUsuarioSuperAdmin(event) {
 async function eliminarUsuarioSuperAdmin(id) {
     if (!confirm("¿Desactivar esta cuenta?")) return;
     try { const result = await api("superadmin_user_delete", { method: "POST", body: { id } }); superAdminData = result.data; llenarUsuariosSuperAdmin(); } catch (e) { alert(e.message); }
+}
+
+async function cambiarEstadoUsuarioSuperAdmin(id, estadoActual) {
+    const nuevoEstado = estadoActual === "activo" ? "inactivo" : "activo";
+    const accion = nuevoEstado === "activo" ? "activar" : "desactivar";
+    if (!confirm(`¿Confirmas que deseas ${accion} esta cuenta?`)) return;
+    try {
+        const result = await api("superadmin_user_status", { method: "POST", body: { id, estado: nuevoEstado } });
+        superAdminData = result.data;
+        llenarUsuariosSuperAdmin();
+        actualizarContadoresSuperAdmin();
+    } catch (e) { alert(e.message); }
 }
 
 function llenarRolesSuperAdmin() {

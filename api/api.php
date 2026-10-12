@@ -1641,6 +1641,18 @@ try {
             db()->prepare("UPDATE users SET status='inactivo' WHERE id=?")->execute([$id]);
             respond(['ok' => true, 'data' => superadmin_snapshot()]);
 
+        case 'superadmin_user_status':
+            $admin = require_roles(['superadmin']);
+            $d = json_input();
+            $id = (int)($d['id'] ?? 0);
+            $status = (string)($d['estado'] ?? '');
+            if (!$id || !in_array($status, ['activo', 'inactivo'], true)) fail('Estado de usuario inválido.');
+            if ($id === (int)$admin['id']) fail('No puedes cambiar el estado de tu propia cuenta.');
+            $existing = find_user_by_id($id);
+            if (!$existing || $existing['role_code'] === 'superadmin') fail('La cuenta no puede modificarse desde esta acción.');
+            db()->prepare('UPDATE users SET status=? WHERE id=?')->execute([$status, $id]);
+            respond(['ok' => true, 'data' => superadmin_snapshot()]);
+
         case 'superadmin_permissions_save':
             require_roles(['superadmin']);
             $d = json_input();
