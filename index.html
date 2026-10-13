@@ -10226,6 +10226,9 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="sidebar-role">Profesor</div>
 <nav class="sidebar-nav">
+<button hidden="" id="sidebarVolverSuperAdminProfesor" onclick="abrirSuperAdmin()" type="button">
+<span class="sidebar-icon">🛡️</span><span>Volver al Super Admin</span>
+</button>
 <button id="sidebarInicioProfesor" onclick="mostrarSeccionProfesor('inicio')">
 <span class="sidebar-icon">🏠</span><span>Inicio</span>
 </button>
@@ -10276,7 +10279,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <span class="profile-chevron">⌄</span>
 </button>
 <div class="more-menu-dropdown user-dropdown">
-<button onclick="mostrarSeccionProfesor('datos'); cerrarMenuUsuarioProfesor();">👤 Mis datos</button>
+<button id="menuDatosProfesor" onclick="mostrarSeccionProfesor('datos'); cerrarMenuUsuarioProfesor();">👤 Mis datos</button>
 <button onclick="cerrarSesion()">↪ Cerrar sesión</button>
 </div>
 </div>
@@ -10537,6 +10540,9 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="sidebar-role">Administrador</div>
 <nav aria-label="Navegación del administrador" class="sidebar-nav">
+<button hidden="" id="sidebarVolverSuperAdminAdministrador" onclick="abrirSuperAdmin()" type="button">
+<span class="sidebar-icon">🛡️</span><span>Volver al Super Admin</span>
+</button>
 <button data-admin-seccion="inicio" id="sidebarInicioAdministrador" type="button">
 <span class="sidebar-icon">📊</span><span>Inicio</span>
 </button>
@@ -10760,6 +10766,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <aside class="superadmin-nav">
 <div class="superadmin-brand"><strong>SIGHO</strong><span>Super Admin</span></div>
 <button class="superadmin-tab active" data-superadmin-tab="inicio">Plantel de Super Admin</button>
+<button class="superadmin-tab" onclick="abrirAdministrador()" type="button">Operación de Administrador</button>
+<button class="superadmin-tab" onclick="abrirProfesor()" type="button">Operación de Profesor</button>
 <button class="superadmin-tab" data-superadmin-tab="usuarios">Usuarios</button>
 <button class="superadmin-tab" data-superadmin-tab="permisos">Roles y permisos</button>
 <button class="superadmin-tab" data-superadmin-tab="configuracion">Configuración</button>
@@ -10774,7 +10782,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="superadmin-home-quick"><div><span class="quick-icon">📊</span><div><strong>Validaciones de administradores</strong><p>Revisa las solicitudes pendientes y mantén el acceso institucional bajo control.</p></div></div><button onclick="mostrarSeccionSuperAdmin('usuarios')" type="button">Gestionar usuarios →</button></div>
 <div class="section admin-section"><h3>Validaciones de administradores</h3><p class="section-description">Solo el Super Admin puede aceptar o rechazar solicitudes para crear cuentas de administrador.</p><div id="tablaValidacionesSuperAdmin"></div></div>
 </section>
-<section class="superadmin-panel" hidden="" id="superadminPanelUsuarios"><div class="superadmin-section-head"><div><h3>Usuarios</h3><p>Crear, editar, activar o desactivar cuentas.</p></div><button class="main-button superadmin-action" onclick="abrirFormularioUsuario()">+ Crear usuario</button></div><div class="superadmin-user-tools"><div class="form-group"><label for="superadminUserSearch">Buscar usuario</label><input id="superadminUserSearch" oninput="filtrarUsuariosSuperAdmin()" placeholder="Nombre, correo o identificación" type="search"/></div><div class="form-group"><label for="superadminUserRoleFilter">Filtrar por rol</label><select id="superadminUserRoleFilter" onchange="filtrarUsuariosSuperAdmin()"><option value="todos">Todos los usuarios</option><option value="estudiante">Solo estudiantes</option><option value="profesor">Solo profesores</option><option value="administrador">Solo administradores</option></select></div><span class="superadmin-user-count" id="superadminUserCount"></span></div><div id="superadminUserForm"></div><div id="superadminUsersTable"></div></section>
+<section class="superadmin-panel" hidden="" id="superadminPanelUsuarios"><div class="superadmin-section-head"><div><h3>Administradores</h3><p>Crea, edita, activa o desactiva cuentas de Administrador.</p></div><button class="main-button superadmin-action" onclick="abrirFormularioUsuario()">+ Crear administrador</button></div><div class="superadmin-user-tools"><div class="form-group"><label for="superadminUserSearch">Buscar administrador</label><input id="superadminUserSearch" oninput="filtrarUsuariosSuperAdmin()" placeholder="Nombre, correo o identificación" type="search"/></div><div class="form-group"><label for="superadminUserRoleFilter">Rol</label><select id="superadminUserRoleFilter" onchange="filtrarUsuariosSuperAdmin()"><option value="administrador">Administradores</option></select></div><span class="superadmin-user-count" id="superadminUserCount"></span></div><div id="superadminUserForm"></div><div id="superadminUsersTable"></div></section>
 <section class="superadmin-panel" hidden="" id="superadminPanelPermisos"><div class="superadmin-section-head"><div><h3>Roles y permisos</h3><p>Asigna permisos a cada rol del sistema.</p></div><select id="superadminRoleSelect" onchange="mostrarMatrizPermisos()"></select></div><div id="superadminPermissionsTable"></div><button class="main-button superadmin-action" onclick="guardarPermisosSuperAdmin()">Guardar permisos</button></section>
 <section class="superadmin-panel" hidden="" id="superadminPanelConfiguracion"><div class="superadmin-section-head"><div><h3>Configuración general</h3><p>Valores generales usados por SIGHO.</p></div></div><div id="superadminSettingsForm"></div><button class="main-button superadmin-action" onclick="guardarConfiguracionSuperAdmin()">Guardar configuración</button></section>
 <section class="superadmin-panel" hidden="" id="superadminPanelAyuda"><div class="superadmin-section-head"><div><h3>Ayuda de SIGHO</h3><p>Consulta la ayuda y abre la IA cuando tengas una duda.</p></div></div><div class="security-box"><strong>Centro de ayuda</strong><br/>Encuentra respuestas rápidas o conversa con la IA de SIGHO.</div><button aria-controls="chatAyudaSuperadmin" aria-expanded="false" class="ai-help-launcher" onclick="alternarChatAyuda('superadmin')" type="button"><span class="ai-help-launcher-icon">🤖</span><span class="ai-help-launcher-text"><strong>IA SIGHO</strong><small>Resolver dudas</small></span></button><div class="role-help-chat" id="chatAyudaSuperadmin"><button class="ai-help-close" onclick="alternarChatAyuda('superadmin')" type="button">Cerrar</button><span class="ai-quick-title">Preguntas frecuentes</span><div class="ai-quick-questions"><button onclick="preguntaRapidaSuperAdmin('¿Cómo administro usuarios?')" type="button">Usuarios</button><button onclick="preguntaRapidaSuperAdmin('¿Cómo asigno permisos?')" type="button">Permisos</button><button onclick="preguntaRapidaSuperAdmin('¿Qué puedo configurar?')" type="button">Configuración</button></div><input id="superadminHelpQuestion" onkeydown="if(event.key==='Enter') consultarAyudaSuperAdmin()" placeholder="Escribe tu duda para la IA..." type="text"/><button onclick="consultarAyudaSuperAdmin()" type="button">Preguntar</button><div class="superadmin-help-answer" id="superadminHelpAnswer">Selecciona una pregunta para ver la orientación.</div></div><div class="superadmin-help-grid"><button onclick="mostrarAyudaSuperAdmin('usuarios')" type="button">¿Cómo administro usuarios?</button><button onclick="mostrarAyudaSuperAdmin('permisos')" type="button">¿Cómo asigno permisos?</button><button onclick="mostrarAyudaSuperAdmin('configuracion')" type="button">¿Qué puedo configurar?</button><button onclick="mostrarAyudaSuperAdmin('volver')" type="button">¿Cómo regreso?</button></div></section>
@@ -10993,6 +11001,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
     let registros = [];
     let solicitudes = [];
     let usuarioActual = null;
+    let modoVistaSuperAdmin = null;
 try { guardarSesionSigho(usuarioActual); } catch (_) {}
     let filtroHistorialProfesorActual = "todos";
     let filtroHistorialAdminActual = "todos";
@@ -11239,6 +11248,15 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
             usuarios = (data.users || []).map(normalizarUsuario);
             solicitudes = data.requests || [];
             window.solicitudesAdministradorAdmin = data.adminRequests || [];
+        } else if (usuarioActual.rol === "superadmin" && modoVistaSuperAdmin === "administrador") {
+            const data = await api("admin_data");
+            registros = (data.records || []).map(normalizarRegistro);
+            usuarios = (data.users || []).map(normalizarUsuario);
+            solicitudes = data.requests || [];
+            window.solicitudesAdministradorAdmin = data.adminRequests || [];
+        } else if (usuarioActual.rol === "superadmin" && modoVistaSuperAdmin === "profesor") {
+            const data = await api("teacher_data");
+            registros = (data.records || []).map(normalizarRegistro);
         } else if (usuarioActual.rol === "superadmin") {
             const data = await api("superadmin_data");
             solicitudes = data.requests || [];
@@ -12935,7 +12953,7 @@ function volverSeccionSuperAdmin() {
 
 function mostrarAyudaSuperAdmin(tema) {
     const respuestas = {
-        usuarios: "En Usuarios puedes crear cuentas, editar sus datos, cambiar el rol, activar o desactivar cuentas y filtrar por nombre, correo, identificación o rol.",
+        usuarios: "En Usuarios puedes crear, editar, activar o desactivar cuentas de Administrador. Para gestionar estudiantes y profesores, abre Operación de Administrador.",
         permisos: "En Roles y permisos selecciona un rol y activa solo los permisos que necesita. Estudiante, Profesor y Administrador tienen permisos diferentes; el Super Admin conserva el control completo.",
         configuracion: "En Configuración puedes actualizar los valores generales que utiliza SIGHO, como el dominio institucional y las metas de horas.",
         volver: "Usa Volver al inicio en el menú de puntos o el botón Atrás del navegador. Las evidencias ahora se abren en la misma pestaña para que puedas regresar normalmente."
@@ -13528,12 +13546,17 @@ async function actualizarProfesor() {
 
         const info = document.getElementById("profesorAreaInfo");
         if (info) {
-            info.innerText = `Sede: ${usuarioActual?.sede || "Sin asignar"} · Proyecto: ${usuarioActual?.proyecto || "Sin asignar"}`;
+            info.innerText = usuarioActual?.rol === "superadmin"
+                ? "Acceso general: todas las sedes y proyectos."
+                : `Sede: ${usuarioActual?.sede || "Sin asignar"} · Proyecto: ${usuarioActual?.proyecto || "Sin asignar"}`;
         }
-    } catch (_) {
+    } catch (e) {
+        if (usuarioActual?.rol === "superadmin") alert(e.message);
         const info = document.getElementById("profesorAreaInfo");
         if (info) {
-            info.innerText = `Sede: ${usuarioActual?.sede || "Sin asignar"} · Proyecto: ${usuarioActual?.proyecto || "Sin asignar"}`;
+            info.innerText = usuarioActual?.rol === "superadmin"
+                ? "Acceso general: todas las sedes y proyectos."
+                : `Sede: ${usuarioActual?.sede || "Sin asignar"} · Proyecto: ${usuarioActual?.proyecto || "Sin asignar"}`;
         }
     }
 
@@ -13853,6 +13876,10 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 }
 
 async function abrirProfesor() {
+    modoVistaSuperAdmin = usuarioActual?.rol === "superadmin" ? "profesor" : null;
+    document.getElementById("sidebarVolverSuperAdminProfesor")?.toggleAttribute("hidden", usuarioActual?.rol !== "superadmin");
+    document.getElementById("menuDatosProfesor")?.toggleAttribute("hidden", usuarioActual?.rol === "superadmin");
+    document.querySelector("#profesor .profesor-admin-request-card")?.toggleAttribute("hidden", usuarioActual?.rol === "superadmin");
     ocultarPantallas();
     document.getElementById("profesor").classList.add("active");
     await actualizarProfesor();
@@ -13861,6 +13888,8 @@ async function abrirProfesor() {
 }
 
 async function abrirAdministrador() {
+    modoVistaSuperAdmin = usuarioActual?.rol === "superadmin" ? "administrador" : null;
+    document.getElementById("sidebarVolverSuperAdminAdministrador")?.toggleAttribute("hidden", usuarioActual?.rol !== "superadmin");
     ocultarPantallas();
     document.getElementById("administrador").classList.add("active");
 
@@ -13874,6 +13903,7 @@ async function abrirAdministrador() {
 
 async function abrirSuperAdmin() {
     try {
+        modoVistaSuperAdmin = null;
         const data = await api("superadmin_data");
         solicitudes = data.requests || [];
         superAdminData = data;
@@ -13935,7 +13965,7 @@ function volverSeccionSuperAdmin() {
 
 function mostrarAyudaSuperAdmin(tema) {
     const respuestas = {
-        usuarios: "En Usuarios puedes crear cuentas, editar sus datos, cambiar el rol, activar o desactivar cuentas y filtrar por nombre, correo, identificación o rol.",
+        usuarios: "En Usuarios puedes crear, editar, activar o desactivar cuentas de Administrador. Para gestionar estudiantes y profesores, abre Operación de Administrador.",
         permisos: "En Roles y permisos selecciona un rol y activa solo los permisos que necesita. Estudiante, Profesor y Administrador tienen permisos diferentes; el Super Admin conserva el control completo.",
         configuracion: "En Configuración puedes actualizar los valores generales que utiliza SIGHO, como el dominio institucional y las metas de horas.",
         volver: "Usa Volver al inicio en el menú de puntos o el botón Atrás del navegador. Las evidencias ahora se abren en la misma pestaña para que puedas regresar normalmente."
@@ -14027,7 +14057,7 @@ function preguntarIaSuperAdmin() {
     windowChat.appendChild(userMessage);
     const texto = pregunta.toLowerCase();
     let respuesta = "Puedo ayudarte con usuarios, roles, permisos, configuración y navegación del panel Super Admin.";
-    if (texto.includes("usuario") || texto.includes("profesor") || texto.includes("estudiante") || texto.includes("admin")) respuesta = "En Usuarios puedes buscar por nombre, correo o identificación, filtrar por rol, crear cuentas, editar datos y desactivar usuarios.";
+    if (texto.includes("usuario") || texto.includes("profesor") || texto.includes("estudiante") || texto.includes("admin")) respuesta = "En Usuarios puedes crear, editar, activar o desactivar cuentas de Administrador. Para gestionar estudiantes y profesores, abre Operación de Administrador.";
     else if (texto.includes("permiso") || texto.includes("rol")) respuesta = "En Roles y permisos selecciona el rol y activa solo los permisos que necesita. Cada rol tiene una configuración diferente.";
     else if (texto.includes("config") || texto.includes("meta") || texto.includes("dominio")) respuesta = "En Configuración puedes modificar los valores generales de SIGHO, como dominio institucional y metas de horas.";
     else if (texto.includes("volver") || texto.includes("regresar") || texto.includes("naveg")) respuesta = "Usa las opciones de la barra lateral para cambiar de sección. El botón Atrás del navegador también conserva la navegación de páginas abiertas.";
@@ -14066,13 +14096,14 @@ function filtrarUsuariosSuperAdmin() {
     });
     const count = document.getElementById("superadminUserCount");
     if (count) count.textContent = `${users.length} usuario${users.length === 1 ? "" : "s"}`;
-    cont.innerHTML = `<div class="table-container"><table class="superadmin-users-table"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.length ? users.map(user => `<tr><td>${escaparHTML(user.nombre)}</td><td>${escaparHTML(user.correo)}</td><td>${escaparHTML(user.rol)}</td><td><span class="status ${user.estado === "activo" ? "approved" : "rejected"}">${escaparHTML(user.estado)}</span></td><td><div class="actions"><button class="secondary-button" onclick="abrirFormularioUsuario(${user.id})">Editar</button><button class="danger-button" onclick="eliminarUsuarioSuperAdmin(${user.id})">Desactivar</button></div></td></tr>`).join("") : `<tr><td colspan="5">No hay usuarios que coincidan con el filtro.</td></tr>`}</tbody></table></div>`;
+    cont.innerHTML = `<div class="table-container"><table class="superadmin-users-table"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.length ? users.map(user => `<tr><td>${escaparHTML(user.nombre)}</td><td>${escaparHTML(user.correo)}</td><td>Administrador</td><td><span class="status ${user.estado === "activo" ? "approved" : "rejected"}">${escaparHTML(user.estado)}</span></td><td><div class="actions"><button class="secondary-button" onclick="abrirFormularioUsuario(${user.id})">Editar</button><button class="${user.estado === "activo" ? "danger-button" : "success-button"}" onclick="eliminarUsuarioSuperAdmin(${user.id})">${user.estado === "activo" ? "Desactivar" : "Activar"}</button></div></td></tr>`).join("") : `<tr><td colspan="5">No hay administradores que coincidan con la búsqueda.</td></tr>`}</tbody></table></div>`;
 }
 
 function abrirFormularioUsuario(id = 0) {
     const user = (superAdminData.users || []).find(item => Number(item.id) === Number(id)); const cont = document.getElementById("superadminUserForm"); if (!cont) return;
-    cont.innerHTML = `<button type="button" class="secondary-button superadmin-back-button" onclick="cancelarFormularioUsuarioSuperAdmin()">← Volver a Usuarios</button><form class="superadmin-form" onsubmit="guardarUsuarioSuperAdmin(event)"><input type="hidden" id="superadminUserId" value="${user?.id || ""}"><div class="form-group"><label>Identificación</label><input id="superadminIdentificacion" required value="${escaparHTML(user?.identificacion || "")}"></div><div class="form-group"><label>Nombres</label><input id="superadminNombres" required value="${escaparHTML(user?.nombres || "")}"></div><div class="form-group"><label>Apellidos</label><input id="superadminApellidos" required value="${escaparHTML(user?.apellidos || "")}"></div><div class="form-group"><label>Correo</label><input id="superadminCorreo" type="email" required value="${escaparHTML(user?.correo || "")}"></div><div class="form-group"><label>Rol</label><select id="superadminRol"><option value="estudiante">Estudiante</option><option value="profesor">Profesor</option><option value="administrador">Administrador</option></select></div><div class="form-group"><label>Estado</label><select id="superadminEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div><div class="form-group wide"><label>${user ? "Nueva contraseña (opcional)" : "Contraseña"}</label><input id="superadminClave" type="password" ${user ? "" : "required"} minlength="8"></div><div class="superadmin-form-actions"><button class="main-button superadmin-action" type="submit">Guardar usuario</button><button class="secondary-button" type="button" onclick="cancelarFormularioUsuarioSuperAdmin()">Cancelar</button></div></form>`;
-    document.getElementById("superadminRol").value = user?.rol || "estudiante"; document.getElementById("superadminEstado").value = user?.estado || "activo";
+    if (id && !user) return;
+    cont.innerHTML = `<button type="button" class="secondary-button superadmin-back-button" onclick="cancelarFormularioUsuarioSuperAdmin()">← Volver a Administradores</button><form class="superadmin-form" onsubmit="guardarUsuarioSuperAdmin(event)"><input type="hidden" id="superadminUserId" value="${user?.id || ""}"><div class="form-group"><label>Identificación</label><input id="superadminIdentificacion" required maxlength="50" value="${escaparHTML(user?.identificacion || "")}"></div><div class="form-group"><label>Nombres</label><input id="superadminNombres" required maxlength="80" value="${escaparHTML(user?.nombres || "")}"></div><div class="form-group"><label>Apellidos</label><input id="superadminApellidos" required maxlength="100" value="${escaparHTML(user?.apellidos || "")}"></div><div class="form-group"><label>Correo institucional</label><input id="superadminCorreo" type="email" required maxlength="150" value="${escaparHTML(user?.correo || "")}"></div><div class="form-group"><label>Rol</label><select id="superadminRol" disabled><option value="administrador">Administrador</option></select></div><div class="form-group"><label>Estado</label><select id="superadminEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div><div class="form-group wide"><label>${user ? "Nueva contraseña (opcional)" : "Contraseña"}</label><input id="superadminClave" type="password" ${user ? "" : "required"} minlength="8" maxlength="72"></div><div class="superadmin-form-actions"><button class="main-button superadmin-action" type="submit">Guardar administrador</button><button class="secondary-button" type="button" onclick="cancelarFormularioUsuarioSuperAdmin()">Cancelar</button></div></form>`;
+    document.getElementById("superadminRol").value = "administrador"; document.getElementById("superadminEstado").value = user?.estado || "activo";
 }
 
 function cancelarFormularioUsuarioSuperAdmin() {
@@ -14080,13 +14111,32 @@ function cancelarFormularioUsuarioSuperAdmin() {
 }
 
 async function guardarUsuarioSuperAdmin(event) {
-    event.preventDefault(); const body = { id: Number(document.getElementById("superadminUserId").value || 0), identificacion: document.getElementById("superadminIdentificacion").value, nombres: document.getElementById("superadminNombres").value, apellidos: document.getElementById("superadminApellidos").value, correo: document.getElementById("superadminCorreo").value, rol: document.getElementById("superadminRol").value, estado: document.getElementById("superadminEstado").value, clave: document.getElementById("superadminClave").value };
-    try { const result = await api("superadmin_user_save", { method: "POST", body }); superAdminData = result.data; document.getElementById("superadminUserForm").innerHTML = ""; llenarUsuariosSuperAdmin(); alert("Usuario guardado correctamente."); } catch (e) { alert(e.message); }
+    event.preventDefault(); const body = { id: Number(document.getElementById("superadminUserId").value || 0), identificacion: document.getElementById("superadminIdentificacion").value, nombres: document.getElementById("superadminNombres").value, apellidos: document.getElementById("superadminApellidos").value, correo: document.getElementById("superadminCorreo").value, estado: document.getElementById("superadminEstado").value, clave: document.getElementById("superadminClave").value };
+    try {
+        const result = await api("superadmin_user_save", { method: "POST", body });
+        superAdminData.users = result.data.users;
+        superAdminData.counts = result.data.counts;
+        document.getElementById("superadminCountAdmins").textContent = result.data.counts.administradores;
+        document.getElementById("superadminUserForm").innerHTML = "";
+        llenarUsuariosSuperAdmin();
+        alert(result.message);
+    } catch (e) { alert(e.message); }
 }
 
 async function eliminarUsuarioSuperAdmin(id) {
-    if (!confirm("¿Desactivar esta cuenta?")) return;
-    try { const result = await api("superadmin_user_delete", { method: "POST", body: { id } }); superAdminData = result.data; llenarUsuariosSuperAdmin(); } catch (e) { alert(e.message); }
+    const user = (superAdminData.users || []).find(item => Number(item.id) === Number(id));
+    if (!user) return;
+    const estado = user.estado === "activo" ? "inactivo" : "activo";
+    const accion = estado === "activo" ? "activar" : "desactivar";
+    if (!confirm(`¿Deseas ${accion} esta cuenta de Administrador?`)) return;
+    try {
+        const result = await api("superadmin_user_status", { method: "POST", body: { id, estado } });
+        superAdminData.users = result.data.users;
+        superAdminData.counts = result.data.counts;
+        document.getElementById("superadminCountAdmins").textContent = result.data.counts.administradores;
+        llenarUsuariosSuperAdmin();
+        alert(result.message);
+    } catch (e) { alert(e.message); }
 }
 
 function llenarRolesSuperAdmin() {
