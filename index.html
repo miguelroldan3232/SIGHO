@@ -3645,6 +3645,29 @@ body:has(.dashboard-screen.active) .container {
     color:#29485f; font-weight:700;
 }
 #administrador .role-kpis { margin:0 0 18px; }
+#administrador .admin-kpi-link {
+    width:100%; border:1px solid #e0eaf0; color:inherit; font:inherit; text-align:left;
+    cursor:pointer; transition:transform .18s,box-shadow .18s,border-color .18s;
+}
+#administrador .admin-kpi-link:hover,
+#administrador .admin-kpi-link:focus-visible {
+    transform:translateY(-2px); border-color:#b9d5e9;
+    box-shadow:0 9px 22px rgba(13,63,112,.1); outline:none;
+}
+#administrador .admin-kpi-link:focus-visible { outline:2px solid #1769aa; outline-offset:2px; }
+#administrador .teacher-admin-card .assignment-grid {
+    grid-template-columns:repeat(3,minmax(0,1fr)) auto; align-items:start;
+}
+#administrador .teacher-admin-card .assignment-grid > div { display:flex; min-width:0; flex-direction:column; }
+#administrador .teacher-admin-card .assignment-grid label { display:block; min-height:18px; }
+#administrador .teacher-admin-card .assignment-grid .field-help {
+    display:-webkit-box; min-height:42px; margin-top:6px; overflow:hidden;
+    line-height:14px; -webkit-box-orient:vertical; -webkit-line-clamp:3;
+}
+#administrador .teacher-admin-card .assignment-save {
+    align-self:start; min-height:42px; margin-top:18px; box-sizing:border-box;
+    white-space:nowrap;
+}
 #administrador .admin-summary-card {
     display:flex; align-items:center; gap:14px;
     background:#fff; border:1px solid #dfe8ef; border-radius:16px;
@@ -3675,11 +3698,20 @@ body:has(.dashboard-screen.active) .container {
 #administrador .admin-section { background:transparent; border:0; box-shadow:none; padding:0; margin:0 0 30px; }
 #administrador .admin-section .section-description { margin:4px 0 0; color:#718492; font-size:12px; line-height:1.5; }
 #administrador .admin-history-controls {
-    display:flex; justify-content:space-between; align-items:flex-end; gap:18px;
+    display:flex; justify-content:space-between; align-items:flex-end; gap:18px; flex-wrap:wrap;
     background:#fff; border:1px solid #dfe8ef; border-radius:15px; padding:16px;
     margin-bottom:16px; box-shadow:0 4px 14px rgba(8,43,76,.04);
 }
 #administrador .admin-professor-select { flex:1; max-width:360px; margin-bottom:0; }
+#administrador .admin-table-search { flex:1 1 220px; min-width:200px; max-width:340px; margin:0; }
+#administrador .admin-table-search input { width:100%; box-sizing:border-box; }
+#administrador .admin-progress-toolbar { justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; }
+#administrador .admin-progress-toolbar .admin-table-search { flex:1 1 220px; max-width:420px; }
+#administrador .admin-progress-toolbar .admin-professor-select { flex:0 1 220px; min-width:180px; }
+#administrador .admin-bulk-actions { display:flex; justify-content:flex-end; align-items:center; gap:12px; margin:12px 0; color:#718492; font-size:12px; }
+#administrador .admin-bulk-actions button:disabled { opacity:.5; cursor:not-allowed; }
+#administrador .admin-selection-checkbox { width:17px; height:17px; accent-color:#1769aa; cursor:pointer; }
+#administrador .admin-table-no-results { margin:10px 0 0; color:#718492; font-size:13px; }
 #administrador .history-filter { display:flex; gap:7px; flex-wrap:wrap; }
 #administrador .teacher-admin-card { margin-bottom:12px; }
 #administrador .validation-panel {
@@ -3736,7 +3768,16 @@ body:has(.dashboard-screen.active) .container {
     #administrador .dashboard-header { align-items:flex-start; }
     #administrador .admin-history-controls { flex-direction:column; align-items:stretch; }
     #administrador .admin-professor-select { max-width:none; }
+    #administrador .admin-table-search { max-width:none; }
+    #administrador .teacher-admin-card .assignment-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    #administrador .teacher-admin-card .assignment-save { grid-column:1 / -1; justify-self:stretch; margin-top:0; }
     #administrador .admin-reset-box { flex-direction:column; align-items:flex-start; }
+}
+@media (max-width: 600px) {
+    #administrador .teacher-admin-card .assignment-grid { grid-template-columns:minmax(0,1fr); }
+    #administrador .teacher-admin-card .assignment-save { grid-column:auto; }
+    #administrador .admin-progress-toolbar > * { width:100%; max-width:none; }
+    #administrador .admin-bulk-actions { align-items:stretch; flex-direction:column; }
 }
 </style>
 <style>
@@ -10324,18 +10365,18 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </header>
 <section class="role-home-section" id="panelInicioAdministrador">
 <div class="role-kpis">
-<div class="role-kpi">
+<button class="role-kpi admin-kpi-link" data-admin-seccion="progreso" type="button">
 <span>🎓</span>
 <div><small>Estudiantes registrados</small><strong id="totalEstudiantesAdmin">0</strong></div>
-</div>
-<div class="role-kpi">
+</button>
+<button class="role-kpi admin-kpi-link" data-admin-seccion="profesores" type="button">
 <span>👥</span>
 <div><small>Profesores registrados</small><strong id="totalProfesoresAdmin">0</strong></div>
-</div>
-<div class="role-kpi">
+</button>
+<button class="role-kpi admin-kpi-link" data-admin-seccion="progreso" type="button">
 <span>📈</span>
 <div><small>Progreso general</small><strong id="kpiProgresoGeneralAdmin">0%</strong></div>
-</div>
+</button>
 </div>
 <div class="admin-summary-card">
 <div class="admin-summary-icon">📊</div>
@@ -10345,13 +10386,13 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 </div>
 <div class="admin-quick-grid">
-<button class="admin-quick-card" onclick="mostrarSeccionAdministrador('profesores')" type="button">
+<button class="admin-quick-card" data-admin-seccion="profesores" type="button">
 <span>👥</span><div><strong>Gestionar profesores</strong><small>Asigna la sede y la zona de cada docente.</small></div><b>→</b>
 </button>
-<button class="admin-quick-card" onclick="mostrarSeccionAdministrador('progreso')" type="button">
+<button class="admin-quick-card" data-admin-seccion="progreso" type="button">
 <span>🎓</span><div><strong>Ver progreso</strong><small>Consulta las horas y el avance de cada estudiante.</small></div><b>→</b>
 </button>
-<button class="admin-quick-card" onclick="mostrarSeccionAdministrador('solicitudes-estudiantes')" type="button">
+<button class="admin-quick-card" data-admin-seccion="solicitudes-estudiantes" type="button">
 <span>🎓</span><div><strong>Solicitudes de estudiantes</strong><small>Revisa y valida las solicitudes de nuevos estudiantes.</small></div><b>→</b>
 </button>
 </div>
@@ -10375,6 +10416,10 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 </div>
 <div class="admin-progress-toolbar">
+<div class="form-group admin-table-search">
+<label for="busquedaProgresoAdmin">Buscar estudiante</label>
+<input id="busquedaProgresoAdmin" type="search" placeholder="Nombre o correo">
+</div>
 <div class="form-group admin-professor-select">
 <label for="filtroGradoAdmin">Filtrar por grado</label>
 <select id="filtroGradoAdmin">
@@ -10384,6 +10429,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <option value="Ciclo V">Ciclo V</option>
 </select>
 </div>
+<button class="secondary-button" disabled id="exportarProgresoAdmin" type="button">Descargar CSV</button>
 </div>
 <div id="tablaAdministrador"></div>
 </section>
@@ -10396,6 +10442,10 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 </div>
 <div class="admin-history-controls">
+<div class="form-group admin-table-search">
+<label for="busquedaHistorialAdmin">Buscar en el historial</label>
+<input id="busquedaHistorialAdmin" type="search" placeholder="Nombre de estudiante o profesor">
+</div>
 <div class="form-group admin-professor-select">
 <label for="filtroProfesorAdmin">Profesor</label>
 <select id="filtroProfesorAdmin">
@@ -10432,6 +10482,10 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="validation-panel-head">
 <div><strong>Solicitudes pendientes</strong><span>Estudiantes que esperan validación del administrador.</span></div>
 <span class="validation-count" id="contadorSolicitudesEstudiantesAdmin">0</span>
+</div>
+<div class="admin-bulk-actions">
+<span id="seleccionSolicitudesAdmin" aria-live="polite">0 seleccionadas</span>
+<button class="success-button" id="aprobarSolicitudesSeleccionadasAdmin" disabled type="button">Aprobar seleccionados</button>
 </div>
 <div id="tablaSolicitudesEstudiantesAdmin"></div>
 </div>
@@ -15656,6 +15710,71 @@ function normalizarGradoFiltroAdmin(valor) {
     return String(valor || "").trim();
 }
 
+function aplicarBusquedaTablaAdmin(inputId, contenedorId) {
+    const input = document.getElementById(inputId);
+    const contenedor = document.getElementById(contenedorId);
+    if (!input || !contenedor) return 0;
+
+    const termino = input.value.trim().toLocaleLowerCase("es");
+    const filas = Array.from(contenedor.querySelectorAll("tbody tr"));
+    let visibles = 0;
+    filas.forEach(fila => {
+        const coincide = !termino || fila.textContent.toLocaleLowerCase("es").includes(termino);
+        fila.style.display = coincide ? "" : "none";
+        if (coincide) visibles++;
+    });
+
+    let mensaje = contenedor.querySelector(".admin-table-no-results");
+    if (filas.length && !mensaje) {
+        mensaje = document.createElement("p");
+        mensaje.className = "admin-table-no-results";
+        mensaje.setAttribute("role", "status");
+        contenedor.appendChild(mensaje);
+    }
+    if (mensaje) {
+        mensaje.textContent = termino && !visibles ? "No hay filas que coincidan con la búsqueda." : "";
+        mensaje.hidden = !termino || visibles > 0;
+    }
+    return visibles;
+}
+
+function actualizarEstadoExportacionProgresoAdmin() {
+    const boton = document.getElementById("exportarProgresoAdmin");
+    if (!boton) return;
+    const tabla = document.querySelector("#tablaAdministrador table");
+    const visibles = tabla
+        ? Array.from(tabla.querySelectorAll("tbody tr")).filter(fila => fila.style.display !== "none").length
+        : 0;
+    boton.disabled = visibles === 0;
+}
+
+function exportarProgresoEstudiantesCSV() {
+    const tabla = document.querySelector("#tablaAdministrador table");
+    if (!tabla) return;
+    const filasVisibles = Array.from(tabla.querySelectorAll("tbody tr")).filter(fila =>
+        fila.style.display !== "none"
+    );
+    if (!filasVisibles.length) return;
+    const filas = [
+        tabla.querySelector("thead tr"),
+        ...filasVisibles
+    ].filter(Boolean);
+    const valores = filas.map(fila => Array.from(fila.cells, celda => {
+        const texto = celda.innerText.trim();
+        const seguro = /^[\t\r ]*[=+\-@]/.test(texto) ? `'${texto}` : texto;
+        return `"${seguro.replace(/"/g, '""')}"`;
+    }).join(","));
+    const csv = "\uFEFF" + valores.join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const enlace = document.createElement("a");
+    enlace.href = url;
+    enlace.download = `progreso-estudiantes-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function mostrarProgresoEstudiantes(estudiantes) {
     const filtro = document.getElementById("filtroGradoAdmin");
     const nivel = filtro?.value || filtroGradoAdminActual || "todos";
@@ -15668,6 +15787,7 @@ function mostrarProgresoEstudiantes(estudiantes) {
 
     if (!estudiantes.length) {
         contenedor.innerHTML = `<div class="empty">No hay estudiantes registrados.</div>`;
+        actualizarEstadoExportacionProgresoAdmin();
         return;
     }
 
@@ -15714,6 +15834,8 @@ function mostrarProgresoEstudiantes(estudiantes) {
 
     html += `</tbody></table></div>`;
     contenedor.innerHTML = html;
+    aplicarBusquedaTablaAdmin("busquedaProgresoAdmin", "tablaAdministrador");
+    actualizarEstadoExportacionProgresoAdmin();
 }
 
 function cargarFiltroProfesoresHistorialAdmin() {
@@ -15785,6 +15907,7 @@ function mostrarHistorialAdmin() {
 
     html += `</tbody></table></div>`;
     contenedor.innerHTML = html;
+    aplicarBusquedaTablaAdmin("busquedaHistorialAdmin", "tablaHistorialAdmin");
 }
 
 function filtrarHistorialAdmin(estado) {
@@ -15967,10 +16090,11 @@ function activarSidebarAdministrador(activo) {
 }
 
 function configurarNavegacionAdministrador() {
-    const botones = Array.from(document.querySelectorAll("#administrador [data-admin-seccion]"));
-    if (!botones.length || document.body.dataset.navegacionAdministrador === "1") return;
+    const raiz = document.getElementById("administrador");
+    if (!raiz || document.body.dataset.navegacionAdministrador === "1") return;
     document.body.dataset.navegacionAdministrador = "1";
 
+    const botones = Array.from(raiz.querySelectorAll("[data-admin-seccion]"));
     botones.forEach(boton => {
         boton.addEventListener("click", () => {
             const seccion = boton.dataset.adminSeccion;
@@ -16002,6 +16126,36 @@ function configurarNavegacionAdministrador() {
             boton.addEventListener("click", () => filtrarHistorialAdmin(estado));
         }
     });
+
+    [
+        ["busquedaProgresoAdmin", "tablaAdministrador"],
+        ["busquedaHistorialAdmin", "tablaHistorialAdmin"]
+    ].forEach(([inputId, contenedorId]) => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener("input", () => {
+                aplicarBusquedaTablaAdmin(inputId, contenedorId);
+                if (inputId === "busquedaProgresoAdmin") actualizarEstadoExportacionProgresoAdmin();
+            });
+        }
+    });
+
+    document.getElementById("exportarProgresoAdmin")?.addEventListener("click", exportarProgresoEstudiantesCSV);
+
+    const solicitudes = document.getElementById("tablaSolicitudesEstudiantesAdmin");
+    solicitudes?.addEventListener("change", evento => {
+        if (evento.target.id === "seleccionarTodasSolicitudesAdmin") {
+            solicitudes.querySelectorAll(".admin-selection-checkbox[data-solicitud-id]").forEach(checkbox => {
+                checkbox.checked = evento.target.checked;
+            });
+        }
+        if (evento.target.matches(".admin-selection-checkbox")) {
+            actualizarSeleccionSolicitudesAdmin();
+        }
+        actualizarSeleccionSolicitudesAdmin();
+    });
+    document.getElementById("aprobarSolicitudesSeleccionadasAdmin")
+        ?.addEventListener("click", aprobarSolicitudesSeleccionadasAdmin);
 }
 
 function actualizarResumenAdministrador() {
@@ -16036,6 +16190,69 @@ function actualizarResumenAdministrador() {
     document.getElementById("badgeSolicitudesPersonalAdministrador")?.replaceChildren(document.createTextNode(String(pendientesProfesores.length + pendientesAdmin)));
     document.getElementById("badgeSolicitudesEstudiantesAdministrador")?.replaceChildren(document.createTextNode(String(pendientesEstudiantes.length)));
     document.getElementById("contadorSolicitudesEstudiantesAdmin")?.replaceChildren(document.createTextNode(String(pendientesEstudiantes.length)));
+}
+
+function actualizarSeleccionSolicitudesAdmin() {
+    const contenedor = document.getElementById("tablaSolicitudesEstudiantesAdmin");
+    const checks = Array.from(contenedor?.querySelectorAll(".admin-selection-checkbox[data-solicitud-id]") || []);
+    const seleccionados = checks.filter(checkbox => checkbox.checked);
+    const texto = document.getElementById("seleccionSolicitudesAdmin");
+    const boton = document.getElementById("aprobarSolicitudesSeleccionadasAdmin");
+    const todos = document.getElementById("seleccionarTodasSolicitudesAdmin");
+
+    if (texto) texto.textContent = `${seleccionados.length} seleccionada${seleccionados.length === 1 ? "" : "s"}`;
+    if (boton) boton.disabled = seleccionados.length === 0;
+    if (todos) {
+        todos.checked = checks.length > 0 && seleccionados.length === checks.length;
+        todos.indeterminate = seleccionados.length > 0 && seleccionados.length < checks.length;
+    }
+}
+
+async function aprobarSolicitudesSeleccionadasAdmin() {
+    const contenedor = document.getElementById("tablaSolicitudesEstudiantesAdmin");
+    const boton = document.getElementById("aprobarSolicitudesSeleccionadasAdmin");
+    const ids = Array.from(contenedor?.querySelectorAll(".admin-selection-checkbox[data-solicitud-id]:checked") || [])
+        .map(checkbox => Number(checkbox.dataset.solicitudId))
+        .filter(Number.isInteger);
+    const seleccionadas = ids.map(id => solicitudes.find(s => Number(s.id) === id)).filter(Boolean);
+    if (!seleccionadas.length || !boton) return;
+
+    const nombres = seleccionadas.map(s => s.nombre || s.correo || `Solicitud ${s.id}`);
+    if (!confirm(`¿Aprobar ${seleccionadas.length} solicitud${seleccionadas.length === 1 ? "" : "es"} de estudiante?\n\n${nombres.join("\n")}`)) return;
+
+    const errores = [];
+    const avisosCorreo = [];
+    boton.disabled = true;
+    boton.textContent = "Procesando...";
+    contenedor.querySelectorAll(".admin-selection-checkbox").forEach(checkbox => { checkbox.disabled = true; });
+
+    try {
+        for (const solicitud of seleccionadas) {
+            try {
+                const resultado = await api("validate_request", {
+                    method: "POST",
+                    body: { id: solicitud.id, estado: "aceptada" }
+                });
+                if (resultado.emailSent === false) {
+                    avisosCorreo.push(`${solicitud.nombre || solicitud.correo}: ${resultado.message}`);
+                }
+            } catch (error) {
+                errores.push(`${solicitud.nombre || solicitud.correo}: ${error.message}`);
+            }
+        }
+
+        await actualizarAdministrador();
+        mostrarSeccionAdministrador("solicitudes-estudiantes");
+
+        const aprobadas = seleccionadas.length - errores.length;
+        let mensaje = `Solicitudes aprobadas: ${aprobadas} de ${seleccionadas.length}.`;
+        if (errores.length) mensaje += `\nNo se pudieron aprobar:\n${errores.join("\n")}`;
+        if (avisosCorreo.length) mensaje += `\n\nAvisos de correo:\n${avisosCorreo.join("\n")}`;
+        alert(mensaje);
+    } finally {
+        boton.textContent = "Aprobar seleccionados";
+        actualizarSeleccionSolicitudesAdmin();
+    }
 }
 
 function mostrarSeccionAdministrador(nombre) {
@@ -16105,13 +16322,44 @@ function mostrarSolicitudesPersonalAdmin() {
 }
 
 function mostrarSolicitudesEstudiantesAdmin() {
-    const contenedor=document.getElementById("tablaSolicitudesEstudiantesAdmin");
-    if(!contenedor) return;
-    const pendientes=(solicitudes||[]).filter(s=>s.estado==="pendiente" && s.rol==="estudiante");
-    if(!pendientes.length){ contenedor.innerHTML='<div class="admin-empty-state"><div class="admin-empty-icon">✓</div><strong>No hay solicitudes pendientes</strong><span>No hay estudiantes esperando validación.</span></div>'; return; }
-    let html='<div class="table-container"><table><thead><tr><th>Nombre</th><th>Correo</th><th>Grado</th><th>Modalidad</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>';
-    pendientes.forEach(s=>{ const modalidad=s.esTecnico?'Técnica · 100 horas':'Académico · 120 horas'; html+=`<tr><td>${escapeHtml(s.nombre||'-')}</td><td>${escapeHtml(s.correo||'-')}</td><td>${escapeHtml(s.gradoSolicitud||s.grado||'-')}</td><td>${escapeHtml(modalidad)}</td><td>${escapeHtml(s.fechaSolicitud||'-')}</td><td><div class="actions"><button class="secondary-button" onclick="verDetalleSolicitud(${s.id})">Ver ficha</button><button class="success-button" onclick="validarSolicitud(${s.id},'aceptada')">✓ Aceptar</button><button class="danger-button" onclick="validarSolicitud(${s.id},'rechazada')">✕ Rechazar</button></div></td></tr>`; });
-    html+='</tbody></table></div>'; contenedor.innerHTML=html;
+    const contenedor = document.getElementById("tablaSolicitudesEstudiantesAdmin");
+    if (!contenedor) return;
+    const pendientes = (solicitudes || []).filter(s => s.estado === "pendiente" && s.rol === "estudiante");
+    if (!pendientes.length) {
+        contenedor.innerHTML = '<div class="admin-empty-state"><div class="admin-empty-icon">✓</div><strong>No hay solicitudes pendientes</strong><span>No hay estudiantes esperando validación.</span></div>';
+        actualizarSeleccionSolicitudesAdmin();
+        return;
+    }
+
+    let html = `
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th><input aria-label="Seleccionar todas las solicitudes" class="admin-selection-checkbox" id="seleccionarTodasSolicitudesAdmin" type="checkbox"></th>
+                        <th>Nombre</th><th>Correo</th><th>Grado</th><th>Modalidad</th><th>Fecha</th><th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+    pendientes.forEach(s => {
+        const modalidad = s.esTecnico ? "Técnica · 100 horas" : "Académico · 120 horas";
+        html += `
+            <tr>
+                <td><input aria-label="Seleccionar solicitud de ${escapeHtml(s.nombre || s.correo || "")}" class="admin-selection-checkbox" data-solicitud-id="${Number(s.id)}" type="checkbox"></td>
+                <td>${escapeHtml(s.nombre || "-")}</td>
+                <td>${escapeHtml(s.correo || "-")}</td>
+                <td>${escapeHtml(s.gradoSolicitud || s.grado || "-")}</td>
+                <td>${escapeHtml(modalidad)}</td>
+                <td>${escapeHtml(s.fechaSolicitud || "-")}</td>
+                <td><div class="actions">
+                    <button class="secondary-button" onclick="verDetalleSolicitud(${Number(s.id)})">Ver ficha</button>
+                    <button class="success-button" onclick="validarSolicitud(${Number(s.id)},'aceptada')">✓ Aceptar</button>
+                    <button class="danger-button" onclick="validarSolicitud(${Number(s.id)},'rechazada')">✕ Rechazar</button>
+                </div></td>
+            </tr>`;
+    });
+    contenedor.innerHTML = html + "</tbody></table></div>";
+    actualizarSeleccionSolicitudesAdmin();
 }
 
 async function validarSolicitudAdministrador(id, estado){
@@ -16134,6 +16382,15 @@ async function cargarProfesoresAdmin() {
     try {
         const data = await api("admin_data");
         const profesores = data.profesores || (data.users || []).filter(u => u.rol === "profesor").map(u => ({ id: u.staffId, nombre: u.nombre, correo: u.correo, sede: u.sede || "", zona: u.zona || "" }));
+        const proyectos = [
+            "Educación Física / Tiempo Libre",
+            "Proyecto Ambiental",
+            "Logística y Vigilancia",
+            "Secretaría y/o Archivo",
+            "Acompañamiento a un docente de transición o primaria",
+            "Eventos especiales",
+            "Otro"
+        ];
         const sedes = [
             "Central JT",
             "San Francisco Club",
@@ -16159,9 +16416,10 @@ async function cargarProfesoresAdmin() {
                     <div class="assignment-grid">
                         <div>
                             <label>Sede</label>
-                            <select id="sedeProf_${p.id}" onchange="actualizarZonasProfesor(${p.id})">
+                            <select id="sedeProf_${p.id}">
                                 ${sedes.map(x => `<option value="${escapeHtml(x)}" ${x === p.sede ? "selected" : ""}>${escapeHtml(x)}</option>`).join("")}
                             </select>
+                            <small class="field-help">Sede principal asignada al docente.</small>
                         </div>
 
                         <div>
@@ -16169,7 +16427,16 @@ async function cargarProfesoresAdmin() {
                             <select id="zonaProf_${p.id}">
                                 ${opcionesZonaProfesor(p.sede, p.zona)}
                             </select>
-                            <small class="field-help">Las zonas disponibles dependen de la sede.</small>
+                            <small class="field-help">Las zonas se actualizan según la sede; no se almacenan en la base de datos actual.</small>
+                        </div>
+
+                        <div>
+                            <label>Proyecto asignado</label>
+                            <select id="proyectoProf_${p.id}" required>
+                                <option value="">Selecciona un proyecto</option>
+                                ${proyectos.map(proyecto => `<option value="${escapeHtml(proyecto)}" ${proyecto === p.proyecto ? "selected" : ""}>${escapeHtml(proyecto)}</option>`).join("")}
+                            </select>
+                            <small class="field-help">Proyecto o área de servicio social a cargo.</small>
                         </div>
 
                         <button class="assignment-save" onclick="asignarProfesor(${p.id})">Guardar asignación</button>
@@ -16177,7 +16444,11 @@ async function cargarProfesoresAdmin() {
                 </div>
             `).join("")
             : `<div class="empty-state">No hay profesores registrados.</div>`;
-        profesores.forEach(p => actualizarZonasProfesor(p.id, p.zona));
+        profesores.forEach(p => {
+            const selectorSede = document.getElementById(`sedeProf_${p.id}`);
+            selectorSede?.addEventListener("change", () => actualizarZonasProfesor(p.id));
+            actualizarZonasProfesor(p.id, p.zona);
+        });
     } catch (e) {
         cont.innerHTML = `<div class="message" style="display:block">${escapeHtml(e.message)}</div>`;
     }
@@ -16250,19 +16521,19 @@ function actualizarZonasProfesor(id, zonaSeleccionada = "") {
 
 async function asignarProfesor(id) {
     const sede = document.getElementById(`sedeProf_${id}`)?.value;
-    const zona = document.getElementById(`zonaProf_${id}`)?.value;
+    const proyecto = document.getElementById(`proyectoProf_${id}`)?.value;
 
-    if (!sede || !zona) {
-        alert("Selecciona la sede y la zona.");
+    if (!sede || !proyecto) {
+        alert("Selecciona la sede y el proyecto.");
         return;
     }
 
     try {
         await api("assign_teacher", {
             method: "POST",
-            body: { staffId: id, sede, zona }
+            body: { staffId: id, sede, proyecto }
         });
-        alert("Sede y zona guardadas correctamente.");
+        alert("Sede y proyecto guardados correctamente. La zona se muestra según la sede y no se almacena.");
         await cargarProfesoresAdmin();
     } catch (e) {
         alert(e.message);
