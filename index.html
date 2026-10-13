@@ -2042,11 +2042,31 @@
 #estudiante .profile-card .main-button:disabled, #profesor .profile-card .main-button:disabled { opacity:.48; cursor:not-allowed; transform:none; }
 .sidebar-special-request { margin-top:8px !important; color:#dceeff !important; background:rgba(255,255,255,.07) !important; border:1px solid rgba(255,255,255,.09) !important; }
 .sidebar-special-request:hover { background:rgba(255,255,255,.14) !important; }
-.admin-progress-toolbar { display:flex; justify-content:flex-end; margin-bottom:14px; }
+.admin-progress-toolbar { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom:14px; }
 .admin-progress-toolbar .form-group { margin:0; min-width:220px; }
+.admin-progress-toolbar .admin-search { flex:1; max-width:380px; }
+.admin-progress-actions { display:flex; align-items:flex-end; gap:10px; }
+.admin-search input { width:100%; min-height:42px; padding:10px 12px; border:1px solid #d7e1e3; border-radius:9px; background:#fff; color:#405158; box-sizing:border-box; }
+.admin-search input:focus { outline:2px solid rgba(23,105,170,.2); border-color:#1769aa; }
+.admin-export-button { min-height:42px; padding:10px 14px; border:0; border-radius:9px; background:#1769aa; color:#fff; font-weight:700; cursor:pointer; }
+.admin-export-button:hover { background:#0d4f82; }
+#administrador .admin-history-search { flex:1; min-width:220px; max-width:340px; }
+#administrador .admin-kpi-link { width:100%; border:1px solid #e0eaf0; color:inherit; font:inherit; text-align:left; cursor:pointer; transition:transform .18s,box-shadow .18s,border-color .18s; }
+#administrador .admin-kpi-link:hover, #administrador .admin-kpi-link:focus-visible { transform:translateY(-2px); border-color:#b9d5e9; box-shadow:0 9px 22px rgba(13,63,112,.1); outline:none; }
+#administrador .teacher-admin-card .assignment-grid { grid-template-columns:repeat(3,minmax(0,1fr)) auto; align-items:stretch; }
+#administrador .teacher-admin-card .assignment-grid > div { display:flex; min-width:0; flex-direction:column; }
+#administrador .teacher-admin-card .assignment-grid > div > label { display:block; min-height:18px; }
+#administrador .teacher-admin-card .assignment-grid .field-help { display:-webkit-box; min-height:42px; margin-top:6px; overflow:hidden; line-height:14px; -webkit-box-orient:vertical; -webkit-line-clamp:3; }
+#administrador .teacher-admin-card .assignment-save { align-self:start; margin-top:18px; min-height:42px; box-sizing:border-box; white-space:nowrap; }
+#administrador .bulk-approval-controls { display:flex; align-items:center; gap:10px; }
+#administrador .bulk-approval-button { border:0; border-radius:9px; padding:10px 14px; background:#2fa45a; color:#fff; font-weight:700; cursor:pointer; }
+#administrador .bulk-approval-button:disabled { opacity:.5; cursor:not-allowed; }
+#administrador .bulk-selection-count { color:#718492; font-size:12px; white-space:nowrap; }
+#administrador .request-select-checkbox { width:17px; height:17px; accent-color:#1769aa; cursor:pointer; }
 #administrador #seccionSolicitudesPersonalAdmin .admin-empty-state, #administrador #seccionSolicitudesPersonalAdmin .table-container, #administrador #seccionSolicitudesEstudiantesAdmin .admin-empty-state, #administrador #seccionSolicitudesEstudiantesAdmin .table-container { margin-top:4px; }
 .request-admin-actions { display:flex; gap:8px; flex-wrap:wrap; }
-@media(max-width:700px){ .admin-progress-toolbar{justify-content:stretch;} .admin-progress-toolbar .form-group{width:100%;} }
+@media(max-width:900px){ #administrador .teacher-admin-card .assignment-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } #administrador .teacher-admin-card .assignment-save { grid-column:1 / -1; justify-self:stretch; margin-top:0; } }
+@media(max-width:700px){ .admin-progress-toolbar{align-items:stretch;flex-direction:column;} .admin-progress-toolbar .form-group{width:100%;max-width:none;} .admin-progress-actions{align-items:stretch;flex-direction:column;} .admin-export-button{width:100%;} #administrador .admin-history-search{width:100%;max-width:none;} #administrador .bulk-approval-controls{align-items:flex-end;flex-direction:column;} #administrador .teacher-admin-card .assignment-grid { grid-template-columns:minmax(0,1fr); } #administrador .teacher-admin-card .assignment-save { grid-column:auto; } }
 
 
 /* Validación en tiempo real para campos "Otro" */
@@ -9588,7 +9608,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <small class="field-help">Número de celular de 10 dígitos.</small>
 </div>
 <div class="form-group" style="grid-column:1 / -1;">
-<div class="security-box" style="margin:0;">El proyecto y la sede serán asignados posteriormente por el Administrador desde «Gestión de profesores».</div>
+<div class="security-box" style="margin:0;">El proyecto y la sede serán asignados posteriormente por el Administrador desde «Gestión de Personal».</div>
 </div>
 </div>
 </div>
@@ -10280,7 +10300,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <span class="sidebar-icon">📊</span><span>Inicio</span>
 </button>
 <button data-admin-seccion="profesores" id="sidebarProfesoresAdministrador" type="button">
-<span class="sidebar-icon">👥</span><span>Gestión de profesores</span>
+<span class="sidebar-icon">👥</span><span>Gestión de Personal</span>
 </button>
 <button data-admin-seccion="progreso" id="sidebarProgresoAdministrador" type="button">
 <span class="sidebar-icon">🎓</span><span>Progreso de estudiantes</span>
@@ -10289,7 +10309,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <span class="sidebar-icon">📜</span><span>Historial de revisiones</span>
 </button>
 <button data-admin-seccion="solicitudes-personal" id="sidebarSolicitudesPersonalAdministrador" type="button">
-<span class="sidebar-icon">👥</span><span>Solicitudes de profesores / Admin</span><b id="badgeSolicitudesPersonalAdministrador">0</b>
+<span class="sidebar-icon">👥</span><span>Solicitudes de personal / Admin</span><b id="badgeSolicitudesPersonalAdministrador">0</b>
 </button>
 <button data-admin-seccion="solicitudes-estudiantes" id="sidebarSolicitudesEstudiantesAdministrador" type="button">
 <span class="sidebar-icon">🎓</span><span>Solicitudes de estudiantes</span><b id="badgeSolicitudesEstudiantesAdministrador">0</b>
@@ -10324,18 +10344,18 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </header>
 <section class="role-home-section" id="panelInicioAdministrador">
 <div class="role-kpis">
-<div class="role-kpi">
+<button aria-label="Ir a Progreso de estudiantes" class="role-kpi admin-kpi-link" onclick="mostrarSeccionAdministrador('progreso')" type="button">
 <span>🎓</span>
 <div><small>Estudiantes registrados</small><strong id="totalEstudiantesAdmin">0</strong></div>
-</div>
-<div class="role-kpi">
+</button>
+<button aria-label="Ir a Gestión de Personal" class="role-kpi admin-kpi-link" onclick="mostrarSeccionAdministrador('profesores')" type="button">
 <span>👥</span>
-<div><small>Profesores registrados</small><strong id="totalProfesoresAdmin">0</strong></div>
-</div>
-<div class="role-kpi">
+<div><small>Personal registrado</small><strong id="totalProfesoresAdmin">0</strong></div>
+</button>
+<button aria-label="Ir a Progreso de estudiantes" class="role-kpi admin-kpi-link" onclick="mostrarSeccionAdministrador('progreso')" type="button">
 <span>📈</span>
 <div><small>Progreso general</small><strong id="kpiProgresoGeneralAdmin">0%</strong></div>
-</div>
+</button>
 </div>
 <div class="admin-summary-card">
 <div class="admin-summary-icon">📊</div>
@@ -10346,7 +10366,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="admin-quick-grid">
 <button class="admin-quick-card" onclick="mostrarSeccionAdministrador('profesores')" type="button">
-<span>👥</span><div><strong>Gestionar profesores</strong><small>Asigna la sede y la zona de cada docente.</small></div><b>→</b>
+<span>👥</span><div><strong>Gestionar personal</strong><small>Asigna sede y proyecto al personal docente y administrativo que recibe estudiantes.</small></div><b>→</b>
 </button>
 <button class="admin-quick-card" onclick="mostrarSeccionAdministrador('progreso')" type="button">
 <span>🎓</span><div><strong>Ver progreso</strong><small>Consulta las horas y el avance de cada estudiante.</small></div><b>→</b>
@@ -10360,8 +10380,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="admin-page-title">
 <div>
 <span class="page-eyebrow">GESTIÓN</span>
-<h3>Gestión de profesores</h3>
-<p class="section-description">Asigna la sede y la zona de cada profesor desde este panel.</p>
+<h3>Gestión de Personal</h3>
+<p class="section-description">Administra docentes y funcionarios que reciben estudiantes; asigna sede y proyecto, y consulta las zonas disponibles según la sede.</p>
 </div>
 </div>
 <div id="tablaProfesoresAdmin"></div>
@@ -10384,6 +10404,13 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <option value="Ciclo V">Ciclo V</option>
 </select>
 </div>
+<div class="admin-progress-actions">
+<div class="form-group admin-search">
+<label for="busquedaProgresoAdmin">Buscar estudiante</label>
+<input autocomplete="off" id="busquedaProgresoAdmin" placeholder="Nombre o correo" type="search">
+</div>
+<button class="admin-export-button" onclick="exportarProgresoEstudiantesAdmin()" type="button">↓ Exportar CSV</button>
+</div>
 </div>
 <div id="tablaAdministrador"></div>
 </section>
@@ -10402,6 +10429,10 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <option value="todos">Todos los profesores</option>
 </select>
 </div>
+<div class="form-group admin-search admin-history-search">
+<label for="busquedaHistorialAdmin">Buscar en el historial</label>
+<input autocomplete="off" id="busquedaHistorialAdmin" placeholder="Alumno o docente" type="search">
+</div>
 <div class="history-filter">
 <button class="filter-button active" id="filtroTodosAdmin" type="button">Todos</button>
 <button class="filter-button" id="filtroAprobadasAdmin" type="button">Aceptados</button>
@@ -10414,8 +10445,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="admin-page-title">
 <div>
 <span class="page-eyebrow">PERSONAL</span>
-<h3>Solicitudes de profesores / Administrador</h3>
-<p class="section-description">Solicitudes de nuevos profesores y solicitudes de profesores que desean obtener permisos de Administrador.</p>
+<h3>Solicitudes de personal / Administrador</h3>
+<p class="section-description">Solicitudes de registro de personal y solicitudes de permisos de Administrador.</p>
 </div>
 </div>
 <div id="tablaSolicitudesPersonalAdministrador"></div>
@@ -10431,7 +10462,12 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="validation-panel">
 <div class="validation-panel-head">
 <div><strong>Solicitudes pendientes</strong><span>Estudiantes que esperan validación del administrador.</span></div>
+<div class="bulk-approval-controls">
+<label class="bulk-selection-count"><input aria-label="Seleccionar todas las solicitudes visibles" class="request-select-checkbox" id="seleccionarTodasSolicitudesEstudiantesAdmin" type="checkbox"> Seleccionar todas</label>
 <span class="validation-count" id="contadorSolicitudesEstudiantesAdmin">0</span>
+<button class="bulk-approval-button" disabled id="aprobarSolicitudesEstudiantesAdmin" type="button">Aprobar seleccionados</button>
+<span aria-live="polite" class="bulk-selection-count" id="cantidadSeleccionadaSolicitudesEstudiantesAdmin">0 seleccionadas</span>
+</div>
 </div>
 <div id="tablaSolicitudesEstudiantesAdmin"></div>
 </div>
@@ -10465,7 +10501,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <button onclick="consultarAyudaRol('administrador')" type="button">🤖 Preguntar a la IA</button>
 <div class="role-help-answer" id="respuestaAyudaAdministrador">Escribe una pregunta y recibirás orientación sobre tu panel.</div>
 </div>
-<div class="help-admin-intro"><strong>También puedes consultar las secciones del panel:</strong><br/>gestión de profesores, progreso de estudiantes, solicitudes, historial y sistema.</div>
+<div class="help-admin-intro"><strong>También puedes consultar las secciones del panel:</strong><br/>gestión de personal, progreso de estudiantes, solicitudes, historial y sistema.</div>
 </section>
 </main>
 </div>
@@ -12594,7 +12630,7 @@ function consultarAyudaRol(rol) {
             general: "Puedo orientarte sobre registros pendientes, estudiantes asignados, historial, observaciones y tu perfil."
         },
         administrador: {
-            profesor: "En Gestión de profesores puedes consultar y asignar la sede y el proyecto de cada docente.",
+            profesor: "En Gestión de Personal puedes consultar y asignar sede, zona y proyecto al personal docente y administrativo que recibe estudiantes.",
             solicitud: "En Solicitudes puedes revisar y aceptar o rechazar solicitudes de estudiantes, profesores y permisos de Administrador.",
             progreso: "En Progreso de estudiantes puedes consultar horas aprobadas, faltantes y porcentaje de avance.",
             general: "Puedo orientarte sobre profesores, solicitudes, progreso, historial y funciones generales del sistema."
@@ -13009,8 +13045,13 @@ async function validarSolicitud(id, estado) {
         const result = await api("validate_request", { method: "POST", body: { id, estado } });
         await actualizarAdministrador();
         // Permanecer en el módulo actual y reconstruir inmediatamente la lista.
+<<<<<<< HEAD
+        mostrarSeccionAdministrador(solicitud.rol === "estudiante" ? "solicitudes-estudiantes" : "solicitudes-personal");
+        alert(estado === "aceptada" ? "Solicitud aceptada. La cuenta ya puede iniciar sesión." : "Solicitud rechazada.");
+=======
         mostrarSeccionAdministrador("solicitudes-personal");
         alert(result.message || (estado === "aceptada" ? "Solicitud aceptada." : "Solicitud rechazada."));
+>>>>>>> main
     } catch (error) { alert(error.message); }
 }
 
@@ -13407,7 +13448,7 @@ function consultarAyudaRol(rol) {
             general: "Puedo orientarte sobre registros pendientes, estudiantes asignados, historial, observaciones y tu perfil."
         },
         administrador: {
-            profesor: "En Gestión de profesores puedes consultar y asignar la sede y el proyecto de cada docente.",
+            profesor: "En Gestión de Personal puedes consultar y asignar sede, zona y proyecto al personal docente y administrativo que recibe estudiantes.",
             solicitud: "En Solicitudes puedes revisar y aceptar o rechazar solicitudes de estudiantes, profesores y permisos de Administrador.",
             progreso: "En Progreso de estudiantes puedes consultar horas aprobadas, faltantes y porcentaje de avance.",
             general: "Puedo orientarte sobre profesores, solicitudes, progreso, historial y funciones generales del sistema."
@@ -13886,15 +13927,15 @@ function abrirAyuda() {
             contenido: `
                 <div class="help-admin-intro">
                     <strong>¿Qué puedes hacer desde este panel?</strong><br>
-                    Gestiona profesores, revisa solicitudes, consulta el progreso de los estudiantes y controla las funciones generales del sistema.
+                    Gestiona el personal docente y administrativo que recibe estudiantes, revisa solicitudes, consulta el progreso de los estudiantes y controla las funciones generales del sistema.
                 </div>
                 <div class="help-admin-grid">
-                    <article class="help-admin-card"><div class="help-admin-icon">👥</div><h4>Gestión de profesores</h4><p>Administra la información de los docentes y define su área de trabajo.</p><ul><li>Selecciona o actualiza la <strong>sede asignada</strong>.</li><li>Selecciona o actualiza el <strong>proyecto asignado</strong>.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">👥</div><h4>Gestión de Personal</h4><p>Administra la información del personal docente y administrativo que recibe estudiantes y define su área de trabajo.</p><ul><li>Selecciona o actualiza la <strong>sede asignada al integrante</strong>.</li><li>Selecciona o actualiza el <strong>proyecto o área de servicio social</strong>.</li><li>La lista de <strong>zonas disponibles</strong> cambia según la sede; la zona no se almacena en la base de datos actual.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">📊</div><h4>Progreso de estudiantes</h4><p>Consulta cómo avanza cada estudiante con sus horas de servicio social.</p><ul><li>Revisa horas aprobadas y horas faltantes.</li><li>Consulta el porcentaje de avance y utiliza los filtros por grado.</li></ul></article>
-                    <article class="help-admin-card"><div class="help-admin-icon">📩</div><h4>Solicitudes de profesores / Admin</h4><p>Aquí se reúnen las solicitudes relacionadas con el personal docente.</p><ul><li>Aprueba o rechaza nuevos registros de profesores.</li><li>Revisa las solicitudes de profesores que desean el rol de Administrador.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">📩</div><h4>Solicitudes de personal / Admin</h4><p>Aquí se reúnen las solicitudes relacionadas con el personal que usa SIGHO.</p><ul><li>Aprueba o rechaza nuevas solicitudes de registro de personal.</li><li>Revisa las solicitudes de permisos de Administrador.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">🎓</div><h4>Solicitudes de estudiantes</h4><p>Este módulo es independiente de las solicitudes de profesores.</p><ul><li>Revisa los datos de cada estudiante.</li><li>Acepta o rechaza su solicitud de registro.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">⚙️</div><h4>Sistema</h4><p>Consulta las funciones generales y el estado del sistema. Utiliza estas opciones para tareas administrativas globales cuando sea necesario.</p></article>
-                    <article class="help-admin-card"><div class="help-admin-icon">🔒</div><h4>Buenas prácticas</h4><p>Antes de aceptar una solicitud, verifica cuidadosamente los datos. Mantén actualizada la sede de cada profesor para que pueda revisar correctamente a sus estudiantes.</p></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">🔒</div><h4>Buenas prácticas</h4><p>Antes de aceptar una solicitud, verifica cuidadosamente los datos. Mantén actualizadas la sede y el proyecto de cada integrante para que pueda recibir y revisar correctamente a sus estudiantes.</p></article>
                 </div>`
         },
         superadmin: { titulo:"Ayuda para Super Admin", subtitulo:"Control general de SIGHO", contenido:`<div class="help-animation"><div class="help-icon">💡</div><strong>¿Cómo funciona tu panel?</strong><p>El Super Admin tiene el nivel más alto de control y puede revisar las solicitudes para crear administradores.</p></div>` },
@@ -15661,13 +15702,17 @@ function mostrarProgresoEstudiantes(estudiantes) {
     const nivel = filtro?.value || filtroGradoAdminActual || "todos";
     filtroGradoAdminActual = nivel;
     if (filtro && filtro.value !== nivel) filtro.value = nivel;
-    const filtrados = nivel === "todos" ? estudiantes : estudiantes.filter(e => normalizarGradoFiltroAdmin(e.grado) === nivel);
-    estudiantes = filtrados;
+    const termino = (document.getElementById("busquedaProgresoAdmin")?.value || "").trim().toLocaleLowerCase();
+    estudiantes = estudiantes.filter(estudiante => {
+        const coincideGrado = nivel === "todos" || normalizarGradoFiltroAdmin(estudiante.grado) === nivel;
+        const texto = `${estudiante.nombre || ""} ${estudiante.correo || ""}`.toLocaleLowerCase();
+        return coincideGrado && (!termino || texto.includes(termino));
+    });
     const contenedor = document.getElementById("tablaAdministrador");
     if (!contenedor) return;
 
     if (!estudiantes.length) {
-        contenedor.innerHTML = `<div class="empty">No hay estudiantes registrados.</div>`;
+        contenedor.innerHTML = `<div class="empty">${termino || nivel !== "todos" ? "No hay estudiantes que coincidan con los filtros seleccionados." : "No hay estudiantes registrados."}</div>`;
         return;
     }
 
@@ -15716,6 +15761,30 @@ function mostrarProgresoEstudiantes(estudiantes) {
     contenedor.innerHTML = html;
 }
 
+function exportarProgresoEstudiantesAdmin() {
+    const tabla = document.querySelector("#tablaAdministrador table");
+    if (!tabla) {
+        alert("No hay datos visibles para exportar.");
+        return;
+    }
+
+    const filas = Array.from(tabla.querySelectorAll("tr"));
+    const csv = filas.map(fila => Array.from(fila.cells, celda => {
+        const valor = celda.innerText.trim().replace(/\s+/g, " ");
+        const seguro = /^[\u0000-\u0020]*[=+\-@]/.test(valor) ? `'${valor}` : valor;
+        return `"${seguro.replace(/"/g, '""')}"`;
+    }).join(",")).join("\r\n");
+    const archivo = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(archivo);
+    const enlace = document.createElement("a");
+    enlace.href = url;
+    enlace.download = `progreso-estudiantes-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function cargarFiltroProfesoresHistorialAdmin() {
     const select = document.getElementById("filtroProfesorAdmin");
     if (!select) return;
@@ -15750,6 +15819,15 @@ function mostrarHistorialAdmin() {
 
     if (filtroHistorialAdminActual !== "todos") {
         lista = lista.filter(r => r.estado === filtroHistorialAdminActual);
+    }
+
+    const termino = (document.getElementById("busquedaHistorialAdmin")?.value || "").trim().toLocaleLowerCase();
+    if (termino) {
+        lista = lista.filter(r => {
+            const profesor = r.revisadoPorNombre || r.revisadoPor || "";
+            const texto = `${profesor} ${r.revisadoPor || ""} ${r.estudiante || ""} ${r.correoEstudiante || ""}`.toLocaleLowerCase();
+            return texto.includes(termino);
+        });
     }
 
     if (!lista.length) {
@@ -15990,6 +16068,18 @@ function configurarNavegacionAdministrador() {
         filtroGrado.addEventListener("change", () => { filtroGradoAdminActual=filtroGrado.value; mostrarProgresoEstudiantes(obtenerEstudiantes()); });
     }
 
+    const busquedaProgreso = document.getElementById("busquedaProgresoAdmin");
+    if (busquedaProgreso && busquedaProgreso.dataset.configurado !== "1") {
+        busquedaProgreso.dataset.configurado = "1";
+        busquedaProgreso.addEventListener("input", () => mostrarProgresoEstudiantes(obtenerEstudiantes()));
+    }
+
+    const busquedaHistorial = document.getElementById("busquedaHistorialAdmin");
+    if (busquedaHistorial && busquedaHistorial.dataset.configurado !== "1") {
+        busquedaHistorial.dataset.configurado = "1";
+        busquedaHistorial.addEventListener("input", mostrarHistorialAdmin);
+    }
+
     const filtrosHistorial = [
         ["filtroTodosAdmin", "todos"],
         ["filtroAprobadasAdmin", "aprobada"],
@@ -16026,7 +16116,7 @@ function actualizarResumenAdministrador() {
     document.getElementById("kpiProgresoGeneralAdmin")?.replaceChildren(document.createTextNode(`${porcentaje.toFixed(1)}%`));
     document.getElementById("resumenGeneralAdmin")?.replaceChildren(document.createTextNode(
         estudiantes.length
-            ? `Hay ${estudiantes.length} estudiante${estudiantes.length === 1 ? "" : "s"} y ${profesores.length} profesor${profesores.length === 1 ? "" : "es"} registrado${profesores.length === 1 ? "" : "s"}. Se han aprobado ${aprobadasTexto} horas en total, equivalentes al ${porcentaje.toFixed(1)}% del progreso general.`
+            ? `Hay ${estudiantes.length} estudiante${estudiantes.length === 1 ? "" : "s"} y ${profesores.length} integrante${profesores.length === 1 ? "" : "s"} del personal registrado${profesores.length === 1 ? "" : "s"}. Se han aprobado ${aprobadasTexto} horas en total, equivalentes al ${porcentaje.toFixed(1)}% del progreso general.`
             : "Aún no hay estudiantes registrados para calcular el progreso general."
     ));
 
@@ -16061,10 +16151,10 @@ function mostrarSeccionAdministrador(nombre) {
 
     const titulos = {
         inicio: ["Inicio", "Vista general del sistema de servicio social."],
-        profesores: ["Gestión de profesores", "Administra las sedes y zonas asignadas a cada docente."],
+        profesores: ["Gestión de Personal", "Administra personal docente y administrativo que recibe estudiantes; asigna sede y proyecto."],
         progreso: ["Progreso de estudiantes", "Consulta las horas aprobadas, faltantes y el avance de cada estudiante."],
         historial: ["Historial de revisiones", "Consulta los registros revisados por los profesores."],
-        "solicitudes-personal": ["Solicitudes de profesores / Administrador", "Revisa las solicitudes de nuevos profesores y las solicitudes de permisos administrativos."],
+        "solicitudes-personal": ["Solicitudes de personal / Administrador", "Revisa solicitudes de registro de personal y solicitudes de permisos administrativos."],
         "solicitudes-estudiantes": ["Solicitudes de estudiantes", "Revisa y valida las solicitudes de nuevos estudiantes."],
         validaciones: ["Sistema", "Gestiona acciones generales del sistema y registros de horas."],
         ayuda: ["Ayuda", "Consulta orientación para administrar SIGHO."]
@@ -16107,11 +16197,94 @@ function mostrarSolicitudesPersonalAdmin() {
 function mostrarSolicitudesEstudiantesAdmin() {
     const contenedor=document.getElementById("tablaSolicitudesEstudiantesAdmin");
     if(!contenedor) return;
+    configurarSeleccionSolicitudesEstudiantesAdmin();
     const pendientes=(solicitudes||[]).filter(s=>s.estado==="pendiente" && s.rol==="estudiante");
-    if(!pendientes.length){ contenedor.innerHTML='<div class="admin-empty-state"><div class="admin-empty-icon">✓</div><strong>No hay solicitudes pendientes</strong><span>No hay estudiantes esperando validación.</span></div>'; return; }
-    let html='<div class="table-container"><table><thead><tr><th>Nombre</th><th>Correo</th><th>Grado</th><th>Modalidad</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>';
-    pendientes.forEach(s=>{ const modalidad=s.esTecnico?'Técnica · 100 horas':'Académico · 120 horas'; html+=`<tr><td>${escapeHtml(s.nombre||'-')}</td><td>${escapeHtml(s.correo||'-')}</td><td>${escapeHtml(s.gradoSolicitud||s.grado||'-')}</td><td>${escapeHtml(modalidad)}</td><td>${escapeHtml(s.fechaSolicitud||'-')}</td><td><div class="actions"><button class="secondary-button" onclick="verDetalleSolicitud(${s.id})">Ver ficha</button><button class="success-button" onclick="validarSolicitud(${s.id},'aceptada')">✓ Aceptar</button><button class="danger-button" onclick="validarSolicitud(${s.id},'rechazada')">✕ Rechazar</button></div></td></tr>`; });
+    if(!pendientes.length){
+        contenedor.innerHTML='<div class="admin-empty-state"><div class="admin-empty-icon">✓</div><strong>No hay solicitudes pendientes</strong><span>No hay estudiantes esperando validación.</span></div>';
+        actualizarSeleccionSolicitudesEstudiantesAdmin();
+        return;
+    }
+    let html='<div class="table-container"><table><thead><tr><th scope="col">Seleccionar</th><th scope="col">Nombre</th><th scope="col">Correo</th><th scope="col">Grado</th><th scope="col">Modalidad</th><th scope="col">Fecha</th><th scope="col">Acciones</th></tr></thead><tbody>';
+    pendientes.forEach(s=>{ const modalidad=s.esTecnico?'Técnica · 100 horas':'Académico · 120 horas'; html+=`<tr><td><input aria-label="Seleccionar solicitud de ${escapeHtml(s.nombre||'estudiante')}" class="request-select-checkbox" name="solicitudesEstudiantesSeleccionadas" type="checkbox" value="${Number(s.id)}"></td><td>${escapeHtml(s.nombre||'-')}</td><td>${escapeHtml(s.correo||'-')}</td><td>${escapeHtml(s.gradoSolicitud||s.grado||'-')}</td><td>${escapeHtml(modalidad)}</td><td>${escapeHtml(s.fechaSolicitud||'-')}</td><td><div class="actions"><button class="secondary-button" onclick="verDetalleSolicitud(${Number(s.id)})">Ver ficha</button><button class="success-button" onclick="validarSolicitud(${Number(s.id)},'aceptada')">✓ Aceptar</button><button class="danger-button" onclick="validarSolicitud(${Number(s.id)},'rechazada')">✕ Rechazar</button></div></td></tr>`; });
     html+='</tbody></table></div>'; contenedor.innerHTML=html;
+    actualizarSeleccionSolicitudesEstudiantesAdmin();
+}
+
+function configurarSeleccionSolicitudesEstudiantesAdmin() {
+    const contenedor = document.getElementById("tablaSolicitudesEstudiantesAdmin");
+    const seleccionarTodas = document.getElementById("seleccionarTodasSolicitudesEstudiantesAdmin");
+    const aprobar = document.getElementById("aprobarSolicitudesEstudiantesAdmin");
+    if (contenedor && contenedor.dataset.seleccionConfigurada !== "1") {
+        contenedor.dataset.seleccionConfigurada = "1";
+        contenedor.addEventListener("change", event => {
+            if (event.target instanceof HTMLInputElement && event.target.name === "solicitudesEstudiantesSeleccionadas") {
+                actualizarSeleccionSolicitudesEstudiantesAdmin();
+            }
+        });
+    }
+    if (seleccionarTodas && seleccionarTodas.dataset.configurado !== "1") {
+        seleccionarTodas.dataset.configurado = "1";
+        seleccionarTodas.addEventListener("change", () => {
+            contenedor?.querySelectorAll('input[name="solicitudesEstudiantesSeleccionadas"]').forEach(input => {
+                input.checked = seleccionarTodas.checked;
+            });
+            actualizarSeleccionSolicitudesEstudiantesAdmin();
+        });
+    }
+    if (aprobar && aprobar.dataset.configurado !== "1") {
+        aprobar.dataset.configurado = "1";
+        aprobar.addEventListener("click", aprobarSolicitudesEstudiantesSeleccionadas);
+    }
+}
+
+function actualizarSeleccionSolicitudesEstudiantesAdmin() {
+    const contenedor = document.getElementById("tablaSolicitudesEstudiantesAdmin");
+    const filas = Array.from(contenedor?.querySelectorAll('input[name="solicitudesEstudiantesSeleccionadas"]') || []);
+    const seleccionadas = filas.filter(input => input.checked).length;
+    const seleccionarTodas = document.getElementById("seleccionarTodasSolicitudesEstudiantesAdmin");
+    const aprobar = document.getElementById("aprobarSolicitudesEstudiantesAdmin");
+    const contador = document.getElementById("cantidadSeleccionadaSolicitudesEstudiantesAdmin");
+    if (seleccionarTodas) {
+        seleccionarTodas.checked = filas.length > 0 && seleccionadas === filas.length;
+        seleccionarTodas.indeterminate = seleccionadas > 0 && seleccionadas < filas.length;
+        seleccionarTodas.disabled = filas.length === 0;
+    }
+    if (aprobar) aprobar.disabled = seleccionadas === 0;
+    if (contador) contador.textContent = `${seleccionadas} seleccionada${seleccionadas === 1 ? "" : "s"}`;
+}
+
+async function aprobarSolicitudesEstudiantesSeleccionadas() {
+    const contenedor = document.getElementById("tablaSolicitudesEstudiantesAdmin");
+    const ids = Array.from(contenedor?.querySelectorAll('input[name="solicitudesEstudiantesSeleccionadas"]:checked') || [])
+        .map(input => Number(input.value))
+        .filter(id => Number.isInteger(id) && id > 0);
+    if (!ids.length) return;
+
+    const seleccionadas = ids.map(id => solicitudes.find(s => Number(s.id) === id)).filter(Boolean);
+    const nombres = seleccionadas.map(s => s.nombre || `solicitud ${s.id}`).join(", ");
+    if (!confirm(`¿Deseas aprobar ${ids.length} solicitud${ids.length === 1 ? "" : "es"} de estudiante?${nombres ? `\n\n${nombres}` : ""}`)) return;
+
+    const boton = document.getElementById("aprobarSolicitudesEstudiantesAdmin");
+    if (boton) boton.disabled = true;
+    let aprobadas = 0;
+    const errores = [];
+    for (const id of ids) {
+        try {
+            await api("validate_request", { method: "POST", body: { id, estado: "aceptada" } });
+            aprobadas++;
+        } catch (error) {
+            const solicitud = seleccionadas.find(s => Number(s.id) === id);
+            errores.push(`${solicitud?.nombre || `Solicitud ${id}`}: ${error.message}`);
+        }
+    }
+
+    await actualizarAdministrador();
+    mostrarSeccionAdministrador("solicitudes-estudiantes");
+    if (errores.length) {
+        alert(`Proceso finalizado: ${aprobadas} aprobada${aprobadas === 1 ? "" : "s"} y ${errores.length} con error.\n\n${errores.join("\n")}`);
+    } else {
+        alert(`${aprobadas} solicitud${aprobadas === 1 ? "" : "es"} aprobada${aprobadas === 1 ? "" : "s"} correctamente.`);
+    }
 }
 
 async function validarSolicitudAdministrador(id, estado){
@@ -16162,6 +16335,7 @@ async function cargarProfesoresAdmin() {
                             <select id="sedeProf_${p.id}" onchange="actualizarZonasProfesor(${p.id})">
                                 ${sedes.map(x => `<option value="${escapeHtml(x)}" ${x === p.sede ? "selected" : ""}>${escapeHtml(x)}</option>`).join("")}
                             </select>
+                            <small class="field-help">Sede principal asignada al integrante del personal.</small>
                         </div>
 
                         <div>
@@ -16169,14 +16343,22 @@ async function cargarProfesoresAdmin() {
                             <select id="zonaProf_${p.id}">
                                 ${opcionesZonaProfesor(p.sede, p.zona)}
                             </select>
-                            <small class="field-help">Las zonas disponibles dependen de la sede.</small>
+                            <small class="field-help">Las zonas disponibles dependen de la sede. Este selector es informativo y no se almacena.</small>
+                        </div>
+
+                        <div>
+                            <label>Proyecto asignado</label>
+                            <select id="proyectoProf_${p.id}">
+                                ${opcionesProyectoProfesor(p.proyecto)}
+                            </select>
+                            <small class="field-help">Proyecto o área de servicio social a cargo.</small>
                         </div>
 
                         <button class="assignment-save" onclick="asignarProfesor(${p.id})">Guardar asignación</button>
                     </div>
                 </div>
             `).join("")
-            : `<div class="empty-state">No hay profesores registrados.</div>`;
+            : `<div class="empty-state">No hay integrantes del personal registrados.</div>`;
         profesores.forEach(p => actualizarZonasProfesor(p.id, p.zona));
     } catch (e) {
         cont.innerHTML = `<div class="message" style="display:block">${escapeHtml(e.message)}</div>`;
@@ -16214,6 +16396,23 @@ const sedesApoyoDocentes = [
     "Bello Horizonte"
 ];
 
+const proyectosProfesor = [
+    "Educación Física / Tiempo Libre",
+    "Proyecto Ambiental",
+    "Logística y Vigilancia",
+    "Secretaría y/o Archivo",
+    "Acompañamiento a un docente de transición o primaria",
+    "Eventos especiales",
+    "Otro"
+];
+
+function opcionesProyectoProfesor(proyectoSeleccionado = "") {
+    return [
+        `<option value="" ${proyectoSeleccionado ? "" : "selected"} disabled>Seleccionar proyecto</option>`,
+        ...proyectosProfesor.map(proyecto => `<option value="${escapeHtml(proyecto)}" ${proyecto === proyectoSeleccionado ? "selected" : ""}>${escapeHtml(proyecto)}</option>`)
+    ].join("");
+}
+
 function zonasDisponiblesPorSede(sede) {
     return zonasPorSede[sede] || ["Próximamente"];
 }
@@ -16250,19 +16449,19 @@ function actualizarZonasProfesor(id, zonaSeleccionada = "") {
 
 async function asignarProfesor(id) {
     const sede = document.getElementById(`sedeProf_${id}`)?.value;
-    const zona = document.getElementById(`zonaProf_${id}`)?.value;
+    const proyecto = document.getElementById(`proyectoProf_${id}`)?.value;
 
-    if (!sede || !zona) {
-        alert("Selecciona la sede y la zona.");
+    if (!sede || !proyecto) {
+        alert("Selecciona la sede y el proyecto.");
         return;
     }
 
     try {
         await api("assign_teacher", {
             method: "POST",
-            body: { staffId: id, sede, zona }
+            body: { staffId: id, sede, proyecto }
         });
-        alert("Sede y zona guardadas correctamente.");
+        alert("Sede y proyecto guardados correctamente.");
         await cargarProfesoresAdmin();
     } catch (e) {
         alert(e.message);
