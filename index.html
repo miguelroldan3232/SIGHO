@@ -5,6 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>SIGHO | Servicio Social · I.E. José Joaquín Flórez Hernández</title>
+<link rel="icon" type="image/jpeg" href="escudo_jjfh.jpg">
 <style>
 
         * {
@@ -17445,9 +17446,6 @@ window.addEventListener('resize',function(){
 <button aria-label="Ayuda" data-mobile-nav="ayuda" type="button">Ayuda</button>
 <button aria-label="Perfil" data-mobile-nav="perfil" type="button">Perfil</button>
 </nav>
-<div aria-hidden="true" class="ptr-indicator" id="ptrIndicator">
-<span>↓</span> Suelta para actualizar
-</div>
 <script>
 /* =========================================================
    MEJORAS MÓVILES SIGHO — JS táctil
@@ -17455,16 +17453,11 @@ window.addEventListener('resize',function(){
 (function () {
     const mobileQuery = window.matchMedia("(max-width: 900px) and (hover: none) and (pointer: coarse)");
     const overlay = document.getElementById("mobileOverlay");
-    const ptrIndicator = document.getElementById("ptrIndicator");
     const sidebarSelectors = ".sidebar, .role-sidebar, .admin-sidebar, .super-admin-sidebar";
 
     let touchStartX = 0;
     let touchStartY = 0;
     let touchStartTime = 0;
-    let ptrStartY = 0;
-    let ptrDistance = 0;
-    let ptrReady = false;
-    let ptrRefreshing = false;
 
     function isMobileTouch() {
         return mobileQuery.matches;
@@ -17524,11 +17517,6 @@ window.addEventListener('resize',function(){
         touchStartY = touch.clientY;
         touchStartTime = Date.now();
 
-        if (window.scrollY <= 0) {
-            ptrStartY = touch.clientY;
-            ptrDistance = 0;
-            ptrReady = false;
-        }
     }, { passive: true });
 
     document.addEventListener("touchend", function (event) {
@@ -17549,57 +17537,8 @@ window.addEventListener('resize',function(){
             }
         }
 
-        if (ptrReady && ptrDistance >= 90 && !ptrRefreshing && window.scrollY <= 0) {
-            ptrRefreshing = true;
-            if (ptrIndicator) {
-                ptrIndicator.classList.remove("ready");
-                ptrIndicator.classList.add("visible");
-                ptrIndicator.innerHTML = "<span>↻</span> Actualizando…";
-            }
-            window.setTimeout(function () {
-                window.location.reload();
-            }, 150);
-        } else if (!ptrRefreshing && ptrIndicator) {
-            ptrIndicator.classList.remove("visible", "ready");
-        }
-
-        ptrStartY = 0;
-        ptrDistance = 0;
-        ptrReady = false;
     }, { passive: true });
 
-    document.addEventListener("touchmove", function (event) {
-        if (!isMobileTouch() || !event.touches.length || window.scrollY > 0) return;
-
-        const currentY = event.touches[0].clientY;
-        const delta = currentY - ptrStartY;
-
-        if (ptrStartY > 0 && delta > 0) {
-            ptrDistance = Math.min(delta, 120);
-
-            if (ptrIndicator) {
-                ptrIndicator.classList.add("visible");
-
-                if (ptrDistance >= 90) {
-                    ptrReady = true;
-                    ptrIndicator.classList.add("ready");
-                    ptrIndicator.innerHTML = "<span>↑</span> Suelta para actualizar";
-                } else {
-                    ptrReady = false;
-                    ptrIndicator.classList.remove("ready");
-                    ptrIndicator.innerHTML = "<span>↓</span> Desliza para actualizar";
-                }
-            }
-        }
-    }, { passive: true });
-
-    window.addEventListener("scroll", function () {
-        if (!isMobileTouch() || !ptrIndicator || window.scrollY > 0) {
-            if (ptrIndicator && !ptrRefreshing) {
-                ptrIndicator.classList.remove("visible", "ready");
-            }
-        }
-    }, { passive: true });
 
     /* Bottom bar: intenta reutilizar la navegación existente sin reemplazarla. */
     document.querySelectorAll("[data-mobile-nav]").forEach(function (button) {
@@ -20463,5 +20402,12 @@ body.dark-mode textarea[disabled].campo-error {
 })();
 </script>
 
+
+<style id="sigho-mobile-stop-native-pull-to-refresh-v40">
+/* Bloquea el overscroll en el borde, sin intervenir en el desplazamiento normal. */
+html, body {
+    overscroll-behavior-y: none !important;
+}
+</style>
 </body>
 </html>
