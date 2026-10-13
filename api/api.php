@@ -339,6 +339,7 @@ function ensure_optional_columns(PDO $pdo): void {
     $checks = [
         ['student_applications', 'service_shift', "ALTER TABLE student_applications ADD COLUMN service_shift VARCHAR(30) NULL AFTER service_days"],
         ['access_requests', 'service_site', "ALTER TABLE access_requests ADD COLUMN service_site VARCHAR(150) NULL AFTER grade"],
+        ['access_requests', 'document_type', "ALTER TABLE access_requests ADD COLUMN document_type VARCHAR(50) NULL AFTER identification"],
         ['staff', 'service_site', "ALTER TABLE staff ADD COLUMN service_site VARCHAR(150) NULL AFTER position"],
         ['staff', 'service_project', "ALTER TABLE staff ADD COLUMN service_project VARCHAR(200) NULL AFTER service_site"],
         ['staff', 'phone', "ALTER TABLE staff ADD COLUMN phone VARCHAR(30) NULL AFTER service_project"],
@@ -488,6 +489,8 @@ function pending_requests(string $roleFilter = ''): array {
                    sa.project_other,
                    sa.service_days,
                    sa.service_shift,
+                   COALESCE(sa.document_type, ar.document_type) AS requested_document_type,
+                   COALESCE(sa.document_number, ar.identification) AS requested_document_number,
                    ar.service_site AS request_service_site,
                    ar.service_project AS request_service_project,
                    ar.phone AS request_phone
@@ -526,8 +529,8 @@ function pending_requests(string $roleFilter = ''): array {
             'segundoApellido' => $r['second_surname'] ?? '',
             'primerNombre' => $r['application_first_name'] ?? '',
             'segundoNombre' => $r['second_name'] ?? '',
-            'tipoDocumento' => $r['document_type'] ?? '',
-            'numeroDocumento' => $r['document_number'] ?? '',
+            'tipoDocumento' => $r['requested_document_type'] ?? '',
+            'numeroDocumento' => $r['requested_document_number'] ?? $r['identification'],
             'gradoSolicitud' => $r['application_grade'] ?? '',
             'fechaNacimiento' => $r['birth_date'] ?? '',
             'direccion' => $r['residence_address'] ?? '',
@@ -765,6 +768,27 @@ try {
             $nombre = trim((string)($d['nombre'] ?? ''));
             $apellido = trim((string)($d['apellido'] ?? ''));
             $ident = trim((string)($d['identificacion'] ?? ''));
+            $tipoDocumento = trim((string)($d['tipoDocumento'] ?? ''));
+            $numeroDocumento = trim((string)($d['numeroDocumento'] ?? ''));
+            $camposNombreProfesor = $rol === 'profesor' && (
+                array_key_exists('primerApellido', $d) ||
+                array_key_exists('segundoApellido', $d) ||
+                array_key_exists('primerNombre', $d) ||
+                array_key_exists('segundoNombre', $d)
+            );
+            if ($rol === 'profesor') {
+                $ident = $numeroDocumento;
+                if ($camposNombreProfesor) {
+                    $nombre = trim(implode(' ', array_filter([
+                        trim((string)($d['primerNombre'] ?? '')),
+                        trim((string)($d['segundoNombre'] ?? ''))
+                    ], static fn($value) => $value !== '')));
+                    $apellido = trim(implode(' ', array_filter([
+                        trim((string)($d['primerApellido'] ?? '')),
+                        trim((string)($d['segundoApellido'] ?? ''))
+                    ], static fn($value) => $value !== '')));
+                }
+            }
             $correo = strtolower(trim((string)($d['correo'] ?? '')));
             $clave = (string)($d['clave'] ?? '');
             $modalidad = $d['modalidad'] ?? null;
@@ -1086,29 +1110,58 @@ try {
             }
 
             if ($rol === 'profesor') {
-                $nombre = capitalizarNombre($nombre);
-                $apellido = capitalizarNombre($apellido);
+                if ($camposNombreProfesor) {
+                    $nombresProfesor = [
+                        'Primer nombre' => capitalizarNombre(trim((string)($d['primerNombre'] ?? ''))),
+                        'Segundo nombre' => capitalizarNombre(trim((string)($d['segundoNombre'] ?? ''))),
+                        'Primer apellido' => capitalizarNombre(trim((string)($d['primerApellido'] ?? ''))),
+                        'Segundo apellido' => capitalizarNombre(trim((string)($d['segundoApellido'] ?? '')))
+                    ];
+                    $regexNombreProfesor = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+                    foreach ($nombresProfesor as $etiqueta => $valor) {
+                        $obligatorio = in_array($etiqueta, ['Primer nombre', 'Primer apellido'], true);
+                        if (!$valor && !$obligatorio) continue;
+                        if (mb_strlen($valor, 'UTF-8') < 2 || mb_strlen($valor, 'UTF-8') > 30 || !preg_match($regexNombreProfesor, $valor)) {
+                            fail($etiqueta . ' debe contener solo letras y espacios sencillos, entre 2 y 30 caracteres.');
+                        }
+                    }
+                    $nombre = trim(implode(' ', array_filter([
+                        $nombresProfesor['Primer nombre'],
+                        $nombresProfesor['Segundo nombre']
+                    ], static fn($value) => $value !== '')));
+                    $apellido = trim(implode(' ', array_filter([
+                        $nombresProfesor['Primer apellido'],
+                        $nombresProfesor['Segundo apellido']
+                    ], static fn($value) => $value !== '')));
+                } else {
+                    $nombre = capitalizarNombre($nombre);
+                    $apellido = capitalizarNombre($apellido);
+                }
                 $ident = trim($ident);
                 $correo = strtolower(trim($correo));
 
-                $regexNombreProfesor = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
-                if (mb_strlen($nombre, 'UTF-8') < 2 || mb_strlen($nombre, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $nombre)) {
-                    fail('Los nombres del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+                if (!$camposNombreProfesor) {
+                    $regexNombreProfesor = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+                    if (mb_strlen($nombre, 'UTF-8') < 2 || mb_strlen($nombre, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $nombre)) {
+                        fail('Los nombres del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+                    }
+                    if (mb_strlen($apellido, 'UTF-8') < 2 || mb_strlen($apellido, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $apellido)) {
+                        fail('Los apellidos del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+                    }
                 }
-                if (mb_strlen($apellido, 'UTF-8') < 2 || mb_strlen($apellido, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $apellido)) {
-                    fail('Los apellidos del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+                if (!in_array($tipoDocumento, ['Cédula de ciudadanía', 'PPT'], true)) {
+                    fail('Selecciona Cédula de ciudadanía o PPT como tipo de documento.');
                 }
-                if ($ident === '') {
-                    fail('La identificación o código institucional del profesor es obligatorio.');
+                $patronDocumentoProfesor = $tipoDocumento === 'PPT' ? '/^\d{6,8}$/' : '/^\d{7,10}$/';
+                if (!preg_match($patronDocumentoProfesor, $ident)) {
+                    fail($tipoDocumento === 'PPT'
+                        ? 'El PPT debe tener entre 6 y 8 dígitos.'
+                        : 'La cédula debe tener entre 7 y 10 dígitos.');
                 }
                 if (!preg_match('/^3\d{9}$/', $telefonoProfesor)
                     || preg_match('/^(\d)\1{9}$/', $telefonoProfesor)
                     || in_array($telefonoProfesor, ['0123456789','1234567890','9876543210','123456789','234567890','987654321','876543210'], true)) {
                     fail('El teléfono de contacto del profesor debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.');
-                }
-                // La identificación/código se conserva libre para no romper formatos existentes como EST-100.
-                if (preg_match('/[<>\"\']/u', $ident)) {
-                    fail('La identificación o código institucional contiene caracteres no permitidos.');
                 }
                 if (preg_match('/\s/u', $correo) || !preg_match('/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i', $correo)) {
                     fail('El correo del profesor debe ser institucional, sin espacios, y usar @iejosejoaquinflorezhernandez.edu.co.');
@@ -1122,9 +1175,10 @@ try {
             ensure_optional_columns($pdo);
             $pdo->beginTransaction();
             try {
-                $st = $pdo->prepare('INSERT INTO access_requests (identification, first_name, last_name, email, password_hash, requested_role_id, modality, technical_program, grade, service_site, service_project, phone) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
+                $st = $pdo->prepare('INSERT INTO access_requests (identification, document_type, first_name, last_name, email, password_hash, requested_role_id, modality, technical_program, grade, service_site, service_project, phone) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)');
                 $st->execute([
                     $ident,
+                    $tipoDocumento !== '' ? $tipoDocumento : null,
                     $nombre,
                     $apellido,
                     $correo,
@@ -1204,19 +1258,12 @@ try {
         case 'update_professor_profile':
             $user = require_roles(['profesor']);
             $d = json_input();
-            $nombres = trim((string)($d['nombres'] ?? ''));
-            $apellidos = trim((string)($d['apellidos'] ?? ''));
             $correo = strtolower(trim((string)($d['correo'] ?? '')));
             $telefono = trim((string)($d['telefono'] ?? ''));
-            if ($nombres === '' || $apellidos === '' || $correo === '' || $telefono === '') fail('Completa todos los datos editables.');
+            if ($correo === '' || $telefono === '') fail('Completa el correo institucional y el teléfono de contacto.');
             if (!filter_var($correo, FILTER_VALIDATE_EMAIL) || !is_institutional_email($correo)) {
                 fail('El correo del profesor debe utilizar el dominio institucional @' . institutional_domain() . '.');
             }
-            $regexNombreProfesor = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
-            $nombres = capitalizarNombre($nombres);
-            $apellidos = capitalizarNombre($apellidos);
-            if (mb_strlen($nombres, 'UTF-8') < 2 || mb_strlen($nombres, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $nombres)) fail('Los nombres del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
-            if (mb_strlen($apellidos, 'UTF-8') < 2 || mb_strlen($apellidos, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $apellidos)) fail('Los apellidos del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
             if (!preg_match('/^3\d{9}$/', $telefono)
                 || preg_match('/^(\d)\1{9}$/', $telefono)
                 || in_array($telefono, ['0123456789','1234567890','9876543210','123456789','234567890','987654321','876543210'], true)) {
@@ -1229,8 +1276,8 @@ try {
             ensure_optional_columns($pdo);
             $pdo->beginTransaction();
             try {
-                $st = $pdo->prepare('UPDATE users SET first_name=?, last_name=?, email=? WHERE id=?');
-                $st->execute([$nombres, $apellidos, $correo, (int)$user['id']]);
+                $st = $pdo->prepare('UPDATE users SET email=? WHERE id=?');
+                $st->execute([$correo, (int)$user['id']]);
                 $st = $pdo->prepare('SELECT id FROM staff WHERE user_id=? LIMIT 1');
                 $st->execute([(int)$user['id']]);
                 if ($st->fetchColumn()) {
@@ -1251,7 +1298,7 @@ try {
             respond(['ok'=>true,'user'=>$payload,'message'=>'Datos actualizados correctamente.']);
 
         case 'change_professor_password':
-            $user = require_roles(['profesor']);
+            $user = require_roles(['profesor', 'estudiante']);
             $d = json_input();
             $actual = (string)($d['claveActual'] ?? '');
             $nueva = (string)($d['nuevaClave'] ?? '');
@@ -1266,6 +1313,12 @@ try {
             $nuevoHash = password_hash($nueva, PASSWORD_DEFAULT);
             $st = db()->prepare('UPDATE users SET password_hash=? WHERE id=?');
             $st->execute([$nuevoHash, (int)$user['id']]);
+            $_SESSION = [];
+            if (ini_get('session.use_cookies')) {
+                $params = session_get_cookie_params();
+                setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+            }
+            session_destroy();
             respond(['ok'=>true,'message'=>'Contraseña actualizada correctamente.']);
 
         case 'my_profile':
@@ -1439,8 +1492,8 @@ try {
             $horas = trim((string)($_POST['horas'] ?? ''));
             $descripcion = trim((string)($_POST['descripcion'] ?? ''));
 
-            if (!$fecha || !$horas || !$descripcion) {
-                fail('Faltan datos del registro.');
+            if (!$fecha || !$horas) {
+                fail('Completa los campos obligatorios: fecha y horas realizadas.');
             }
 
             // A. Fecha: únicamente días del año actual y nunca una fecha futura.
@@ -1455,13 +1508,13 @@ try {
                 fail("La fecha debe pertenecer al año {$anioActual} y no puede ser posterior a hoy.");
             }
 
-            // B. Horas realizadas: únicamente enteros entre 1 y 50.
+            // B. Horas realizadas: únicamente enteros entre 1 y 15.
             if (!preg_match('/^[0-9]{1,2}$/', $horas)) {
-                fail('Las horas realizadas deben ser números enteros del 1 al 50.');
+                fail('Las horas realizadas deben ser números enteros del 1 al 15.');
             }
             $hours = (int)$horas;
-            if ($hours < 1 || $hours > 50) {
-                fail('Las horas realizadas deben ser números enteros del 1 al 50.');
+            if ($hours < 1 || $hours > 15) {
+                fail('Las horas realizadas deben ser números enteros del 1 al 15.');
             }
 
             // C. Restricción por grado. Ciclo V mantiene horario flexible.
@@ -1487,13 +1540,13 @@ try {
             if (mb_strlen($descripcion, 'UTF-8') > 1000) fail('La descripción puede tener máximo 1000 caracteres.');
 
             $upload = $_FILES['evidencia'] ?? null;
-            if (!$upload || !isset($upload['name'])) fail('Debes adjuntar al menos una imagen.');
+            if (!$upload || !isset($upload['name'])) fail('Debes adjuntar exactamente 3 imágenes JPG o JPEG.');
             if (!is_array($upload['name'])) {
                 $upload = array_map(static fn($value): array => [$value], $upload);
             }
             $cantidadEvidencias = count($upload['name']);
-            if ($cantidadEvidencias < 1 || $cantidadEvidencias > 3) {
-                fail('Debes adjuntar de 1 a 3 imágenes como máximo.');
+            if ($cantidadEvidencias !== 3) {
+                fail('Debes adjuntar exactamente 3 imágenes JPG o JPEG.');
             }
 
             if (!is_dir(EVIDENCE_DIR) && !mkdir(EVIDENCE_DIR, 0775, true) && !is_dir(EVIDENCE_DIR)) {
@@ -1502,7 +1555,6 @@ try {
 
             $pdo = db();
             ensure_record_evidence_table($pdo);
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
             $uploadsValidados = [];
             for ($i = 0; $i < $cantidadEvidencias; $i++) {
                 $file = [
@@ -1522,9 +1574,21 @@ try {
                     fail('Solo se permiten imágenes JPG o JPEG.');
                 }
 
-                $mime = $finfo->file((string)$file['tmp_name']);
-                if ($mime !== 'image/jpeg') fail('Solo se permiten imágenes JPG o JPEG.');
-                $file['mime'] = $mime;
+                $rutaTemporal = (string)$file['tmp_name'];
+                if (!is_file($rutaTemporal)) fail('No se pudo leer una de las imágenes adjuntas.');
+                $handle = fopen($rutaTemporal, 'rb');
+                if ($handle === false) fail('No se pudo leer una de las imágenes adjuntas.');
+                $cabecera = fread($handle, 3);
+                $longitud = filesize($rutaTemporal);
+                $marcaFinal = '';
+                if ($longitud !== false && $longitud >= 2 && fseek($handle, -2, SEEK_END) === 0) {
+                    $marcaFinal = fread($handle, 2) ?: '';
+                }
+                fclose($handle);
+                if ($cabecera !== "\xFF\xD8\xFF" || $marcaFinal !== "\xFF\xD9") {
+                    fail('Solo se permiten imágenes JPG o JPEG válidas.');
+                }
+                $file['mime'] = 'image/jpeg';
                 $uploadsValidados[] = $file;
             }
 

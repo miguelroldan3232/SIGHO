@@ -30,6 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `access_requests` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `identification` varchar(50) NOT NULL,
+  `document_type` varchar(50) DEFAULT NULL,
   `first_name` varchar(80) NOT NULL,
   `last_name` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,

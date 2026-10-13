@@ -346,7 +346,41 @@
         #estudiante .notification-empty strong,#estudiante .notification-empty span { display:block; }
         #estudiante .notification-empty strong { margin:7px 0 3px; color:#4f666f; }
         #estudiante .notification-empty span { font-size:12px; }
-        .teacher-admin-card select:disabled, #profesor #profesorPerfilProyectoEditable:disabled { background:#edf0f1; color:#7c888c; cursor:not-allowed; opacity:1; }
+        #administrador .notification-button { position:relative; border:1px solid #d8e5ea; background:#fff; border-radius:11px; width:44px; height:44px; cursor:pointer; font-size:18px; }
+        #administrador .notification-button b { position:absolute; right:-4px; top:-5px; min-width:19px; height:19px; padding:0 5px; border-radius:20px; background:#d83a3a; color:#fff; font-size:10px; display:none; align-items:center; justify-content:center; }
+        #administrador .notification-panel { position:absolute; top:52px; right:0; width:330px; max-width:min(330px,calc(100vw - 30px)); background:#fff; border:1px solid #dce7eb; border-radius:14px; box-shadow:0 14px 35px rgba(8,43,76,.16); opacity:0; visibility:hidden; transform:translateY(-6px); pointer-events:none; transition:.2s; z-index:300; overflow:hidden; }
+        #administrador .notification-panel.show { opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto; }
+        #administrador .notification-panel-head { display:flex; justify-content:space-between; gap:10px; padding:13px 14px; border-bottom:1px solid #edf2f4; }
+        #administrador .notification-panel-head strong,#administrador .notification-panel-head span { display:block; }
+        #administrador .notification-panel-head span { font-size:11px; color:#7a8b91; margin-top:3px; }
+        #administrador .notification-panel-head button { border:0; background:none; color:#1769aa; font-size:11px; cursor:pointer; }
+        #administrador .notification-list { max-height:320px; overflow:auto; }
+        #administrador .notification-item { width:100%; display:flex; gap:10px; text-align:left; border:0; border-bottom:1px solid #eef2f4; background:#fff; padding:12px 14px; cursor:pointer; }
+        #administrador .notification-item:hover { background:#f7fafb; }
+        #administrador .notification-item.unread { background:#f4f9fc; }
+        #administrador .notification-dot { color:#d83a3a; font-weight:900; }
+        #administrador .notification-copy strong,#administrador .notification-copy small { display:block; }
+        #administrador .notification-copy strong { font-size:12px; color:#254b5f; }
+        #administrador .notification-copy small { margin-top:3px; font-size:11px; color:#7b8b91; }
+        #administrador .notification-empty { padding:25px 15px; text-align:center; color:#74868c; }
+        #administrador .notification-empty strong,#administrador .notification-empty span { display:block; }
+        #administrador .notification-empty strong { margin:7px 0 3px; color:#4f666f; }
+        #administrador .notification-empty span { font-size:12px; }
+        html.dark-mode #administrador .notification-button, body.dark-mode #administrador .notification-button { background:#172334; color:#e5edf5; border-color:#334155; }
+        html.dark-mode #administrador .notification-panel, body.dark-mode #administrador .notification-panel { background:#172334; color:#f8fafc; border-color:#334155; }
+        html.dark-mode #administrador .notification-panel-head, body.dark-mode #administrador .notification-panel-head { border-color:#334155; }
+        html.dark-mode #administrador .notification-panel-head strong, body.dark-mode #administrador .notification-panel-head strong,
+        html.dark-mode #administrador .notification-copy strong, body.dark-mode #administrador .notification-copy strong,
+        html.dark-mode #administrador .notification-empty strong, body.dark-mode #administrador .notification-empty strong { color:#f8fafc; }
+        html.dark-mode #administrador .notification-panel-head span, body.dark-mode #administrador .notification-panel-head span,
+        html.dark-mode #administrador .notification-copy small, body.dark-mode #administrador .notification-copy small,
+        html.dark-mode #administrador .notification-empty, body.dark-mode #administrador .notification-empty,
+        html.dark-mode #administrador .notification-empty span, body.dark-mode #administrador .notification-empty span { color:#94a3b8; }
+        html.dark-mode #administrador .notification-panel-head button, body.dark-mode #administrador .notification-panel-head button { color:#93c5fd; }
+        html.dark-mode #administrador .notification-item, body.dark-mode #administrador .notification-item { background:#172334; border-color:#334155; }
+        html.dark-mode #administrador .notification-item.unread, body.dark-mode #administrador .notification-item.unread { background:#1e293b; }
+        html.dark-mode #administrador .notification-item:hover, body.dark-mode #administrador .notification-item:hover { background:#263449; }
+        .teacher-admin-card select:disabled { background:#edf0f1; color:#7c888c; cursor:not-allowed; opacity:1; }
         .teacher-admin-card .assignment-grid select { width:100%; min-height:42px; box-sizing:border-box; }
         /* Zona fija: se presenta como un campo estático, sin flecha ni interacción. */
         .teacher-admin-card .assignment-grid select.zona-fija {
@@ -1271,6 +1305,115 @@
             margin: 0;
             color: #dceffc;
             font-size: 13px;
+        }
+
+        .review-observation-card {
+            width: min(560px, 100%);
+        }
+
+        .review-observation-card .sigho-modal-head {
+            position: relative;
+            padding-right: 70px;
+        }
+
+        .review-observation-close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,.55);
+            border-radius: 50%;
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            font-size: 26px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .review-observation-body {
+            padding: 22px 24px;
+        }
+
+        .review-observation-body [hidden] {
+            display: none !important;
+        }
+
+        .review-observation-readonly {
+            margin: 0;
+            padding: 14px 16px;
+            border: 1px solid #dce6ee;
+            border-radius: 12px;
+            background: #f5f8fb;
+            color: #243b50;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .review-observation-body label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #183b57;
+        }
+
+        .review-observation-body textarea {
+            min-height: 140px;
+        }
+
+        .review-observation-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 0 24px 22px;
+        }
+
+        html.dark-mode .review-observation-body label,
+        body.dark-mode .review-observation-body label {
+            color: #dceaf6;
+        }
+
+        html.dark-mode .review-observation-readonly,
+        body.dark-mode .review-observation-readonly {
+            border-color: #334155;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .review-observation-done {
+            background: #e8f5ed !important;
+            color: #246b40 !important;
+            border-color: #bfdfca !important;
+        }
+
+        html.dark-mode .review-observation-done,
+        body.dark-mode .review-observation-done {
+            background: #183a2a !important;
+            color: #bde3ca !important;
+            border-color: #315c43 !important;
+        }
+
+        .sigho-confirm-card {
+            width: min(480px, 100%);
+        }
+
+        .sigho-confirm-message {
+            padding: 22px 24px;
+            color: #354b60;
+            line-height: 1.6;
+        }
+
+        html.dark-mode .sigho-confirm-message,
+        body.dark-mode .sigho-confirm-message {
+            color: #dbe7f2;
+        }
+
+        .sigho-confirm-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 0 24px 22px;
         }
 
         .help-admin-grid {
@@ -3341,6 +3484,7 @@ body:has(.dashboard-screen.active) .container {
 #profesor .readonly-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 #profesor .readonly-grid label { color:#617582; font-size:11px; font-weight:700; }
 #profesor .readonly-grid input { display:block; margin-top:6px; min-height:42px; background:#f1f4f6; color:#758590; border-color:#e0e6ea; cursor:not-allowed; }
+#profesor .readonly-grid .readonly-full-width { grid-column:1 / -1; }
 #profesor .three-columns { grid-template-columns:repeat(3,1fr); }
 #profesor .profile-password-button { white-space:nowrap; }
 #profesor #botonMostrarCambioClaveProfesor { margin-top:2px; }
@@ -3868,6 +4012,7 @@ body:has(.dashboard-screen.active) .container {
     position: absolute;
     top: 14px;
     right: 18px;
+    z-index: 1;
     width: 44px;
     height: 44px;
     min-height: 44px;
@@ -5747,16 +5892,15 @@ body.dark-mode #profesor .pending-counter {
 </style>
 <style id="sigho-password-focus-visibility-v17">
 /* =========================================================
-   SIGHO — CONTRASEÑA: VISIBILIDAD SOLO AL ENFOCAR v17
-   - Oculta por completo la máscara/puntos cuando el campo no tiene foco.
-   - Los puntos aparecen únicamente mientras el campo está enfocado.
+   SIGHO — CONTRASEÑA: MÁSCARA PERSISTENTE
+   - Los puntos siguen visibles aunque el campo pierda el foco.
    - Funciona con Modo Claro, body.dark-mode y html.dark-mode.
    - Corrige también -webkit-text-fill-color y placeholders de WebKit.
    - El texto de ayuda asociado a contraseñas aparece solo con focus/focus-within.
    ========================================================= */
 
 /* ---------------------------------------------------------
-   1. CONTRASEÑAS SIN FOCO: TEXTO Y MÁSCARA INVISIBLES
+   1. CONTRASEÑAS: MÁSCARA VISIBLE TAMBIÉN AL PERDER EL FOCO
    --------------------------------------------------------- */
 input[type="password"]:not(:focus),
 input[type="password"]:not(:focus-within),
@@ -5764,10 +5908,18 @@ html.dark-mode input[type="password"]:not(:focus),
 body.dark-mode input[type="password"]:not(:focus),
 html.dark-mode input[type="password"]:not(:focus-within),
 body.dark-mode input[type="password"]:not(:focus-within) {
-    color: transparent !important;
-    -webkit-text-fill-color: transparent !important;
-    caret-color: transparent !important;
+    color: #35434a !important;
+    -webkit-text-fill-color: #35434a !important;
+    caret-color: #35434a !important;
     text-shadow: none !important;
+}
+html.dark-mode input[type="password"]:not(:focus),
+html.dark-mode input[type="password"]:not(:focus-within),
+body.dark-mode input[type="password"]:not(:focus),
+body.dark-mode input[type="password"]:not(:focus-within) {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
 }
 
 /* ---------------------------------------------------------
@@ -5803,7 +5955,7 @@ input[type="password"]:focus::-webkit-input-placeholder {
 }
 
 /* ---------------------------------------------------------
-   4. MODO OSCURO: MOSTRAR SOLO CON FOCO
+   4. MODO OSCURO: MÁSCARA Y TEXTO LEGIBLES
    --------------------------------------------------------- */
 html.dark-mode input[type="password"]:focus,
 html.dark-mode input[type="password"]:focus-within,
@@ -5825,7 +5977,7 @@ body.dark-mode input[type="password"]:focus::-webkit-input-placeholder {
 }
 
 /* ---------------------------------------------------------
-   5. AUTOFILL DE WEBKIT: TAMBIÉN OCULTO SIN FOCO
+   5. AUTOFILL DE WEBKIT: CONSERVAR LA MÁSCARA VISIBLE
    --------------------------------------------------------- */
 input[type="password"]:-webkit-autofill,
 input[type="password"]:-webkit-autofill:hover,
@@ -5836,12 +5988,30 @@ html.dark-mode input[type="password"]:-webkit-autofill:active,
 body.dark-mode input[type="password"]:-webkit-autofill,
 body.dark-mode input[type="password"]:-webkit-autofill:hover,
 body.dark-mode input[type="password"]:-webkit-autofill:active {
-    -webkit-text-fill-color: transparent !important;
-    color: transparent !important;
-    caret-color: transparent !important;
+    -webkit-text-fill-color: #35434a !important;
+    color: #35434a !important;
+    caret-color: #35434a !important;
+}
+
+html.dark-mode input[type="password"]:-webkit-autofill,
+html.dark-mode input[type="password"]:-webkit-autofill:hover,
+html.dark-mode input[type="password"]:-webkit-autofill:active,
+body.dark-mode input[type="password"]:-webkit-autofill,
+body.dark-mode input[type="password"]:-webkit-autofill:hover,
+body.dark-mode input[type="password"]:-webkit-autofill:active {
+    -webkit-text-fill-color: #ffffff !important;
+    color: #ffffff !important;
+    caret-color: #ffffff !important;
 }
 
 input[type="password"]:-webkit-autofill:focus,
+html.dark-mode input[type="password"]:-webkit-autofill:focus,
+body.dark-mode input[type="password"]:-webkit-autofill:focus {
+    -webkit-text-fill-color: #35434a !important;
+    color: #35434a !important;
+    caret-color: #35434a !important;
+}
+
 html.dark-mode input[type="password"]:-webkit-autofill:focus,
 body.dark-mode input[type="password"]:-webkit-autofill:focus {
     -webkit-text-fill-color: #ffffff !important;
@@ -5890,9 +6060,9 @@ input[type="password"]:focus-within + .field-help {
 @media (prefers-color-scheme: dark) {
     input[type="password"]:not(:focus),
     input[type="password"]:not(:focus-within) {
-        color: transparent !important;
-        -webkit-text-fill-color: transparent !important;
-        caret-color: transparent !important;
+        color: currentColor !important;
+        -webkit-text-fill-color: currentColor !important;
+        caret-color: currentColor !important;
         text-shadow: none !important;
     }
 
@@ -5921,9 +6091,9 @@ input[type="password"]:focus-within + .field-help {
     input[type="password"]:-webkit-autofill,
     input[type="password"]:-webkit-autofill:hover,
     input[type="password"]:-webkit-autofill:active {
-        color: transparent !important;
-        -webkit-text-fill-color: transparent !important;
-        caret-color: transparent !important;
+        color: currentColor !important;
+        -webkit-text-fill-color: currentColor !important;
+        caret-color: currentColor !important;
     }
 
     input[type="password"]:-webkit-autofill:focus {
@@ -6869,10 +7039,12 @@ body.dark-mode #profesor .assignment-banner {
 }
 </style><style id="sigho-dark-account-security-buttons-v34">
 /* =========================================================
-   SEGURIDAD DE LA CUENTA DEL PROFESOR — BOTONES EN MODO OSCURO
+   SEGURIDAD DE CUENTA — BOTONES EN MODO OSCURO
    ========================================================= */
 html.dark-mode #profesor #botonMostrarCambioClaveProfesor,
-body.dark-mode #profesor #botonMostrarCambioClaveProfesor {
+body.dark-mode #profesor #botonMostrarCambioClaveProfesor,
+html.dark-mode #estudiante #botonMostrarCambioClaveEstudiante,
+body.dark-mode #estudiante #botonMostrarCambioClaveEstudiante {
     background-color: rgba(255, 255, 255, 0.08) !important;
     background: rgba(255, 255, 255, 0.08) !important;
     color: #e2e8f0 !important;
@@ -6881,7 +7053,9 @@ body.dark-mode #profesor #botonMostrarCambioClaveProfesor {
 }
 
 html.dark-mode #profesor #botonMostrarCambioClaveProfesor:hover,
-body.dark-mode #profesor #botonMostrarCambioClaveProfesor:hover {
+body.dark-mode #profesor #botonMostrarCambioClaveProfesor:hover,
+html.dark-mode #estudiante #botonMostrarCambioClaveEstudiante:hover,
+body.dark-mode #estudiante #botonMostrarCambioClaveEstudiante:hover {
     background-color: rgba(255, 255, 255, 0.12) !important;
     background: rgba(255, 255, 255, 0.12) !important;
     color: #ffffff !important;
@@ -6890,7 +7064,9 @@ body.dark-mode #profesor #botonMostrarCambioClaveProfesor:hover {
 
 /* Cancelar: peligro tenue, pero completamente legible. */
 html.dark-mode #profesor .password-card .profile-actions button.secondary-button:not(.profile-password-button),
-body.dark-mode #profesor .password-card .profile-actions button.secondary-button:not(.profile-password-button) {
+body.dark-mode #profesor .password-card .profile-actions button.secondary-button:not(.profile-password-button),
+html.dark-mode #estudiante .password-card .profile-actions button.secondary-button:not(.profile-password-button),
+body.dark-mode #estudiante .password-card .profile-actions button.secondary-button:not(.profile-password-button) {
     background-color: rgba(239, 68, 68, 0.15) !important;
     background: rgba(239, 68, 68, 0.15) !important;
     color: #fca5a5 !important;
@@ -6899,7 +7075,9 @@ body.dark-mode #profesor .password-card .profile-actions button.secondary-button
 }
 
 html.dark-mode #profesor .password-card .profile-actions button.secondary-button:not(.profile-password-button):hover,
-body.dark-mode #profesor .password-card .profile-actions button.secondary-button:not(.profile-password-button):hover {
+body.dark-mode #profesor .password-card .profile-actions button.secondary-button:not(.profile-password-button):hover,
+html.dark-mode #estudiante .password-card .profile-actions button.secondary-button:not(.profile-password-button):hover,
+body.dark-mode #estudiante .password-card .profile-actions button.secondary-button:not(.profile-password-button):hover {
     background-color: rgba(239, 68, 68, 0.22) !important;
     background: rgba(239, 68, 68, 0.22) !important;
     color: #fecaca !important;
@@ -6908,7 +7086,9 @@ body.dark-mode #profesor .password-card .profile-actions button.secondary-button
 
 /* Actualizar contraseña: botón principal azul, con texto blanco. */
 html.dark-mode #profesor .password-card .profile-actions button.profile-password-button,
-body.dark-mode #profesor .password-card .profile-actions button.profile-password-button {
+body.dark-mode #profesor .password-card .profile-actions button.profile-password-button,
+html.dark-mode #estudiante .password-card .profile-actions button.profile-password-button,
+body.dark-mode #estudiante .password-card .profile-actions button.profile-password-button {
     background-color: #2563eb !important;
     background: #2563eb !important;
     color: #ffffff !important;
@@ -6917,7 +7097,9 @@ body.dark-mode #profesor .password-card .profile-actions button.profile-password
 }
 
 html.dark-mode #profesor .password-card .profile-actions button.profile-password-button:hover,
-body.dark-mode #profesor .password-card .profile-actions button.profile-password-button:hover {
+body.dark-mode #profesor .password-card .profile-actions button.profile-password-button:hover,
+html.dark-mode #estudiante .password-card .profile-actions button.profile-password-button:hover,
+body.dark-mode #estudiante .password-card .profile-actions button.profile-password-button:hover {
     background-color: #3b82f6 !important;
     background: #3b82f6 !important;
     color: #ffffff !important;
@@ -6927,10 +7109,16 @@ body.dark-mode #profesor .password-card .profile-actions button.profile-password
 
 html.dark-mode #profesor #botonMostrarCambioClaveProfesor:focus-visible,
 body.dark-mode #profesor #botonMostrarCambioClaveProfesor:focus-visible,
+html.dark-mode #estudiante #botonMostrarCambioClaveEstudiante:focus-visible,
+body.dark-mode #estudiante #botonMostrarCambioClaveEstudiante:focus-visible,
 html.dark-mode #profesor .password-card .profile-actions button.secondary-button:focus-visible,
 body.dark-mode #profesor .password-card .profile-actions button.secondary-button:focus-visible,
+html.dark-mode #estudiante .password-card .profile-actions button.secondary-button:focus-visible,
+body.dark-mode #estudiante .password-card .profile-actions button.secondary-button:focus-visible,
 html.dark-mode #profesor .password-card .profile-actions button.profile-password-button:focus-visible,
-body.dark-mode #profesor .password-card .profile-actions button.profile-password-button:focus-visible {
+body.dark-mode #profesor .password-card .profile-actions button.profile-password-button:focus-visible,
+html.dark-mode #estudiante .password-card .profile-actions button.profile-password-button:focus-visible,
+body.dark-mode #estudiante .password-card .profile-actions button.profile-password-button:focus-visible {
     outline: 2px solid #60a5fa !important;
     outline-offset: 2px !important;
 }
@@ -6938,8 +7126,12 @@ body.dark-mode #profesor .password-card .profile-actions button.profile-password
 /* Seguridad de la cuenta: conservar expresamente el estilo original en Modo Claro. */
 html:not(.dark-mode) #profesor #botonMostrarCambioClaveProfesor,
 body:not(.dark-mode) #profesor #botonMostrarCambioClaveProfesor,
+html:not(.dark-mode) #estudiante #botonMostrarCambioClaveEstudiante,
+body:not(.dark-mode) #estudiante #botonMostrarCambioClaveEstudiante,
 html:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-button,
-body:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-button {
+body:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-button,
+html:not(.dark-mode) #estudiante .password-card .profile-actions button.secondary-button,
+body:not(.dark-mode) #estudiante .password-card .profile-actions button.secondary-button {
     background: #e6eff0 !important;
     background-color: #e6eff0 !important;
     color: #52646a !important;
@@ -6949,8 +7141,12 @@ body:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-
 
 html:not(.dark-mode) #profesor #botonMostrarCambioClaveProfesor:hover,
 body:not(.dark-mode) #profesor #botonMostrarCambioClaveProfesor:hover,
+html:not(.dark-mode) #estudiante #botonMostrarCambioClaveEstudiante:hover,
+body:not(.dark-mode) #estudiante #botonMostrarCambioClaveEstudiante:hover,
 html:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-button:hover,
-body:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-button:hover {
+body:not(.dark-mode) #profesor .password-card .profile-actions button.secondary-button:hover,
+html:not(.dark-mode) #estudiante .password-card .profile-actions button.secondary-button:hover,
+body:not(.dark-mode) #estudiante .password-card .profile-actions button.secondary-button:hover {
     background: #d9e6e8 !important;
     background-color: #d9e6e8 !important;
     color: #52646a !important;
@@ -9458,7 +9654,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="form-group">
 <label>Correo para acceder a SIGHO <span class="required">*</span></label>
-<input id="correoSolicitudEstudiante" placeholder="Ej: sarasanchezv116@gmail.com" required="" type="email"/>
+<input aria-describedby="ayudaCorreoSolicitudEstudiante" id="correoSolicitudEstudiante" placeholder="Ej: sarasánchez116@gmail.com" required="" type="email"/>
+<small class="field-help" id="ayudaCorreoSolicitudEstudiante">El correo electrónico que digitará en este campo debe tener la siguiente estructura: Primer nombre, primer apellido, grado y, seguido grupo.</small>
 </div>
 <div class="section section-subtitle">
 <h3>Información escolar</h3>
@@ -9557,19 +9754,37 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="form-row">
 <div class="form-group">
-<label>Nombres <span class="required">*</span></label>
-<input autocomplete="given-name" id="nombre" maxlength="60" placeholder="Ej. Juan Carlos" required="" type="text"/>
-<small class="field-help">Escribe tus nombres completos.</small>
+<label>Primer apellido <span class="required">*</span></label>
+<input autocomplete="family-name" id="primerApellidoProfesor" maxlength="30" minlength="2" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" placeholder="Ej. Pérez" required="" type="text"/>
+<small class="field-help">Escribe tu primer apellido tal como aparece en tu documento.</small>
 </div>
 <div class="form-group">
-<label>Apellidos <span class="required">*</span></label>
-<input autocomplete="family-name" id="apellido" maxlength="60" placeholder="Ej. Pérez Gómez" required="" type="text"/>
-<small class="field-help">Escribe tus apellidos completos.</small>
+<label>Segundo apellido</label>
+<input autocomplete="family-name" id="segundoApellidoProfesor" maxlength="30" minlength="2" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" placeholder="Ej. Gómez" type="text"/>
+<small class="field-help">Si tienes segundo apellido, escríbelo aquí.</small>
 </div>
 <div class="form-group">
-<label>Identificación / código institucional <span class="required">*</span></label>
-<input id="identificacionSolicitud" placeholder="Código o identificación institucional" required="" type="text"/>
-<small class="field-help">Escribe tu identificación o código institucional.</small>
+<label>Primer nombre <span class="required">*</span></label>
+<input autocomplete="given-name" id="primerNombreProfesor" maxlength="30" minlength="2" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" placeholder="Ej. Juan" required="" type="text"/>
+<small class="field-help">Escribe tu primer nombre.</small>
+</div>
+<div class="form-group">
+<label>Segundo nombre</label>
+<input autocomplete="additional-name" id="segundoNombreProfesor" maxlength="30" minlength="2" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?: [A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*" placeholder="Ej. Carlos" type="text"/>
+<small class="field-help">Si tienes segundo nombre, escríbelo aquí.</small>
+</div>
+<div class="form-group">
+<label for="tipoDocumentoProfesor">Tipo de documento <span class="required">*</span></label>
+<select autocomplete="off" id="tipoDocumentoProfesor" required="">
+<option disabled="" hidden="" selected="" value="">Seleccionar</option>
+<option value="Cédula de ciudadanía">Cédula de ciudadanía (CC)</option>
+<option value="PPT">PPT (Permiso de Protección Temporal)</option>
+</select>
+</div>
+<div class="form-group">
+<label for="numeroDocumentoProfesor">Número de documento <span class="required">*</span></label>
+<input autocomplete="off" id="numeroDocumentoProfesor" inputmode="numeric" maxlength="10" minlength="7" pattern="\d{7,10}" placeholder="Escribe tu número de documento" required="" type="text"/>
+<small class="field-help" id="ayudaDocumentoProfesor">Escribe el número sin puntos ni espacios. La cédula debe tener entre 7 y 10 dígitos.</small>
 </div>
 </div>
 <div class="section">
@@ -9585,7 +9800,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <label>Teléfono de contacto <span class="required">*</span></label>
 <input aria-describedby="ayudaTelefonoProfesorSolicitud" autocomplete="tel" id="telefonoProfesorSolicitud" inputmode="numeric" maxlength="12" pattern="3\d{2} \d{3} \d{4}" placeholder="300 123 4567" required="" type="tel"/>
 <small class="field-help" id="ayudaTelefonoProfesorSolicitud">Celular de 10 dígitos que comienza en 3. No se permiten números repetidos ni secuencias consecutivas.</small>
-<small class="field-help">Número de celular de 10 dígitos.</small>
 </div>
 <div class="form-group" style="grid-column:1 / -1;">
 <div class="security-box" style="margin:0;">El proyecto y la sede serán asignados posteriormente por el Administrador desde «Gestión de profesores».</div>
@@ -9761,7 +9975,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="professor-section-header">
 <div>
 <h3>Registrar horas</h3>
-<p class="section-description">Registra una jornada realizada, describe la actividad y adjunta su evidencia.</p>
+<p class="section-description">Registra una jornada realizada, agrega su evidencia y, si deseas, describe la actividad.</p>
 </div>
 </div>
 <div class="security-box">
@@ -9775,8 +9989,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="form-group">
 <label for="horasRealizadas">Horas realizadas</label>
-<input aria-describedby="ayudaHorasRealizadas" id="horasRealizadas" inputmode="numeric" max="50" min="1" placeholder="Ej. 4" required="" step="1" type="number"/>
-<small class="field-help" id="ayudaHorasRealizadas">Ingresa las horas realizadas (números enteros del 1 al 50).</small>
+<input aria-describedby="ayudaHorasRealizadas" id="horasRealizadas" inputmode="numeric" max="15" min="1" placeholder="Ej. 4" required="" step="1" type="number"/>
+<small class="field-help" id="ayudaHorasRealizadas">Ingresa las horas realizadas (números enteros del 1 al 15).</small>
 </div>
 </div>
 <div class="form-group">
@@ -9786,12 +10000,13 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="form-group">
 <label>Evidencia</label>
 <div aria-live="polite" class="evidence-uploader" id="visorEvidenciaHora">
-<label class="evidence-select-button" for="evidenciaHora">📎 Agregar imágenes JPG/JPEG</label>
+<label class="evidence-select-button" for="evidenciaHora" tabindex="0">📎 Agregar imágenes JPG/JPEG</label>
 <input accept=".jpg,.jpeg,image/jpeg" hidden="" id="evidenciaHora" multiple="" type="file"/>
-<span class="evidence-file-name" id="nombreEvidenciaHora">Ninguna imagen seleccionada (máximo 3)</span>
+<span class="evidence-file-name" id="nombreEvidenciaHora">Ninguna imagen seleccionada (exactamente 3)</span>
 <div class="evidence-preview" id="previewEvidenciaHora"></div>
 </div>
-<small class="field-help">Adjunta de 1 a 3 imágenes JPG/JPEG, de máximo 5 MB cada una. Pulsa una miniatura para ampliarla o ✕ para quitarla.</small>
+<small class="field-help" id="ayudaEvidenciaHora">Adjunta exactamente 3 imágenes JPG/JPEG, de máximo 5 MB cada una. Pulsa una miniatura para ampliarla o ✕ para quitarla.</small>
+<small class="field-error-message" id="errorEvidenciaHora" style="display:none;"></small>
 </div>
 <button class="main-button" id="registrarHorasBtn" onclick="registrarHoras()" type="button">Registrar Jornada</button>
 <div class="message" id="mensajeHoras"></div>
@@ -9854,6 +10069,27 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <button class="main-button" disabled="" id="guardarPerfilEstudianteBtn" onclick="guardarPerfilEstudiante()" type="button">Guardar cambios</button>
 </div>
 <div class="message" id="mensajePerfil"></div>
+</div>
+</div>
+<div class="profile-card password-card">
+<div class="profile-card-head">
+<div><strong>Seguridad de la cuenta</strong><span>Cambia tu contraseña sin modificar el resto de tu perfil.</span></div>
+</div>
+<button class="secondary-button profile-password-button" id="botonMostrarCambioClaveEstudiante" onclick="alternarCambioClaveCuenta('estudiante')" type="button">Cambiar contraseña</button>
+<div id="formularioCambioClaveEstudiante" style="display:none; margin-top:16px;">
+<div class="form-row three-columns">
+<div class="form-group"><label for="claveActualEstudiante">Contraseña actual</label><input autocomplete="current-password" id="claveActualEstudiante" placeholder="Contraseña actual" required="" type="password"/></div>
+<div class="form-group"><label for="nuevaClaveEstudiante">Nueva contraseña</label><input autocomplete="new-password" id="nuevaClaveEstudiante" minlength="8" placeholder="Mínimo 8 caracteres" required="" type="password"/></div>
+<div class="form-group"><label for="confirmarClaveEstudiante">Confirmar nueva contraseña</label><input autocomplete="new-password" id="confirmarClaveEstudiante" minlength="8" placeholder="Repite la nueva contraseña" required="" type="password"/></div>
+</div>
+<small class="field-help">Mínimo 8 caracteres, debe incluir mayúscula, minúscula y número.</small>
+<div class="profile-actions">
+<span class="profile-save-state" id="estadoClaveEstudiante"></span>
+<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+<button class="secondary-button" onclick="alternarCambioClaveCuenta('estudiante', false)" type="button">Cancelar</button>
+<button class="secondary-button profile-password-button" onclick="cambiarClaveCuenta('estudiante')" type="button">Actualizar contraseña</button>
+</div>
+</div>
 </div>
 </div>
 </section>
@@ -10082,32 +10318,15 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div>
 <span class="page-eyebrow">CUENTA</span>
 <h3>Mis datos</h3>
-<p class="section-description">Corrige tu información de contacto. Los datos institucionales y la asignación de área permanecen bajo control administrativo.</p>
+<p class="section-description">Actualiza tu correo institucional y teléfono de contacto. Tus datos institucionales permanecen protegidos.</p>
 </div>
 </div>
 <div class="profile-grid">
 <div class="profile-card profile-editable-card">
 <div class="profile-card-head">
-<div><strong>Información editable</strong><span>Puedes actualizar estos datos cuando sea necesario.</span></div>
+<div><strong>Información editable</strong><span>Correo institucional y teléfono de contacto.</span></div>
 </div>
 <div class="form-row two-columns">
-<div class="form-group">
-<label for="profesorPerfilNombres">Nombres <span class="required">*</span></label>
-<input autocomplete="given-name" disabled="" id="profesorPerfilNombres" maxlength="60" minlength="2" placeholder="Nombres del profesor" required="" type="text"/>
-<small class="field-help">Entre 2 y 60 caracteres; solo letras y un espacio entre palabras.</small>
-</div>
-<div class="form-group">
-<label for="profesorPerfilApellidos">Apellidos <span class="required">*</span></label>
-<input autocomplete="family-name" disabled="" id="profesorPerfilApellidos" maxlength="60" minlength="2" placeholder="Apellidos del profesor" required="" type="text"/>
-<small class="field-help">Entre 2 y 60 caracteres; solo letras y un espacio entre palabras.</small>
-</div>
-</div>
-<div class="form-row two-columns">
-<div class="form-group">
-<label for="profesorPerfilProyectoEditable">Proyecto asignado</label>
-<input disabled="" id="profesorPerfilProyectoEditable" readonly="" value="Sin asignar"/>
-<small class="field-help">La asignación del proyecto corresponde al Administrador.</small>
-</div>
 <div class="form-group">
 <label for="profesorPerfilCorreo">Correo institucional <span class="required">*</span></label>
 <input autocomplete="email" disabled="" id="profesorPerfilCorreo" placeholder="profesor@iejosejoaquinflorezhernandez.edu.co" required="" type="email"/>
@@ -10128,10 +10347,11 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="profile-card profile-locked-card">
 <div class="profile-card-head">
-<div><strong>Datos institucionales</strong><span>Solo el Administrador puede modificarlos.</span></div>
+<div><strong>Datos institucionales, protegidos</strong><span>Solo el Administrador puede modificarlos.</span></div>
 <span class="lock-pill">🔒 Protegidos</span>
 </div>
 <div class="readonly-grid">
+<label class="readonly-full-width">Nombre completo<input disabled="" id="profesorPerfilNombreCompleto" readonly="" value=""/></label>
 <label>Rol<input disabled="" id="profesorPerfilRol" readonly="" value="Profesor"/></label>
 <label>Identificación<input disabled="" id="profesorPerfilIdentificacion" readonly="" value=""/></label>
 <label>Sede asignada<input disabled="" id="profesorPerfilSede" readonly="" value="Sin asignar"/></label>
@@ -10146,9 +10366,9 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <button class="secondary-button profile-password-button" id="botonMostrarCambioClaveProfesor" onclick="alternarCambioClaveProfesor()" type="button">Cambiar contraseña</button>
 <div id="formularioCambioClaveProfesor" style="display:none; margin-top:16px;">
 <div class="form-row three-columns">
-<div class="form-group"><label for="claveActualProfesor">Contraseña actual</label><input autocomplete="current-password" id="claveActualProfesor" placeholder="Contraseña actual" type="password"/></div>
-<div class="form-group"><label for="nuevaClaveProfesor">Nueva contraseña</label><input autocomplete="new-password" id="nuevaClaveProfesor" minlength="8" placeholder="Mínimo 8 caracteres" type="password"/></div>
-<div class="form-group"><label for="confirmarClaveProfesor">Confirmar nueva contraseña</label><input autocomplete="new-password" id="confirmarClaveProfesor" minlength="8" placeholder="Repite la nueva contraseña" type="password"/></div>
+<div class="form-group"><label for="claveActualProfesor">Contraseña actual</label><input autocomplete="current-password" id="claveActualProfesor" placeholder="Contraseña actual" required="" type="password"/></div>
+<div class="form-group"><label for="nuevaClaveProfesor">Nueva contraseña</label><input autocomplete="new-password" id="nuevaClaveProfesor" minlength="8" placeholder="Mínimo 8 caracteres" required="" type="password"/></div>
+<div class="form-group"><label for="confirmarClaveProfesor">Confirmar nueva contraseña</label><input autocomplete="new-password" id="confirmarClaveProfesor" minlength="8" placeholder="Repite la nueva contraseña" required="" type="password"/></div>
 </div>
 <small class="field-help">Mínimo 8 caracteres, debe incluir mayúscula, minúscula y número.</small>
 <div class="profile-actions">
@@ -10310,6 +10530,14 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <p id="subtituloVistaAdministrador">Vista general del sistema de servicio social.</p>
 </div>
 <div class="dashboard-tools user-topbar">
+<div class="notification-wrap">
+<button aria-expanded="false" aria-label="Notificaciones" class="notification-button" onclick="toggleNotificacionesAdministrador(event)" title="Notificaciones recientes">🔔<b id="badgeNotificacionesAdministrador">0</b></button>
+<div aria-label="Notificaciones recientes" class="notification-panel" id="panelNotificacionesAdministrador" role="dialog">
+<div class="notification-panel-head"><div><strong>Notificaciones</strong><span>Solicitudes pendientes de revisión</span></div><button onclick="marcarNotificacionesAdministradorLeidas()" type="button">Marcar leídas</button></div>
+<div class="notification-list" id="listaNotificacionesAdministrador"></div>
+</div>
+<div aria-hidden="true" class="notification-backdrop" id="backdropNotificacionesAdministrador" onclick="cerrarPanelNotificacionesAdministrador()"></div>
+</div>
 <button aria-expanded="false" aria-label="Abrir menú del usuario" class="profile-button admin-profile-button" onclick="toggleUserMenu(this)">
 <span class="profile-avatar">👤</span>
 <span class="profile-user-name" id="nombrePerfilAdministradorHeader">Administrador</span>
@@ -10598,6 +10826,54 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="sigho-alert-message" id="sighoAlertMessage"></div>
 <div class="sigho-alert-actions"><button class="main-button" id="sighoAlertAccept" type="button">Aceptar</button></div>
 </div>
+</div>
+<div aria-labelledby="sighoConfirmTitle" aria-modal="true" class="sigho-modal" id="modalSighoConfirm" role="alertdialog">
+<article class="sigho-modal-card sigho-confirm-card">
+<header class="sigho-modal-head"><h3 id="sighoConfirmTitle">Confirmar acción</h3></header>
+<div class="sigho-confirm-message" id="sighoConfirmMessage"></div>
+<footer class="sigho-confirm-actions">
+<button class="secondary-button" id="sighoConfirmCancel" type="button">Cancelar</button>
+<button class="main-button" id="sighoConfirmAccept" type="button">Aceptar</button>
+</footer>
+</article>
+</div>
+<div aria-labelledby="sighoLeaveEditTitle" aria-modal="true" class="sigho-modal" id="modalSighoLeaveEdit" role="alertdialog">
+<article class="sigho-modal-card sigho-confirm-card">
+<header class="sigho-modal-head"><h3 id="sighoLeaveEditTitle">¿Salir sin guardar?</h3></header>
+<div class="sigho-confirm-message" id="sighoLeaveEditMessage">Si sales ahora, no se guardarán los cambios.</div>
+<footer class="sigho-confirm-actions">
+<button class="secondary-button" id="sighoLeaveEditStay" type="button">Seguir editando</button>
+<button class="main-button" id="sighoLeaveEditDiscard" type="button">Salir sin guardar</button>
+</footer>
+</article>
+</div>
+<div aria-labelledby="modalCambioClaveTitulo" aria-modal="true" class="sigho-modal" id="modalCambioClaveExito" role="alertdialog">
+<article class="sigho-modal-card solicitud-exito-card">
+<div class="solicitud-exito-body">
+<div class="solicitud-exito-icon">✓</div>
+<h3 id="modalCambioClaveTitulo">Contraseña actualizada</h3>
+<p>Por seguridad, debes volver a iniciar sesión para probar tu nueva contraseña.</p>
+<button class="solicitud-exito-button" onclick="finalizarCambioClave()" type="button">Volver a iniciar sesión</button>
+</div>
+</article>
+</div>
+<div aria-labelledby="reviewObservationTitle" aria-modal="true" class="sigho-modal" id="modalObservacionProfesor" role="dialog">
+<article class="sigho-modal-card review-observation-card">
+<header class="sigho-modal-head">
+<h3 id="reviewObservationTitle">Observación del registro</h3>
+<p>Escribe la observación que recibirá el estudiante.</p>
+<button aria-label="Cerrar ficha de observación" class="review-observation-close" onclick="cerrarModalObservacionProfesor(null)" type="button">×</button>
+</header>
+<div class="review-observation-body">
+<p class="review-observation-readonly" id="observacionProfesorLectura" hidden=""></p>
+<label for="textoObservacionProfesor" id="etiquetaTextoObservacionProfesor">Observación</label>
+<textarea id="textoObservacionProfesor" maxlength="500" placeholder="Escribe aquí la observación..." rows="5"></textarea>
+</div>
+<footer class="review-observation-actions">
+<button class="secondary-button" id="cancelarObservacionProfesor" onclick="cerrarModalObservacionProfesor(null)" type="button">Cancelar</button>
+<button class="main-button" id="accionObservacionProfesor" onclick="accionModalObservacionProfesor()" type="button">Guardar observación</button>
+</footer>
+</article>
 </div>
 <div aria-labelledby="identityVerificationTitle" aria-modal="true" class="sigho-modal" id="modalVerificacionCorreo" role="dialog">
 <article class="sigho-modal-card identity-verification-card">
@@ -11133,7 +11409,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                 !["segundoNombre", "segundoApellido"].includes(el.id);
         });
         if (personal) personal.querySelectorAll("input, select").forEach(el => {
-            el.required = rol === "profesor";
+            el.required = rol === "profesor" &&
+                !["segundoApellidoProfesor", "segundoNombreProfesor"].includes(el.id);
         });
 
         estudiante?.querySelectorAll('input[name="diasServicio"]').forEach(el => {
@@ -11461,7 +11738,11 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 
     window.restablecerOjoLogin = function () {
         const input = document.getElementById('clave');
-        if (input) input.setAttribute('type', 'password');
+        if (input) {
+            input.setAttribute('type', 'password');
+            input.style.webkitTextSecurity = 'disc';
+            input.style.textSecurity = 'disc';
+        }
         sincronizar();
     };
 })();
@@ -11628,7 +11909,8 @@ async function iniciarSesion() {
                 !["segundoNombre", "segundoApellido"].includes(el.id);
         });
         if (personal) personal.querySelectorAll("input, select").forEach(el => {
-            el.required = rol === "profesor";
+            el.required = rol === "profesor" &&
+                !["segundoApellidoProfesor", "segundoNombreProfesor"].includes(el.id);
         });
 
         estudiante?.querySelectorAll('input[name="diasServicio"]').forEach(el => {
@@ -11921,21 +12203,12 @@ if (inputClave && btnToggle && iconEye) {
     btnToggle.setAttribute('title', 'Mostrar contraseña');
     btnToggle.setAttribute('aria-pressed', 'false');
 
-    btnToggle.addEventListener('click', () => {
-        const isPassword = inputClave.type === 'password';
-        inputClave.type = isPassword ? 'text' : 'password';
-        iconEye.innerHTML = isPassword ? svgEye : svgEyeOff;
-        btnToggle.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
-        btnToggle.setAttribute('title', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
-        btnToggle.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
-        inputClave.focus();
-    });
 }
 
 function renderizarEvidencia(r) {
     if (r.evidenciaArchivos?.length) {
         return r.evidenciaArchivos.map((archivo, index) =>
-            `<a class="evidence-link" href="${escaparHTML(archivo.url)}" target="_blank" rel="noopener">Ver ${index + 1}</a>`
+            `<a class="evidence-link" href="${escaparHTML(archivo.url)}">Ver ${index + 1}</a>`
         ).join(" ");
     }
     if (r.evidenciaUrl) {
@@ -12333,28 +12606,44 @@ async function enviarSolicitud() {
             diasServicio
         };
     } else {
-        const nombre = capitalizarNombreCompleto(document.getElementById("nombre").value).slice(0, 60);
-        const apellido = capitalizarNombreCompleto(document.getElementById("apellido").value).slice(0, 60);
-        const identificacion = document.getElementById("identificacionSolicitud").value.trim();
+        const primerApellido = capitalizarNombreCompleto(document.getElementById("primerApellidoProfesor").value);
+        const segundoApellido = capitalizarNombreCompleto(document.getElementById("segundoApellidoProfesor").value);
+        const primerNombre = capitalizarNombreCompleto(document.getElementById("primerNombreProfesor").value);
+        const segundoNombre = capitalizarNombreCompleto(document.getElementById("segundoNombreProfesor").value);
+        const nombre = [primerNombre, segundoNombre].filter(Boolean).join(" ");
+        const apellido = [primerApellido, segundoApellido].filter(Boolean).join(" ");
+        const tipoDocumento = document.getElementById("tipoDocumentoProfesor").value;
+        const numeroDocumento = document.getElementById("numeroDocumentoProfesor").value.trim();
         const correo = document.getElementById("correoSolicitud").value.replace(/\s/g, "").trim().toLowerCase();
         const telefono = document.getElementById("telefonoProfesorSolicitud")?.value.replace(/\D/g, "").slice(0, 10) || "";
         const regexNombreProfesor = /^[\p{L}]+(?: [\p{L}]+)*$/u;
         const regexCorreoInstitucional = /^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
+        const validarNombreProfesor = (valor, etiqueta, id, obligatorio) => {
+            if (!valor && !obligatorio) return true;
+            if (valor.length < 2 || valor.length > 30 || !regexNombreProfesor.test(valor)) {
+                const texto = `${etiqueta} debe contener solo letras y espacios sencillos, entre 2 y 30 caracteres.`;
+                marcarErrorCampoSolicitud(id, texto);
+                mostrarErrorSolicitud(texto, id);
+                return false;
+            }
+            return true;
+        };
 
-        if (!nombre || !apellido || !identificacion || !correo || !telefono) {
+        if (!primerApellido || !primerNombre || !tipoDocumento || !numeroDocumento || !correo || !telefono) {
             mostrarErrorSolicitud("Completa todos los campos obligatorios del profesor.");
             return;
         }
-        if (!regexNombreProfesor.test(nombre)) {
-            const texto="Los nombres solo pueden contener letras y un espacio sencillo entre palabras.";
-            marcarErrorCampoSolicitud("nombre",texto);
-            mostrarErrorSolicitud(texto,"nombre");
-            return;
-        }
-        if (!regexNombreProfesor.test(apellido)) {
-            const texto="Los apellidos solo pueden contener letras y un espacio sencillo entre palabras.";
-            marcarErrorCampoSolicitud("apellido",texto);
-            mostrarErrorSolicitud(texto,"apellido");
+        if (!validarNombreProfesor(primerApellido, "El primer apellido", "primerApellidoProfesor", true) ||
+            !validarNombreProfesor(segundoApellido, "El segundo apellido", "segundoApellidoProfesor", false) ||
+            !validarNombreProfesor(primerNombre, "El primer nombre", "primerNombreProfesor", true) ||
+            !validarNombreProfesor(segundoNombre, "El segundo nombre", "segundoNombreProfesor", false)) return;
+        const patronDocumento = tipoDocumento === "PPT" ? /^\d{6,8}$/ : /^\d{7,10}$/;
+        if (!["Cédula de ciudadanía", "PPT"].includes(tipoDocumento) || !patronDocumento.test(numeroDocumento)) {
+            const texto = tipoDocumento === "PPT"
+                ? "El PPT debe tener entre 6 y 8 dígitos."
+                : "La cédula debe tener entre 7 y 10 dígitos.";
+            marcarErrorCampoSolicitud("numeroDocumentoProfesor", texto);
+            mostrarErrorSolicitud(texto, "numeroDocumentoProfesor");
             return;
         }
         if (!regexCorreoInstitucional.test(correo)) {
@@ -12379,7 +12668,17 @@ async function enviarSolicitud() {
             return;
         }
 
-        body = { rol, nombre, apellido, identificacion, correo, telefono, clave };
+        body = {
+            rol, nombre, apellido,
+            identificacion: numeroDocumento,
+            primerApellido,
+            segundoApellido,
+            primerNombre,
+            segundoNombre,
+            tipoDocumento,
+            numeroDocumento,
+            correo, telefono, clave
+        };
     }
 
     try {
@@ -12501,10 +12800,25 @@ function configurarRestriccionesRegistroHoras(gradoForzado = "") {
 
     fecha.min = `${anio}-01-01`;
     fecha.max = iso(hoy);
-    if (fecha.value && (fecha.value < fecha.min || fecha.value > fecha.max)) fecha.value = "";
-    // Las horas son enteros de 1 a 50. No modificar el valor mientras se escribe.
+    if (!fecha.value || fecha.value < fecha.min || fecha.value > fecha.max) fecha.value = iso(hoy);
+    fecha.dataset.ultimaFechaValida = fecha.value;
+    if (fecha.dataset.anioBloqueado !== "1") {
+        fecha.dataset.anioBloqueado = "1";
+        const bloquearCambioAnio = () => {
+            const anioPermitido = fecha.min.slice(0, 4);
+            if (!fecha.value || fecha.value.slice(0, 4) !== anioPermitido) {
+                fecha.value = fecha.dataset.ultimaFechaValida || iso(new Date());
+                return;
+            }
+            if (fecha.value) fecha.dataset.ultimaFechaValida = fecha.value;
+        };
+        fecha.addEventListener("input", bloquearCambioAnio);
+        fecha.addEventListener("change", bloquearCambioAnio);
+        fecha.addEventListener("blur", bloquearCambioAnio);
+    }
+    // Las horas son enteros de 1 a 15. No modificar el valor mientras se escribe.
     horas.min = "1";
-    horas.max = "50";
+    horas.max = "15";
     horas.step = "1";
     horas.inputMode = "numeric";
 }
@@ -12704,19 +13018,80 @@ function configurarRestriccionesRegistroHoras(gradoForzado = "") {
     fecha.min = `${anio}-01-01`;
     fecha.max = iso(hoy);
     if (!fecha.value || fecha.value < fecha.min || fecha.value > fecha.max) fecha.value = iso(hoy);
+    fecha.dataset.ultimaFechaValida = fecha.value;
+    if (fecha.dataset.anioBloqueado !== "1") {
+        fecha.dataset.anioBloqueado = "1";
+        const bloquearCambioAnio = () => {
+            const anioPermitido = fecha.min.slice(0, 4);
+            if (!fecha.value || fecha.value.slice(0, 4) !== anioPermitido) {
+                fecha.value = fecha.dataset.ultimaFechaValida || iso(new Date());
+                return;
+            }
+            if (fecha.value) fecha.dataset.ultimaFechaValida = fecha.value;
+        };
+        fecha.addEventListener("input", bloquearCambioAnio);
+        fecha.addEventListener("change", bloquearCambioAnio);
+        fecha.addEventListener("blur", bloquearCambioAnio);
+    }
 
-    // Las horas son enteros de 1 a 50. No modificar el valor mientras se escribe.
+    // Las horas son enteros de 1 a 15. No modificar el valor mientras se escribe.
     horas.min = "1";
-    horas.max = "50";
+    horas.max = "15";
     horas.step = "1";
     horas.inputMode = "numeric";
     if (fecha.dataset.yearBoundsRefresh !== "1") {
         fecha.dataset.yearBoundsRefresh = "1";
         fecha.addEventListener("focus", () => configurarRestriccionesRegistroHoras());
     }
+    [fecha, horas].forEach(campo => {
+        if (campo.dataset.validacionRegistroConfigurada === "1") return;
+        campo.dataset.validacionRegistroConfigurada = "1";
+        ["input", "change", "blur"].forEach(evento => campo.addEventListener(evento, () => {
+            validarCampoRegistroHoras(campo, campo.dataset.validacionSolicitada === "1");
+        }));
+    });
 }
 
 let evidenciasHoraSeleccionadas = [];
+
+function validarCampoRegistroHoras(campo, mostrarVacio = false) {
+    if (!campo) return true;
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const anio = String(hoy.getFullYear());
+    const hoyISO = `${anio}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+    let mensaje = "";
+    if (campo.id === "fechaHora") {
+        if (!campo.value) mensaje = mostrarVacio ? "Campo obligatorio: selecciona una fecha." : "";
+        else if (campo.value.slice(0, 4) !== anio || campo.value < `${anio}-01-01` || campo.value > hoyISO) {
+            mensaje = "La fecha debe ser del año actual y no puede ser posterior a hoy.";
+        }
+    } else if (campo.id === "horasRealizadas") {
+        const valor = campo.value.trim();
+        const horas = Number(valor);
+        if (!valor) mensaje = mostrarVacio ? "Campo obligatorio: ingresa las horas realizadas." : "";
+        else if (!Number.isInteger(horas) || horas < 1 || horas > 15) {
+            mensaje = "Las horas deben ser un número entero entre 1 y 15.";
+        }
+    }
+    campo.setCustomValidity(mensaje);
+    campo.setAttribute("aria-invalid", mensaje ? "true" : "false");
+    if (mensaje) mostrarErrorCampo(campo, mensaje);
+    else limpiarErrorCampo(campo);
+    return !mensaje && Boolean(campo.value.trim());
+}
+
+function validarCantidadEvidenciasHora(mostrarError = false) {
+    const uploader = document.getElementById("visorEvidenciaHora");
+    const error = document.getElementById("errorEvidenciaHora");
+    const valido = evidenciasHoraSeleccionadas.length === 3;
+    if (uploader) uploader.classList.toggle("campo-error", !valido && mostrarError);
+    if (error) {
+        error.textContent = !valido && mostrarError ? "Campo obligatorio: adjunta exactamente 3 imágenes JPG o JPEG." : "";
+        error.style.display = !valido && mostrarError ? "block" : "none";
+    }
+    return valido;
+}
 
 function dibujarEvidenciasSeleccionadas() {
     const input = document.getElementById("evidenciaHora");
@@ -12728,7 +13103,7 @@ function dibujarEvidenciasSeleccionadas() {
     const cantidad = evidenciasHoraSeleccionadas.length;
     nombre.textContent = cantidad
         ? `${cantidad} de 3 imágenes seleccionadas`
-        : "Ninguna imagen seleccionada (máximo 3)";
+        : "Ninguna imagen seleccionada (exactamente 3)";
     input.disabled = cantidad >= 3;
     if (selector) {
         selector.setAttribute("aria-disabled", String(cantidad >= 3));
@@ -12771,6 +13146,7 @@ function dibujarEvidenciasSeleccionadas() {
         tarjeta.append(abrir, nombreArchivo, quitar);
         preview.append(tarjeta);
     });
+    validarCantidadEvidenciasHora(cantidad !== 3 && document.getElementById("errorEvidenciaHora")?.dataset.validacionSolicitada === "1");
 }
 
 function configurarSelectorEvidencia() {
@@ -12799,6 +13175,7 @@ function configurarSelectorEvidencia() {
             agregados++;
         });
         dibujarEvidenciasSeleccionadas();
+        validarCantidadEvidenciasHora(document.getElementById("errorEvidenciaHora")?.dataset.validacionSolicitada === "1");
         if (invalidos) alert("Solo puedes seleccionar imágenes JPG o JPEG.");
         if (nuevos.length > disponibles && disponibles >= 0) alert("Solo puedes adjuntar un máximo de 3 imágenes.");
         if (demasiadoGrandes) alert("Cada imagen debe pesar más de 0 y máximo 5 MB.");
@@ -12834,6 +13211,14 @@ function cerrarVistaAmpliadaEvidencia(event) {
     if (imagen) imagen.removeAttribute("src");
 }
 
+document.addEventListener("click", event => {
+    if (!(event.target instanceof Element)) return;
+    const enlace = event.target.closest("a.evidence-link, a.student-evidence-link");
+    if (!enlace) return;
+    event.preventDefault();
+    abrirVistaAmpliadaEvidencia(enlace.href, enlace.getAttribute("aria-label") || enlace.textContent.trim());
+});
+
 document.addEventListener("keydown", event => {
     if (event.key === "Escape") cerrarVistaAmpliadaEvidencia();
 });
@@ -12850,11 +13235,17 @@ async function registrarHoras() {
     const fecha=fechaEl?.value||"", horasTexto=horasEl?.value||"", descripcion=descripcionEl?.value.trim()||"";
     const archivos = evidenciasHoraSeleccionadas.map(evidencia => evidencia.file);
     const horas=Number(horasTexto);
-    if(!fecha || !horasTexto || !descripcion || archivos.length === 0){ alert("Completa todos los campos y selecciona al menos una imagen JPG/JPEG."); return; }
-    if(archivos.length > 3){ alert("Solo puedes adjuntar un máximo de 3 imágenes."); return; }
-    if(!Number.isInteger(horas) || horas < 1 || horas > 50){ alert("Las horas realizadas deben ser números enteros del 1 al 50."); return; }
-    const hoy=new Date(); hoy.setHours(0,0,0,0); const anio=hoy.getFullYear(); const hoyISO=`${anio}-${String(hoy.getMonth()+1).padStart(2,"0")}-${String(hoy.getDate()).padStart(2,"0")}`;
-    if(fecha<`${anio}-01-01` || fecha>hoyISO || fecha.slice(0,4)!==String(anio)){ alert(`La fecha debe pertenecer únicamente al año ${anio} y no puede ser posterior a hoy.`); return; }
+    [fechaEl, horasEl].forEach(campo => { if (campo) campo.dataset.validacionSolicitada = "1"; });
+    const camposValidos = [validarCampoRegistroHoras(fechaEl, true), validarCampoRegistroHoras(horasEl, true)];
+    const errorEvidenciaAntesDeEnviar = document.getElementById("errorEvidenciaHora");
+    if (errorEvidenciaAntesDeEnviar) errorEvidenciaAntesDeEnviar.dataset.validacionSolicitada = "1";
+    const evidenciasValidas = validarCantidadEvidenciasHora(true);
+    if (camposValidos.includes(false) || !evidenciasValidas) {
+        if (!camposValidos[0]) fechaEl?.focus();
+        else if (!camposValidos[1]) horasEl?.focus();
+        else document.querySelector('label[for="evidenciaHora"]')?.focus();
+        return;
+    }
     const gradoNormalizado=normalizarGradoRegistro(usuarioActual?.grado||usuarioActual?.Grado||"");
     if(!["10°","11°","Ciclo V"].includes(gradoNormalizado)){ alert("No fue posible determinar correctamente el grado del estudiante."); return; }
     for (const archivo of archivos) {
@@ -12870,7 +13261,11 @@ async function registrarHoras() {
         if(data.record) registros.unshift(normalizarRegistro(data.record));
         actualizarEstudiante();
         await mostrarConfirmacionRegistroHora({fecha,horas});
-        ["fechaHora","horasRealizadas","descripcionHora"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+        ["fechaHora","horasRealizadas","descripcionHora"].forEach(id=>{const el=document.getElementById(id);if(el){el.value="";limpiarErrorCampo(el);el.removeAttribute("aria-invalid");delete el.dataset.validacionSolicitada;}});
+        const uploader=document.getElementById("visorEvidenciaHora");
+        uploader?.classList.remove("campo-error");
+        const errorEvidencia=document.getElementById("errorEvidenciaHora");
+        if(errorEvidencia){errorEvidencia.textContent="";errorEvidencia.style.display="none";errorEvidencia.removeAttribute("data-validacion-solicitada");}
         reiniciarSelectorEvidencia();
         if(mensaje){mensaje.style.display="block";mensaje.innerText="Jornada registrada correctamente.";}
     }catch(error){alert(error.message||"No fue posible registrar la jornada.");}
@@ -12884,22 +13279,22 @@ function confirmarRegistroHoraExito(){document.getElementById("modalRegistroHora
 function renderizarEvidencia(r) {
     if (r.evidenciaArchivos?.length) {
         return r.evidenciaArchivos.map((archivo, index) =>
-            `<a class="evidence-link" href="${escaparHTML(archivo.url)}" target="_blank" rel="noopener">Ver ${index + 1}</a>`
+            `<a class="evidence-link" href="${escaparHTML(archivo.url)}">Ver ${index + 1}</a>`
         ).join(" ");
     }
     if (r.evidenciaUrl) {
-        return `<a class="evidence-link" href="${escaparHTML(r.evidenciaUrl)}" target="_blank" rel="noopener">Ver</a>`;
+        return `<a class="evidence-link" href="${escaparHTML(r.evidenciaUrl)}">Ver</a>`;
     }
     return r.evidencia ? escaparHTML(r.evidencia) : "-";
 }
 
 async function revisarRegistro(id, nuevoEstado) {
     const textoAccion = nuevoEstado === "aprobada" ? "aceptar" : "rechazar";
-    if (!confirm(`¿Confirmas que deseas ${textoAccion} este registro?`)) return;
+    if (!await confirmarAccionSigho(`¿Confirmas que deseas ${textoAccion} este registro?`)) return;
     let observacion = "";
-    const quiere = confirm("¿Quieres dejar una observación para el estudiante?\n\nAceptar = Sí\nCancelar = No");
+    const quiere = await confirmarAccionSigho("¿Quieres dejar una observación para el estudiante?");
     if (quiere) {
-        const valor = prompt("Escribe la observación:", "");
+        const valor = await solicitarObservacionProfesor("");
         if (valor !== null) observacion = valor.trim();
     }
     try {
@@ -12911,7 +13306,9 @@ async function revisarRegistro(id, nuevoEstado) {
 
 async function ponerObservacion(id) {
     const registro = registros.find(r => Number(r.id) === Number(id));
-    const observacion = prompt("Escribe o actualiza la observación:", registro?.observacion || "");
+    if (!registro) return;
+    const observacionExistente = registro.observacion || registro.motivoRechazo || "";
+    const observacion = await solicitarObservacionProfesor(observacionExistente, Boolean(observacionExistente));
     if (observacion === null) return;
     try {
         await api("review_record", { method: "POST", body: {
@@ -12922,12 +13319,82 @@ async function ponerObservacion(id) {
     } catch (error) { alert(error.message); }
 }
 
+let resolverObservacionProfesor = null;
+let modoObservacionProfesor = "editar";
+
+function solicitarObservacionProfesor(valorInicial = "", soloLectura = false) {
+    const modal = document.getElementById("modalObservacionProfesor");
+    const campo = document.getElementById("textoObservacionProfesor");
+    const lectura = document.getElementById("observacionProfesorLectura");
+    const etiqueta = document.getElementById("etiquetaTextoObservacionProfesor");
+    const cancelar = document.getElementById("cancelarObservacionProfesor");
+    if (!modal || !campo || !lectura) return Promise.reject(new Error("No fue posible abrir el formulario de observación."));
+    campo.value = valorInicial;
+    lectura.textContent = valorInicial;
+    lectura.hidden = !soloLectura;
+    campo.hidden = soloLectura;
+    if (etiqueta) etiqueta.hidden = soloLectura;
+    if (cancelar) cancelar.hidden = soloLectura;
+    modoObservacionProfesor = soloLectura ? "ver" : "editar";
+    actualizarAccionModalObservacionProfesor();
+    modal.classList.add("show");
+    if (soloLectura) document.getElementById("reviewObservationTitle")?.focus?.();
+    else campo.focus();
+    return new Promise(resolve => {
+        resolverObservacionProfesor = resolve;
+    });
+}
+
+function actualizarAccionModalObservacionProfesor() {
+    const accion = document.getElementById("accionObservacionProfesor");
+    if (!accion) return;
+    accion.textContent = modoObservacionProfesor === "ver" ? "Editar" : "Guardar observación";
+}
+
+function accionModalObservacionProfesor() {
+    if (modoObservacionProfesor === "ver") {
+        modoObservacionProfesor = "editar";
+        const campo = document.getElementById("textoObservacionProfesor");
+        const lectura = document.getElementById("observacionProfesorLectura");
+        const etiqueta = document.getElementById("etiquetaTextoObservacionProfesor");
+        const cancelar = document.getElementById("cancelarObservacionProfesor");
+        if (campo && lectura) campo.value = lectura.textContent || "";
+        if (lectura) lectura.hidden = true;
+        if (campo) {
+            campo.hidden = false;
+            campo.focus();
+        }
+        if (etiqueta) etiqueta.hidden = false;
+        if (cancelar) cancelar.hidden = false;
+        actualizarAccionModalObservacionProfesor();
+        return;
+    }
+    cerrarModalObservacionProfesor();
+}
+
+function cerrarModalObservacionProfesor(valor) {
+    const modal = document.getElementById("modalObservacionProfesor");
+    const campo = document.getElementById("textoObservacionProfesor");
+    modal?.classList.remove("show");
+    if (resolverObservacionProfesor) {
+        const resolver = resolverObservacionProfesor;
+        resolverObservacionProfesor = null;
+        resolver(typeof valor === "string" ? valor.trim() : valor === null ? null : (campo?.value || "").trim());
+    }
+}
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && document.getElementById("modalObservacionProfesor")?.classList.contains("show")) {
+        cerrarModalObservacionProfesor(null);
+    }
+});
+
 async function cambiarEstadoRegistro(id, nuevoEstado) {
-    if (!confirm(`¿Deseas cambiar este registro a ${nuevoEstado === "aprobada" ? "APROBADA" : "RECHAZADA"}?`)) return;
+    if (!await confirmarAccionSigho(`¿Deseas cambiar este registro a ${nuevoEstado === "aprobada" ? "APROBADA" : "RECHAZADA"}?`)) return;
     let observacion = "";
-    const quiere = confirm("¿Quieres dejar una observación sobre este cambio?\n\nAceptar = Sí\nCancelar = No");
+    const quiere = await confirmarAccionSigho("¿Quieres dejar una observación sobre este cambio?");
     if (quiere) {
-        const valor = prompt("Escribe la observación:", "");
+        const valor = await solicitarObservacionProfesor("");
         if (valor !== null) observacion = valor.trim();
     }
     try {
@@ -12936,6 +13403,40 @@ async function cambiarEstadoRegistro(id, nuevoEstado) {
         actualizarProfesor();
     } catch (error) { alert(error.message); }
 }
+
+let resolverConfirmacionSigho = null;
+
+function confirmarAccionSigho(mensaje) {
+    const modal = document.getElementById("modalSighoConfirm");
+    const mensajeElemento = document.getElementById("sighoConfirmMessage");
+    const aceptar = document.getElementById("sighoConfirmAccept");
+    const cancelar = document.getElementById("sighoConfirmCancel");
+    if (!modal || !mensajeElemento || !aceptar || !cancelar) {
+        return Promise.reject(new Error("No fue posible abrir la confirmación."));
+    }
+    mensajeElemento.textContent = mensaje;
+    modal.classList.add("show");
+    aceptar.focus();
+    return new Promise(resolve => {
+        resolverConfirmacionSigho = resolve;
+        aceptar.onclick = () => cerrarConfirmacionSigho(true);
+        cancelar.onclick = () => cerrarConfirmacionSigho(false);
+    });
+}
+
+function cerrarConfirmacionSigho(confirmado) {
+    document.getElementById("modalSighoConfirm")?.classList.remove("show");
+    if (!resolverConfirmacionSigho) return;
+    const resolver = resolverConfirmacionSigho;
+    resolverConfirmacionSigho = null;
+    resolver(confirmado);
+}
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && document.getElementById("modalSighoConfirm")?.classList.contains("show")) {
+        cerrarConfirmacionSigho(false);
+    }
+});
 
 async function actualizarProfesor() {
     try {
@@ -13828,6 +14329,82 @@ function cerrarModales() {
     document.querySelectorAll(".sigho-modal.show").forEach(modal => modal.classList.remove("show"));
 }
 
+let resolverSalidaEdicionSigho = null;
+
+function tieneCambiosPendientesSalida(rol) {
+    const capitalizado = rol === "profesor" ? "Profesor" : "Estudiante";
+    const camposClave = [`claveActual${capitalizado}`, `nuevaClave${capitalizado}`, `confirmarClave${capitalizado}`];
+    if (camposClave.some(id => document.getElementById(id)?.value)) return true;
+
+    if (rol === "estudiante") {
+        const editando = document.getElementById("perfilCorreo") && !document.getElementById("perfilCorreo").disabled;
+        if (!editando) return false;
+        const originales = window.valoresOriginalesPerfilEstudiante || {};
+        return Object.entries(originales).some(([id, valor]) => document.getElementById(id)?.value !== valor);
+    }
+
+    const correo = document.getElementById("profesorPerfilCorreo");
+    const telefono = document.getElementById("profesorPerfilTelefono");
+    const editando = correo && !correo.disabled && telefono && !telefono.disabled;
+    return Boolean(editando && JSON.stringify(obtenerDatosPerfilProfesor()) !== snapshotPerfilProfesor);
+}
+
+function confirmarSalidaEdicionSigho(rol) {
+    if (!tieneCambiosPendientesSalida(rol)) return Promise.resolve(true);
+    return solicitarConfirmacionEdicionSigho("Si sales ahora, no se guardarán los cambios.");
+}
+
+function solicitarConfirmacionEdicionSigho(mensaje) {
+    const modal = document.getElementById("modalSighoLeaveEdit");
+    const continuar = document.getElementById("sighoLeaveEditDiscard");
+    const quedarse = document.getElementById("sighoLeaveEditStay");
+    if (!modal || !continuar || !quedarse) {
+        return Promise.reject(new Error("No fue posible abrir la confirmación para salir sin guardar."));
+    }
+    document.getElementById("sighoLeaveEditMessage").textContent = mensaje;
+    modal.classList.add("show");
+    quedarse.focus();
+    return new Promise(resolve => {
+        resolverSalidaEdicionSigho = resolve;
+        continuar.onclick = () => cerrarConfirmacionSalidaEdicionSigho(true);
+        quedarse.onclick = () => cerrarConfirmacionSalidaEdicionSigho(false);
+    });
+}
+
+function cerrarConfirmacionSalidaEdicionSigho(salir) {
+    document.getElementById("modalSighoLeaveEdit")?.classList.remove("show");
+    const mensaje = document.getElementById("sighoLeaveEditMessage");
+    if (mensaje) mensaje.textContent = "Si sales ahora, no se guardarán los cambios.";
+    if (!resolverSalidaEdicionSigho) return;
+    const resolver = resolverSalidaEdicionSigho;
+    resolverSalidaEdicionSigho = null;
+    resolver(salir);
+}
+
+function descartarEdicionCuentaSigho(rol) {
+    if (rol === "estudiante") {
+        const correo = document.getElementById("perfilCorreo");
+        if (correo && !correo.disabled) cancelarEdicionPerfilEstudiante();
+    } else {
+        const correo = document.getElementById("profesorPerfilCorreo");
+        if (correo && !correo.disabled) cancelarEdicionPerfilProfesor();
+    }
+    alternarCambioClaveCuenta(rol, false);
+}
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && document.getElementById("modalSighoLeaveEdit")?.classList.contains("show")) {
+        cerrarConfirmacionSalidaEdicionSigho(false);
+    }
+});
+
+document.getElementById("modalSighoLeaveEdit")?.addEventListener("click", event => {
+    if (event.target === event.currentTarget) cerrarConfirmacionSalidaEdicionSigho(false);
+});
+
+window.sighoConfirmarSalidaEdicion = confirmarSalidaEdicionSigho;
+window.sighoDescartarEdicionCuenta = descartarEdicionCuentaSigho;
+
 function abrirMisDatos() {
     if (usuarioActual?.rol === "profesor") {
         cerrarMenuUsuarioProfesor();
@@ -13934,7 +14511,7 @@ async function solicitarPermisosAdministrador(){
     if(usuarioActual?.rol!=="profesor") return;
     const boton=document.getElementById("botonSolicitudAdminProfesor");
     if(boton?.disabled) return;
-    if(!confirm("¿Deseas enviar una solicitud para obtener permisos de Administrador?")) return;
+    if(!await confirmarAccionSigho("¿Deseas enviar una solicitud para obtener permisos de Administrador?")) return;
     if(boton){ boton.disabled=true; boton.textContent="Enviando solicitud..."; }
     try{
         const data=await api("request_admin_permission",{method:"POST",body:{}});
@@ -13952,11 +14529,9 @@ async function cargarPerfilProfesor() {
         const data = await api("professor_profile");
         const p = data.profile || {};
         const campos = {
-            profesorPerfilNombres: p.nombres || "",
-            profesorPerfilApellidos: p.apellidos || "",
+            profesorPerfilNombreCompleto: [p.nombres, p.apellidos].filter(Boolean).join(" "),
             profesorPerfilCorreo: p.correo || usuarioActual.correo || "",
             profesorPerfilTelefono: p.telefono || usuarioActual.telefono || "",
-            profesorPerfilProyectoEditable: p.proyecto || usuarioActual.proyecto || "",
             profesorPerfilRol: "Profesor",
             profesorPerfilIdentificacion: p.identificacion || usuarioActual.identificacion || "",
             profesorPerfilSede: p.sede || usuarioActual.sede || "Sin asignar",
@@ -13973,7 +14548,7 @@ async function cargarPerfilProfesor() {
 }
 
 function establecerEdicionPerfilProfesor(editar) {
-    ["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono"].forEach(id => {
+    ["profesorPerfilCorreo","profesorPerfilTelefono"].forEach(id => {
         const el=document.getElementById(id); if(el) el.disabled=!editar;
     });
     document.getElementById("editarPerfilProfesorBtn")?.toggleAttribute("hidden", editar);
@@ -13990,8 +14565,6 @@ function cancelarEdicionPerfilProfesor(){
     try {
         const originales=JSON.parse(snapshotPerfilProfesor || "{}");
         const campos={
-            profesorPerfilNombres:originales.nombres,
-            profesorPerfilApellidos:originales.apellidos,
             profesorPerfilCorreo:originales.correo,
             profesorPerfilTelefono:originales.telefono
         };
@@ -14013,8 +14586,7 @@ function cancelarEdicionPerfilProfesor(){
     actualizarEstadoPerfilProfesor();
 }
 function configurarEdicionPerfilProfesor(){
-    const campos=["profesorPerfilNombres","profesorPerfilApellidos","profesorPerfilCorreo","profesorPerfilTelefono"];
-    const regexNombre=/^[\p{L}]+(?: [\p{L}]+)*$/u;
+    const campos=["profesorPerfilCorreo","profesorPerfilTelefono"];
     const regexCorreo=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
     const secuenciasTelefono=["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
 
@@ -14022,11 +14594,7 @@ function configurarEdicionPerfilProfesor(){
         if(!campo || campo.disabled) return true;
         let valido=false;
         let mensaje="";
-        if(campo.id==="profesorPerfilNombres" || campo.id==="profesorPerfilApellidos") {
-            const valor=campo.value.trim();
-            valido=valor.length>=2 && valor.length<=60 && regexNombre.test(valor);
-            mensaje=`${campo.id==="profesorPerfilNombres"?"Los nombres":"Los apellidos"} deben tener entre 2 y 60 caracteres, con solo letras y un espacio sencillo entre palabras.`;
-        } else if(campo.id==="profesorPerfilCorreo") {
+        if(campo.id==="profesorPerfilCorreo") {
             valido=regexCorreo.test(campo.value.trim());
             mensaje="Escribe un correo válido que termine en @iejosejoaquinflorezhernandez.edu.co.";
         } else if(campo.id==="profesorPerfilTelefono") {
@@ -14048,9 +14616,7 @@ function configurarEdicionPerfilProfesor(){
         if(el && el.dataset.edicionConfigurada!=="1"){
             el.dataset.edicionConfigurada="1";
             el.addEventListener("input",()=>{
-                if(id === "profesorPerfilNombres" || id === "profesorPerfilApellidos") {
-                    actualizarValorManteniendoCursor(el, valor => valor.replace(/[^\p{L} ]/gu, "").replace(/ {2,}/g, " ").replace(/^ +/g, "").slice(0,60));
-                } else if(id === "profesorPerfilCorreo") {
+                if(id === "profesorPerfilCorreo") {
                     actualizarValorManteniendoCursor(el, valor => valor.replace(/\s/g, ""));
                 } else if(id === "profesorPerfilTelefono") {
                     actualizarValorManteniendoCursor(
@@ -14063,7 +14629,6 @@ function configurarEdicionPerfilProfesor(){
                 actualizarEstadoPerfilProfesor();
             });
             el.addEventListener("blur",()=>{
-                if(id === "profesorPerfilNombres" || id === "profesorPerfilApellidos") el.value=capitalizarNombreCompleto(el.value).slice(0,60);
                 if(id === "profesorPerfilCorreo") el.value=el.value.replace(/\s/g, "").trim();
                 validarCampo(el,true);
                 actualizarEstadoPerfilProfesor();
@@ -14076,8 +14641,6 @@ function configurarEdicionPerfilProfesor(){
 let snapshotPerfilProfesor = "";
 function obtenerDatosPerfilProfesor() {
     return {
-        nombres: capitalizarNombreCompleto(document.getElementById("profesorPerfilNombres")?.value || "").slice(0, 60),
-        apellidos: capitalizarNombreCompleto(document.getElementById("profesorPerfilApellidos")?.value || "").slice(0, 60),
         correo: document.getElementById("profesorPerfilCorreo")?.value.trim().toLowerCase() || "",
         telefono: document.getElementById("profesorPerfilTelefono")?.value.trim() || "",
     };
@@ -14097,14 +14660,11 @@ function actualizarEstadoPerfilProfesor() {
 async function guardarPerfilProfesor() {
     const datos=obtenerDatosPerfilProfesor();
     const estado=document.getElementById("estadoPerfilProfesor");
-    const regexNombreProfesor=/^[\p{L}]+(?: [\p{L}]+)*$/u;
     const regexCorreoInstitucional=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
     const telefonoProfesor = datos.telefono.replace(/\D/g, "");
     const todosIgualesTelefono = /^(\d)\1{9}$/.test(telefonoProfesor);
     const secuenciasTelefono = ["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
     const validaciones=[
-        ["profesorPerfilNombres",datos.nombres.length>=2 && datos.nombres.length<=60 && regexNombreProfesor.test(datos.nombres),"Los nombres deben tener entre 2 y 60 caracteres, con solo letras y un espacio sencillo entre palabras."],
-        ["profesorPerfilApellidos",datos.apellidos.length>=2 && datos.apellidos.length<=60 && regexNombreProfesor.test(datos.apellidos),"Los apellidos deben tener entre 2 y 60 caracteres, con solo letras y un espacio sencillo entre palabras."],
         ["profesorPerfilCorreo",regexCorreoInstitucional.test(datos.correo),"Escribe un correo válido que termine en @iejosejoaquinflorezhernandez.edu.co."],
         ["profesorPerfilTelefono",/^3\d{9}$/.test(telefonoProfesor) && !todosIgualesTelefono && !secuenciasTelefono.includes(telefonoProfesor),"El teléfono debe tener 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva."]
     ];
@@ -14122,8 +14682,8 @@ async function guardarPerfilProfesor() {
         if(estado){estado.textContent="Revisa los campos marcados antes de guardar."; estado.className="profile-save-state error";}
         return;
     }
-    if(!datos.nombres || !datos.apellidos || !datos.correo || !telefonoProfesor){
-        mostrarToastProfesor("Completa todos los campos editables.", true);
+    if(!datos.correo || !telefonoProfesor){
+        mostrarToastProfesor("Completa el correo institucional y el teléfono de contacto.", true);
         return;
     }
     datos.telefono = telefonoProfesor;
@@ -14150,38 +14710,82 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
     }
 }
 function alternarCambioClaveProfesor(mostrar) {
-    const form=document.getElementById("formularioCambioClaveProfesor");
-    const boton=document.getElementById("botonMostrarCambioClaveProfesor");
-    if(!form || !boton) return;
-    const abrir = typeof mostrar === "boolean" ? mostrar : form.style.display === "none";
-    form.style.display = abrir ? "block" : "none";
-    boton.textContent = abrir ? "Ocultar cambio de contraseña" : "Cambiar contraseña";
-    if(!abrir){
-        ["claveActualProfesor","nuevaClaveProfesor","confirmarClaveProfesor"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
-        const estado=document.getElementById("estadoClaveProfesor"); if(estado){estado.textContent="";estado.className="profile-save-state";}
-    }
+    alternarCambioClaveCuenta("profesor", mostrar);
 }
 
 async function cambiarClaveProfesor(){
-    const claveActual=document.getElementById("claveActualProfesor")?.value||"";
-    const nuevaClave=document.getElementById("nuevaClaveProfesor")?.value||"";
-    const confirmarClave=document.getElementById("confirmarClaveProfesor")?.value||"";
-    const estado=document.getElementById("estadoClaveProfesor");
-    if(!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(nuevaClave)){
-        if(estado){estado.textContent="La nueva contraseña debe tener mínimo 8 caracteres, con mayúscula, minúscula y número.";estado.className="profile-save-state error";}
+    return cambiarClaveCuenta("profesor");
+}
+
+function alternarCambioClaveCuenta(rol, mostrar) {
+    const capitalizado = rol === "profesor" ? "Profesor" : "Estudiante";
+    const form = document.getElementById(`formularioCambioClave${capitalizado}`);
+    const boton = document.getElementById(`botonMostrarCambioClave${capitalizado}`);
+    if (!form || !boton) return;
+    const abrir = typeof mostrar === "boolean" ? mostrar : form.style.display === "none";
+    const idsCamposClave = [`claveActual${capitalizado}`, `nuevaClave${capitalizado}`, `confirmarClave${capitalizado}`];
+    if (!abrir && typeof mostrar !== "boolean" && idsCamposClave.some(id => document.getElementById(id)?.value)) {
+        solicitarConfirmacionEdicionSigho("Si ocultas el formulario, se borrarán los datos de contraseña que escribiste.")
+            .then(confirmado => {
+                if (confirmado) alternarCambioClaveCuenta(rol, false);
+            })
+            .catch(error => alert(error.message || "No fue posible confirmar el cierre del formulario."));
         return;
     }
-    if(nuevaClave!==confirmarClave){
-        if(estado){estado.textContent="La confirmación de la nueva contraseña no coincide.";estado.className="profile-save-state error";}
+    form.style.display = abrir ? "block" : "none";
+    boton.textContent = abrir ? "Ocultar cambio de contraseña" : "Cambiar contraseña";
+    if (!abrir) {
+        idsCamposClave.forEach(id => {
+            const campo = document.getElementById(id);
+            if (campo) campo.value = "";
+        });
+        const estado = document.getElementById(`estadoClave${capitalizado}`);
+        if (estado) {
+            estado.textContent = "";
+            estado.className = "profile-save-state";
+        }
+    }
+}
+
+async function cambiarClaveCuenta(rol) {
+    if (!["profesor", "estudiante"].includes(rol) || usuarioActual?.rol !== rol) return;
+    const capitalizado = rol === "profesor" ? "Profesor" : "Estudiante";
+    const claveActual = document.getElementById(`claveActual${capitalizado}`)?.value || "";
+    const nuevaClave = document.getElementById(`nuevaClave${capitalizado}`)?.value || "";
+    const confirmarClave = document.getElementById(`confirmarClave${capitalizado}`)?.value || "";
+    const estado = document.getElementById(`estadoClave${capitalizado}`);
+    if (!claveActual) {
+        if (estado) { estado.textContent = "Ingresa tu contraseña actual."; estado.className = "profile-save-state error"; }
+        document.getElementById(`claveActual${capitalizado}`)?.focus();
         return;
     }
-    try{
-        await api("change_professor_password",{method:"POST",body:{claveActual,nuevaClave,confirmarClave}});
-        ["claveActualProfesor","nuevaClaveProfesor","confirmarClaveProfesor"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
-        if(estado){estado.textContent="Contraseña actualizada correctamente";estado.className="profile-save-state success";}
-        mostrarToastProfesor("Contraseña actualizada correctamente.");
-        alternarCambioClaveProfesor(false);
-    }catch(e){if(estado){estado.textContent=e.message;estado.className="profile-save-state error";} }
+    if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/.test(nuevaClave)) {
+        if (estado) { estado.textContent = "La nueva contraseña debe tener mínimo 8 caracteres, con mayúscula, minúscula y número."; estado.className = "profile-save-state error"; }
+        document.getElementById(`nuevaClave${capitalizado}`)?.focus();
+        return;
+    }
+    if (nuevaClave !== confirmarClave) {
+        if (estado) { estado.textContent = "La confirmación de la nueva contraseña no coincide."; estado.className = "profile-save-state error"; }
+        document.getElementById(`confirmarClave${capitalizado}`)?.focus();
+        return;
+    }
+    try {
+        await api("change_professor_password", { method: "POST", body: { claveActual, nuevaClave, confirmarClave } });
+        [`claveActual${capitalizado}`, `nuevaClave${capitalizado}`, `confirmarClave${capitalizado}`].forEach(id => {
+            const campo = document.getElementById(id);
+            if (campo) campo.value = "";
+        });
+        document.getElementById("modalCambioClaveExito")?.classList.add("show");
+        document.getElementById("modalCambioClaveExito button")?.focus();
+    } catch (error) {
+        if (estado) { estado.textContent = error.message || "No se pudo actualizar la contraseña."; estado.className = "profile-save-state error"; }
+    }
+}
+
+async function finalizarCambioClave() {
+    document.getElementById("modalCambioClaveExito")?.classList.remove("show");
+    await cerrarSesion();
+    mostrarLogin();
 }
 function mostrarToastProfesor(mensaje,error=false){
     const toast=document.getElementById("toastProfesor"); if(!toast)return;
@@ -14242,7 +14846,8 @@ function actualizarValorManteniendoCursor(input, transformar, mapearPosicion = p
 function configurarValidacionSolicitudProfesor() {
     const correo = document.getElementById("correoSolicitud");
     const telefono = document.getElementById("telefonoProfesorSolicitud");
-    const identificacion = document.getElementById("identificacionSolicitud");
+    const tipoDocumento = document.getElementById("tipoDocumentoProfesor");
+    const numeroDocumento = document.getElementById("numeroDocumentoProfesor");
     const clave = document.getElementById("claveSolicitudProfesor");
 
     if (correo && correo.dataset.validacionProfesorConfigurada !== "1") {
@@ -14268,12 +14873,46 @@ function configurarValidacionSolicitudProfesor() {
         });
     }
 
-    if (identificacion && identificacion.dataset.validacionProfesorConfigurada !== "1") {
-        identificacion.dataset.validacionProfesorConfigurada = "1";
-        identificacion.addEventListener("input", () => {
-            actualizarValorManteniendoCursor(identificacion, valor => valor.replace(/[<>"']/g, "").slice(0, 60));
-        });
+    const validarDocumentoProfesor = () => {
+        if (!tipoDocumento || !numeroDocumento) return;
+        const tipo = tipoDocumento.value;
+        const limite = tipo === "PPT" ? 8 : 10;
+        const minimo = tipo === "PPT" ? 6 : 7;
+        numeroDocumento.maxLength = limite;
+        numeroDocumento.minLength = minimo;
+        numeroDocumento.pattern = `\\d{${minimo},${limite}}`;
+        actualizarValorManteniendoCursor(
+            numeroDocumento,
+            valor => valor.replace(/\D/g, "").slice(0, limite)
+        );
+        const ayuda = document.getElementById("ayudaDocumentoProfesor");
+        if (ayuda) {
+            ayuda.textContent = tipo === "PPT"
+                ? "Escribe el número sin puntos ni espacios. El PPT debe tener entre 6 y 8 dígitos."
+                : "Escribe el número sin puntos ni espacios. La cédula debe tener entre 7 y 10 dígitos.";
+        }
+
+        let mensaje = "";
+        if (!tipo) mensaje = "Selecciona el tipo de documento.";
+        else if (tipo === "Cédula de ciudadanía" && !new RegExp(`^\\d{7,10}$`).test(numeroDocumento.value)) {
+            mensaje = "La cédula debe tener entre 7 y 10 dígitos.";
+        } else if (tipo === "PPT" && !new RegExp(`^\\d{6,8}$`).test(numeroDocumento.value)) {
+            mensaje = "El PPT debe tener entre 6 y 8 dígitos.";
+        }
+        numeroDocumento.setCustomValidity(mensaje);
+        if (numeroDocumento.value && mensaje) mostrarErrorCampo(numeroDocumento, mensaje);
+        else limpiarErrorCampo(numeroDocumento);
+    };
+    if (tipoDocumento && tipoDocumento.dataset.validacionProfesorConfigurada !== "1") {
+        tipoDocumento.dataset.validacionProfesorConfigurada = "1";
+        tipoDocumento.addEventListener("change", validarDocumentoProfesor);
     }
+    if (numeroDocumento && numeroDocumento.dataset.validacionProfesorConfigurada !== "1") {
+        numeroDocumento.dataset.validacionProfesorConfigurada = "1";
+        numeroDocumento.addEventListener("input", validarDocumentoProfesor);
+        numeroDocumento.addEventListener("blur", validarDocumentoProfesor);
+    }
+    validarDocumentoProfesor();
 
     if (clave && clave.dataset.validacionProfesorConfigurada !== "1") {
         clave.dataset.validacionProfesorConfigurada = "1";
@@ -14467,7 +15106,7 @@ function mostrarErrorCampo(input, mensaje) {
     // y capitalización automática. Los campos opcionales pueden permanecer vacíos.
     const idsNombres = [
         "primerNombre", "segundoNombre", "primerApellido", "segundoApellido",
-        "nombreAcudiente", "profesorPerfilNombres", "profesorPerfilApellidos", "perfilAcudiente",
+        "nombreAcudiente", "perfilAcudiente",
         "nombre", "apellido"
     ];
 
@@ -15371,6 +16010,7 @@ function mostrarHistorialProfesor() {
 
     lista.forEach(r => {
         const aprobado = r.estado === "aprobada";
+        const observacion = r.observacion || r.motivoRechazo || "";
         html += `
             <tr>
                 <td>${escapeHtml(r.estudiante)}</td>
@@ -15381,10 +16021,10 @@ function mostrarHistorialProfesor() {
                 <td>${escapeHtml(r.descripcion)}</td>
                 <td>${renderizarEvidencia(r)}</td>
                 <td><span class="status ${aprobado ? "approved" : "rejected"}">${aprobado ? "Aprobada" : "Rechazada"}</span></td>
-                <td>${escapeHtml(r.observacion || r.motivoRechazo || "-")}</td>
+                <td>${observacion ? "✓ Realizada" : "-"}</td>
                 <td>
                     <div class="actions">
-                        <button class="secondary-button" onclick="ponerObservacion(${r.id})">📝 Observación</button>
+                        <button class="${observacion ? "secondary-button review-observation-done" : "secondary-button"}" onclick="ponerObservacion(${r.id})">${observacion ? "✓ Ya realizaste una observación" : "📝 Observación"}</button>
                         ${aprobado
                             ? `<button class="danger-button" onclick="cambiarEstadoRegistro(${r.id}, 'rechazada')">Cambiar a rechazada</button>`
                             : `<button class="success-button" onclick="cambiarEstadoRegistro(${r.id}, 'aprobada')">Cambiar a aprobada</button>`}
@@ -15495,9 +16135,9 @@ function mostrarRegistrosEstudiante(lista = registros) {
         const descripcion = r.descripcion || "Sin descripción registrada.";
         const observacion = r.observacion || r.motivoRechazo || "";
         const evidencia = r.evidenciaArchivos?.length
-            ? r.evidenciaArchivos.map((archivo, index) => `<a class="student-evidence-link" href="${escaparHTML(archivo.url)}" target="_blank" rel="noopener">📎 Imagen ${index + 1}</a>`).join("<br>")
+            ? r.evidenciaArchivos.map((archivo, index) => `<a class="student-evidence-link" href="${escaparHTML(archivo.url)}">📎 Imagen ${index + 1}</a>`).join("<br>")
             : r.evidenciaUrl
-            ? `<a class="student-evidence-link" href="${escaparHTML(r.evidenciaUrl)}" target="_blank" rel="noopener">📎 Ver evidencia</a>`
+            ? `<a class="student-evidence-link" href="${escaparHTML(r.evidenciaUrl)}">📎 Ver evidencia</a>`
             : (r.evidencia ? `<span class="table-secondary-text">${escaparHTML(r.evidencia)}</span>` : `<span class="table-secondary-text">Sin evidencia</span>`);
 
         return `
@@ -16036,6 +16676,106 @@ function actualizarResumenAdministrador() {
     document.getElementById("badgeSolicitudesPersonalAdministrador")?.replaceChildren(document.createTextNode(String(pendientesProfesores.length + pendientesAdmin)));
     document.getElementById("badgeSolicitudesEstudiantesAdministrador")?.replaceChildren(document.createTextNode(String(pendientesEstudiantes.length)));
     document.getElementById("contadorSolicitudesEstudiantesAdmin")?.replaceChildren(document.createTextNode(String(pendientesEstudiantes.length)));
+    actualizarNotificacionesAdministrador();
+}
+
+function obtenerIdsNotificacionesAdministradorLeidas() {
+    try {
+        return JSON.parse(localStorage.getItem("sigho_notificaciones_administrador_leidas") || "[]");
+    } catch (_) {
+        return [];
+    }
+}
+
+function guardarIdsNotificacionesAdministradorLeidas(ids) {
+    try {
+        localStorage.setItem("sigho_notificaciones_administrador_leidas", JSON.stringify(ids.slice(-100)));
+    } catch (_) {}
+}
+
+function obtenerEventosNotificacionesAdministrador() {
+    const solicitudesPersonales = (solicitudes || [])
+        .filter(s => s.estado === "pendiente" && s.rol === "profesor")
+        .map(s => ({ ...s, tipo: "profesor", clave: `profesor:${s.id}`, titulo: "Nueva solicitud de profesor" }));
+    const solicitudesAdmin = (window.solicitudesAdministradorAdmin || [])
+        .map(s => ({ ...s, tipo: "admin", clave: `admin:${s.id}`, titulo: "Solicitud de permisos de Administrador" }));
+    const solicitudesEstudiantes = (solicitudes || [])
+        .filter(s => s.estado === "pendiente" && s.rol === "estudiante")
+        .map(s => ({ ...s, tipo: "estudiante", clave: `estudiante:${s.id}`, titulo: "Nueva solicitud de estudiante" }));
+    return [...solicitudesAdmin, ...solicitudesPersonales, ...solicitudesEstudiantes]
+        .sort((a, b) => String(b.fechaSolicitud || "").localeCompare(String(a.fechaSolicitud || "")))
+        .slice(0, 20);
+}
+
+function actualizarNotificacionesAdministrador() {
+    const lista = document.getElementById("listaNotificacionesAdministrador");
+    const badge = document.getElementById("badgeNotificacionesAdministrador");
+    if (!lista || !badge) return;
+
+    const eventos = obtenerEventosNotificacionesAdministrador();
+    const leidas = obtenerIdsNotificacionesAdministradorLeidas();
+    const nuevas = eventos.filter(s => !leidas.includes(s.clave));
+    badge.textContent = String(nuevas.length);
+    badge.style.display = nuevas.length ? "flex" : "none";
+
+    if (!eventos.length) {
+        lista.innerHTML = '<div class="notification-empty">🔔<strong>No hay solicitudes pendientes</strong><span>Las nuevas solicitudes aparecerán aquí.</span></div>';
+        return;
+    }
+
+    lista.innerHTML = eventos.map(s => {
+        const esNueva = !leidas.includes(s.clave);
+        return `<button type="button" class="notification-item ${esNueva ? "unread" : ""}" onclick="abrirNotificacionAdministrador('${s.tipo}',${Number(s.id)})">
+            <span class="notification-dot">${esNueva ? "•" : "✓"}</span>
+            <span class="notification-copy"><strong>${escapeHtml(s.titulo)}</strong><small>${escapeHtml(s.nombre || "Solicitante")} · ${escapeHtml(s.fechaSolicitud || "Pendiente de revisión")}</small></span>
+        </button>`;
+    }).join("");
+}
+
+function cerrarPanelNotificacionesAdministrador() {
+    const panel = document.getElementById("panelNotificacionesAdministrador");
+    const backdrop = document.getElementById("backdropNotificacionesAdministrador");
+    const boton = document.querySelector("#administrador .notification-button");
+    panel?.classList.remove("show");
+    backdrop?.classList.remove("show");
+    boton?.setAttribute("aria-expanded", "false");
+    sincronizarBloqueoScrollNotificaciones();
+}
+
+function toggleNotificacionesAdministrador(evento) {
+    evento?.stopPropagation();
+    const panel = document.getElementById("panelNotificacionesAdministrador");
+    const backdrop = document.getElementById("backdropNotificacionesAdministrador");
+    const boton = document.querySelector("#administrador .notification-button");
+    if (!panel) return;
+
+    const abrir = !panel.classList.contains("show");
+    document.querySelectorAll(".notification-panel.show").forEach(p => p.classList.remove("show"));
+    document.querySelectorAll(".notification-backdrop.show").forEach(b => b.classList.remove("show"));
+    document.querySelectorAll('.notification-button[aria-expanded="true"]').forEach(b => b.setAttribute("aria-expanded", "false"));
+    document.querySelectorAll(".more-menu-dropdown.show").forEach(menu => menu.classList.remove("show"));
+    if (abrir) {
+        panel.classList.add("show");
+        backdrop?.classList.add("show");
+        boton?.setAttribute("aria-expanded", "true");
+        actualizarNotificacionesAdministrador();
+    }
+    sincronizarBloqueoScrollNotificaciones();
+}
+
+function marcarNotificacionesAdministradorLeidas() {
+    guardarIdsNotificacionesAdministradorLeidas(obtenerEventosNotificacionesAdministrador().map(s => s.clave));
+    actualizarNotificacionesAdministrador();
+}
+
+function abrirNotificacionAdministrador(tipo, id) {
+    const clave = `${tipo}:${id}`;
+    const leidas = obtenerIdsNotificacionesAdministradorLeidas();
+    if (!leidas.includes(clave)) leidas.push(clave);
+    guardarIdsNotificacionesAdministradorLeidas(leidas);
+    actualizarNotificacionesAdministrador();
+    cerrarPanelNotificacionesAdministrador();
+    mostrarSeccionAdministrador(tipo === "estudiante" ? "solicitudes-estudiantes" : "solicitudes-personal");
 }
 
 function mostrarSeccionAdministrador(nombre) {
@@ -16117,7 +16857,7 @@ function mostrarSolicitudesEstudiantesAdmin() {
 async function validarSolicitudAdministrador(id, estado){
     const solicitud=(window.solicitudesAdministradorAdmin||[]).find(s=>Number(s.id)===Number(id));
     if(!solicitud) return;
-    if(!confirm(`¿Deseas ${estado==='aceptada'?'aprobar':'rechazar'} la solicitud de Administrador de ${solicitud.nombre}?`)) return;
+    if(!await confirmarAccionSigho(`¿Deseas ${estado==='aceptada'?'aprobar':'rechazar'} la solicitud de Administrador de ${solicitud.nombre}?`)) return;
     try{
         await api('validate_admin_request_by_admin',{method:'POST',body:{id,estado}});
         await actualizarAdministrador();
@@ -16310,7 +17050,7 @@ document.addEventListener("DOMContentLoaded", function () {
     horas.dataset.fixDefinitivo = "1";
 
     horas.min = "1";
-    horas.max = "50";
+    horas.max = "15";
     horas.step = "1";
     horas.inputMode = "numeric";
 
@@ -18767,8 +19507,8 @@ body.dark-mode textarea[disabled].campo-error {
         const activa = document.querySelector(".screen.active");
         const id = activa?.id || "home";
 
-        if (id === "estudiante") return rutaProtegida("estudiante", "inicio");
-        if (id === "profesor") return rutaProtegida("profesor", "inicio");
+        if (id === "estudiante") return rutaProtegida("estudiante", seccionEstudianteVisible());
+        if (id === "profesor") return rutaProtegida("profesor", seccionProfesorVisible());
         if (id === "administrador") return rutaProtegida("administrador", "inicio");
         if (id === "superAdmin") return rutaProtegida("superadmin", "inicio");
         if (id === "solicitud") return rutaPublica("solicitud");
@@ -18997,6 +19737,22 @@ body.dark-mode textarea[disabled].campo-error {
             return rutaSuperAdminActual(section);
         });
 
+        const cerrarSesionOriginal = window.cerrarSesion;
+        if (typeof cerrarSesionOriginal === "function") {
+            window.cerrarSesion = function () {
+                const args = arguments;
+                const rol = rolActual();
+                if (!["estudiante", "profesor"].includes(rol)) return cerrarSesionOriginal.apply(this, arguments);
+                return window.sighoConfirmarSalidaEdicion(rol).then(confirmado => {
+                    if (!confirmado) return false;
+                    window.sighoDescartarEdicionCuenta(rol);
+                    return cerrarSesionOriginal.apply(this, args);
+                }).catch(function (error) {
+                    alert(error.message || "No fue posible confirmar la salida.");
+                    return false;
+                });
+            };
+        }
     }
 
     function instalarSeccionesManualmente() {
@@ -19011,16 +19767,42 @@ body.dark-mode textarea[disabled].campo-error {
 
         if (typeof oldStudent === "function") {
             window.mostrarSeccionEstudiante = function (section) {
-                const result = oldStudent.apply(this, arguments);
-                if (!aplicandoHistorial && !operacionRolActiva) registrarRuta(rutaProtegida("estudiante", section || "inicio"));
-                return result;
+                const args = arguments;
+                const targetSection = section || "inicio";
+                const navegar = () => {
+                    const result = oldStudent.apply(this, args);
+                    if (!aplicandoHistorial && !operacionRolActiva) registrarRuta(rutaProtegida("estudiante", targetSection));
+                    return result;
+                };
+                if (aplicandoHistorial || targetSection === seccionEstudianteVisible()) return navegar();
+                return window.sighoConfirmarSalidaEdicion("estudiante").then(confirmado => {
+                    if (!confirmado) return false;
+                    window.sighoDescartarEdicionCuenta("estudiante");
+                    return navegar();
+                }).catch(error => {
+                    alert(error.message || "No fue posible confirmar la salida.");
+                    return false;
+                });
             };
         }
         if (typeof oldTeacher === "function") {
             window.mostrarSeccionProfesor = function (section) {
-                const result = oldTeacher.apply(this, arguments);
-                if (!aplicandoHistorial && !operacionRolActiva) registrarRuta(rutaProtegida("profesor", section || "inicio"));
-                return result;
+                const args = arguments;
+                const targetSection = section || "inicio";
+                const navegar = () => {
+                    const result = oldTeacher.apply(this, args);
+                    if (!aplicandoHistorial && !operacionRolActiva) registrarRuta(rutaProtegida("profesor", targetSection));
+                    return result;
+                };
+                if (aplicandoHistorial || targetSection === seccionProfesorVisible()) return navegar();
+                return window.sighoConfirmarSalidaEdicion("profesor").then(confirmado => {
+                    if (!confirmado) return false;
+                    window.sighoDescartarEdicionCuenta("profesor");
+                    return navegar();
+                }).catch(error => {
+                    alert(error.message || "No fue posible confirmar la salida.");
+                    return false;
+                });
             };
         }
         if (typeof oldAdmin === "function") {
@@ -19067,6 +19849,27 @@ body.dark-mode textarea[disabled].campo-error {
 
         const state = history.state;
         const route = state && state[HISTORY_KEY] ? state.route : null;
+        const routeActual = rutaDesdeDOM();
+        const rolActualVista = String(routeActual.screen || "").toLowerCase();
+        if (route && claveRuta(route) !== claveRuta(routeActual) &&
+            ["estudiante", "profesor"].includes(rolActualVista) &&
+            window.sighoConfirmarSalidaEdicion &&
+            !aplicandoHistorial) {
+            try {
+                const confirmado = await window.sighoConfirmarSalidaEdicion(rolActualVista);
+                if (!confirmado) {
+                    history.pushState(estadoRuta(routeActual, { guard: true }), "", location.href);
+                    ultimaClaveRuta = claveRuta(routeActual);
+                    return;
+                }
+                window.sighoDescartarEdicionCuenta(rolActualVista);
+            } catch (error) {
+                alert(error.message || "No fue posible confirmar la salida.");
+                history.pushState(estadoRuta(routeActual, { guard: true }), "", location.href);
+                ultimaClaveRuta = claveRuta(routeActual);
+                return;
+            }
+        }
 
         /* Si el navegador intenta salir de un estado no perteneciente a SIGHO,
            reemplazamos el destino con la vista segura actual. */
@@ -19333,109 +20136,6 @@ body.dark-mode textarea[disabled].campo-error {
      * Al refrescar, el usuario persistido será detectado cuando el Splash
      * termine; después de un login, el mismo puente se reutiliza.
      */
-})();
-</script>
-
-<script id="sigho-password-eye-hold-to-reveal">
-(function () {
-    'use strict';
-
-    const selector = '#btnTogglePassword, .password-universal-toggle, .profesor-password-toggle';
-    let botonActivo = null;
-
-    function obtenerCampo(boton) {
-        if (boton.id === 'btnTogglePassword') return document.getElementById('clave');
-        const id = boton.getAttribute('data-password-target');
-        return id
-            ? document.getElementById(id)
-            : boton.closest('.password-universal-wrapper, .profesor-password-wrapper, .password-input-wrapper')?.querySelector('input');
-    }
-
-    function actualizarBoton(boton, visible) {
-        const etiqueta = visible ? 'Ocultar contraseña' : 'Mostrar contraseña';
-        boton.setAttribute('aria-pressed', visible ? 'true' : 'false');
-        boton.setAttribute('aria-label', etiqueta);
-        boton.setAttribute('title', etiqueta);
-
-        const icono = boton.id === 'btnTogglePassword'
-            ? document.getElementById('iconEye')
-            : boton.querySelector('svg, .profesor-password-eye');
-        if (icono) {
-            icono.innerHTML = visible
-                ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>'
-                : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
-        }
-    }
-
-    function revelar(boton) {
-        const input = obtenerCampo(boton);
-        if (!input) return;
-        botonActivo = boton;
-        input.type = 'text';
-        input.classList.add('password-universal-visible');
-        input.style.removeProperty('-webkit-text-security');
-        input.style.removeProperty('text-security');
-        input.style.removeProperty('-webkit-text-fill-color');
-        input.style.removeProperty('color');
-        input.style.removeProperty('text-shadow');
-        input.style.removeProperty('caret-color');
-        actualizarBoton(boton, true);
-    }
-
-    function ocultar(boton) {
-        if (!boton) return;
-        const input = obtenerCampo(boton);
-        if (input) {
-            input.type = 'password';
-            input.classList.remove('password-universal-visible');
-            input.style.setProperty('-webkit-text-security', 'disc', 'important');
-            input.style.setProperty('text-security', 'disc', 'important');
-        }
-        actualizarBoton(boton, false);
-        if (botonActivo === boton) botonActivo = null;
-    }
-
-    document.addEventListener('pointerdown', function (event) {
-        const boton = event.target.closest?.(selector);
-        if (!boton || event.button !== 0) return;
-        event.preventDefault();
-        revelar(boton);
-    }, true);
-
-    window.addEventListener('pointerup', function () {
-        ocultar(botonActivo);
-    }, true);
-    window.addEventListener('pointercancel', function () {
-        ocultar(botonActivo);
-    }, true);
-    window.addEventListener('blur', function () {
-        ocultar(botonActivo);
-    });
-
-    document.addEventListener('pointerout', function (event) {
-        if (!botonActivo) return;
-        const boton = event.target.closest?.(selector);
-        if (boton === botonActivo && !boton.contains(event.relatedTarget)) ocultar(boton);
-    }, true);
-
-    document.addEventListener('keydown', function (event) {
-        if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return;
-        const boton = event.target.closest?.(selector);
-        if (!boton) return;
-        event.preventDefault();
-        revelar(boton);
-    }, true);
-
-    window.addEventListener('keyup', function (event) {
-        if (event.key === ' ' || event.key === 'Enter') ocultar(botonActivo);
-    }, true);
-
-    document.addEventListener('click', function (event) {
-        if (!event.target.closest?.(selector)) return;
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-    }, true);
 })();
 </script>
 
