@@ -9363,11 +9363,11 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
                         el seguimiento de cada hora.
                     </p>
 <div class="hero-actions">
-<button class="hero-primary" onclick="mostrarLogin()" type="button">
+<button class="hero-primary" id="btnInicioLogin" type="button">
 <span>🔐</span>
                             Iniciar sesión
                         </button>
-<button class="hero-secondary" onclick="mostrarSolicitud()" type="button">
+<button class="hero-secondary" id="btnInicioSolicitud" type="button">
 <span>📝</span>
                             Solicitar acceso
                         </button>
@@ -17016,7 +17016,10 @@ document.addEventListener("DOMContentLoaded",()=>{
     configurarSelectorEvidencia();
 });
 
-// Los controles inline del HTML necesitan acceder a estas acciones desde window.
+document.getElementById("btnInicioLogin")?.addEventListener("click", mostrarLogin);
+document.getElementById("btnInicioSolicitud")?.addEventListener("click", mostrarSolicitud);
+
+// Estas acciones también se usan desde controles y navegación globales.
 window.mostrarLogin = mostrarLogin;
 window.mostrarSolicitud = mostrarSolicitud;
 window.iniciarSesion = iniciarSesion;
