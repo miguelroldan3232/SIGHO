@@ -758,7 +758,7 @@
             flex-wrap: wrap;
         }
 
-        /* Historial del profesor: aprovechar todo el ancho sin scrollbar horizontal */
+        /* Historial del funcionario público: aprovechar todo el ancho sin scrollbar horizontal */
         #profesor .profesor-historial-container {
             overflow-x: hidden;
             width: 100%;
@@ -2582,7 +2582,7 @@
 
 </style>
 <style>
-/* ===== LAYOUT PROFESOR: SIDEBAR INTEGRADO + CONTENIDO LIMPIO ===== */
+/* ===== LAYOUT FUNCIONARIO PÚBLICO: SIDEBAR INTEGRADO + CONTENIDO LIMPIO ===== */
 #profesor {
     min-height: 100vh;
     background: #f1f5f9;
@@ -3097,7 +3097,7 @@ body:has(.dashboard-screen.active) .container {
     color: #173f5f;
 }
 
-/* Tablas del profesor: caben dentro del panel sin desplazamiento horizontal. */
+/* Tablas del funcionario público: caben dentro del panel sin desplazamiento horizontal. */
 #profesor .table-container {
     width: 100%;
     max-width: 100%;
@@ -6075,7 +6075,7 @@ body.dark-mode input[type="password"]:-webkit-autofill:focus {
     display: block !important;
 }
 
-/* Ayuda de los tres campos de cambio de contraseña del profesor. */
+/* Ayuda de los tres campos de cambio de contraseña del funcionario público. */
 #formularioCambioClaveProfesor .field-help {
     display: none !important;
 }
@@ -6527,7 +6527,7 @@ body.dark-mode #administrador .admin-empty-state {
     border-color: #334155 !important;
 }
 </style><style id="sigho-dark-gestion-profesores-v23">
-/* ===== Ajustes específicos: Gestión de profesores / Modo Oscuro ===== */
+/* ===== Ajustes específicos: Gestión de funcionarios públicos / Modo Oscuro ===== */
 html.dark-mode #administrador .assignment-save,
 body.dark-mode #administrador .assignment-save,
 html.dark-mode #tablaProfesoresAdmin .assignment-save,
@@ -7068,7 +7068,7 @@ body.dark-mode #profesor .lock-pill {
   box-shadow: none !important;
 }
 </style><style id="sigho-dark-assignment-banner-v33">
-/* Barra informativa "Sede: ... · Proyecto: ..." del panel del profesor */
+/* Barra informativa "Sede: ... · Proyecto: ..." del panel del funcionario público */
 html.dark-mode #profesor .assignment-banner,
 body.dark-mode #profesor .assignment-banner {
     background-color: rgba(16, 185, 129, 0.15) !important;
@@ -9400,7 +9400,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </h2>
 <p>
                         Registra tus actividades, adjunta evidencias y consulta
-                        tu avance mientras docentes y administradores realizan
+                        tu avance mientras funcionarios públicos y administradores realizan
                         el seguimiento de cada hora.
                     </p>
 <div class="hero-actions">
@@ -9438,7 +9438,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="feature-item">
 <span class="feature-icon green">✓</span>
 <div>
-<strong>Revisión docente</strong>
+<strong>Revisión de funcionarios públicos</strong>
 <small>Aprobación o rechazo</small>
 </div>
 </div>
@@ -9524,7 +9524,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <select id="rolSolicitud" onchange="limpiarSolicitudAlCambiarRol(this.value)" required="">
 <option disabled="" selected="" value="">Seleccionar rol</option>
 <option value="estudiante">Estudiante</option>
-<option value="profesor">Profesor</option>
+<option value="profesor">Funcionario público</option>
 </select>
 </div>
 <!-- CAMPOS EXCLUSIVOS DEL ESTUDIANTE -->
@@ -9788,10 +9788,10 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 </div>
 </div>
-<!-- CAMPOS PARA PROFESOR / ADMINISTRADOR -->
+<!-- CAMPOS PARA FUNCIONARIO PÚBLICO / ADMINISTRADOR -->
 <div id="camposSolicitudPersonal" style="display:none;">
 <div class="section">
-<h3>Datos del profesor</h3>
+<h3>Datos del funcionario público</h3>
 </div>
 <div class="form-row">
 <div class="form-group">
@@ -9843,7 +9843,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <small class="field-help" id="ayudaTelefonoProfesorSolicitud">Celular de 10 dígitos que comienza en 3. No se permiten números repetidos ni secuencias consecutivas.</small>
 </div>
 <div class="form-group" style="grid-column:1 / -1;">
-<div class="security-box" style="margin:0;">El proyecto y la sede serán asignados posteriormente por el Administrador desde «Gestión de profesores».</div>
+<div class="security-box" style="margin:0;">El proyecto y la sede serán asignados posteriormente por el Administrador desde «Gestión de funcionarios públicos».</div>
 </div>
 </div>
 </div>
@@ -10171,7 +10171,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </details>
 <details class="faq-card" data-faq="">
 <summary>¿Por qué mi registro aparece pendiente?</summary>
-<div class="faq-answer"><p>Los registros quedan pendientes mientras esperan la revisión de un profesor. Cuando sea revisado, su estado cambiará a aprobado o rechazado.</p></div>
+<div class="faq-answer"><p>Los registros quedan pendientes mientras esperan la revisión de un funcionario público. Cuando sea revisado, su estado cambiará a aprobado o rechazado.</p></div>
 </details>
 </div>
 </div>
@@ -10224,7 +10224,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <span>JJFH</span>
 </div>
 </div>
-<div class="sidebar-role">Profesor</div>
+<div class="sidebar-role">Funcionario público</div>
 <nav class="sidebar-nav">
 <button hidden="" id="sidebarVolverSuperAdminProfesor" onclick="abrirSuperAdmin()" type="button">
 <span class="sidebar-icon">🛡️</span><span>Volver al Super Admin</span>
@@ -10251,7 +10251,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <header class="dashboard-header">
 <button aria-expanded="false" aria-label="Abrir menú del profesor" class="mobile-sidebar-toggle" onclick="toggleMobileSidebar('profesor')" type="button">☰</button>
 <div>
-<h2>Panel del profesor</h2>
+<h2>Panel del funcionario público</h2>
 <p>Revisión y seguimiento de los registros de servicio social.</p>
 </div>
 <div class="dashboard-tools user-topbar">
@@ -10274,8 +10274,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <button aria-label="Abrir menú del usuario" class="profile-button" onclick="toggleUserMenu(this)">
 <span class="profile-avatar">👤</span>
-<span class="profile-user-name" id="nombrePerfilProfesorHeader">Profesor</span>
-<span class="profile-role">Profesor</span>
+<span class="profile-user-name" id="nombrePerfilProfesorHeader">Funcionario público</span>
+<span class="profile-role">Funcionario público</span>
 <span class="profile-chevron">⌄</span>
 </button>
 <div class="more-menu-dropdown user-dropdown">
@@ -10396,7 +10396,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="readonly-grid">
 <label class="readonly-full-width">Nombre completo<input disabled="" id="profesorPerfilNombreCompleto" readonly="" value=""/></label>
-<label>Rol<input disabled="" id="profesorPerfilRol" readonly="" value="Profesor"/></label>
+<label>Rol<input disabled="" id="profesorPerfilRol" readonly="" value="Funcionario público"/></label>
 <label>Identificación<input disabled="" id="profesorPerfilIdentificacion" readonly="" value=""/></label>
 <label>Sede asignada<input disabled="" id="profesorPerfilSede" readonly="" value="Sin asignar"/></label>
 <label>Proyecto asignado<input disabled="" id="profesorPerfilProyecto" readonly="" value="Sin asignar"/></label>
@@ -10430,7 +10430,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div>
 <span class="page-eyebrow">CENTRO DE AYUDA</span>
 <h3>Ayuda</h3>
-<p class="section-description">Encuentra respuestas rápidas a las dudas más comunes sobre el panel del profesor.</p>
+<p class="section-description">Encuentra respuestas rápidas a las dudas más comunes sobre el panel del funcionario público.</p>
 </div>
 </div>
 <div class="help-search-card">
@@ -10486,7 +10486,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </details>
 <details class="faq-card" data-faq="">
 <summary>¿Por qué solo veo algunos estudiantes?</summary>
-<div class="faq-answer"><p>El panel del profesor muestra únicamente los estudiantes relacionados con tu sede y proyecto asignados. Esto evita que revises registros de otras áreas.</p></div>
+<div class="faq-answer"><p>El panel del funcionario público muestra únicamente los estudiantes relacionados con tu sede y proyecto asignados. Esto evita que revises registros de otras áreas.</p></div>
 </details>
 <details class="faq-card" data-faq="">
 <summary>¿Dónde veo mis estudiantes asignados?</summary>
@@ -10547,7 +10547,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <span class="sidebar-icon">📊</span><span>Inicio</span>
 </button>
 <button data-admin-seccion="profesores" id="sidebarProfesoresAdministrador" type="button">
-<span class="sidebar-icon">👥</span><span>Gestión de profesores</span>
+<span class="sidebar-icon">👥</span><span>Gestión de funcionarios públicos</span>
 </button>
 <button data-admin-seccion="progreso" id="sidebarProgresoAdministrador" type="button">
 <span class="sidebar-icon">🎓</span><span>Progreso de estudiantes</span>
@@ -10556,7 +10556,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <span class="sidebar-icon">📜</span><span>Historial de revisiones</span>
 </button>
 <button data-admin-seccion="solicitudes-personal" id="sidebarSolicitudesPersonalAdministrador" type="button">
-<span class="sidebar-icon">👥</span><span>Solicitudes de profesores / Admin</span><b id="badgeSolicitudesPersonalAdministrador">0</b>
+<span class="sidebar-icon">👥</span><span>Solicitudes de funcionarios públicos / Admin</span><b id="badgeSolicitudesPersonalAdministrador">0</b>
 </button>
 <button data-admin-seccion="solicitudes-estudiantes" id="sidebarSolicitudesEstudiantesAdministrador" type="button">
 <span class="sidebar-icon">🎓</span><span>Solicitudes de estudiantes</span><b id="badgeSolicitudesEstudiantesAdministrador">0</b>
@@ -10605,7 +10605,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </button>
 <button class="role-kpi admin-kpi-link" data-admin-seccion="profesores" type="button">
 <span>👥</span>
-<div><small>Profesores registrados</small><strong id="totalProfesoresAdmin">0</strong></div>
+<div><small>Funcionarios públicos registrados</small><strong id="totalProfesoresAdmin">0</strong></div>
 </button>
 <button class="role-kpi admin-kpi-link" data-admin-seccion="progreso" type="button">
 <span>📈</span>
@@ -10616,12 +10616,12 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="admin-summary-icon">📊</div>
 <div>
 <strong>Resumen del servicio social</strong>
-<p id="resumenGeneralAdmin">Aquí podrás consultar el estado general de estudiantes, profesores y horas registradas.</p>
+<p id="resumenGeneralAdmin">Aquí podrás consultar el estado general de estudiantes, funcionarios públicos y horas registradas.</p>
 </div>
 </div>
 <div class="admin-quick-grid">
 <button class="admin-quick-card" data-admin-seccion="profesores" type="button">
-<span>👥</span><div><strong>Gestionar profesores</strong><small>Asigna la sede y la zona de cada docente.</small></div><b>→</b>
+<span>👥</span><div><strong>Gestionar funcionarios públicos</strong><small>Asigna la sede y la zona de cada funcionario.</small></div><b>→</b>
 </button>
 <button class="admin-quick-card" data-admin-seccion="progreso" type="button">
 <span>🎓</span><div><strong>Ver progreso</strong><small>Consulta las horas y el avance de cada estudiante.</small></div><b>→</b>
@@ -10635,8 +10635,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="admin-page-title">
 <div>
 <span class="page-eyebrow">GESTIÓN</span>
-<h3>Gestión de profesores</h3>
-<p class="section-description">Asigna la sede y la zona de cada profesor desde este panel.</p>
+<h3>Gestión de funcionarios públicos</h3>
+<p class="section-description">Asigna la sede y la zona de cada funcionario desde este panel.</p>
 </div>
 </div>
 <div id="tablaProfesoresAdmin"></div>
@@ -10672,7 +10672,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div>
 <span class="page-eyebrow">REVISIÓN</span>
 <h3>Historial de revisiones</h3>
-<p class="section-description">Consulta los registros revisados por los profesores y filtra entre aceptados, rechazados o todos.</p>
+<p class="section-description">Consulta los registros revisados por los funcionarios públicos y filtra entre aceptados, rechazados o todos.</p>
 </div>
 </div>
 <div class="admin-history-controls">
@@ -10681,9 +10681,9 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <input id="busquedaHistorialAdmin" type="search" placeholder="Nombre de estudiante o profesor">
 </div>
 <div class="form-group admin-professor-select">
-<label for="filtroProfesorAdmin">Profesor</label>
+<label for="filtroProfesorAdmin">Funcionario público</label>
 <select id="filtroProfesorAdmin">
-<option value="todos">Todos los profesores</option>
+<option value="todos">Todos los funcionarios públicos</option>
 </select>
 </div>
 <div class="history-filter">
@@ -10698,8 +10698,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="admin-page-title">
 <div>
 <span class="page-eyebrow">PERSONAL</span>
-<h3>Solicitudes de profesores / Administrador</h3>
-<p class="section-description">Solicitudes de nuevos profesores y solicitudes de profesores que desean obtener permisos de Administrador.</p>
+<h3>Solicitudes de funcionarios públicos / Administrador</h3>
+<p class="section-description">Solicitudes de nuevos funcionarios públicos y solicitudes de funcionarios públicos que desean obtener permisos de Administrador.</p>
 </div>
 </div>
 <div id="tablaSolicitudesPersonalAdministrador"></div>
@@ -10748,12 +10748,12 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="role-help-chat" id="chatAyudaAdministrador">
 <button class="ai-help-close" onclick="alternarChatAyuda('administrador')" type="button">Cerrar</button>
 <span class="ai-quick-title">Preguntas frecuentes</span>
-<div class="ai-quick-questions"><button onclick="preguntaRapidaAyuda('administrador','¿Cómo gestiono profesores?')" type="button">Profesores</button><button onclick="preguntaRapidaAyuda('administrador','¿Cómo reviso solicitudes?')" type="button">Solicitudes</button><button onclick="preguntaRapidaAyuda('administrador','¿Cómo consulto el progreso?')" type="button">Progreso</button></div>
+<div class="ai-quick-questions"><button onclick="preguntaRapidaAyuda('administrador','¿Cómo gestiono funcionarios públicos?')" type="button">Funcionarios públicos</button><button onclick="preguntaRapidaAyuda('administrador','¿Cómo reviso solicitudes?')" type="button">Solicitudes</button><button onclick="preguntaRapidaAyuda('administrador','¿Cómo consulto el progreso?')" type="button">Progreso</button></div>
 <input id="preguntaAyudaAdministrador" onkeydown="if(event.key==='Enter') consultarAyudaRol('administrador')" placeholder="Escribe tu duda para la IA..." type="text"/>
 <button onclick="consultarAyudaRol('administrador')" type="button">🤖 Preguntar a la IA</button>
 <div class="role-help-answer" id="respuestaAyudaAdministrador">Escribe una pregunta y recibirás orientación sobre tu panel.</div>
 </div>
-<div class="help-admin-intro"><strong>También puedes consultar las secciones del panel:</strong><br/>gestión de profesores, progreso de estudiantes, solicitudes, historial y sistema.</div>
+<div class="help-admin-intro"><strong>También puedes consultar las secciones del panel:</strong><br/>gestión de funcionarios públicos, progreso de estudiantes, solicitudes, historial y sistema.</div>
 </section>
 </main>
 </div>
@@ -10767,7 +10767,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="superadmin-brand"><strong>SIGHO</strong><span>Super Admin</span></div>
 <button class="superadmin-tab active" data-superadmin-tab="inicio">Plantel de Super Admin</button>
 <button class="superadmin-tab" onclick="abrirAdministrador()" type="button">Operación de Administrador</button>
-<button class="superadmin-tab" onclick="abrirProfesor()" type="button">Operación de Profesor</button>
+<button class="superadmin-tab" onclick="abrirProfesor()" type="button">Operación de Funcionario público</button>
 <button class="superadmin-tab" data-superadmin-tab="usuarios">Usuarios</button>
 <button class="superadmin-tab" data-superadmin-tab="permisos">Roles y permisos</button>
 <button class="superadmin-tab" data-superadmin-tab="configuracion">Configuración</button>
@@ -10777,7 +10777,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <main class="superadmin-main">
 <div class="dashboard-header"><div><h2 id="tituloSuperAdmin">Plantel de Super Admin</h2><p>Administración exclusiva del sistema</p></div><div class="dashboard-tools"><button aria-label="Más opciones" class="more-menu-button" onclick="toggleUserMenu(this)" title="Más opciones">⋮</button><div class="more-menu-dropdown"><button onclick="abrirMisDatos()">👤 Mis datos</button><button onclick="cerrarSesion()">↪ Cerrar sesión</button></div></div></div>
 <section class="superadmin-panel role-home-section" id="superadminPanelInicio">
-<div class="role-kpis superadmin-kpis"><div class="role-kpi"><span>🎓</span><div><small>Estudiantes registrados</small><strong id="superadminCountStudents">0</strong></div></div><div class="role-kpi"><span>👥</span><div><small>Profesores registrados</small><strong id="superadminCountTeachers">0</strong></div></div><div class="role-kpi"><span>🔐</span><div><small>Administradores registrados</small><strong id="superadminCountAdmins">0</strong></div></div></div>
+<div class="role-kpis superadmin-kpis"><div class="role-kpi"><span>🎓</span><div><small>Estudiantes registrados</small><strong id="superadminCountStudents">0</strong></div></div><div class="role-kpi"><span>👥</span><div><small>Funcionarios públicos registrados</small><strong id="superadminCountTeachers">0</strong></div></div><div class="role-kpi"><span>🔐</span><div><small>Administradores registrados</small><strong id="superadminCountAdmins">0</strong></div></div></div>
 <div class="assignment-banner superadmin-assignment-banner"><span class="quick-icon">🛡️</span><div><strong>Control general del sistema</strong><p>Administra usuarios, roles, permisos y configuración desde una sola consola.</p></div></div>
 <div class="superadmin-home-quick"><div><span class="quick-icon">📊</span><div><strong>Validaciones de administradores</strong><p>Revisa las solicitudes pendientes y mantén el acceso institucional bajo control.</p></div></div><button onclick="mostrarSeccionSuperAdmin('usuarios')" type="button">Gestionar usuarios →</button></div>
 <div class="section admin-section"><h3>Validaciones de administradores</h3><p class="section-description">Solo el Super Admin puede aceptar o rechazar solicitudes para crear cuentas de administrador.</p><div id="tablaValidacionesSuperAdmin"></div></div>
@@ -10961,7 +10961,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="sigho-modal-card registro-hora-exito-card">
 <div class="registro-hora-exito-body">
 <div class="registro-hora-exito-icon">✓</div>
-<span class="registro-hora-badge">Pendiente de revisión por el profesor</span>
+<span class="registro-hora-badge">Pendiente de revisión por el funcionario público</span>
 <h3>¡Jornada registrada con éxito!</h3>
 <p class="registro-hora-exito-subtitle">Tu jornada fue enviada y quedó pendiente de revisión.</p>
 <div class="registro-hora-resumen">
@@ -12402,7 +12402,7 @@ async function enviarSolicitud() {
     marcarCamposSolicitudInvalidos(rol);
 
     if (!rol || !["estudiante", "profesor"].includes(rol)) {
-        mostrarErrorSolicitud("Selecciona si la solicitud corresponde a Estudiante o Profesor.","rolSolicitud");
+        mostrarErrorSolicitud("Selecciona si la solicitud corresponde a Estudiante o Funcionario público.","rolSolicitud");
         return;
     }
     if (!clave) {
@@ -12727,7 +12727,7 @@ async function enviarSolicitud() {
 
         const telefonoProfesorElemento = document.getElementById("telefonoProfesorSolicitud");
         if (!validarCelularSIGHO(telefonoProfesorElemento)) {
-            const texto=telefonoProfesorElemento.validationMessage || "El celular del profesor no es válido.";
+            const texto=telefonoProfesorElemento.validationMessage || "El celular del funcionario público no es válido.";
             marcarErrorCampoSolicitud(telefonoProfesorElemento,texto);
             mostrarErrorSolicitud(texto,telefonoProfesorElemento);
             return;
@@ -12968,8 +12968,8 @@ function consultarAyudaRol(rol) {
     const pregunta = (input?.value || "").trim().toLowerCase();
     const respuestas = {
         estudiante: {
-            registro: "Para registrar una jornada entra a Registrar horas, completa fecha, entrada, salida, descripción y adjunta la evidencia. El registro quedará pendiente hasta que un profesor lo revise.",
-            hora: "Las horas solo se suman como aprobadas cuando el profesor acepta el registro. Las jornadas pendientes o rechazadas no cuentan como aprobadas.",
+            registro: "Para registrar una jornada entra a Registrar horas, completa fecha, entrada, salida, descripción y adjunta la evidencia. El registro quedará pendiente hasta que un funcionario público lo revise.",
+            hora: "Las horas solo se suman como aprobadas cuando un funcionario público acepta el registro. Las jornadas pendientes o rechazadas no cuentan como aprobadas.",
             cuenta: "En Mis datos puedes consultar y actualizar la información permitida de tu perfil. Si olvidaste tu contraseña, solicita ayuda al administrador.",
             general: "Puedo orientarte sobre registrar horas, evidencias, estados de tus jornadas, progreso y datos de tu cuenta."
         },
@@ -12980,10 +12980,10 @@ function consultarAyudaRol(rol) {
             general: "Puedo orientarte sobre registros pendientes, estudiantes asignados, historial, observaciones y tu perfil."
         },
         administrador: {
-            profesor: "En Gestión de profesores puedes consultar y asignar la sede y el proyecto de cada docente.",
-            solicitud: "En Solicitudes puedes revisar y aceptar o rechazar solicitudes de estudiantes, profesores y permisos de Administrador.",
+            profesor: "En Gestión de funcionarios públicos puedes consultar y asignar la sede y el proyecto de cada funcionario.",
+            solicitud: "En Solicitudes puedes revisar y aceptar o rechazar solicitudes de estudiantes, funcionarios públicos y permisos de Administrador.",
             progreso: "En Progreso de estudiantes puedes consultar horas aprobadas, faltantes y porcentaje de avance.",
-            general: "Puedo orientarte sobre profesores, solicitudes, progreso, historial y funciones generales del sistema."
+            general: "Puedo orientarte sobre funcionarios públicos, solicitudes, progreso, historial y funciones generales del sistema."
         }
     };
     const contenido = respuestas[rol] || {};
@@ -12991,7 +12991,7 @@ function consultarAyudaRol(rol) {
     if (pregunta.includes("registro") || pregunta.includes("jornada") || pregunta.includes("evidencia")) respuesta = contenido.registro || respuesta;
     else if (pregunta.includes("hora") || pregunta.includes("progreso")) respuesta = contenido.hora || contenido.progreso || respuesta;
     else if (pregunta.includes("estudiante")) respuesta = contenido.estudiante || respuesta;
-    else if (pregunta.includes("profesor")) respuesta = contenido.profesor || respuesta;
+    else if (pregunta.includes("profesor") || pregunta.includes("funcionario")) respuesta = contenido.profesor || respuesta;
     else if (pregunta.includes("solicitud")) respuesta = contenido.solicitud || respuesta;
     else if (pregunta.includes("cuenta") || pregunta.includes("contraseña") || pregunta.includes("perfil")) respuesta = contenido.cuenta || respuesta;
     if (answer) answer.textContent = pregunta ? respuesta : "Escribe una pregunta para recibir orientación.";
@@ -13533,8 +13533,8 @@ async function actualizarProfesor() {
     actualizarNotificacionesProfesor(pendientes);
     document.getElementById("kpiAprobadasProfesor")?.replaceChildren(document.createTextNode(aprobadas.toFixed(1)));
 
-    const nombreCompletoProfesor = (usuarioActual?.nombre || "Profesor").trim();
-    const primerNombreProfesor = nombreCompletoProfesor.split(/\s+/)[0] || "Profesor";
+    const nombreCompletoProfesor = (usuarioActual?.nombre || "Funcionario público").trim();
+    const primerNombreProfesor = nombreCompletoProfesor.split(/\s+/)[0] || "Funcionario público";
     const nombrePerfil = document.getElementById("nombrePerfilProfesorHeader");
     if (nombrePerfil) nombrePerfil.textContent = primerNombreProfesor;
 
@@ -14057,7 +14057,7 @@ function preguntarIaSuperAdmin() {
     windowChat.appendChild(userMessage);
     const texto = pregunta.toLowerCase();
     let respuesta = "Puedo ayudarte con usuarios, roles, permisos, configuración y navegación del panel Super Admin.";
-    if (texto.includes("usuario") || texto.includes("profesor") || texto.includes("estudiante") || texto.includes("admin")) respuesta = "En Usuarios puedes crear, editar, activar o desactivar cuentas de Administrador. Para gestionar estudiantes y profesores, abre Operación de Administrador.";
+    if (texto.includes("usuario") || texto.includes("profesor") || texto.includes("funcionario") || texto.includes("estudiante") || texto.includes("admin")) respuesta = "En Usuarios puedes crear, editar, activar o desactivar cuentas de Administrador. Para gestionar estudiantes y funcionarios públicos, abre Operación de Administrador.";
     else if (texto.includes("permiso") || texto.includes("rol")) respuesta = "En Roles y permisos selecciona el rol y activa solo los permisos que necesita. Cada rol tiene una configuración diferente.";
     else if (texto.includes("config") || texto.includes("meta") || texto.includes("dominio")) respuesta = "En Configuración puedes modificar los valores generales de SIGHO, como dominio institucional y metas de horas.";
     else if (texto.includes("volver") || texto.includes("regresar") || texto.includes("naveg")) respuesta = "Usa las opciones de la barra lateral para cambiar de sección. El botón Atrás del navegador también conserva la navegación de páginas abiertas.";
@@ -14196,7 +14196,7 @@ function actualizarNotificacionesEstudiante(){
     const leidas=obtenerIdsNotificacionesEstudianteLeidas();
     const nuevas=eventos.filter(r=>!leidas.includes(String(r.id))); badge.textContent=String(nuevas.length); badge.style.display=nuevas.length?"flex":"none";
     if(!eventos.length){lista.innerHTML='<div class="notification-empty">🔔<strong>No hay avisos recientes</strong><span>Cuando haya novedades sobre tus jornadas aparecerán aquí.</span></div>';return;}
-    lista.innerHTML=eventos.map(r=>{const estado=r.estado||"pendiente";const titulo=estado==="aprobada"?"Tu jornada fue aprobada":estado==="rechazada"?"Tu jornada fue rechazada":"Tu jornada está pendiente";const extra=estado==="rechazada"?(r.observacion||r.motivoRechazo||"Revisa la observación del profesor."):estado==="aprobada"?"El profesor revisó y aprobó este registro.":"El profesor aún debe revisar este registro.";return `<button type="button" class="notification-item ${!leidas.includes(String(r.id))?"unread":""}" onclick="abrirNotificacionEstudiante(${Number(r.id)})"><span class="notification-dot">${!leidas.includes(String(r.id))?"•":"✓"}</span><span class="notification-copy"><strong>${escapeHtml(titulo)}</strong><small>${escapeHtml(r.fecha||"")} · ${formatearHoras(r.horas)} h · ${escapeHtml(extra)}</small></span></button>`;}).join("");
+    lista.innerHTML=eventos.map(r=>{const estado=r.estado||"pendiente";const titulo=estado==="aprobada"?"Tu jornada fue aprobada":estado==="rechazada"?"Tu jornada fue rechazada":"Tu jornada está pendiente";const extra=estado==="rechazada"?(r.observacion||r.motivoRechazo||"Revisa la observación del funcionario público."):estado==="aprobada"?"El funcionario público revisó y aprobó este registro.":"El funcionario público aún debe revisar este registro.";return `<button type="button" class="notification-item ${!leidas.includes(String(r.id))?"unread":""}" onclick="abrirNotificacionEstudiante(${Number(r.id)})"><span class="notification-dot">${!leidas.includes(String(r.id))?"•":"✓"}</span><span class="notification-copy"><strong>${escapeHtml(titulo)}</strong><small>${escapeHtml(r.fecha||"")} · ${formatearHoras(r.horas)} h · ${escapeHtml(extra)}</small></span></button>`;}).join("");
 }
 function sincronizarBloqueoScrollNotificaciones(){
     const notificacionesAbiertas = document.querySelector('.notification-panel.show') || document.querySelector('.notification-backdrop.show');
@@ -14525,7 +14525,7 @@ function abrirMisDatos() {
     const modal = document.getElementById("modalUsuario");
     const contenido = document.getElementById("modalUsuarioContenido");
     if (!modal || !contenido) return;
-    const rolNombres = { estudiante: "Estudiante", profesor: "Profesor", administrador: "Administrador", superadmin: "Super Admin" };
+    const rolNombres = { estudiante: "Estudiante", profesor: "Funcionario público", administrador: "Administrador", superadmin: "Super Admin" };
     let datosExtra = "";
     if (usuarioActual.rol === "estudiante") {
         datosExtra = `<strong>Grado</strong><span>${escaparHTML(usuarioActual.grado || "No registrado")}</span><strong>Modalidad</strong><span>${usuarioActual.esTecnico ? "Técnica · 100 horas" : "Académico · 120 horas"}</span>`;
@@ -14570,16 +14570,16 @@ function abrirAyuda() {
                     Gestiona profesores, revisa solicitudes, consulta el progreso de los estudiantes y controla las funciones generales del sistema.
                 </div>
                 <div class="help-admin-grid">
-                    <article class="help-admin-card"><div class="help-admin-icon">👥</div><h4>Gestión de profesores</h4><p>Administra la información de los docentes y define su área de trabajo.</p><ul><li>Selecciona o actualiza la <strong>sede asignada</strong>.</li><li>Selecciona o actualiza el <strong>proyecto asignado</strong>.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">👥</div><h4>Gestión de funcionarios públicos</h4><p>Administra la información de los funcionarios y define su área de trabajo.</p><ul><li>Selecciona o actualiza la <strong>sede asignada</strong>.</li><li>Selecciona o actualiza el <strong>proyecto asignado</strong>.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">📊</div><h4>Progreso de estudiantes</h4><p>Consulta cómo avanza cada estudiante con sus horas de servicio social.</p><ul><li>Revisa horas aprobadas y horas faltantes.</li><li>Consulta el porcentaje de avance y utiliza los filtros por grado.</li></ul></article>
-                    <article class="help-admin-card"><div class="help-admin-icon">📩</div><h4>Solicitudes de profesores / Admin</h4><p>Aquí se reúnen las solicitudes relacionadas con el personal docente.</p><ul><li>Aprueba o rechaza nuevos registros de profesores.</li><li>Revisa las solicitudes de profesores que desean el rol de Administrador.</li></ul></article>
-                    <article class="help-admin-card"><div class="help-admin-icon">🎓</div><h4>Solicitudes de estudiantes</h4><p>Este módulo es independiente de las solicitudes de profesores.</p><ul><li>Revisa los datos de cada estudiante.</li><li>Acepta o rechaza su solicitud de registro.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">📩</div><h4>Solicitudes de funcionarios públicos / Admin</h4><p>Aquí se reúnen las solicitudes relacionadas con funcionarios públicos.</p><ul><li>Aprueba o rechaza nuevos registros de funcionarios públicos.</li><li>Revisa las solicitudes de funcionarios públicos que desean el rol de Administrador.</li></ul></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">🎓</div><h4>Solicitudes de estudiantes</h4><p>Este módulo es independiente de las solicitudes de funcionarios públicos.</p><ul><li>Revisa los datos de cada estudiante.</li><li>Acepta o rechaza su solicitud de registro.</li></ul></article>
                     <article class="help-admin-card"><div class="help-admin-icon">⚙️</div><h4>Sistema</h4><p>Consulta las funciones generales y el estado del sistema. Utiliza estas opciones para tareas administrativas globales cuando sea necesario.</p></article>
-                    <article class="help-admin-card"><div class="help-admin-icon">🔒</div><h4>Buenas prácticas</h4><p>Antes de aceptar una solicitud, verifica cuidadosamente los datos. Mantén actualizada la sede de cada profesor para que pueda revisar correctamente a sus estudiantes.</p></article>
+                    <article class="help-admin-card"><div class="help-admin-icon">🔒</div><h4>Buenas prácticas</h4><p>Antes de aceptar una solicitud, verifica cuidadosamente los datos. Mantén actualizada la sede de cada funcionario público para que pueda revisar correctamente a sus estudiantes.</p></article>
                 </div>`
         },
         superadmin: { titulo:"Ayuda para Super Admin", subtitulo:"Control general de SIGHO", contenido:`<div class="help-animation"><div class="help-icon">💡</div><strong>¿Cómo funciona tu panel?</strong><p>El Super Admin tiene el nivel más alto de control y puede revisar las solicitudes para crear administradores.</p></div>` },
-        estudiante: { titulo:"Ayuda para estudiantes", subtitulo:"Tu espacio para registrar y controlar el servicio social", contenido:`<div class="help-animation"><div class="help-icon">💡</div><strong>¿Cómo funciona tu panel?</strong><p>Aquí puedes registrar cada jornada de servicio social, describir lo que realizaste y adjuntar la evidencia correspondiente. Los registros quedan pendientes hasta que un profesor los revise. En «Mis registros» puedes consultar qué jornadas fueron aceptadas o rechazadas y cuántas horas te faltan.</p></div>` }
+        estudiante: { titulo:"Ayuda para estudiantes", subtitulo:"Tu espacio para registrar y controlar el servicio social", contenido:`<div class="help-animation"><div class="help-icon">💡</div><strong>¿Cómo funciona tu panel?</strong><p>Aquí puedes registrar cada jornada de servicio social, describir lo que realizaste y adjuntar la evidencia correspondiente. Los registros quedan pendientes hasta que un funcionario público los revise. En «Mis registros» puedes consultar qué jornadas fueron aceptadas o rechazadas y cuántas horas te faltan.</p></div>` }
     };
 
     const ayuda = ayudas[usuarioActual.rol] || ayudas.estudiante;
@@ -14636,7 +14636,7 @@ async function cargarPerfilProfesor() {
             profesorPerfilNombreCompleto: [p.nombres, p.apellidos].filter(Boolean).join(" "),
             profesorPerfilCorreo: p.correo || usuarioActual.correo || "",
             profesorPerfilTelefono: p.telefono || usuarioActual.telefono || "",
-            profesorPerfilRol: "Profesor",
+            profesorPerfilRol: "Funcionario público",
             profesorPerfilIdentificacion: p.identificacion || usuarioActual.identificacion || "",
             profesorPerfilSede: p.sede || usuarioActual.sede || "Sin asignar",
             profesorPerfilProyecto: p.proyecto || usuarioActual.proyecto || "Sin asignar"
@@ -14798,8 +14798,8 @@ async function guardarPerfilProfesor() {
         const data=await api("update_professor_profile",{method:"POST",body:datos});
         usuarioActual=normalizarUsuario(data.user);
 try { guardarSesionSigho(usuarioActual); } catch (_) {}
-        const nombreCompletoProfesor=(usuarioActual.nombre||"Profesor").trim();
-        const primerNombreProfesor=nombreCompletoProfesor.split(/\s+/)[0] || "Profesor";
+        const nombreCompletoProfesor=(usuarioActual.nombre||"Funcionario público").trim();
+        const primerNombreProfesor=nombreCompletoProfesor.split(/\s+/)[0] || "Funcionario público";
         document.getElementById("nombrePerfilProfesorHeader")?.replaceChildren(document.createTextNode(primerNombreProfesor));
         establecerEdicionPerfilProfesor(false);
         guardarSnapshotPerfilProfesor();
@@ -15262,7 +15262,7 @@ function mostrarErrorCampo(input, mensaje) {
 
     // ============================================================
     // VALIDACIÓN GLOBAL DE CELULARES SIGHO
-    // Se reutiliza la misma lógica en estudiante, profesor y
+    // Se reutiliza la misma lógica en estudiante, funcionario público y
     // acudiente cuando este último selecciona "Número celular".
     // ============================================================
     function formatearCelularSIGHO(valor) {
@@ -15835,7 +15835,7 @@ async function abrirEstudiantesAsignados(token = profesorVistaToken) {
     try {
         const datos = await api("teacher_students");
 
-        // Si el profesor cambió de sección mientras llegaba la respuesta,
+        // Si el funcionario público cambió de sección mientras llegaba la respuesta,
         // descartamos el resultado para que no vuelva a pintar "Mis estudiantes".
         if (
             token !== profesorVistaToken ||
@@ -16533,11 +16533,11 @@ function cargarFiltroProfesoresHistorialAdmin() {
     if (!select) return;
     const actual = select.value || profesorHistorialAdminActual || "todos";
     const profesores = usuarios.filter(u => u.rol === "profesor");
-    const opciones = ['<option value="todos">Todos los profesores</option>'];
+    const opciones = ['<option value="todos">Todos los funcionarios públicos</option>'];
     profesores.forEach(p => {
         const valor = p.correo || "";
         if (!valor) return;
-        opciones.push(`<option value="${escapeHtml(valor)}">${escapeHtml(p.nombre || "Profesor")}</option>`);
+        opciones.push(`<option value="${escapeHtml(valor)}">${escapeHtml(p.nombre || "Funcionario público")}</option>`);
     });
     select.innerHTML = opciones.join("");
     select.value = [...select.options].some(o => o.value === String(actual)) ? String(actual) : "todos";
@@ -16574,7 +16574,7 @@ function mostrarHistorialAdmin() {
             <table>
                 <thead>
                     <tr>
-                        <th>Profesor</th><th>Estudiante</th><th>Fecha</th><th>Horario</th>
+                        <th>Funcionario público</th><th>Estudiante</th><th>Fecha</th><th>Horario</th>
                         <th>Horas</th><th>Actividad</th><th>Estado</th><th>Observación</th>
                     </tr>
                 </thead>
@@ -16584,7 +16584,7 @@ function mostrarHistorialAdmin() {
         const aprobado = r.estado === "aprobada";
         html += `
             <tr>
-                <td>${escapeHtml(r.revisadoPorNombre || r.revisadoPor || "Profesor no identificado")}</td>
+                <td>${escapeHtml(r.revisadoPorNombre || r.revisadoPor || "Funcionario público no identificado")}</td>
                 <td>${escapeHtml(r.estudiante)}</td>
                 <td>${escapeHtml(r.fecha)}</td>
                 <td>${escapeHtml(r.entrada)} - ${escapeHtml(r.salida)}</td>
@@ -16625,7 +16625,7 @@ function mostrarValidacionesAdmin() {
     );
 
     if (!pendientes.length) {
-        contenedor.innerHTML = `<div class="admin-empty-state"><div class="admin-empty-icon">✓</div><strong>No hay solicitudes pendientes</strong><span>Todas las solicitudes de estudiantes y profesores han sido revisadas.</span></div>`;
+        contenedor.innerHTML = `<div class="admin-empty-state"><div class="admin-empty-icon">✓</div><strong>No hay solicitudes pendientes</strong><span>Todas las solicitudes de estudiantes y funcionarios públicos han sido revisadas.</span></div>`;
         return;
     }
 
@@ -17104,9 +17104,9 @@ function mostrarSolicitudesPersonalAdmin() {
     if(!cont) return;
     const profesores=(solicitudes||[]).filter(s=>s.estado==="pendiente" && s.rol==="profesor");
     const admins=window.solicitudesAdministradorAdmin || [];
-    if(!profesores.length && !admins.length){ cont.innerHTML='<div class="admin-empty-state"><div class="admin-empty-icon">✓</div><strong>No hay solicitudes pendientes</strong><span>No hay profesores esperando registro o permisos de Administrador.</span></div>'; return; }
+    if(!profesores.length && !admins.length){ cont.innerHTML='<div class="admin-empty-state"><div class="admin-empty-icon">✓</div><strong>No hay solicitudes pendientes</strong><span>No hay funcionarios públicos esperando registro o permisos de Administrador.</span></div>'; return; }
     let html='<div class="table-container"><table><thead><tr><th>Tipo de solicitud</th><th>Nombre</th><th>Correo</th><th>Identificación</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>';
-    profesores.forEach(s=>{ html+=`<tr><td><span class="status-badge">Nuevo profesor</span></td><td>${escapeHtml(s.nombre||'-')}</td><td>${escapeHtml(s.correo||'-')}</td><td>${escapeHtml(s.identificacion||'-')}</td><td>${escapeHtml(s.fechaSolicitud||'-')}</td><td><div class="request-admin-actions"><button class="success-button" onclick="validarSolicitud(${s.id},'aceptada')">✓ Aprobar</button><button class="danger-button" onclick="validarSolicitud(${s.id},'rechazada')">✕ Rechazar</button></div></td></tr>`; });
+    profesores.forEach(s=>{ html+=`<tr><td><span class="status-badge">Nuevo funcionario público</span></td><td>${escapeHtml(s.nombre||'-')}</td><td>${escapeHtml(s.correo||'-')}</td><td>${escapeHtml(s.identificacion||'-')}</td><td>${escapeHtml(s.fechaSolicitud||'-')}</td><td><div class="request-admin-actions"><button class="success-button" onclick="validarSolicitud(${s.id},'aceptada')">✓ Aprobar</button><button class="danger-button" onclick="validarSolicitud(${s.id},'rechazada')">✕ Rechazar</button></div></td></tr>`; });
     admins.forEach(s=>{ html+=`<tr><td><span class="status-badge" style="background:#eef2ff;color:#3949ab;border-color:#c7d2fe;">Solicitud de Administrador</span></td><td>${escapeHtml(s.nombre||'-')}</td><td>${escapeHtml(s.correo||'-')}</td><td>${escapeHtml(s.identificacion||'-')}</td><td>${escapeHtml(s.fechaSolicitud||'-')}</td><td><div class="request-admin-actions"><button class="success-button" onclick="validarSolicitudAdministrador(${s.id},'aceptada')">✓ Aprobar</button><button class="danger-button" onclick="validarSolicitudAdministrador(${s.id},'rechazada')">✕ Rechazar</button></div></td></tr>`; });
     html+='</tbody></table></div>'; cont.innerHTML=html;
 }
@@ -17159,9 +17159,9 @@ async function validarSolicitudAdministrador(id, estado){
     try{
         await api('validate_admin_request_by_admin',{method:'POST',body:{id,estado}});
         await actualizarAdministrador();
-        // Mantener al Administrador dentro de Solicitudes de profesores / Administrador.
+        // Mantener al Administrador dentro de Solicitudes de funcionarios públicos / Administrador.
         mostrarSeccionAdministrador('solicitudes-personal');
-        alert(estado==='aceptada'?'El profesor ahora tiene permisos de Administrador.':'Solicitud rechazada.');
+        alert(estado==='aceptada'?'El funcionario público ahora tiene permisos de Administrador.':'Solicitud rechazada.');
     }catch(e){ alert(e.message); }
 }
 
@@ -17209,7 +17209,7 @@ async function cargarProfesoresAdmin() {
                             <select id="sedeProf_${p.id}">
                                 ${sedes.map(x => `<option value="${escapeHtml(x)}" ${x === p.sede ? "selected" : ""}>${escapeHtml(x)}</option>`).join("")}
                             </select>
-                            <small class="field-help">Sede principal asignada al docente.</small>
+                            <small class="field-help">Sede principal asignada al funcionario público.</small>
                         </div>
 
                         <div>
@@ -17233,7 +17233,7 @@ async function cargarProfesoresAdmin() {
                     </div>
                 </div>
             `).join("")
-            : `<div class="empty-state">No hay profesores registrados.</div>`;
+            : `<div class="empty-state">No hay funcionarios públicos registrados.</div>`;
         profesores.forEach(p => {
             const selectorSede = document.getElementById(`sedeProf_${p.id}`);
             selectorSede?.addEventListener("change", () => actualizarZonasProfesor(p.id));
@@ -17267,7 +17267,7 @@ const zonasPorSede = {
     "Bello Horizonte": ["Apoyo docentes"]
 };
 
-const sedesApoyoDocentes = [
+const sedesApoyoFuncionariosPublicos = [
     "San Francisco Club",
     "Picaleña",
     "Secundino Porras Cruz",
@@ -17290,7 +17290,7 @@ function actualizarZonasProfesor(id, zonaSeleccionada = "") {
     const selector = document.getElementById(`zonaProf_${id}`);
     if (!selector) return;
 
-    const sedeConZonaFija = sedesApoyoDocentes.includes(sede);
+    const sedeConZonaFija = sedesApoyoFuncionariosPublicos.includes(sede);
 
     if (sedeConZonaFija) {
         // Estas sedes solo permiten "Apoyo docentes" y se muestran como campo estático.
@@ -19124,7 +19124,7 @@ body.dark-mode .password-universal-wrapper input.password-universal-visible[type
         text-security: disc !important;
     }
 
-    /* Mantener exactamente el mismo ajuste en las ayudas y claves de profesor. */
+    /* Mantener exactamente el mismo ajuste en las ayudas y claves de funcionario público. */
     .password-universal-wrapper > input[type="password"],
     .profesor-password-wrapper > input[type="password"],
     .password-input-wrapper > input[type="password"] {
@@ -20293,8 +20293,8 @@ body.dark-mode textarea[disabled].campo-error {
         const mapa = {
             estudiante: "Estudiante",
             alumno: "Estudiante",
-            profesor: "Profesor",
-            docente: "Profesor",
+            profesor: "Funcionario público",
+            docente: "Funcionario público",
             administrador: "Administrador",
             admin: "Administrador",
             superadmin: "Super Admin",
