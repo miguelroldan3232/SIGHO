@@ -373,7 +373,7 @@ function ensure_student_application_table(PDO $pdo): void {
 }
 
 function ensure_optional_columns(PDO $pdo): void {
-    // Estas columnas permiten conservar la jornada del estudiante y la sede del profesor.
+    // Estas columnas permiten conservar la jornada del estudiante y la sede del funcionario público.
     $checks = [
         ['student_applications', 'service_shift', "ALTER TABLE student_applications ADD COLUMN service_shift VARCHAR(30) NULL AFTER service_days"],
         ['access_requests', 'service_site', "ALTER TABLE access_requests ADD COLUMN service_site VARCHAR(150) NULL AFTER grade"],
@@ -808,7 +808,7 @@ try {
             $ident = trim((string)($d['identificacion'] ?? ''));
             $tipoDocumento = trim((string)($d['tipoDocumento'] ?? ''));
             $numeroDocumento = trim((string)($d['numeroDocumento'] ?? ''));
-            $camposNombreProfesor = $rol === 'profesor' && (
+            $camposNombreFuncionarioPublico = $rol === 'profesor' && (
                 array_key_exists('primerApellido', $d) ||
                 array_key_exists('segundoApellido', $d) ||
                 array_key_exists('primerNombre', $d) ||
@@ -816,7 +816,7 @@ try {
             );
             if ($rol === 'profesor') {
                 $ident = $numeroDocumento;
-                if ($camposNombreProfesor) {
+                if ($camposNombreFuncionarioPublico) {
                     $nombre = trim(implode(' ', array_filter([
                         trim((string)($d['primerNombre'] ?? '')),
                         trim((string)($d['segundoNombre'] ?? ''))
@@ -832,15 +832,15 @@ try {
             $modalidad = $d['modalidad'] ?? null;
             $programa = trim((string)($d['programaTecnico'] ?? '')) ?: null;
             $grado = trim((string)($d['grado'] ?? '')) ?: null;
-            $sedeProfesor = trim((string)($d['sede'] ?? ''));
-            $proyectoProfesor = trim((string)($d['proyecto'] ?? ''));
-            $telefonoProfesor = trim((string)($d['telefono'] ?? ''));
+            $sedeFuncionarioPublico = trim((string)($d['sede'] ?? ''));
+            $proyectoFuncionarioPublico = trim((string)($d['proyecto'] ?? ''));
+            $telefonoFuncionarioPublico = trim((string)($d['telefono'] ?? ''));
 
             if (!$rol || !$nombre || !$apellido || !$ident || !$correo || !$clave) {
                 fail('Completa todos los campos.');
             }
             if (!in_array($rol, ['estudiante','profesor'], true)) {
-                fail('En las solicitudes solo se permite el rol Estudiante o Profesor.');
+                fail('En las solicitudes solo se permite el rol Estudiante o Funcionario público.');
             }
             if ($rol === 'estudiante') {
                 if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/', $clave)) {
@@ -848,11 +848,11 @@ try {
                 }
             } else {
                 if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/', $clave)) {
-                    fail('La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con mayúscula, minúscula y número.');
+                    fail('La contraseña del funcionario público debe tener mínimo 8 caracteres, sin espacios, con mayúscula, minúscula y número.');
                 }
             }
             if ($rol === 'profesor' && !is_institutional_email($correo)) {
-                 fail('El profesor debe usar un correo @' . institutional_domain() . '.');
+                 fail('El funcionario público debe usar un correo @' . institutional_domain() . '.');
             }
             if ($rol === 'estudiante' && !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
                 fail('El estudiante debe usar un correo electrónico válido.');
@@ -1148,28 +1148,28 @@ try {
             }
 
             if ($rol === 'profesor') {
-                if ($camposNombreProfesor) {
-                    $nombresProfesor = [
+                if ($camposNombreFuncionarioPublico) {
+                    $nombresFuncionarioPublico = [
                         'Primer nombre' => capitalizarNombre(trim((string)($d['primerNombre'] ?? ''))),
                         'Segundo nombre' => capitalizarNombre(trim((string)($d['segundoNombre'] ?? ''))),
                         'Primer apellido' => capitalizarNombre(trim((string)($d['primerApellido'] ?? ''))),
                         'Segundo apellido' => capitalizarNombre(trim((string)($d['segundoApellido'] ?? '')))
                     ];
-                    $regexNombreProfesor = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
-                    foreach ($nombresProfesor as $etiqueta => $valor) {
+                    $regexNombreFuncionarioPublico = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+                    foreach ($nombresFuncionarioPublico as $etiqueta => $valor) {
                         $obligatorio = in_array($etiqueta, ['Primer nombre', 'Primer apellido'], true);
                         if (!$valor && !$obligatorio) continue;
-                        if (mb_strlen($valor, 'UTF-8') < 2 || mb_strlen($valor, 'UTF-8') > 30 || !preg_match($regexNombreProfesor, $valor)) {
+                        if (mb_strlen($valor, 'UTF-8') < 2 || mb_strlen($valor, 'UTF-8') > 30 || !preg_match($regexNombreFuncionarioPublico, $valor)) {
                             fail($etiqueta . ' debe contener solo letras y espacios sencillos, entre 2 y 30 caracteres.');
                         }
                     }
                     $nombre = trim(implode(' ', array_filter([
-                        $nombresProfesor['Primer nombre'],
-                        $nombresProfesor['Segundo nombre']
+                        $nombresFuncionarioPublico['Primer nombre'],
+                        $nombresFuncionarioPublico['Segundo nombre']
                     ], static fn($value) => $value !== '')));
                     $apellido = trim(implode(' ', array_filter([
-                        $nombresProfesor['Primer apellido'],
-                        $nombresProfesor['Segundo apellido']
+                        $nombresFuncionarioPublico['Primer apellido'],
+                        $nombresFuncionarioPublico['Segundo apellido']
                     ], static fn($value) => $value !== '')));
                 } else {
                     $nombre = capitalizarNombre($nombre);
@@ -1178,36 +1178,36 @@ try {
                 $ident = trim($ident);
                 $correo = strtolower(trim($correo));
 
-                if (!$camposNombreProfesor) {
-                    $regexNombreProfesor = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
-                    if (mb_strlen($nombre, 'UTF-8') < 2 || mb_strlen($nombre, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $nombre)) {
-                        fail('Los nombres del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+                if (!$camposNombreFuncionarioPublico) {
+                    $regexNombreFuncionarioPublico = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+                    if (mb_strlen($nombre, 'UTF-8') < 2 || mb_strlen($nombre, 'UTF-8') > 60 || !preg_match($regexNombreFuncionarioPublico, $nombre)) {
+                        fail('Los nombres del funcionario público solo pueden contener letras y un espacio sencillo entre palabras.');
                     }
-                    if (mb_strlen($apellido, 'UTF-8') < 2 || mb_strlen($apellido, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $apellido)) {
-                        fail('Los apellidos del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+                    if (mb_strlen($apellido, 'UTF-8') < 2 || mb_strlen($apellido, 'UTF-8') > 60 || !preg_match($regexNombreFuncionarioPublico, $apellido)) {
+                        fail('Los apellidos del funcionario público solo pueden contener letras y un espacio sencillo entre palabras.');
                     }
                 }
                 if (!in_array($tipoDocumento, ['Cédula de ciudadanía', 'PPT'], true)) {
                     fail('Selecciona Cédula de ciudadanía o PPT como tipo de documento.');
                 }
-                $patronDocumentoProfesor = $tipoDocumento === 'PPT' ? '/^\d{6,8}$/' : '/^\d{7,10}$/';
-                if (!preg_match($patronDocumentoProfesor, $ident)) {
+                $patronDocumentoFuncionarioPublico = $tipoDocumento === 'PPT' ? '/^\d{6,8}$/' : '/^\d{7,10}$/';
+                if (!preg_match($patronDocumentoFuncionarioPublico, $ident)) {
                     fail($tipoDocumento === 'PPT'
                         ? 'El PPT debe tener entre 6 y 8 dígitos.'
                         : 'La cédula debe tener entre 7 y 10 dígitos.');
                 }
-                if (!preg_match('/^3\d{9}$/', $telefonoProfesor)
-                    || preg_match('/^(\d)\1{9}$/', $telefonoProfesor)
-                    || in_array($telefonoProfesor, ['0123456789','1234567890','9876543210','123456789','234567890','987654321','876543210'], true)) {
-                    fail('El teléfono de contacto del profesor debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.');
+                if (!preg_match('/^3\d{9}$/', $telefonoFuncionarioPublico)
+                    || preg_match('/^(\d)\1{9}$/', $telefonoFuncionarioPublico)
+                    || in_array($telefonoFuncionarioPublico, ['0123456789','1234567890','9876543210','123456789','234567890','987654321','876543210'], true)) {
+                    fail('El teléfono de contacto del funcionario público debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.');
                 }
                 if (preg_match('/\s/u', $correo) || !preg_match('/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i', $correo)) {
-                    fail('El correo del profesor debe ser institucional, sin espacios, y usar @iejosejoaquinflorezhernandez.edu.co.');
+                    fail('El correo del funcionario público debe ser institucional, sin espacios, y usar @iejosejoaquinflorezhernandez.edu.co.');
                 }
 
-                // El proyecto y la sede del profesor no se solicitan públicamente: los asigna el Administrador.
-                $proyectoProfesor = null;
-                $sedeProfesor = null;
+                // El proyecto y la sede del funcionario público no se solicitan públicamente: los asigna el Administrador.
+                $proyectoFuncionarioPublico = null;
+                $sedeFuncionarioPublico = null;
             }
 
             ensure_optional_columns($pdo);
@@ -1225,9 +1225,9 @@ try {
                     $rol === 'estudiante' ? $modalidad : null,
                     $rol === 'estudiante' && $modalidad === 'tecnico' ? ($programa ?: 'Técnica') : null,
                     $rol === 'estudiante' ? $gradoEstudiante : $grado,
-                    $rol === 'profesor' ? $sedeProfesor : null,
-                    $rol === 'profesor' ? $proyectoProfesor : null,
-                    $rol === 'profesor' ? $telefonoProfesor : null
+                    $rol === 'profesor' ? $sedeFuncionarioPublico : null,
+                    $rol === 'profesor' ? $proyectoFuncionarioPublico : null,
+                    $rol === 'profesor' ? $telefonoFuncionarioPublico : null
                 ]);
                 $accessRequestId = (int)$pdo->lastInsertId();
 
@@ -1286,7 +1286,7 @@ try {
                 'apellidos'=>$p['last_name'] ?? '',
                 'correo'=>$p['email'] ?? $user['correo'],
                 'telefono'=>$p['phone'] ?? '',
-                'rol'=>'Profesor',
+                'rol'=>'Funcionario público',
                 'identificacion'=>$p['identification'] ?? $user['identificacion'] ?? '',
                 'sede'=>$p['service_site'] ?? '',
                 'proyecto'=>$p['service_project'] ?? '',
@@ -1300,7 +1300,7 @@ try {
             $telefono = trim((string)($d['telefono'] ?? ''));
             if ($correo === '' || $telefono === '') fail('Completa el correo institucional y el teléfono de contacto.');
             if (!filter_var($correo, FILTER_VALIDATE_EMAIL) || !is_institutional_email($correo)) {
-                fail('El correo del profesor debe utilizar el dominio institucional @' . institutional_domain() . '.');
+                fail('El correo del funcionario público debe utilizar el dominio institucional @' . institutional_domain() . '.');
             }
             if (!preg_match('/^3\d{9}$/', $telefono)
                 || preg_match('/^(\d)\1{9}$/', $telefono)
@@ -1695,7 +1695,7 @@ try {
 
             respond([
                 'ok' => true,
-                'message' => 'Jornada registrada correctamente. Quedó pendiente de revisión por el profesor.',
+                'message' => 'Jornada registrada correctamente. Quedó pendiente de revisión por el funcionario público.',
                 'record' => $record
             ]);
 
@@ -1753,7 +1753,7 @@ try {
             if (!$proyecto || !in_array($proyecto,$proyectos,true)) fail('Proyecto inválido.');
             ensure_optional_columns(db());
             $st=db()->prepare("SELECT s.id FROM staff s JOIN users u ON u.id=s.user_id JOIN roles r ON r.id=u.role_id WHERE s.id=? AND r.code='profesor' AND u.status='activo'");
-            $st->execute([$staffId]); if(!$st->fetchColumn()) fail('Profesor no encontrado.',404);
+            $st->execute([$staffId]); if(!$st->fetchColumn()) fail('Funcionario público no encontrado.',404);
             $st=db()->prepare('UPDATE staff SET service_site=?, service_project=? WHERE id=?');
             $st->execute([$sede,$proyecto,$staffId]);
             respond(['ok'=>true,'message'=>'Sede y proyecto asignados correctamente.']);
@@ -1788,7 +1788,7 @@ try {
                     $roleId=(int)$pdo->query("SELECT id FROM roles WHERE code='administrador'")->fetchColumn();
                     $st=$pdo->prepare("UPDATE users SET role_id=? WHERE LOWER(email)=LOWER(?) AND status='activo'");
                     $st->execute([$roleId,$r['email']]);
-                    if ($st->rowCount() < 1) fail('No se encontró la cuenta del profesor solicitante.');
+                    if ($st->rowCount() < 1) fail('No se encontró la cuenta del funcionario público solicitante.');
                 }
                 $st=$pdo->prepare('UPDATE access_requests SET status=?, validated_by=?, validated_at=NOW() WHERE id=?');
                 $st->execute([$status,(int)$admin['id'],$id]);
@@ -1802,13 +1802,13 @@ try {
             $users = [];
             $st = $pdo->query("SELECT u.*, r.code AS role_code FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code IN ('estudiante','profesor') ORDER BY u.first_name, u.last_name");
             foreach ($st->fetchAll() as $u) $users[] = user_payload($u);
-            $profesores = [];
+            $funcionariosPublicos = [];
             $st = $pdo->query("SELECT u.*, r.code AS role_code, s.id AS staff_id, s.service_site, s.service_project FROM users u JOIN roles r ON r.id=u.role_id JOIN staff s ON s.user_id=u.id WHERE u.status='activo' AND r.code='profesor' ORDER BY u.first_name,u.last_name");
-            foreach ($st->fetchAll() as $u) $profesores[] = ['id'=>(int)$u['staff_id'],'userId'=>(int)$u['id'],'nombre'=>trim($u['first_name'].' '.$u['last_name']),'correo'=>$u['email'],'sede'=>$u['service_site']??'','proyecto'=>$u['service_project']??''];
+            foreach ($st->fetchAll() as $u) $funcionariosPublicos[] = ['id'=>(int)$u['staff_id'],'userId'=>(int)$u['id'],'nombre'=>trim($u['first_name'].' '.$u['last_name']),'correo'=>$u['email'],'sede'=>$u['service_site']??'','proyecto'=>$u['service_project']??''];
             respond([
                 'ok' => true,
                 'users' => $users,
-                'profesores' => $profesores,
+                'profesores' => $funcionariosPublicos,
                 'records' => get_records(),
                 'requests' => array_merge(pending_requests('estudiante'), pending_requests('profesor')),
                 'adminRequests' => pending_requests('administrador')
