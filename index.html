@@ -1354,6 +1354,19 @@
         .solicitud-exito-body p { margin:0; color:#52646a; line-height:1.6; font-size:14px; }
         .solicitud-exito-button { margin-top:22px; min-width:120px; border:0; border-radius:11px; padding:11px 22px; background:#1769aa; color:#fff; cursor:pointer; font-weight:800; }
         .solicitud-exito-button:hover { filter:brightness(.96); }
+        .sigho-alert-card { width: min(480px, 100%); }
+        #modalSighoAlert, #modalVerificacionCorreo { z-index: 10000; }
+        .sigho-alert-message { padding: 22px 24px; color: #354b60; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+        .sigho-alert-actions { display: flex; justify-content: flex-end; padding: 0 24px 22px; }
+        .identity-verification-card { width: min(520px, 100%); }
+        .identity-verification-body { padding: 22px 24px; color: #52646a; line-height: 1.6; }
+        .identity-verification-body label { display: block; margin: 16px 0 6px; color: #0d3f70; font-weight: 700; }
+        .identity-verification-body input { width: 100%; text-align: center; letter-spacing: .35em; font-size: 22px; }
+        .identity-verification-actions { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 24px 24px; }
+        .identity-verification-actions button { flex: 1 1 150px; }
+        .identity-verification-actions .identity-reject { background: #a33242; }
+        .identity-verification-status { min-height: 22px; margin: 8px 0 0; color: #a33242; font-size: 13px; }
+        .identity-verification-resend { margin: 8px 0 0; padding: 0; border: 0; background: none; color: #1769aa; text-decoration: underline; cursor: pointer; }
 
         .modal-close {
             margin-top: 16px;
@@ -3791,6 +3804,126 @@ body:has(.dashboard-screen.active) .container {
     object-fit: contain !important;
     margin: 0 auto !important;
 }
+.evidence-preview.multi-evidence-preview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+    padding-top: 12px;
+}
+.evidence-thumb-card {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #d8e5ee;
+    border-radius: 12px;
+    background: #f3f7fa;
+}
+.evidence-thumb-open {
+    display: block;
+    width: 100%;
+    padding: 6px;
+    border: 0;
+    background: transparent;
+    cursor: zoom-in;
+}
+.evidence-thumb-open img {
+    display: block;
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+}
+.evidence-thumb-name {
+    display: block;
+    overflow: hidden;
+    padding: 0 8px 8px;
+    color: #354b60;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.evidence-thumb-remove {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: grid;
+    width: 30px;
+    height: 30px;
+    min-height: 30px;
+    padding: 0;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.9);
+    border-radius: 50%;
+    background: #a33242;
+    color: #fff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,.22);
+}
+.evidence-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    padding: 56px 20px 24px;
+    background: rgba(3,12,22,.92);
+}
+.evidence-lightbox.show { display: flex; }
+.evidence-lightbox img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: min(96vw, 1400px);
+    max-height: calc(100vh - 120px);
+    object-fit: contain;
+}
+.evidence-lightbox p { max-width: 90vw; margin: 0; color: #fff; text-align: center; overflow-wrap: anywhere; }
+.evidence-lightbox-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 50%;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+}
+#visorEvidenciaHora .evidence-preview.multi-evidence-preview.show {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    flex-direction: initial !important;
+    align-items: initial !important;
+    justify-content: initial !important;
+}
+#visorEvidenciaHora .evidence-preview .evidence-thumb-open {
+    width: 100% !important;
+    padding: 6px !important;
+    border: 0 !important;
+    background: transparent !important;
+}
+#visorEvidenciaHora .evidence-preview .evidence-thumb-open img {
+    width: 100% !important;
+    height: 120px !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    object-fit: contain !important;
+}
+@media (max-width: 520px) {
+    #visorEvidenciaHora .evidence-preview.multi-evidence-preview.show { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    #visorEvidenciaHora .evidence-preview .evidence-thumb-open img { height: 100px !important; }
+}
 </style>
 <style>
 /* =====================================================
@@ -4586,6 +4719,198 @@ body:has(.dashboard-screen.active) .container {
     body.dark-mode input::placeholder,
     body.dark-mode textarea::placeholder {
         color: #94a3b8 !important;
+    }
+</style>
+<style id="ficha-solicitud-estudiante-styles">
+    .student-request-modal {
+    z-index: 260;
+    padding: 24px;
+    background: rgba(8, 26, 45, .58);
+    }
+
+    .student-request-card {
+    display: flex;
+    flex-direction: column;
+    width: min(920px, 100%);
+    max-height: min(88vh, 900px);
+    overflow: hidden;
+    border: 1px solid #dce8ef;
+    border-radius: 22px;
+    background: #fff;
+    color: #243746;
+    box-shadow: 0 28px 90px rgba(8, 43, 76, .3);
+    }
+
+    .student-request-head {
+    position: relative;
+    padding: 26px 32px;
+    color: #fff;
+    background: linear-gradient(120deg, #082b4c, #1769aa 75%, #238b74);
+    }
+
+    .student-request-head .student-request-eyebrow {
+    display: block;
+    margin-bottom: 8px;
+    color: #c8e5f6;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .13em;
+    }
+
+    .student-request-head h2 {
+    margin: 0;
+    padding-right: 48px;
+    color: #fff;
+    font-size: clamp(22px, 3vw, 30px);
+    line-height: 1.2;
+    }
+
+    .student-request-head p {
+    margin: 7px 0 0;
+    color: #e0eff9;
+    font-size: 14px;
+    }
+
+    .student-request-close {
+    position: absolute;
+    top: 20px;
+    right: 22px;
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.32);
+    border-radius: 12px;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    font-size: 23px;
+    cursor: pointer;
+    transition: background .18s ease, transform .18s ease;
+    }
+
+    .student-request-close:hover {
+    transform: translateY(-1px);
+    background: rgba(255,255,255,.22);
+    }
+
+    .student-request-content {
+    display: grid;
+    gap: 18px;
+    overflow-y: auto;
+    padding: 24px 30px;
+    }
+
+    .student-request-section {
+    padding: 18px;
+    border: 1px solid #e1eaf0;
+    border-radius: 16px;
+    background: #f8fbfd;
+    }
+
+    .student-request-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 14px;
+    color: #0d3f70;
+    font-size: 15px;
+    }
+
+    .student-request-section h3::before {
+    width: 4px;
+    height: 18px;
+    border-radius: 5px;
+    background: #2fa45a;
+    content: "";
+    }
+
+    .student-request-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    }
+
+    .student-request-field {
+    min-width: 0;
+    padding: 11px 13px;
+    border: 1px solid #e7eef3;
+    border-radius: 11px;
+    background: #fff;
+    }
+
+    .student-request-field.wide { grid-column: span 2; }
+    .student-request-field.full { grid-column: 1 / -1; }
+
+    .student-request-field dt {
+    margin-bottom: 5px;
+    color: #718394;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .025em;
+    }
+
+    .student-request-field dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: #243746;
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.45;
+    }
+
+    .student-request-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 30px;
+    border-top: 1px solid #e6edf2;
+    background: #fff;
+    }
+
+    .student-request-footer .main-button { min-width: 120px; }
+
+    body.dark-mode .student-request-card {
+    border-color: #2b4259;
+    background: #172334;
+    color: #dbe7f2;
+    box-shadow: 0 28px 90px rgba(0, 0, 0, .55);
+    }
+
+    body.dark-mode .student-request-section {
+    border-color: #2b4259;
+    background: #142132;
+    }
+
+    body.dark-mode .student-request-section h3 { color: #9dd0f1; }
+
+    body.dark-mode .student-request-field {
+    border-color: #2b4259;
+    background: #1a2a3c;
+    }
+
+    body.dark-mode .student-request-field dt { color: #9aafc0; }
+    body.dark-mode .student-request-field dd { color: #e1ebf3; }
+
+    body.dark-mode .student-request-footer {
+    border-color: #2b4259;
+    background: #172334;
+    }
+
+    @media (max-width: 680px) {
+    .student-request-modal { align-items: flex-end; padding: 10px; }
+    .student-request-card { max-height: 92vh; border-radius: 18px; }
+    .student-request-head { padding: 22px 20px; }
+    .student-request-close { top: 15px; right: 15px; }
+    .student-request-content { gap: 13px; padding: 16px; }
+    .student-request-section { padding: 14px; }
+    .student-request-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .student-request-field.wide { grid-column: 1 / -1; }
+    .student-request-footer { padding: 13px 16px; }
+    }
+
+    @media (max-width: 390px) {
+    .student-request-fields { grid-template-columns: 1fr; }
+    .student-request-field.wide,
+    .student-request-field.full { grid-column: auto; }
     }
 </style>
 <script id="sigho-theme-init">
@@ -9111,8 +9436,13 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <option value="Mallamas EPSI">Mallamas EPSI</option>
 <option value="Pijaos Salud EPSI">Pijaos Salud EPSI</option>
 </optgroup>
+<option value="Otro">Otro</option>
 </select>
-<small class="field-help">Selecciona tu EPS.</small>
+<small class="field-help">Selecciona tu EPS. Si no aparece, elige «Otro».</small>
+</div>
+<div class="form-group eps-otro-group" id="grupoEpsOtroSolicitud" style="display:none;">
+<label for="epsOtroSolicitud">Especifica tu EPS</label>
+<input disabled="" id="epsOtroSolicitud" maxlength="60" pattern="[\p{L}]+(?: [\p{L}]+)*" placeholder="Nombre de la EPS" type="text"/>
 </div>
 <div class="form-group" id="grupoRegimenEspecialSolicitud" style="display:none;">
 <label for="regimenEspecialSolicitud">Selecciona el régimen</label>
@@ -9460,7 +9790,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="form-row">
 <div class="form-group">
 <label for="fechaHora">Fecha</label>
-<input aria-describedby="ayudaFechaHora" id="fechaHora" max="2026-12-31" min="2026-01-01" required="" type="date"/>
+<input aria-describedby="ayudaFechaHora" id="fechaHora" required="" type="date"/>
 <small class="field-help" id="ayudaFechaHora">Solo puedes registrar jornadas del año actual y hasta hoy.</small>
 </div>
 <div class="form-group">
@@ -9476,13 +9806,12 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="form-group">
 <label>Evidencia</label>
 <div aria-live="polite" class="evidence-uploader" id="visorEvidenciaHora">
-<label class="evidence-select-button" for="evidenciaHora">📎 Seleccionar imagen JPG/JPEG</label>
-<input accept=".jpg,.jpeg,image/jpeg" hidden="" id="evidenciaHora" type="file"/>
-<span class="evidence-file-name" id="nombreEvidenciaHora">Ninguna imagen seleccionada</span>
-<div class="evidence-preview" id="previewEvidenciaHora"><img alt="Vista previa de la evidencia" id="imagenPreviewEvidenciaHora"/><span id="textoPreviewEvidenciaHora"></span></div>
-<button aria-label="Quitar archivo" class="remove-evidence-button" disabled="" id="quitarEvidenciaHora" title="Quitar archivo" type="button">✕</button>
+<label class="evidence-select-button" for="evidenciaHora">📎 Agregar imágenes JPG/JPEG</label>
+<input accept=".jpg,.jpeg,image/jpeg" hidden="" id="evidenciaHora" multiple="" type="file"/>
+<span class="evidence-file-name" id="nombreEvidenciaHora">Ninguna imagen seleccionada (máximo 3)</span>
+<div class="evidence-preview" id="previewEvidenciaHora"></div>
 </div>
-<small class="field-help">Puedes adjuntar una imagen o un archivo PDF.</small>
+<small class="field-help">Adjunta de 1 a 3 imágenes JPG/JPEG, de máximo 5 MB cada una. Pulsa una miniatura para ampliarla o ✕ para quitarla.</small>
 </div>
 <button class="main-button" id="registrarHorasBtn" onclick="registrarHoras()" type="button">Registrar Jornada</button>
 <div class="message" id="mensajeHoras"></div>
@@ -10275,6 +10604,20 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="sigho-modal-body" id="modalUsuarioContenido"></div>
 </div>
 </div>
+<div aria-labelledby="fichaSolicitudTitulo" aria-modal="true" class="sigho-modal student-request-modal" id="modalFichaSolicitud" onclick="cerrarFichaSolicitudSiFondo(event)" role="dialog">
+<article class="student-request-card">
+<header class="student-request-head">
+<span class="student-request-eyebrow">SOLICITUD DE ACCESO · ESTUDIANTE</span>
+<h2 id="fichaSolicitudTitulo">Ficha del estudiante</h2>
+<p id="fichaSolicitudSubtitulo">Información entregada en la solicitud</p>
+<button aria-label="Cerrar ficha" class="student-request-close" onclick="cerrarFichaSolicitud()" type="button">×</button>
+</header>
+<div class="student-request-content" id="fichaSolicitudContenido"></div>
+<footer class="student-request-footer">
+<button class="main-button" onclick="cerrarFichaSolicitud()" type="button">Cerrar ficha</button>
+</footer>
+</article>
+</div>
 <div class="sigho-modal" id="modalSolicitudExito">
 <div class="sigho-modal-card solicitud-exito-card">
 <div class="solicitud-exito-body">
@@ -10284,6 +10627,33 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <button class="solicitud-exito-button" onclick="confirmarSolicitudExito()" type="button">Aceptar</button>
 </div>
 </div>
+</div>
+<div aria-labelledby="sighoAlertTitle" aria-modal="true" class="sigho-modal" id="modalSighoAlert" role="alertdialog">
+<div class="sigho-modal-card sigho-alert-card">
+<div class="sigho-modal-head"><h3 id="sighoAlertTitle">SIGHO</h3></div>
+<div class="sigho-alert-message" id="sighoAlertMessage"></div>
+<div class="sigho-alert-actions"><button class="main-button" id="sighoAlertAccept" type="button">Aceptar</button></div>
+</div>
+</div>
+<div aria-labelledby="identityVerificationTitle" aria-modal="true" class="sigho-modal" id="modalVerificacionCorreo" role="dialog">
+<article class="sigho-modal-card identity-verification-card">
+<header class="sigho-modal-head">
+<h3 id="identityVerificationTitle">Confirma tu correo</h3>
+<p>Un paso para proteger tu cuenta de SIGHO.</p>
+</header>
+<div class="identity-verification-body">
+<p id="identityVerificationIntro">Te enviamos un código al correo registrado. Escríbelo y confirma si reconoces esta solicitud.</p>
+<label for="identityVerificationCode">Código de verificación</label>
+<input autocomplete="one-time-code" id="identityVerificationCode" inputmode="numeric" maxlength="8" pattern="[0-9]{8}" placeholder="8 dígitos" type="text"/>
+<button class="identity-verification-resend" id="identityVerificationResend" onclick="reenviarCodigoVerificacion()" type="button">Reenviar código</button>
+<p aria-live="polite" class="identity-verification-status" id="identityVerificationStatus"></p>
+</div>
+<footer class="identity-verification-actions">
+<button class="main-button" onclick="responderVerificacionCorreo('si')" type="button">Sí, fui yo</button>
+<button class="main-button identity-reject" onclick="responderVerificacionCorreo('no')" type="button">No fui yo</button>
+<button class="identity-reject" onclick="salirDeVerificacionCorreo()" type="button">Cerrar sesión</button>
+</footer>
+</article>
 </div>
 <div class="sigho-modal" id="modalRegistroHoraExito">
 <div class="sigho-modal-card registro-hora-exito-card">
@@ -10299,6 +10669,11 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <button class="solicitud-exito-button" onclick="confirmarRegistroHoraExito()" type="button">Aceptar</button>
 </div>
 </div>
+</div>
+<div aria-label="Vista ampliada de evidencia" aria-modal="true" class="evidence-lightbox" id="evidenceLightbox" role="dialog" onclick="cerrarVistaAmpliadaEvidencia(event)">
+<button aria-label="Cerrar imagen ampliada" class="evidence-lightbox-close" id="evidenceLightboxClose" onclick="cerrarVistaAmpliadaEvidencia(event)" type="button">×</button>
+<img alt="Evidencia ampliada" id="evidenceLightboxImage"/>
+<p id="evidenceLightboxCaption"></p>
 </div>
 <div class="sigho-modal" id="modalAyuda" onclick="cerrarModalSiFondo(event)">
 <div class="sigho-modal-card">
@@ -10369,6 +10744,39 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
     // Dejamos la función disponible globalmente para los botones del HTML.
     window.api = api;
 
+    const sighoAlertQueue = [];
+    let sighoAlertShowing = false;
+    function mostrarSiguienteAvisoSigho() {
+        if (sighoAlertShowing || sighoAlertQueue.length === 0) return;
+        const modal = document.getElementById("modalSighoAlert");
+        const mensaje = document.getElementById("sighoAlertMessage");
+        const aceptar = document.getElementById("sighoAlertAccept");
+        if (!modal || !mensaje || !aceptar) return;
+        sighoAlertShowing = true;
+        mensaje.textContent = sighoAlertQueue.shift();
+        modal.classList.add("show");
+        aceptar.focus();
+    }
+    window.alert = function (message) {
+        sighoAlertQueue.push(String(message ?? ""));
+        mostrarSiguienteAvisoSigho();
+    };
+    document.getElementById("sighoAlertAccept")?.addEventListener("click", () => {
+        document.getElementById("modalSighoAlert")?.classList.remove("show");
+        sighoAlertShowing = false;
+        mostrarSiguienteAvisoSigho();
+    });
+    document.addEventListener("keydown", event => {
+        if (sighoAlertShowing && event.key === "Enter") {
+            event.preventDefault();
+            document.getElementById("sighoAlertAccept")?.click();
+        }
+        if (document.getElementById("modalVerificacionCorreo")?.classList.contains("show") &&
+            event.key === "Escape") {
+            event.preventDefault();
+        }
+    });
+
     // Normaliza los datos recibidos del API para que el resto de SIGHO
     // trabaje siempre con la misma estructura.
     function normalizarUsuario(u) {
@@ -10386,8 +10794,102 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
             studentId: u.studentId || null,
             sede: u.sede || "",
             proyecto: u.proyecto || "",
-            telefono: u.telefono || ""
+            telefono: u.telefono || "",
+            emailVerificada: u.emailVerificada !== false
         };
+    }
+
+    function mostrarVerificacionCorreo() {
+        mostrarLogin();
+        const modal = document.getElementById("modalVerificacionCorreo");
+        const codigo = document.getElementById("identityVerificationCode");
+        const estado = document.getElementById("identityVerificationStatus");
+        if (estado) estado.textContent = "";
+        if (codigo) codigo.value = "";
+        modal?.classList.add("show");
+        codigo?.focus();
+    }
+
+    async function reenviarCodigoVerificacion() {
+        const estado = document.getElementById("identityVerificationStatus");
+        const boton = document.getElementById("identityVerificationResend");
+        if (boton) boton.disabled = true;
+        if (estado) estado.textContent = "";
+        try {
+            const data = await api("resend_identity_code", { method: "POST" });
+            if (estado) estado.textContent = data.message;
+        } catch (error) {
+            if (estado) estado.textContent = error.message;
+        } finally {
+            if (boton) boton.disabled = false;
+        }
+    }
+
+    async function responderVerificacionCorreo(decision) {
+        const estado = document.getElementById("identityVerificationStatus");
+        const codigo = document.getElementById("identityVerificationCode");
+        const valorCodigo = codigo?.value.trim() || "";
+        if (!/^\d{8}$/.test(valorCodigo)) {
+            if (estado) estado.textContent = "Escribe el código de 8 dígitos que recibiste por correo.";
+            codigo?.focus();
+            return;
+        }
+        const botones = document.querySelectorAll("#modalVerificacionCorreo button");
+        botones.forEach(boton => boton.disabled = true);
+        if (estado) estado.textContent = "Verificando...";
+        try {
+            const data = await api("verify_identity", {
+                method: "POST",
+                body: { decision, codigo: valorCodigo }
+            });
+            if (decision === "no") {
+                document.getElementById("modalVerificacionCorreo")?.classList.remove("show");
+                usuarioActual = null;
+                try { limpiarSesionSigho(); } catch (_) {}
+                mostrarLogin();
+                window.alert(data.message);
+                return;
+            }
+            if (!usuarioActual) {
+                const session = await api("session");
+                if (!session.user) throw new Error("No hay una sesión activa para continuar.");
+                usuarioActual = normalizarUsuario(session.user);
+            }
+            usuarioActual.emailVerificada = true;
+            await completarInicioSesion(usuarioActual, false);
+            document.getElementById("modalVerificacionCorreo")?.classList.remove("show");
+        } catch (error) {
+            if (estado) estado.textContent = error.message;
+        } finally {
+            botones.forEach(boton => boton.disabled = false);
+        }
+    }
+
+    async function salirDeVerificacionCorreo() {
+        document.getElementById("modalVerificacionCorreo")?.classList.remove("show");
+        await cerrarSesion();
+    }
+
+    async function completarInicioSesion(usuario, reproducirSonido = true) {
+        usuarioActual = normalizarUsuario(usuario);
+        try { guardarSesionSigho(usuarioActual); } catch (_) {}
+        try { sessionStorage.setItem("justLoggedIn", "1"); } catch (_) {}
+        const mensaje = document.getElementById("mensajeLogin");
+        if (mensaje) mensaje.style.display = "none";
+        if (reproducirSonido && typeof window.sighoPlayLoginSound === "function") {
+            window.sighoPlayLoginSound();
+        }
+
+        await cargarDatosPorRol();
+        if (usuarioActual.rol === "estudiante") await abrirEstudiante();
+        else if (usuarioActual.rol === "profesor") await abrirProfesor();
+        else if (usuarioActual.rol === "administrador") await abrirAdministrador();
+        else await abrirSuperAdmin();
+
+        if (typeof window.__sighoTryShowXboxWelcome === "function" &&
+            window.__sighoSplashFinished === true) {
+            try { window.__sighoTryShowXboxWelcome(); } catch (_) {}
+        }
     }
 
     function normalizarGradoRegistroHistorial(valor) {
@@ -10414,6 +10916,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
             evidenciaData: r.evidenciaData || "",
             evidenciaTipo: r.evidenciaTipo || "",
             evidenciaUrl: r.evidenciaUrl || "",
+            evidenciaArchivos: Array.isArray(r.evidenciaArchivos) ? r.evidenciaArchivos : [],
             estado: r.estado || "",
             observacion: r.observacion || "",
             motivoRechazo: r.motivoRechazo || "",
@@ -10669,6 +11172,10 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
             el.required = rol === "profesor";
         });
 
+        estudiante?.querySelectorAll('input[name="diasServicio"]').forEach(el => {
+            el.required = false;
+        });
+
         actualizarSeguridadSocialSolicitud();
 
         if (claveEstudiante) {
@@ -10771,7 +11278,14 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
             actualizar();
         };
 
+        configurar("epsSolicitud", "grupoEpsOtroSolicitud", "epsOtroSolicitud");
         configurar("perfilEps", "grupoEpsOtroPerfil", "perfilEpsOtro");
+        const rolSolicitud = document.getElementById("rolSolicitud");
+        if (rolSolicitud && rolSolicitud.dataset.seguridadSocialConfigurado !== "1") {
+            rolSolicitud.dataset.seguridadSocialConfigurado = "1";
+            rolSolicitud.addEventListener("change", actualizarSeguridadSocialSolicitud);
+        }
+        actualizarSeguridadSocialSolicitud();
     }
 
     function actualizarSeguridadSocialSolicitud() {
@@ -10786,6 +11300,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         if (!selectorSubgrupo || !menuSubgrupo) return;
 
         const grupoEps = document.getElementById("grupoEpsSolicitud");
+        const grupoEpsOtro = document.getElementById("grupoEpsOtroSolicitud");
+        const epsOtro = document.getElementById("epsOtroSolicitud");
         const grupoRegimen = document.getElementById("grupoRegimenEspecialSolicitud");
         const grupoSisben = document.getElementById("grupoSisbenSolicitud");
         const esEstudiante = document.getElementById("rolSolicitud")?.value === "estudiante";
@@ -10850,6 +11366,13 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 
         const seleccion = tipo.value;
         if (grupoEps) grupoEps.style.display = seleccion === "eps" ? "block" : "none";
+        const seleccionoOtro = seleccion === "eps" && eps.value === "Otro";
+        if (grupoEpsOtro) grupoEpsOtro.style.display = seleccionoOtro ? "block" : "none";
+        if (epsOtro) {
+            epsOtro.disabled = !esEstudiante || !seleccionoOtro;
+            epsOtro.required = esEstudiante && seleccionoOtro;
+            if (!seleccionoOtro) epsOtro.value = "";
+        }
         if (grupoRegimen) grupoRegimen.style.display = seleccion === "especial" ? "block" : "none";
         if (grupoSisben) grupoSisben.style.display = seleccion === "sisben" ? "block" : "none";
         eps.disabled = !esEstudiante || seleccion !== "eps";
@@ -10995,46 +11518,12 @@ async function iniciarSesion() {
 
     try {
         const data = await api("login", { method: "POST", body: { correo, clave } });
-        usuarioActual = normalizarUsuario(data.user);
-
-        try {
-            guardarSesionSigho(usuarioActual);
-        } catch (_) {}
-
-        /*
-         * Marca esta navegación como un inicio de sesión REAL.
-         * La bandera se conserva para compatibilidad con el flujo existente;
-         * el disparo real del banner depende de que el Splash haya terminado.
-         */
-        try {
-            sessionStorage.setItem("justLoggedIn", "1");
-        } catch (_) {}
-
-        mensaje.style.display = "none";
-
-        /* Sonido de bienvenida: el audio ya fue desbloqueado al aceptar
-           el aviso institucional, por lo que funciona para todos los roles. */
-        if (typeof window.sighoPlayLoginSound === "function") {
-            window.sighoPlayLoginSound();
+        if (data.user.emailVerificada === false) {
+            usuarioActual = normalizarUsuario(data.user);
+            mostrarVerificacionCorreo();
+            return;
         }
-
-        await cargarDatosPorRol();
-        if (usuarioActual.rol === "estudiante") await abrirEstudiante();
-        else if (usuarioActual.rol === "profesor") await abrirProfesor();
-        else if (usuarioActual.rol === "administrador") await abrirAdministrador();
-        else await abrirSuperAdmin();
-
-        /*
-         * Si el login ocurre cuando el Splash todavía está visible,
-         * el banner queda pendiente y será disparado 1 s después de su
-         * ocultamiento. Si el Splash ya terminó, se muestra ahora.
-         */
-        if (typeof window.__sighoTryShowXboxWelcome === "function" &&
-            window.__sighoSplashFinished === true) {
-            try {
-                window.__sighoTryShowXboxWelcome();
-            } catch (_) {}
-        }
+        await completarInicioSesion(data.user);
     } catch (error) {
         mensaje.style.display = "block";
         mensaje.innerText = error.message;
@@ -11178,6 +11667,10 @@ async function iniciarSesion() {
             el.required = rol === "profesor";
         });
 
+        estudiante?.querySelectorAll('input[name="diasServicio"]').forEach(el => {
+            el.required = false;
+        });
+
         if (claveEstudiante) {
             claveEstudiante.required = rol === "estudiante";
             if (rol !== "estudiante") claveEstudiante.value = "";
@@ -11291,7 +11784,14 @@ async function iniciarSesion() {
             actualizar();
         };
 
+        configurar("epsSolicitud", "grupoEpsOtroSolicitud", "epsOtroSolicitud");
         configurar("perfilEps", "grupoEpsOtroPerfil", "perfilEpsOtro");
+        const rolSolicitud = document.getElementById("rolSolicitud");
+        if (rolSolicitud && rolSolicitud.dataset.seguridadSocialConfigurado !== "1") {
+            rolSolicitud.dataset.seguridadSocialConfigurado = "1";
+            rolSolicitud.addEventListener("change", actualizarSeguridadSocialSolicitud);
+        }
+        actualizarSeguridadSocialSolicitud();
     }
 
     function actualizarSeguridadSocialSolicitud() {
@@ -11306,6 +11806,8 @@ async function iniciarSesion() {
         if (!selectorSubgrupo || !menuSubgrupo) return;
 
         const grupoEps = document.getElementById("grupoEpsSolicitud");
+        const grupoEpsOtro = document.getElementById("grupoEpsOtroSolicitud");
+        const epsOtro = document.getElementById("epsOtroSolicitud");
         const grupoRegimen = document.getElementById("grupoRegimenEspecialSolicitud");
         const grupoSisben = document.getElementById("grupoSisbenSolicitud");
         const esEstudiante = document.getElementById("rolSolicitud")?.value === "estudiante";
@@ -11370,6 +11872,13 @@ async function iniciarSesion() {
 
         const seleccion = tipo.value;
         if (grupoEps) grupoEps.style.display = seleccion === "eps" ? "block" : "none";
+        const seleccionoOtro = seleccion === "eps" && eps.value === "Otro";
+        if (grupoEpsOtro) grupoEpsOtro.style.display = seleccionoOtro ? "block" : "none";
+        if (epsOtro) {
+            epsOtro.disabled = !esEstudiante || !seleccionoOtro;
+            epsOtro.required = esEstudiante && seleccionoOtro;
+            if (!seleccionoOtro) epsOtro.value = "";
+        }
         if (grupoRegimen) grupoRegimen.style.display = seleccion === "especial" ? "block" : "none";
         if (grupoSisben) grupoSisben.style.display = seleccion === "sisben" ? "block" : "none";
         eps.disabled = !esEstudiante || seleccion !== "eps";
@@ -11460,9 +11969,15 @@ if (inputClave && btnToggle && iconEye) {
 }
 
 function renderizarEvidencia(r) {
+    if (r.evidenciaArchivos?.length) {
+        return r.evidenciaArchivos.map((archivo, index) =>
+            `<a class="evidence-link" href="${escaparHTML(archivo.url)}" target="_blank" rel="noopener">Ver ${index + 1}</a>`
+        ).join(" ");
+    }
     if (r.evidenciaUrl) {
         return `<a class="evidence-link" href="${escaparHTML(r.evidenciaUrl)}">Ver</a>`;
     }
+    return r.evidencia ? escaparHTML(r.evidencia) : "-";
 }
 
 function limpiarErroresFormulario(contenedor) {
@@ -11620,7 +12135,9 @@ async function enviarSolicitud() {
                 : seguridadSocialTipo === "sisben"
                     ? `Sisbén Grupo ${document.getElementById("sisbenLetraSolicitud").value}, Subgrupo ${document.getElementById("sisbenNumeroSolicitud").value}`
                     : "";
-        const eps = epsSeleccionada;
+        const eps = seguridadSocialTipo === "eps" && epsSeleccionada === "Otro"
+            ? document.getElementById("epsOtroSolicitud").value.trim()
+            : epsSeleccionada;
         const nombreAcudiente = capitalizarNombreCompleto(document.getElementById("nombreAcudiente").value);
         const tipoTelefonoAcudiente = document.getElementById("tipoTelefonoAcudiente").value;
         const telefonoAcudiente = document.getElementById("telefonoAcudiente").value.trim();
@@ -11790,6 +12307,13 @@ async function enviarSolicitud() {
         }
 
         const regexTextoOtro = /^[\p{L}]+(?: [\p{L}]+)*$/u;
+        if (seguridadSocialTipo === "eps" && epsSeleccionada === "Otro" &&
+            (eps.length < 2 || eps.length > 60 || !regexTextoOtro.test(eps))) {
+            const texto = "Especifica una EPS con solo letras y espacios sencillos, entre 2 y 60 caracteres.";
+            marcarErrorCampoSolicitud("epsOtroSolicitud", texto);
+            mostrarErrorSolicitud(texto, "epsOtroSolicitud");
+            return;
+        }
         if (eps.length > 150) {
             const campoEps=seguridadSocialTipo==="eps"?"epsSolicitud":seguridadSocialTipo==="especial"?"regimenEspecialSolicitud":"sisbenNumeroSolicitud";
             const texto="La opción de Seguridad Social puede tener máximo 150 caracteres.";
@@ -12014,7 +12538,6 @@ function configurarRestriccionesRegistroHoras(gradoForzado = "") {
     fecha.min = `${anio}-01-01`;
     fecha.max = iso(hoy);
     if (fecha.value && (fecha.value < fecha.min || fecha.value > fecha.max)) fecha.value = "";
-
     // Las horas son enteros de 1 a 50. No modificar el valor mientras se escribe.
     horas.min = "1";
     horas.max = "50";
@@ -12216,54 +12739,140 @@ function configurarRestriccionesRegistroHoras(gradoForzado = "") {
 
     fecha.min = `${anio}-01-01`;
     fecha.max = iso(hoy);
-    if (fecha.value && (fecha.value < fecha.min || fecha.value > fecha.max)) fecha.value = "";
+    if (!fecha.value || fecha.value < fecha.min || fecha.value > fecha.max) fecha.value = iso(hoy);
 
     // Las horas son enteros de 1 a 50. No modificar el valor mientras se escribe.
     horas.min = "1";
     horas.max = "50";
     horas.step = "1";
     horas.inputMode = "numeric";
+    if (fecha.dataset.yearBoundsRefresh !== "1") {
+        fecha.dataset.yearBoundsRefresh = "1";
+        fecha.addEventListener("focus", () => configurarRestriccionesRegistroHoras());
+    }
+}
+
+let evidenciasHoraSeleccionadas = [];
+
+function dibujarEvidenciasSeleccionadas() {
+    const input = document.getElementById("evidenciaHora");
+    const nombre = document.getElementById("nombreEvidenciaHora");
+    const preview = document.getElementById("previewEvidenciaHora");
+    const selector = document.querySelector('label[for="evidenciaHora"]');
+    if (!input || !nombre || !preview) return;
+
+    const cantidad = evidenciasHoraSeleccionadas.length;
+    nombre.textContent = cantidad
+        ? `${cantidad} de 3 imágenes seleccionadas`
+        : "Ninguna imagen seleccionada (máximo 3)";
+    input.disabled = cantidad >= 3;
+    if (selector) {
+        selector.setAttribute("aria-disabled", String(cantidad >= 3));
+        selector.title = cantidad >= 3 ? "Ya seleccionaste el máximo de 3 imágenes." : "Agregar imágenes JPG/JPEG";
+    }
+
+    preview.replaceChildren();
+    preview.classList.toggle("multi-evidence-preview", cantidad > 0);
+    preview.classList.toggle("show", cantidad > 0);
+    evidenciasHoraSeleccionadas.forEach((evidencia, index) => {
+        const tarjeta = document.createElement("div");
+        tarjeta.className = "evidence-thumb-card";
+
+        const abrir = document.createElement("button");
+        abrir.className = "evidence-thumb-open";
+        abrir.type = "button";
+        abrir.setAttribute("aria-label", `Ampliar ${evidencia.file.name}`);
+        const imagen = document.createElement("img");
+        imagen.src = evidencia.url;
+        imagen.alt = `Vista previa: ${evidencia.file.name}`;
+        abrir.append(imagen);
+        abrir.addEventListener("click", () => abrirVistaAmpliadaEvidencia(evidencia.url, evidencia.file.name));
+
+        const nombreArchivo = document.createElement("span");
+        nombreArchivo.className = "evidence-thumb-name";
+        nombreArchivo.textContent = evidencia.file.name;
+
+        const quitar = document.createElement("button");
+        quitar.className = "evidence-thumb-remove";
+        quitar.type = "button";
+        quitar.textContent = "×";
+        quitar.title = `Quitar ${evidencia.file.name}`;
+        quitar.setAttribute("aria-label", `Quitar ${evidencia.file.name}`);
+        quitar.addEventListener("click", () => {
+            URL.revokeObjectURL(evidencia.url);
+            evidenciasHoraSeleccionadas.splice(index, 1);
+            dibujarEvidenciasSeleccionadas();
+        });
+
+        tarjeta.append(abrir, nombreArchivo, quitar);
+        preview.append(tarjeta);
+    });
 }
 
 function configurarSelectorEvidencia() {
-    const input=document.getElementById("evidenciaHora");
-    const nombre=document.getElementById("nombreEvidenciaHora");
-    const quitar=document.getElementById("quitarEvidenciaHora");
-    const preview=document.getElementById("previewEvidenciaHora");
-    const imagen=document.getElementById("imagenPreviewEvidenciaHora");
-    const texto=document.getElementById("textoPreviewEvidenciaHora");
-    if(!input || !nombre || !quitar || input.dataset.configurado==="1") return;
-    input.dataset.configurado="1";
-    const actualizar=()=>{
-        const archivo=input.files?.[0];
-        const esJpg=archivo && (archivo.type==="image/jpeg" || /\.jpe?g$/i.test(archivo.name));
-        if(archivo && !esJpg){ input.value=""; nombre.textContent="Ninguna imagen seleccionada"; quitar.hidden=true; if(preview) preview.classList.remove("show"); alert("Solo puedes seleccionar imágenes JPG o JPEG."); return; }
-        nombre.textContent=archivo ? archivo.name : "Ninguna imagen seleccionada";
-        quitar.hidden=!archivo;
-        if(archivo && preview && imagen){
-            const url=URL.createObjectURL(archivo);
-            imagen.onload=()=>URL.revokeObjectURL(url);
-            imagen.src=url;
-            if(texto) texto.textContent=`Vista previa: ${archivo.name}`;
-            preview.classList.add("show");
-        } else if(preview){ preview.classList.remove("show"); if(imagen) imagen.removeAttribute("src"); }
-    };
-    input.addEventListener("change",actualizar);
-    quitar.addEventListener("click",()=>{ input.value=""; actualizar(); });
-    actualizar();
+    const input = document.getElementById("evidenciaHora");
+    if (!input || input.dataset.configurado === "1") return;
+    input.dataset.configurado = "1";
+    input.addEventListener("change", () => {
+        const nuevos = Array.from(input.files || []);
+        input.value = "";
+        const disponibles = 3 - evidenciasHoraSeleccionadas.length;
+        let agregados = 0;
+        let invalidos = 0;
+        let demasiadoGrandes = 0;
+        nuevos.forEach(archivo => {
+            const esJpg = archivo.type === "image/jpeg" || /\.jpe?g$/i.test(archivo.name);
+            if (!esJpg) {
+                invalidos++;
+                return;
+            }
+            if (archivo.size <= 0 || archivo.size > 5 * 1024 * 1024) {
+                demasiadoGrandes++;
+                return;
+            }
+            if (agregados >= disponibles) return;
+            evidenciasHoraSeleccionadas.push({ file: archivo, url: URL.createObjectURL(archivo) });
+            agregados++;
+        });
+        dibujarEvidenciasSeleccionadas();
+        if (invalidos) alert("Solo puedes seleccionar imágenes JPG o JPEG.");
+        if (nuevos.length > disponibles && disponibles >= 0) alert("Solo puedes adjuntar un máximo de 3 imágenes.");
+        if (demasiadoGrandes) alert("Cada imagen debe pesar más de 0 y máximo 5 MB.");
+    });
+    dibujarEvidenciasSeleccionadas();
 }
-function reiniciarSelectorEvidencia(){
-    const input=document.getElementById("evidenciaHora");
-    const nombre=document.getElementById("nombreEvidenciaHora");
-    const quitar=document.getElementById("quitarEvidenciaHora");
-    const preview=document.getElementById("previewEvidenciaHora");
-    const imagen=document.getElementById("imagenPreviewEvidenciaHora");
-    if(input) input.value="";
-    if(nombre) nombre.textContent="Ninguna imagen seleccionada";
-    if(quitar) quitar.hidden=true;
-    if(preview) preview.classList.remove("show");
-    if(imagen) imagen.removeAttribute("src");
+
+function reiniciarSelectorEvidencia() {
+    const input = document.getElementById("evidenciaHora");
+    if (input) input.value = "";
+    evidenciasHoraSeleccionadas.forEach(evidencia => URL.revokeObjectURL(evidencia.url));
+    evidenciasHoraSeleccionadas = [];
+    dibujarEvidenciasSeleccionadas();
 }
+
+function abrirVistaAmpliadaEvidencia(url, nombre) {
+    const lightbox = document.getElementById("evidenceLightbox");
+    const imagen = document.getElementById("evidenceLightboxImage");
+    const caption = document.getElementById("evidenceLightboxCaption");
+    if (!lightbox || !imagen) return;
+    imagen.src = url;
+    imagen.alt = nombre;
+    if (caption) caption.textContent = nombre;
+    lightbox.classList.add("show");
+    document.getElementById("evidenceLightboxClose")?.focus();
+}
+
+function cerrarVistaAmpliadaEvidencia(event) {
+    if (event && event.currentTarget !== event.target) return;
+    const lightbox = document.getElementById("evidenceLightbox");
+    const imagen = document.getElementById("evidenceLightboxImage");
+    lightbox?.classList.remove("show");
+    if (imagen) imagen.removeAttribute("src");
+}
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") cerrarVistaAmpliadaEvidencia();
+});
 
 async function registrarHoras() {
     const fechaEl = document.getElementById("fechaHora");
@@ -12274,17 +12883,22 @@ async function registrarHoras() {
     const mensaje = document.getElementById("mensajeHoras");
     await sincronizarDatosRegistroHoras();
     configurarRestriccionesRegistroHoras(usuarioActual?.grado || "");
-    const fecha=fechaEl?.value||"", horasTexto=horasEl?.value||"", descripcion=descripcionEl?.value.trim()||"", archivo=evidenciaEl?.files?.[0];
+    const fecha=fechaEl?.value||"", horasTexto=horasEl?.value||"", descripcion=descripcionEl?.value.trim()||"";
+    const archivos = evidenciasHoraSeleccionadas.map(evidencia => evidencia.file);
     const horas=Number(horasTexto);
-    if(!fecha || !horasTexto || !descripcion || !archivo){ alert("Completa todos los campos y selecciona una imagen JPG/JPEG."); return; }
+    if(!fecha || !horasTexto || !descripcion || archivos.length === 0){ alert("Completa todos los campos y selecciona al menos una imagen JPG/JPEG."); return; }
+    if(archivos.length > 3){ alert("Solo puedes adjuntar un máximo de 3 imágenes."); return; }
     if(!Number.isInteger(horas) || horas < 1 || horas > 50){ alert("Las horas realizadas deben ser números enteros del 1 al 50."); return; }
     const hoy=new Date(); hoy.setHours(0,0,0,0); const anio=hoy.getFullYear(); const hoyISO=`${anio}-${String(hoy.getMonth()+1).padStart(2,"0")}-${String(hoy.getDate()).padStart(2,"0")}`;
     if(fecha<`${anio}-01-01` || fecha>hoyISO || fecha.slice(0,4)!==String(anio)){ alert(`La fecha debe pertenecer únicamente al año ${anio} y no puede ser posterior a hoy.`); return; }
     const gradoNormalizado=normalizarGradoRegistro(usuarioActual?.grado||usuarioActual?.Grado||"");
     if(!["10°","11°","Ciclo V"].includes(gradoNormalizado)){ alert("No fue posible determinar correctamente el grado del estudiante."); return; }
-    if(archivo.type!=="image/jpeg" && !/\.jpe?g$/i.test(archivo.name)){ alert("La evidencia debe ser una imagen JPG o JPEG."); return; }
-    if(archivo.size>5*1024*1024){ alert("La evidencia debe pesar máximo 5 MB."); return; }
-    const form=new FormData(); form.append("fecha",fecha); form.append("horas",String(horas)); form.append("descripcion",descripcion); form.append("evidencia",archivo);
+    for (const archivo of archivos) {
+        if(archivo.type!=="image/jpeg" && !/\.jpe?g$/i.test(archivo.name)){ alert("Cada evidencia debe ser una imagen JPG o JPEG."); return; }
+        if(archivo.size<=0 || archivo.size>5*1024*1024){ alert("Cada evidencia debe pesar máximo 5 MB."); return; }
+    }
+    const form=new FormData(); form.append("fecha",fecha); form.append("horas",String(horas)); form.append("descripcion",descripcion);
+    archivos.forEach(archivo => form.append("evidencia[]", archivo));
     if(boton){boton.disabled=true;boton.innerHTML='<span class="button-spinner" aria-hidden="true"></span> Registrando jornada...';}
     if(mensaje){mensaje.style.display="none";mensaje.innerText="";}
     try{
@@ -12304,8 +12918,13 @@ function mostrarConfirmacionRegistroHora(datos){return new Promise(resolve=>{res
 function confirmarRegistroHoraExito(){document.getElementById("modalRegistroHoraExito")?.classList.remove("show");if(resolverRegistroHoraExito){const resolver=resolverRegistroHoraExito;resolverRegistroHoraExito=null;resolver();}}
 
 function renderizarEvidencia(r) {
+    if (r.evidenciaArchivos?.length) {
+        return r.evidenciaArchivos.map((archivo, index) =>
+            `<a class="evidence-link" href="${escaparHTML(archivo.url)}" target="_blank" rel="noopener">Ver ${index + 1}</a>`
+        ).join(" ");
+    }
     if (r.evidenciaUrl) {
-        return `<a class="evidence-link" href="${escaparHTML(r.evidenciaUrl)}">Ver</a>`;
+        return `<a class="evidence-link" href="${escaparHTML(r.evidenciaUrl)}" target="_blank" rel="noopener">Ver</a>`;
     }
     return r.evidencia ? escaparHTML(r.evidencia) : "-";
 }
@@ -12423,11 +13042,16 @@ async function validarSolicitud(id, estado) {
     const accion = estado === "aceptada" ? "aceptar" : "rechazar";
     if (!confirm(`¿Confirmas que deseas ${accion} la solicitud de ${solicitud.nombre}?`)) return;
     try {
-        await api("validate_request", { method: "POST", body: { id, estado } });
+        const result = await api("validate_request", { method: "POST", body: { id, estado } });
         await actualizarAdministrador();
         // Permanecer en el módulo actual y reconstruir inmediatamente la lista.
+<<<<<<< HEAD
         mostrarSeccionAdministrador(solicitud.rol === "estudiante" ? "solicitudes-estudiantes" : "solicitudes-personal");
         alert(estado === "aceptada" ? "Solicitud aceptada. La cuenta ya puede iniciar sesión." : "Solicitud rechazada.");
+=======
+        mostrarSeccionAdministrador("solicitudes-personal");
+        alert(result.message || (estado === "aceptada" ? "Solicitud aceptada." : "Solicitud rechazada."));
+>>>>>>> main
     } catch (error) { alert(error.message); }
 }
 
@@ -13466,12 +14090,15 @@ function configurarEdicionPerfilProfesor(){
             el.dataset.edicionConfigurada="1";
             el.addEventListener("input",()=>{
                 if(id === "profesorPerfilNombres" || id === "profesorPerfilApellidos") {
-                    el.value = el.value.replace(/[^\p{L} ]/gu, "").replace(/ {2,}/g, " ").replace(/^ +/g, "").slice(0,60);
+                    actualizarValorManteniendoCursor(el, valor => valor.replace(/[^\p{L} ]/gu, "").replace(/ {2,}/g, " ").replace(/^ +/g, "").slice(0,60));
                 } else if(id === "profesorPerfilCorreo") {
-                    el.value = el.value.replace(/\s/g, "");
+                    actualizarValorManteniendoCursor(el, valor => valor.replace(/\s/g, ""));
                 } else if(id === "profesorPerfilTelefono") {
-                    const numero = el.value.replace(/\D/g, "").slice(0,10);
-                    el.value = numero.length > 6 ? `${numero.slice(0,3)} ${numero.slice(3,6)} ${numero.slice(6)}` : numero.length > 3 ? `${numero.slice(0,3)} ${numero.slice(3)}` : numero;
+                    actualizarValorManteniendoCursor(
+                        el,
+                        valor => formatearCelularSIGHO(valor),
+                        posicion => formatearCelularSIGHO(el.value.slice(0, posicion)).length
+                    );
                 }
                 validarCampo(el);
                 actualizarEstadoPerfilProfesor();
@@ -13638,6 +14265,21 @@ function capitalizarNombreCompleto(valor) {
         .join(" ");
 }
 
+function actualizarValorManteniendoCursor(input, transformar, mapearPosicion = posicion => transformar(input.value.slice(0, posicion)).length) {
+    const anterior = input.value;
+    const inicio = input.selectionStart ?? anterior.length;
+    const fin = input.selectionEnd ?? inicio;
+    const nuevo = transformar(anterior);
+    if (nuevo === anterior) return;
+
+    const inicioNuevo = Math.min(mapearPosicion(inicio), nuevo.length);
+    const finNuevo = Math.min(mapearPosicion(fin), nuevo.length);
+    input.value = nuevo;
+    try {
+        input.setSelectionRange(inicioNuevo, finNuevo);
+    } catch (_) {}
+}
+
 function configurarValidacionSolicitudProfesor() {
     const correo = document.getElementById("correoSolicitud");
     const telefono = document.getElementById("telefonoProfesorSolicitud");
@@ -13659,26 +14301,25 @@ function configurarValidacionSolicitudProfesor() {
     if (telefono && telefono.dataset.validacionProfesorConfigurada !== "1") {
         telefono.dataset.validacionProfesorConfigurada = "1";
         telefono.addEventListener("input", () => {
-            const digitos = telefono.value.replace(/\D/g, "").slice(0, 10);
-            telefono.value = digitos.length > 6
-                ? `${digitos.slice(0,3)} ${digitos.slice(3,6)} ${digitos.slice(6)}`
-                : digitos.length > 3
-                    ? `${digitos.slice(0,3)} ${digitos.slice(3)}`
-                    : digitos;
+            actualizarValorManteniendoCursor(
+                telefono,
+                valor => formatearCelularSIGHO(valor),
+                posicion => formatearCelularSIGHO(telefono.value.slice(0, posicion)).length
+            );
         });
     }
 
     if (identificacion && identificacion.dataset.validacionProfesorConfigurada !== "1") {
         identificacion.dataset.validacionProfesorConfigurada = "1";
         identificacion.addEventListener("input", () => {
-            identificacion.value = identificacion.value.replace(/[<>"']/g, "").slice(0, 60);
+            actualizarValorManteniendoCursor(identificacion, valor => valor.replace(/[<>"']/g, "").slice(0, 60));
         });
     }
 
     if (clave && clave.dataset.validacionProfesorConfigurada !== "1") {
         clave.dataset.validacionProfesorConfigurada = "1";
         clave.addEventListener("input", () => {
-            clave.value = clave.value.replace(/\s/g, "");
+            actualizarValorManteniendoCursor(clave, valor => valor.replace(/\s/g, ""));
         });
     }
 }
@@ -13720,7 +14361,7 @@ function mostrarErrorCampo(input, mensaje) {
         const valor = String(input.value || '').replace(/\D/g, '');
         const limite = tipo === 'PPT' ? 8 : 10;
         input.maxLength = limite;
-        input.value = valor.slice(0, limite);
+        actualizarValorManteniendoCursor(input, texto => texto.replace(/\D/g, "").slice(0, limite));
 
         let mensaje = '';
         let valido = true;
@@ -13882,13 +14523,13 @@ function mostrarErrorCampo(input, mensaje) {
 
         el.addEventListener("input", () => {
             const max = Number(el.maxLength) > 0 ? Number(el.maxLength) : 60;
-            el.value = capitalizarNombreCompleto(
-                el.value
+            actualizarValorManteniendoCursor(el, valor => capitalizarNombreCompleto(
+                valor
                     .replace(/[^\p{L}\s]/gu, "")
                     .replace(/\s+/g, " ")
                     .replace(/^ /, "")
                     .slice(0, max)
-            );
+            ));
             if (!el.value) el.setCustomValidity("");
             else el.setCustomValidity(/^[\p{L}]+(?: [\p{L}]+)*$/u.test(el.value) ? "" : "Usa solo letras y un espacio entre palabras.");
         });
@@ -13913,7 +14554,7 @@ function mostrarErrorCampo(input, mensaje) {
         documento.dataset.validacionConfigurada = "1";
         documento.addEventListener("input", () => {
             const limite = tipoDocumento?.value === "PPT" ? 8 : 10;
-            documento.value = documento.value.replace(/\D/g, "").slice(0, limite);
+            actualizarValorManteniendoCursor(documento, valor => valor.replace(/\D/g, "").slice(0, limite));
         });
     }
 
@@ -13935,13 +14576,12 @@ function mostrarErrorCampo(input, mensaje) {
 
         let numero = elemento.value.replace(/\D/g, "").slice(0, 10);
 
-        // El mismo comportamiento usado por el celular del estudiante:
-        // si el primer dígito existe y no es 3, se limpia el valor.
-        if (numero.length > 0 && numero.charAt(0) !== "3") {
-            numero = "";
-        }
-
-        elemento.value = formatearCelularSIGHO(numero);
+        const formatearPrefijo = prefijo => formatearCelularSIGHO(prefijo);
+        actualizarValorManteniendoCursor(
+            elemento,
+            texto => formatearCelularSIGHO(texto),
+            posicion => formatearPrefijo(elemento.value.slice(0, posicion)).length
+        );
 
         const todosIguales = /^(\d)\1{9}$/.test(numero);
         const secuenciaFalsa = numero === "1234567890";
@@ -13950,6 +14590,8 @@ function mostrarErrorCampo(input, mensaje) {
         elemento.setCustomValidity(
             numero.length === 0
                 ? "El celular debe iniciar con el número 3."
+                : numero.charAt(0) !== "3"
+                    ? "El celular debe iniciar con el número 3."
                 : !valido
                     ? "Escribe un celular válido de 10 dígitos que inicie en 3. No se permiten números repetidos ni la secuencia 1234567890."
                     : ""
@@ -13985,9 +14627,15 @@ function mostrarErrorCampo(input, mensaje) {
         if (!elemento) return false;
 
         const numero = elemento.value.replace(/\D/g, "").slice(0, 10);
-        elemento.value = numero.length > 3
-            ? `${numero.slice(0, 3)} ${numero.slice(3)}`
-            : numero;
+        const formatearFijo = valor => {
+            const digitos = valor.replace(/\D/g, "").slice(0, 10);
+            return digitos.length > 3 ? `${digitos.slice(0, 3)} ${digitos.slice(3)}` : digitos;
+        };
+        actualizarValorManteniendoCursor(
+            elemento,
+            formatearFijo,
+            posicion => formatearFijo(elemento.value.slice(0, posicion)).length
+        );
 
         // 10 dígitos: 60 + indicativo regional (1-8) + 7 dígitos.
         // Los 7 restantes no pueden iniciar por 0, 1 o 9
@@ -14074,12 +14722,24 @@ function mostrarErrorCampo(input, mensaje) {
             if (tipoPerfil?.value === "celular") {
                 perfilTelAcudiente.maxLength = 12;
                 perfilTelAcudiente.placeholder = "300 123 4567";
-                perfilTelAcudiente.value = formatearCelularSIGHO(digitos);
+                actualizarValorManteniendoCursor(
+                    perfilTelAcudiente,
+                    valor => formatearCelularSIGHO(valor),
+                    posicion => formatearCelularSIGHO(perfilTelAcudiente.value.slice(0, posicion)).length
+                );
                 if (ayudaPerfil) ayudaPerfil.textContent = "Celular de 10 dígitos que comienza en 3. No se permiten números repetidos ni la secuencia 1234567890.";
             } else if (tipoPerfil?.value === "fijo") {
                 perfilTelAcudiente.maxLength = 11;
                 perfilTelAcudiente.placeholder = "601 2345678";
-                perfilTelAcudiente.value = digitos.length > 3 ? `${digitos.slice(0, 3)} ${digitos.slice(3)}` : digitos;
+                const formatearFijo = valor => {
+                    const numeros = valor.replace(/\D/g, "").slice(0, 10);
+                    return numeros.length > 3 ? `${numeros.slice(0, 3)} ${numeros.slice(3)}` : numeros;
+                };
+                actualizarValorManteniendoCursor(
+                    perfilTelAcudiente,
+                    formatearFijo,
+                    posicion => formatearFijo(perfilTelAcudiente.value.slice(0, posicion)).length
+                );
                 if (ayudaPerfil) ayudaPerfil.textContent = "Teléfono fijo de 10 dígitos: 60, indicativo regional del 1 al 8 y 7 dígitos finales.";
             } else {
                 perfilTelAcudiente.placeholder = "Selecciona el tipo de línea";
@@ -14121,7 +14781,7 @@ function mostrarErrorCampo(input, mensaje) {
     const perfilDireccion = document.getElementById("perfilDireccion");
     if (perfilDireccion) {
         perfilDireccion.addEventListener("input", () => {
-            perfilDireccion.value = perfilDireccion.value.slice(0, 100);
+            actualizarValorManteniendoCursor(perfilDireccion, valor => valor.slice(0, 100));
             const valor = perfilDireccion.value.trim();
             if (valor) {
                 perfilDireccion.setCustomValidity("");
@@ -14143,7 +14803,10 @@ function mostrarErrorCampo(input, mensaje) {
     if (perfilAcudiente && perfilAcudiente.dataset.validacionNombreConfigurada !== "1") {
         perfilAcudiente.dataset.validacionNombreConfigurada = "1";
         perfilAcudiente.addEventListener("input", () => {
-            perfilAcudiente.value = capitalizarNombreCompleto(perfilAcudiente.value.replace(/[^\p{L}\s]/gu, "").replace(/\s+/g, " ").replace(/^ /, "")).slice(0, 60);
+            actualizarValorManteniendoCursor(
+                perfilAcudiente,
+                valor => capitalizarNombreCompleto(valor.replace(/[^\p{L}\s]/gu, "").replace(/\s+/g, " ").replace(/^ /, "")).slice(0, 60)
+            );
             if (perfilAcudiente.value.trim().length >= 2 && /^[\p{L}]+(?: [\p{L}]+)*$/u.test(perfilAcudiente.value.trim())) {
                 perfilAcudiente.setCustomValidity("");
                 limpiarErrorCampo(perfilAcudiente);
@@ -14162,7 +14825,7 @@ function mostrarErrorCampo(input, mensaje) {
     if (perfilCorreo) {
         const validarCorreoPerfil = () => {
             if (perfilCorreo.disabled) return;
-            perfilCorreo.value = perfilCorreo.value.trim().toLowerCase();
+            actualizarValorManteniendoCursor(perfilCorreo, valor => valor.trim().toLowerCase());
             const valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(perfilCorreo.value);
             perfilCorreo.setCustomValidity(valido ? "" : "Escribe un correo electrónico válido.");
             if (valido) limpiarErrorCampo(perfilCorreo);
@@ -14193,7 +14856,9 @@ function mostrarErrorCampo(input, mensaje) {
     const clave = document.getElementById("claveSolicitud");
     if (clave && clave.dataset.validacionConfigurada !== "1") {
         clave.dataset.validacionConfigurada = "1";
-        clave.addEventListener("input", () => { clave.value = clave.value.replace(/\s/g, ""); });
+        clave.addEventListener("input", () => {
+            actualizarValorManteniendoCursor(clave, valor => valor.replace(/\s/g, ""));
+        });
     }
 
     const loginContenedor=document.getElementById("camposLogin");
@@ -14439,6 +15104,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!data?.user) return;
 
         usuarioActual = normalizarUsuario(data.user);
+        if (!usuarioActual.emailVerificada) {
+            mostrarVerificacionCorreo();
+            return;
+        }
         try { guardarSesionSigho(usuarioActual); } catch (_) {}
         await cargarDatosPorRol();
 
@@ -14866,8 +15535,10 @@ function mostrarRegistrosEstudiante(lista = registros) {
         const estado = estadoTexto[r.estado] || [r.estado || "Sin estado", "pending"];
         const descripcion = r.descripcion || "Sin descripción registrada.";
         const observacion = r.observacion || r.motivoRechazo || "";
-        const evidencia = r.evidenciaUrl
-            ? `<a class="student-evidence-link" href="${escaparHTML(r.evidenciaUrl)}">📎 Ver evidencia</a>`
+        const evidencia = r.evidenciaArchivos?.length
+            ? r.evidenciaArchivos.map((archivo, index) => `<a class="student-evidence-link" href="${escaparHTML(archivo.url)}" target="_blank" rel="noopener">📎 Imagen ${index + 1}</a>`).join("<br>")
+            : r.evidenciaUrl
+            ? `<a class="student-evidence-link" href="${escaparHTML(r.evidenciaUrl)}" target="_blank" rel="noopener">📎 Ver evidencia</a>`
             : (r.evidencia ? `<span class="table-secondary-text">${escaparHTML(r.evidencia)}</span>` : `<span class="table-secondary-text">Sin evidencia</span>`);
 
         return `
@@ -15265,36 +15936,91 @@ function verDetalleSolicitud(id) {
     const s = solicitudes.find(item => Number(item.id) === Number(id));
     if (!s || s.rol !== "estudiante") return;
 
-    const dias = Array.isArray(s.diasServicio) ? s.diasServicio.join(", ") : (s.diasServicio || "-");
+    const dias = Array.isArray(s.diasServicio)
+        ? (s.diasServicio.length ? s.diasServicio.join(", ") : "-")
+        : (s.diasServicio || "-");
     const proyecto = s.proyecto === "Otro" && s.proyectoOtro
         ? `Otro: ${s.proyectoOtro}`
         : (s.proyecto || "-");
+    const nombre = [s.primerNombre, s.segundoNombre, s.primerApellido, s.segundoApellido]
+        .filter(Boolean).join(" ") || s.nombre || "-";
+    const modalidad = s.esTecnico ? "Técnica · 100 horas" : "Académico · 120 horas";
+    const valor = dato => escapeHtml(dato || "-");
+    const campo = (etiqueta, dato, clase = "") =>
+        `<dl class="student-request-field ${clase}"><dt>${escapeHtml(etiqueta)}</dt><dd>${valor(dato)}</dd></dl>`;
+    const bloque = (titulo, campos) =>
+        `<section class="student-request-section"><h3>${escapeHtml(titulo)}</h3><div class="student-request-fields">${campos.join("")}</div></section>`;
+    const fechaSolicitud = s.fechaSolicitud
+        ? String(s.fechaSolicitud).replace("T", " ").replace(/:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?$/, "")
+        : "-";
 
-    alert(`FICHA DEL ESTUDIANTE
+    document.getElementById("fichaSolicitudTitulo").textContent = nombre;
+    document.getElementById("fichaSolicitudSubtitulo").textContent =
+        `Grado ${s.gradoSolicitud || s.grado || "sin especificar"} · Solicitud recibida ${fechaSolicitud}`;
+    document.getElementById("fichaSolicitudContenido").innerHTML = [
+        bloque("Datos personales", [
+            campo("Año del servicio social", s.anioServicio),
+            campo("Tipo de documento", s.tipoDocumento),
+            campo("Número de documento", s.numeroDocumento || s.identificacion),
+            campo("Primer nombre", s.primerNombre),
+            campo("Segundo nombre", s.segundoNombre),
+            campo("Primer apellido", s.primerApellido),
+            campo("Segundo apellido", s.segundoApellido),
+            campo("Fecha de nacimiento", s.fechaNacimiento),
+            campo("Grado", s.gradoSolicitud || s.grado),
+            campo("Modalidad", modalidad),
+            campo("Correo electrónico", s.correo, "full")
+        ]),
+        bloque("Contacto y seguridad social", [
+            campo("Número celular", s.telefono),
+            campo("Dirección de residencia", s.direccion, "wide"),
+            campo("Seguridad social", s.eps, "full")
+        ]),
+        bloque("Datos del acudiente", [
+            campo("Nombre completo", s.nombreAcudiente),
+            campo("Tipo de línea", s.tipoTelefonoAcudiente === "fijo" ? "Teléfono fijo" : s.tipoTelefonoAcudiente === "celular" ? "Celular" : ""),
+            campo("Número de contacto", s.telefonoAcudiente)
+        ]),
+        bloque("Servicio social", [
+            campo("Sede", s.sede),
+            campo("Jornada", s.jornada),
+            campo("Proyecto", proyecto, "wide"),
+            campo("Días seleccionados", dias, "full")
+        ])
+    ].join("");
 
-Año del servicio social: ${s.anioServicio || "-"}
-Primer apellido: ${s.primerApellido || "-"}
-Segundo apellido: ${s.segundoApellido || "-"}
-Primer nombre: ${s.primerNombre || "-"}
-Segundo nombre: ${s.segundoNombre || "-"}
-Tipo de documento: ${s.tipoDocumento || "-"}
-Número de documento: ${s.numeroDocumento || s.identificacion || "-"}
-Grado: ${s.gradoSolicitud || s.grado || "-"}
-Fecha de nacimiento: ${s.fechaNacimiento || "-"}
-Dirección: ${s.direccion || "-"}
-Celular: ${s.telefono || "-"}
-EPS: ${s.eps || "-"}
+    const modal = document.getElementById("modalFichaSolicitud");
+    if (!modal.dataset.tecladoConfigurado) {
+        modal.dataset.tecladoConfigurado = "1";
+        modal.addEventListener("keydown", evento => {
+            if (evento.key === "Escape") {
+                evento.preventDefault();
+                cerrarFichaSolicitud();
+            }
+        });
+    }
+    focoAnteriorFichaSolicitud = document.activeElement;
+    overflowAnteriorFichaSolicitud = document.body.style.overflow;
+    modal.classList.add("show");
+    document.body.style.overflow = "hidden";
+    modal.querySelector(".student-request-close")?.focus();
+}
 
-ACUDIENTE
-Nombre: ${s.nombreAcudiente || "-"}
-Teléfono: ${s.telefonoAcudiente || "-"}
+let focoAnteriorFichaSolicitud = null;
+let overflowAnteriorFichaSolicitud = "";
 
-SERVICIO SOCIAL
-Sede: ${s.sede || "-"}
-Proyecto: ${proyecto}
-Días: ${dias}
-Modalidad: ${s.esTecnico ? "Técnica · 100 horas" : "Académico · 120 horas"}
-Correo: ${s.correo || "-"}`);
+function cerrarFichaSolicitud() {
+    const modal = document.getElementById("modalFichaSolicitud");
+    if (!modal?.classList.contains("show")) return;
+    modal.classList.remove("show");
+    document.body.style.overflow = overflowAnteriorFichaSolicitud;
+    focoAnteriorFichaSolicitud?.focus?.();
+    focoAnteriorFichaSolicitud = null;
+    overflowAnteriorFichaSolicitud = "";
+}
+
+function cerrarFichaSolicitudSiFondo(evento) {
+    if (evento.target.id === "modalFichaSolicitud") cerrarFichaSolicitud();
 }
 
 function activarSidebarAdministrador(activo) {
