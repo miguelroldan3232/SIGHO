@@ -2,6 +2,28 @@
 session_start();
 require_once __DIR__ . '/config.php';
 
+// Carga variables SMTP desde .env sin depender de que Apache las exporte globalmente.
+(function (): void {
+    foreach ([dirname(__DIR__) . DIRECTORY_SEPARATOR . '.env', __DIR__ . DIRECTORY_SEPARATOR . '.env'] as $envFile) {
+        if (!is_file($envFile) || !is_readable($envFile)) continue;
+        $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (!is_array($lines)) continue;
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) continue;
+            [$key, $value] = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            if ($key === '' || getenv($key) !== false) continue;
+            if (strlen($value) >= 2 && (($value[0] === '"' && substr($value, -1) === '"') || ($value[0] === "'" && substr($value, -1) === "'"))) {
+                $value = substr($value, 1, -1);
+            }
+            putenv($key . '=' . $value);
+            $_ENV[$key] = $value;
+        }
+    }
+})();
+
 header('Content-Type: application/json; charset=utf-8');
 
 function db(): PDO {
@@ -36,6 +58,37 @@ function respond(array $data, int $status = 200): never {
 
 function fail(string $message, int $status = 400): never {
     respond(['ok' => false, 'message' => $message], $status);
+}
+
+function ensure_request_email_verification_table(PDO $pdo): void {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS access_request_email_verifications (
+        request_id INT NOT NULL PRIMARY KEY,
+        code_hash VARCHAR(255) NOT NULL,
+        expires_at DATETIME NOT NULL,
+        attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+        last_sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        verified_at DATETIME NULL,
+        INDEX idx_request_email_verified (verified_at),
+        CONSTRAINT fk_request_email_verification_request FOREIGN KEY (request_id) REFERENCES access_requests(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function send_request_verification_email(string $email, string $name, string $role, string $code): void {
+    $mailer = configured_mailer();
+    $mailer->addAddress($email, $name);
+    $mailer->isHTML(true);
+    $mailer->Subject = 'SIGHO - verifica tu correo para completar la solicitud';
+    $safeName = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeRole = htmlspecialchars($role, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $mailer->Body = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#18314f;padding:24px">'
+        . '<h2 style="color:#1259a7">Verificación de correo electrónico</h2>'
+        . '<p>Hola ' . $safeName . '. Recibimos una solicitud de registro en SIGHO como <strong>' . $safeRole . '</strong>.</p>'
+        . '<p>Para comprobar que tienes acceso a esta dirección de correo, escribe el siguiente código en el formulario de solicitud:</p>'
+        . '<p style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#1259a7">' . $code . '</p>'
+        . '<p>El código vence en 30 minutos. La verificación del correo no aprueba la solicitud; un administrador deberá revisarla.</p>'
+        . '<p style="font-size:13px;color:#62758b">Si no realizaste esta solicitud, ignora este mensaje.</p></div>';
+    $mailer->AltBody = "Hola {$name}. Recibimos una solicitud de registro en SIGHO como {$role}. Tu código para verificar el correo es {$code}. Vence en 30 minutos. Verificar el correo no aprueba la solicitud; un administrador debe revisarla. Si no realizaste esta solicitud, ignora este mensaje.";
+    $mailer->send();
 }
 
 function ensure_email_verification_table(PDO $pdo): void {
@@ -77,12 +130,9 @@ function ensure_record_evidence_table(PDO $pdo): void {
 }
 
 function email_verified(int $userId): bool {
-    $pdo = db();
-    ensure_email_verification_table($pdo);
-    $st = $pdo->prepare('SELECT verified_at FROM account_email_verifications WHERE user_id = ?');
-    $st->execute([$userId]);
-    $verifiedAt = $st->fetchColumn();
-    return $verifiedAt === false || $verifiedAt !== null;
+    // La verificación se realiza al enviar la solicitud de registro, antes de la revisión administrativa.
+    // No se solicita un segundo código durante el inicio de sesión.
+    return true;
 }
 
 function create_email_verification(PDO $pdo, int $userId): string {
@@ -208,8 +258,145 @@ function capitalizarNombre(string $valor): string {
 }
 
 
+function sigho_permission_catalog(): array {
+    return [
+        'profile.own' => ['name' => 'Consultar y actualizar mis datos', 'description' => 'Acceder al perfil propio y actualizar los datos permitidos.', 'roles' => ['estudiante', 'profesor', 'administrador']],
+        'records.own' => ['name' => 'Consultar mis registros', 'description' => 'Consultar las jornadas y horas propias.', 'roles' => ['estudiante']],
+        'records.create' => ['name' => 'Registrar jornadas', 'description' => 'Enviar nuevas jornadas de servicio social.', 'roles' => ['estudiante']],
+        'records.review' => ['name' => 'Revisar jornadas', 'description' => 'Consultar y revisar jornadas de servicio social.', 'roles' => ['profesor', 'administrador']],
+        'students.assigned' => ['name' => 'Consultar estudiantes asignados', 'description' => 'Ver estudiantes relacionados con la sede y el proyecto asignados.', 'roles' => ['profesor']],
+        'access.request_admin' => ['name' => 'Solicitar permisos de Administrador', 'description' => 'Enviar una solicitud para obtener permisos de Administrador.', 'roles' => ['profesor']],
+        'requests.manage' => ['name' => 'Gestionar solicitudes', 'description' => 'Consultar y validar solicitudes de acceso de estudiantes y funcionarios.', 'roles' => ['administrador']],
+        'staff.manage' => ['name' => 'Gestionar funcionarios públicos', 'description' => 'Consultar y asignar sedes y proyectos a funcionarios públicos.', 'roles' => ['administrador']],
+        'students.progress' => ['name' => 'Consultar progreso de estudiantes', 'description' => 'Consultar horas aprobadas y progreso del servicio social.', 'roles' => ['administrador']],
+        'records.reset' => ['name' => 'Reiniciar registros', 'description' => 'Eliminar los registros de horas del sistema.', 'roles' => ['administrador']],
+        'admin_requests.review' => ['name' => 'Validar solicitudes de Administrador', 'description' => 'Aceptar o rechazar solicitudes para crear cuentas de Administrador.', 'roles' => ['administrador']],
+        'users.manage' => ['name' => 'Gestionar usuarios', 'description' => 'Consultar y activar o desactivar cuentas de usuario.', 'roles' => ['superadmin']],
+        'roles.manage' => ['name' => 'Gestionar roles y permisos', 'description' => 'Consultar y asignar permisos a los roles del sistema.', 'roles' => ['superadmin']],
+        'settings.manage' => ['name' => 'Gestionar configuración', 'description' => 'Modificar el dominio institucional y las metas de horas.', 'roles' => ['superadmin']],
+    ];
+}
+
+function sigho_action_permissions(): array {
+    return [
+        'professor_profile' => 'profile.own',
+        'update_professor_profile' => 'profile.own',
+        'change_professor_password' => 'profile.own',
+        'my_profile' => 'profile.own',
+        'update_student_profile' => 'profile.own',
+        'my_records' => 'records.own',
+        'teacher_data' => 'records.review',
+        'teacher_students' => 'students.assigned',
+        'create_record' => 'records.create',
+        'review_record' => 'records.review',
+        'assign_teacher' => 'staff.manage',
+        'request_admin_permission' => 'access.request_admin',
+        'validate_admin_request_by_admin' => 'admin_requests.review',
+        'admin_data' => 'requests.manage',
+        'validate_request' => 'requests.manage',
+        'pending_requests' => 'requests.manage',
+        'superadmin_data' => 'users.manage',
+        'superadmin_user_save' => 'users.manage',
+        'superadmin_user_status' => 'users.manage',
+        'superadmin_permissions_save' => 'roles.manage',
+        'superadmin_settings_save' => 'settings.manage',
+        'validate_admin_request' => 'admin_requests.review',
+        'reset_records' => 'records.reset',
+    ];
+}
+
+function ensure_sigho_configuration(PDO $pdo): void {
+    static $ready = false;
+    if ($ready) return;
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS sigho_settings (
+            setting_key VARCHAR(80) NOT NULL PRIMARY KEY,
+            setting_value VARCHAR(255) NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS sigho_role_permissions (
+            role_id BIGINT UNSIGNED NOT NULL,
+            permission_key VARCHAR(80) NOT NULL,
+            enabled TINYINT(1) NOT NULL DEFAULT 0,
+            PRIMARY KEY (role_id, permission_key),
+            INDEX idx_sigho_role_permissions_key (permission_key)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+
+    $defaults = [
+        'institutional_domain' => 'iejosejoaquinflorezhernandez.edu.co',
+        'academic_hours_target' => '120',
+        'technical_hours_target' => '100',
+    ];
+    $insertSetting = $pdo->prepare('INSERT IGNORE INTO sigho_settings (setting_key, setting_value) VALUES (?, ?)');
+    foreach ($defaults as $key => $value) $insertSetting->execute([$key, $value]);
+
+    $roles = $pdo->query('SELECT id, code FROM roles')->fetchAll();
+    $catalog = sigho_permission_catalog();
+    $insertPermission = $pdo->prepare('INSERT IGNORE INTO sigho_role_permissions (role_id, permission_key, enabled) VALUES (?, ?, ?)');
+    foreach ($roles as $role) {
+        foreach ($catalog as $key => $permission) {
+            $insertPermission->execute([
+                (int)$role['id'],
+                $key,
+                in_array($role['code'], $permission['roles'], true) ? 1 : 0,
+            ]);
+        }
+    }
+    $ready = true;
+}
+
+function sigho_setting(PDO $pdo, string $key, string $fallback): string {
+    ensure_sigho_configuration($pdo);
+    $st = $pdo->prepare('SELECT setting_value FROM sigho_settings WHERE setting_key = ?');
+    $st->execute([$key]);
+    $value = $st->fetchColumn();
+    return $value === false ? $fallback : (string)$value;
+}
+
+function sigho_settings_data(PDO $pdo): array {
+    ensure_sigho_configuration($pdo);
+    return [
+        'institutional_domain' => ['descripcion' => 'Dominio del correo institucional (sin @)', 'valor' => sigho_setting($pdo, 'institutional_domain', 'iejosejoaquinflorezhernandez.edu.co')],
+        'academic_hours_target' => ['descripcion' => 'Meta de horas para estudiantes académicos', 'valor' => sigho_setting($pdo, 'academic_hours_target', '120')],
+        'technical_hours_target' => ['descripcion' => 'Meta de horas para estudiantes técnicos', 'valor' => sigho_setting($pdo, 'technical_hours_target', '100')],
+    ];
+}
+
+function sigho_permissions_data(PDO $pdo): array {
+    ensure_sigho_configuration($pdo);
+    $roles = $pdo->query('SELECT id, code FROM roles ORDER BY id')->fetchAll();
+    $roleNames = [
+        'estudiante' => 'Estudiante',
+        'profesor' => 'Funcionario público',
+        'administrador' => 'Administrador',
+        'superadmin' => 'Super Admin',
+    ];
+    foreach ($roles as &$role) {
+        $role['id'] = (int)$role['id'];
+        $role['name'] = $roleNames[$role['code']] ?? ucfirst((string)$role['code']);
+    }
+    unset($role);
+    $matrix = [];
+    $grants = $pdo->query('SELECT role_id, permission_key FROM sigho_role_permissions WHERE enabled = 1')->fetchAll();
+    foreach ($grants as $grant) {
+        $matrix[(int)$grant['role_id']][(string)$grant['permission_key']] = true;
+    }
+    $permissions = [];
+    foreach (sigho_permission_catalog() as $key => $permission) {
+        $permissions[] = ['key' => $key] + $permission;
+    }
+    return [
+        'roles' => $roles,
+        'permissions' => $permissions,
+        'matrix' => $matrix,
+    ];
+}
+
 function institutional_domain(): string {
-    return 'iejosejoaquinflorezhernandez.edu.co';
+    return sigho_setting(db(), 'institutional_domain', 'iejosejoaquinflorezhernandez.edu.co');
 }
 
 function is_institutional_email(string $email): bool {
@@ -239,6 +426,16 @@ function require_login(): array {
 function require_roles(array $roles): array {
     $user = require_login();
     if (!in_array($user['rol'], $roles, true)) fail('No tienes permisos para realizar esta acción.', 403);
+    if ($user['rol'] !== 'superadmin') {
+        $action = (string)($_GET['action'] ?? '');
+        $permissionKey = sigho_action_permissions()[$action] ?? null;
+        if ($permissionKey !== null) {
+            ensure_sigho_configuration(db());
+            $st = db()->prepare('SELECT enabled FROM sigho_role_permissions WHERE role_id = (SELECT id FROM roles WHERE code = ?) AND permission_key = ?');
+            $st->execute([$user['rol'], $permissionKey]);
+            if ((int)$st->fetchColumn() !== 1) fail('Tu rol no tiene permiso para realizar esta acción.', 403);
+        }
+    }
     return $user;
 }
 
@@ -298,6 +495,56 @@ function user_payload(array $row): array {
     return $payload;
 }
 
+function superadmin_user_data(PDO $pdo): array {
+    $counts = ['estudiantes' => 0, 'profesores' => 0, 'administradores' => 0];
+    $st = $pdo->query("SELECT r.code, COUNT(*) AS total FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code IN ('estudiante','profesor','administrador') GROUP BY r.code");
+    foreach ($st->fetchAll() as $row) {
+        $key = ['estudiante' => 'estudiantes', 'profesor' => 'profesores', 'administrador' => 'administradores'][$row['code']] ?? null;
+        if ($key !== null) $counts[$key] = (int)$row['total'];
+    }
+    $st = $pdo->query("SELECT u.id, u.identification, u.first_name, u.last_name, u.email, u.status, r.code AS role_code FROM users u JOIN roles r ON r.id=u.role_id WHERE r.code IN ('estudiante','profesor','administrador') ORDER BY r.code, u.first_name, u.last_name, u.id");
+    $users = array_map(static function (array $user): array {
+        return [
+            'id' => (int)$user['id'],
+            'identificacion' => $user['identification'],
+            'nombres' => $user['first_name'],
+            'apellidos' => $user['last_name'],
+            'nombre' => trim($user['first_name'] . ' ' . $user['last_name']),
+            'correo' => $user['email'],
+            'rol' => $user['role_code'],
+            'estado' => $user['status'],
+        ];
+    }, $st->fetchAll());
+    $roleNames = [
+        'estudiante' => 'Estudiante',
+        'profesor' => 'Funcionario público',
+        'administrador' => 'Administrador',
+        'superadmin' => 'Super Admin',
+    ];
+    $roles = $pdo->query("SELECT id, code FROM roles ORDER BY id")->fetchAll();
+    foreach ($roles as &$role) {
+        $role['id'] = (int)$role['id'];
+        $role['name'] = $roleNames[$role['code']] ?? ucfirst((string)$role['code']);
+    }
+    unset($role);
+    return ['counts' => $counts, 'users' => $users, 'roles' => $roles];
+}
+
+function ensure_superadmin_staff(PDO $pdo, int $userId): int {
+    $st = $pdo->prepare('SELECT id FROM staff WHERE user_id=? LIMIT 1');
+    $st->execute([$userId]);
+    $staffId = $st->fetchColumn();
+    if ($staffId !== false) return (int)$staffId;
+
+    $staffCode = 'SA-' . $userId;
+    $st = $pdo->prepare('SELECT COUNT(*) FROM staff WHERE staff_code=?');
+    $st->execute([$staffCode]);
+    if ((int)$st->fetchColumn() > 0) $staffCode .= '-' . strtoupper(bin2hex(random_bytes(3)));
+    $st = $pdo->prepare("INSERT INTO staff (user_id, staff_code, position) VALUES (?, ?, 'Super Administrador')");
+    $st->execute([$userId, $staffCode]);
+    return (int)$pdo->lastInsertId();
+}
+
 
 function ensure_student_application_table(PDO $pdo): void {
     $pdo->exec("
@@ -335,7 +582,7 @@ function ensure_student_application_table(PDO $pdo): void {
 }
 
 function ensure_optional_columns(PDO $pdo): void {
-    // Estas columnas permiten conservar la jornada del estudiante y la sede del profesor.
+    // Estas columnas permiten conservar la jornada del estudiante y la sede del funcionario público.
     $checks = [
         ['student_applications', 'service_shift', "ALTER TABLE student_applications ADD COLUMN service_shift VARCHAR(30) NULL AFTER service_days"],
         ['access_requests', 'service_site', "ALTER TABLE access_requests ADD COLUMN service_site VARCHAR(150) NULL AFTER grade"],
@@ -497,7 +744,7 @@ function pending_requests(string $roleFilter = ''): array {
             FROM access_requests ar
             JOIN roles r ON r.id = ar.requested_role_id
             LEFT JOIN student_applications sa ON sa.access_request_id = ar.id
-            WHERE ar.status = 'pendiente'";
+            WHERE ar.status = 'pendiente' AND (NOT EXISTS (SELECT 1 FROM access_request_email_verifications erv0 WHERE erv0.request_id = ar.id) OR EXISTS (SELECT 1 FROM access_request_email_verifications erv WHERE erv.request_id = ar.id AND erv.verified_at IS NOT NULL))";
     $params = [];
     if ($roleFilter !== '') {
         $sql .= ' AND r.code = ?';
@@ -595,7 +842,13 @@ try {
                 $user['emailVerificada'] = email_verified((int)$user['id']);
                 $_SESSION['user'] = $user;
             }
-            respond(['ok' => true, 'user' => $user]);
+            $pdo = db();
+            $settings = sigho_settings_data($pdo);
+            respond(['ok' => true, 'user' => $user, 'settings' => [
+                'institutional_domain' => $settings['institutional_domain']['valor'],
+                'academic_hours_target' => (int)$settings['academic_hours_target']['valor'],
+                'technical_hours_target' => (int)$settings['technical_hours_target']['valor'],
+            ]]);
 
         case 'login':
             ensure_email_verification_table(db());
@@ -762,6 +1015,66 @@ try {
             session_destroy();
             respond(['ok' => true]);
 
+        case 'resend_request_email_code':
+            $d = json_input();
+            $requestId = (int)($d['requestId'] ?? 0);
+            $email = strtolower(trim((string)($d['correo'] ?? '')));
+            if ($requestId < 1 || !filter_var($email, FILTER_VALIDATE_EMAIL)) fail('La solicitud o el correo no son válidos.');
+            $pdo = db();
+            ensure_request_email_verification_table($pdo);
+            $st = $pdo->prepare("SELECT ar.email, ar.first_name, ar.last_name, r.code AS role_code, ar.status FROM access_requests ar JOIN roles r ON r.id=ar.requested_role_id WHERE ar.id=? AND LOWER(ar.email)=LOWER(?) LIMIT 1");
+            $st->execute([$requestId, $email]);
+            $req = $st->fetch();
+            if (!$req || $req['status'] !== 'pendiente') fail('No se encontró una solicitud pendiente con ese correo.', 404);
+            $st = $pdo->prepare('SELECT TIMESTAMPDIFF(SECOND, last_sent_at, NOW()) FROM access_request_email_verifications WHERE request_id=?');
+            $st->execute([$requestId]);
+            $elapsed = $st->fetchColumn();
+            if ($elapsed !== false && $elapsed !== null && (int)$elapsed < 60) fail('Espera un minuto antes de solicitar otro código.');
+            $code = (string)random_int(10000000, 99999999);
+            $st = $pdo->prepare('INSERT INTO access_request_email_verifications (request_id, code_hash, expires_at, attempts, last_sent_at, verified_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 MINUTE), 0, NOW(), NULL) ON DUPLICATE KEY UPDATE code_hash=VALUES(code_hash), expires_at=VALUES(expires_at), attempts=0, last_sent_at=NOW(), verified_at=NULL');
+            $st->execute([$requestId, password_hash($code, PASSWORD_DEFAULT)]);
+            try {
+                send_request_verification_email($req['email'], trim($req['first_name'].' '.$req['last_name']), $req['role_code'] === 'profesor' ? 'Funcionario público' : 'Estudiante', $code);
+            } catch (Throwable $e) {
+                error_log('SIGHO request verification email failed: '.$e->getMessage());
+                fail('No se pudo enviar el correo. Verifica la configuración SMTP e inténtalo más tarde.', 503);
+            }
+            respond(['ok'=>true, 'message'=>'Enviamos un nuevo código de verificación a tu correo.']);
+
+        case 'verify_request_email':
+            $d = json_input();
+            $requestId = (int)($d['requestId'] ?? 0);
+            $email = strtolower(trim((string)($d['correo'] ?? '')));
+            $code = trim((string)($d['codigo'] ?? ''));
+            if ($requestId < 1 || !filter_var($email, FILTER_VALIDATE_EMAIL) || !preg_match('/^\d{8}$/', $code)) fail('Ingresa el correo y el código de 8 dígitos.');
+            $pdo = db();
+            ensure_request_email_verification_table($pdo);
+            $pdo->beginTransaction();
+            try {
+                $st = $pdo->prepare("SELECT ar.id, ar.status FROM access_requests ar WHERE ar.id=? AND LOWER(ar.email)=LOWER(?) FOR UPDATE");
+                $st->execute([$requestId, $email]);
+                $req = $st->fetch();
+                if (!$req || $req['status'] !== 'pendiente') { $pdo->rollBack(); fail('No se encontró una solicitud pendiente con ese correo.', 404); }
+                $st = $pdo->prepare('SELECT code_hash, (expires_at <= NOW()) AS expired, attempts, verified_at FROM access_request_email_verifications WHERE request_id=? FOR UPDATE');
+                $st->execute([$requestId]);
+                $v = $st->fetch();
+                if (!$v) { $pdo->rollBack(); fail('Primero solicita el código de verificación.'); }
+                if ($v['verified_at'] !== null) { $pdo->commit(); respond(['ok'=>true, 'verified'=>true, 'message'=>'El correo ya fue verificado. Tu solicitud está pendiente de revisión por un administrador.']); }
+                if ((int)$v['attempts'] >= 5) { $pdo->rollBack(); fail('Se agotaron los intentos. Solicita un código nuevo.'); }
+                if ((bool)$v['expired']) { $pdo->rollBack(); fail('El código venció. Solicita uno nuevo.'); }
+                if (!password_verify($code, $v['code_hash'])) {
+                    $st = $pdo->prepare('UPDATE access_request_email_verifications SET attempts=attempts+1 WHERE request_id=?');
+                    $st->execute([$requestId]); $pdo->commit(); fail('El código no es correcto. Revísalo e inténtalo de nuevo.');
+                }
+                $st = $pdo->prepare('UPDATE access_request_email_verifications SET verified_at=NOW() WHERE request_id=?');
+                $st->execute([$requestId]);
+                $pdo->commit();
+                respond(['ok'=>true, 'verified'=>true, 'message'=>'Correo verificado correctamente. Tu solicitud quedó pendiente de revisión por un administrador.']);
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
+            }
+
         case 'request_access':
             $d = json_input();
             $rol = trim((string)($d['rol'] ?? ''));
@@ -770,7 +1083,7 @@ try {
             $ident = trim((string)($d['identificacion'] ?? ''));
             $tipoDocumento = trim((string)($d['tipoDocumento'] ?? ''));
             $numeroDocumento = trim((string)($d['numeroDocumento'] ?? ''));
-            $camposNombreProfesor = $rol === 'profesor' && (
+            $camposNombreFuncionarioPublico = $rol === 'profesor' && (
                 array_key_exists('primerApellido', $d) ||
                 array_key_exists('segundoApellido', $d) ||
                 array_key_exists('primerNombre', $d) ||
@@ -778,7 +1091,7 @@ try {
             );
             if ($rol === 'profesor') {
                 $ident = $numeroDocumento;
-                if ($camposNombreProfesor) {
+                if ($camposNombreFuncionarioPublico) {
                     $nombre = trim(implode(' ', array_filter([
                         trim((string)($d['primerNombre'] ?? '')),
                         trim((string)($d['segundoNombre'] ?? ''))
@@ -794,15 +1107,15 @@ try {
             $modalidad = $d['modalidad'] ?? null;
             $programa = trim((string)($d['programaTecnico'] ?? '')) ?: null;
             $grado = trim((string)($d['grado'] ?? '')) ?: null;
-            $sedeProfesor = trim((string)($d['sede'] ?? ''));
-            $proyectoProfesor = trim((string)($d['proyecto'] ?? ''));
-            $telefonoProfesor = trim((string)($d['telefono'] ?? ''));
+            $sedeFuncionarioPublico = trim((string)($d['sede'] ?? ''));
+            $proyectoFuncionarioPublico = trim((string)($d['proyecto'] ?? ''));
+            $telefonoFuncionarioPublico = trim((string)($d['telefono'] ?? ''));
 
             if (!$rol || !$nombre || !$apellido || !$ident || !$correo || !$clave) {
                 fail('Completa todos los campos.');
             }
             if (!in_array($rol, ['estudiante','profesor'], true)) {
-                fail('En las solicitudes solo se permite el rol Estudiante o Profesor.');
+                fail('En las solicitudes solo se permite el rol Estudiante o Funcionario público.');
             }
             if ($rol === 'estudiante') {
                 if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/', $clave)) {
@@ -810,11 +1123,11 @@ try {
                 }
             } else {
                 if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/', $clave)) {
-                    fail('La contraseña del profesor debe tener mínimo 8 caracteres, sin espacios, con mayúscula, minúscula y número.');
+                    fail('La contraseña del funcionario público debe tener mínimo 8 caracteres, sin espacios, con mayúscula, minúscula y número.');
                 }
             }
             if ($rol === 'profesor' && !is_institutional_email($correo)) {
-                 fail('El profesor debe usar un correo @' . institutional_domain() . '.');
+                 fail('El funcionario público debe usar un correo @' . institutional_domain() . '.');
             }
             if ($rol === 'estudiante' && !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
                 fail('El estudiante debe usar un correo electrónico válido.');
@@ -1110,28 +1423,28 @@ try {
             }
 
             if ($rol === 'profesor') {
-                if ($camposNombreProfesor) {
-                    $nombresProfesor = [
+                if ($camposNombreFuncionarioPublico) {
+                    $nombresFuncionarioPublico = [
                         'Primer nombre' => capitalizarNombre(trim((string)($d['primerNombre'] ?? ''))),
                         'Segundo nombre' => capitalizarNombre(trim((string)($d['segundoNombre'] ?? ''))),
                         'Primer apellido' => capitalizarNombre(trim((string)($d['primerApellido'] ?? ''))),
                         'Segundo apellido' => capitalizarNombre(trim((string)($d['segundoApellido'] ?? '')))
                     ];
-                    $regexNombreProfesor = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
-                    foreach ($nombresProfesor as $etiqueta => $valor) {
+                    $regexNombreFuncionarioPublico = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+                    foreach ($nombresFuncionarioPublico as $etiqueta => $valor) {
                         $obligatorio = in_array($etiqueta, ['Primer nombre', 'Primer apellido'], true);
                         if (!$valor && !$obligatorio) continue;
-                        if (mb_strlen($valor, 'UTF-8') < 2 || mb_strlen($valor, 'UTF-8') > 30 || !preg_match($regexNombreProfesor, $valor)) {
+                        if (mb_strlen($valor, 'UTF-8') < 2 || mb_strlen($valor, 'UTF-8') > 30 || !preg_match($regexNombreFuncionarioPublico, $valor)) {
                             fail($etiqueta . ' debe contener solo letras y espacios sencillos, entre 2 y 30 caracteres.');
                         }
                     }
                     $nombre = trim(implode(' ', array_filter([
-                        $nombresProfesor['Primer nombre'],
-                        $nombresProfesor['Segundo nombre']
+                        $nombresFuncionarioPublico['Primer nombre'],
+                        $nombresFuncionarioPublico['Segundo nombre']
                     ], static fn($value) => $value !== '')));
                     $apellido = trim(implode(' ', array_filter([
-                        $nombresProfesor['Primer apellido'],
-                        $nombresProfesor['Segundo apellido']
+                        $nombresFuncionarioPublico['Primer apellido'],
+                        $nombresFuncionarioPublico['Segundo apellido']
                     ], static fn($value) => $value !== '')));
                 } else {
                     $nombre = capitalizarNombre($nombre);
@@ -1140,36 +1453,36 @@ try {
                 $ident = trim($ident);
                 $correo = strtolower(trim($correo));
 
-                if (!$camposNombreProfesor) {
-                    $regexNombreProfesor = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
-                    if (mb_strlen($nombre, 'UTF-8') < 2 || mb_strlen($nombre, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $nombre)) {
-                        fail('Los nombres del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+                if (!$camposNombreFuncionarioPublico) {
+                    $regexNombreFuncionarioPublico = '/^[\p{L}]+(?: [\p{L}]+)*$/u';
+                    if (mb_strlen($nombre, 'UTF-8') < 2 || mb_strlen($nombre, 'UTF-8') > 60 || !preg_match($regexNombreFuncionarioPublico, $nombre)) {
+                        fail('Los nombres del funcionario público solo pueden contener letras y un espacio sencillo entre palabras.');
                     }
-                    if (mb_strlen($apellido, 'UTF-8') < 2 || mb_strlen($apellido, 'UTF-8') > 60 || !preg_match($regexNombreProfesor, $apellido)) {
-                        fail('Los apellidos del profesor solo pueden contener letras y un espacio sencillo entre palabras.');
+                    if (mb_strlen($apellido, 'UTF-8') < 2 || mb_strlen($apellido, 'UTF-8') > 60 || !preg_match($regexNombreFuncionarioPublico, $apellido)) {
+                        fail('Los apellidos del funcionario público solo pueden contener letras y un espacio sencillo entre palabras.');
                     }
                 }
                 if (!in_array($tipoDocumento, ['Cédula de ciudadanía', 'PPT'], true)) {
                     fail('Selecciona Cédula de ciudadanía o PPT como tipo de documento.');
                 }
-                $patronDocumentoProfesor = $tipoDocumento === 'PPT' ? '/^\d{6,8}$/' : '/^\d{7,10}$/';
-                if (!preg_match($patronDocumentoProfesor, $ident)) {
+                $patronDocumentoFuncionarioPublico = $tipoDocumento === 'PPT' ? '/^\d{6,8}$/' : '/^\d{7,10}$/';
+                if (!preg_match($patronDocumentoFuncionarioPublico, $ident)) {
                     fail($tipoDocumento === 'PPT'
                         ? 'El PPT debe tener entre 6 y 8 dígitos.'
                         : 'La cédula debe tener entre 7 y 10 dígitos.');
                 }
-                if (!preg_match('/^3\d{9}$/', $telefonoProfesor)
-                    || preg_match('/^(\d)\1{9}$/', $telefonoProfesor)
-                    || in_array($telefonoProfesor, ['0123456789','1234567890','9876543210','123456789','234567890','987654321','876543210'], true)) {
-                    fail('El teléfono de contacto del profesor debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.');
+                if (!preg_match('/^3\d{9}$/', $telefonoFuncionarioPublico)
+                    || preg_match('/^(\d)\1{9}$/', $telefonoFuncionarioPublico)
+                    || in_array($telefonoFuncionarioPublico, ['0123456789','1234567890','9876543210','123456789','234567890','987654321','876543210'], true)) {
+                    fail('El teléfono de contacto del funcionario público debe tener exactamente 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva.');
                 }
                 if (preg_match('/\s/u', $correo) || !preg_match('/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i', $correo)) {
-                    fail('El correo del profesor debe ser institucional, sin espacios, y usar @iejosejoaquinflorezhernandez.edu.co.');
+                    fail('El correo del funcionario público debe ser institucional, sin espacios, y usar @iejosejoaquinflorezhernandez.edu.co.');
                 }
 
-                // El proyecto y la sede del profesor no se solicitan públicamente: los asigna el Administrador.
-                $proyectoProfesor = null;
-                $sedeProfesor = null;
+                // El proyecto y la sede del funcionario público no se solicitan públicamente: los asigna el Administrador.
+                $proyectoFuncionarioPublico = null;
+                $sedeFuncionarioPublico = null;
             }
 
             ensure_optional_columns($pdo);
@@ -1187,9 +1500,9 @@ try {
                     $rol === 'estudiante' ? $modalidad : null,
                     $rol === 'estudiante' && $modalidad === 'tecnico' ? ($programa ?: 'Técnica') : null,
                     $rol === 'estudiante' ? $gradoEstudiante : $grado,
-                    $rol === 'profesor' ? $sedeProfesor : null,
-                    $rol === 'profesor' ? $proyectoProfesor : null,
-                    $rol === 'profesor' ? $telefonoProfesor : null
+                    $rol === 'profesor' ? $sedeFuncionarioPublico : null,
+                    $rol === 'profesor' ? $proyectoFuncionarioPublico : null,
+                    $rol === 'profesor' ? $telefonoFuncionarioPublico : null
                 ]);
                 $accessRequestId = (int)$pdo->lastInsertId();
 
@@ -1233,8 +1546,27 @@ try {
                 throw $e;
             }
 
-            $message = 'Solicitud enviada. Quedará pendiente de validación por un administrador.';
-            respond(['ok' => true, 'message' => $message]);
+            ensure_request_email_verification_table($pdo);
+            $requestEmailCode = (string)random_int(10000000, 99999999);
+            $st = $pdo->prepare('INSERT INTO access_request_email_verifications (request_id, code_hash, expires_at, attempts, last_sent_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 MINUTE), 0, NOW())');
+            $st->execute([$accessRequestId, password_hash($requestEmailCode, PASSWORD_DEFAULT)]);
+            $emailSent = false;
+            try {
+                send_request_verification_email($correo, trim($nombre . ' ' . $apellido), $rol === 'profesor' ? 'Funcionario público' : 'Estudiante', $requestEmailCode);
+                $emailSent = true;
+            } catch (Throwable $e) {
+                error_log('SIGHO request verification email failed: ' . $e->getMessage());
+            }
+            respond([
+                'ok' => true,
+                'requiresEmailVerification' => true,
+                'requestId' => $accessRequestId,
+                'correo' => $correo,
+                'emailSent' => $emailSent,
+                'message' => $emailSent
+                    ? 'Enviamos un código de 8 dígitos a tu correo. Ingrésalo para verificar la dirección y dejar la solicitud lista para revisión.'
+                    : 'La solicitud se guardó, pero no pudimos enviar el correo. Verifica la configuración SMTP y usa “Reenviar código”.'
+            ]);
 
         case 'professor_profile':
             $user = require_roles(['profesor']);
@@ -1248,7 +1580,7 @@ try {
                 'apellidos'=>$p['last_name'] ?? '',
                 'correo'=>$p['email'] ?? $user['correo'],
                 'telefono'=>$p['phone'] ?? '',
-                'rol'=>'Profesor',
+                'rol'=>'Funcionario público',
                 'identificacion'=>$p['identification'] ?? $user['identificacion'] ?? '',
                 'sede'=>$p['service_site'] ?? '',
                 'proyecto'=>$p['service_project'] ?? '',
@@ -1262,7 +1594,7 @@ try {
             $telefono = trim((string)($d['telefono'] ?? ''));
             if ($correo === '' || $telefono === '') fail('Completa el correo institucional y el teléfono de contacto.');
             if (!filter_var($correo, FILTER_VALIDATE_EMAIL) || !is_institutional_email($correo)) {
-                fail('El correo del profesor debe utilizar el dominio institucional @' . institutional_domain() . '.');
+                fail('El correo del funcionario público debe utilizar el dominio institucional @' . institutional_domain() . '.');
             }
             if (!preg_match('/^3\d{9}$/', $telefono)
                 || preg_match('/^(\d)\1{9}$/', $telefono)
@@ -1451,8 +1783,7 @@ try {
             respond(['ok' => true, 'records' => get_records((int)$user['studentId'])]);
 
         case 'teacher_data':
-            // Permitir que el Super Admin abra Operación de Funcionario Público.
-            $user = require_roles(['profesor', 'administrador', 'superadmin']);
+            $user = require_roles(['profesor','administrador','superadmin']);
             if ($user['rol'] === 'profesor') {
                 ensure_optional_columns(db());
                 respond(['ok' => true, 'records' => get_records(null, true, (int)$user['staffId'])]);
@@ -1460,38 +1791,20 @@ try {
             respond(['ok' => true, 'records' => get_records()]);
 
         case 'teacher_students':
-            // El Super Admin puede consultar la lista general; el profesor mantiene
-            // su filtro limitado a la sede y proyecto asignados.
-            $user = require_roles(['profesor', 'superadmin']);
+            $user = require_roles(['profesor','superadmin']);
             ensure_student_application_table(db());
             ensure_optional_columns(db());
-
             if ($user['rol'] === 'superadmin') {
-                $sql = "SELECT DISTINCT u.id, u.email AS correo,
-                               CONCAT(u.first_name, ' ', u.last_name) AS nombre,
-                               s.grade AS grado,
-                               s.target_hours AS metaHoras,
-                               sa.project AS proyecto,
-                               sa.service_site AS sede
-                        FROM students s
-                        JOIN users u ON u.id = s.user_id
-                        JOIN student_applications sa ON sa.student_id = s.id
-                        WHERE sa.id = (
-                            SELECT MAX(sa2.id)
-                            FROM student_applications sa2
-                            WHERE sa2.student_id = s.id
-                        )
-                        ORDER BY u.first_name, u.last_name";
-                $st = db()->prepare($sql);
-                $st->execute();
-                respond([
-                    'ok' => true,
-                    'students' => $st->fetchAll(),
-                    'sede' => '',
-                    'proyecto' => ''
-                ]);
+                $sql = "SELECT DISTINCT u.id, u.email AS correo, CONCAT(u.first_name, ' ', u.last_name) AS nombre, s.grade AS grado,
+                               s.target_hours AS metaHoras, sa.project AS proyecto, sa.service_site AS sede
+                        FROM students s JOIN users u ON u.id=s.user_id
+                        LEFT JOIN student_applications sa ON sa.student_id=s.id
+                          AND sa.id=(SELECT MAX(sa2.id) FROM student_applications sa2 WHERE sa2.student_id=s.id)
+                        WHERE u.status='activo'
+                        ORDER BY u.first_name,u.last_name";
+                $students = db()->query($sql)->fetchAll();
+                respond(['ok'=>true,'students'=>$students,'sede'=>'Todas las sedes','proyecto'=>'Todos los proyectos']);
             }
-
             $st = db()->prepare('SELECT service_site, service_project FROM staff WHERE id = ?');
             $st->execute([(int)$user['staffId']]);
             $teacher = $st->fetch();
@@ -1676,12 +1989,12 @@ try {
 
             respond([
                 'ok' => true,
-                'message' => 'Jornada registrada correctamente. Quedó pendiente de revisión por el profesor.',
+                'message' => 'Jornada registrada correctamente. Quedó pendiente de revisión por el funcionario público.',
                 'record' => $record
             ]);
 
         case 'review_record':
-            $user = require_roles(['profesor','administrador']);
+            $user = require_roles(['profesor','administrador','superadmin']);
             $d = json_input();
             $id = (int)($d['id'] ?? 0);
             $newStatus = (string)($d['estado'] ?? '');
@@ -1693,7 +2006,9 @@ try {
             $st->execute([$id]);
             $record = $st->fetch();
             if (!$record) fail('Registro no encontrado.', 404);
-            $staffId = (int)$user['staffId'];
+            $staffId = $user['rol'] === 'superadmin'
+                ? ensure_superadmin_staff($pdo, (int)$user['id'])
+                : (int)($user['staffId'] ?? 0);
             if ($user['rol'] === 'profesor') {
                 ensure_student_application_table($pdo);
                 ensure_optional_columns($pdo);
@@ -1721,7 +2036,7 @@ try {
             respond(['ok' => true, 'message' => 'Registro actualizado.']);
 
         case 'assign_teacher':
-            $user = require_roles(['administrador']);
+            $user = require_roles(['administrador','superadmin']);
             $d = json_input();
             $staffId = (int)($d['staffId'] ?? 0);
             $sede = trim((string)($d['sede'] ?? ''));
@@ -1732,7 +2047,7 @@ try {
             if (!$proyecto || !in_array($proyecto,$proyectos,true)) fail('Proyecto inválido.');
             ensure_optional_columns(db());
             $st=db()->prepare("SELECT s.id FROM staff s JOIN users u ON u.id=s.user_id JOIN roles r ON r.id=u.role_id WHERE s.id=? AND r.code='profesor' AND u.status='activo'");
-            $st->execute([$staffId]); if(!$st->fetchColumn()) fail('Profesor no encontrado.',404);
+            $st->execute([$staffId]); if(!$st->fetchColumn()) fail('Funcionario público no encontrado.',404);
             $st=db()->prepare('UPDATE staff SET service_site=?, service_project=? WHERE id=?');
             $st->execute([$sede,$proyecto,$staffId]);
             respond(['ok'=>true,'message'=>'Sede y proyecto asignados correctamente.']);
@@ -1752,7 +2067,7 @@ try {
             respond(['ok'=>true,'message'=>'Solicitud de permisos de Administrador enviada al panel administrativo.']);
 
         case 'validate_admin_request_by_admin':
-            $admin = require_roles(['administrador']);
+            $admin = require_roles(['administrador','superadmin']);
             $d = json_input();
             $id = (int)($d['id'] ?? 0);
             $status = (string)($d['estado'] ?? '');
@@ -1767,7 +2082,7 @@ try {
                     $roleId=(int)$pdo->query("SELECT id FROM roles WHERE code='administrador'")->fetchColumn();
                     $st=$pdo->prepare("UPDATE users SET role_id=? WHERE LOWER(email)=LOWER(?) AND status='activo'");
                     $st->execute([$roleId,$r['email']]);
-                    if ($st->rowCount() < 1) fail('No se encontró la cuenta del profesor solicitante.');
+                    if ($st->rowCount() < 1) fail('No se encontró la cuenta del funcionario público solicitante.');
                 }
                 $st=$pdo->prepare('UPDATE access_requests SET status=?, validated_by=?, validated_at=NOW() WHERE id=?');
                 $st->execute([$status,(int)$admin['id'],$id]);
@@ -1776,26 +2091,25 @@ try {
             respond(['ok'=>true,'message'=>$status==='aceptada'?'Permisos de Administrador concedidos correctamente.':'Solicitud de Administrador rechazada.']);
 
         case 'admin_data':
-            // Permitir que el Super Admin abra Operación de Administrador.
-            require_roles(['administrador', 'superadmin']);
+            require_roles(['administrador','superadmin']);
             $pdo = db();
             $users = [];
             $st = $pdo->query("SELECT u.*, r.code AS role_code FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code IN ('estudiante','profesor') ORDER BY u.first_name, u.last_name");
             foreach ($st->fetchAll() as $u) $users[] = user_payload($u);
-            $profesores = [];
+            $funcionariosPublicos = [];
             $st = $pdo->query("SELECT u.*, r.code AS role_code, s.id AS staff_id, s.service_site, s.service_project FROM users u JOIN roles r ON r.id=u.role_id JOIN staff s ON s.user_id=u.id WHERE u.status='activo' AND r.code='profesor' ORDER BY u.first_name,u.last_name");
-            foreach ($st->fetchAll() as $u) $profesores[] = ['id'=>(int)$u['staff_id'],'userId'=>(int)$u['id'],'nombre'=>trim($u['first_name'].' '.$u['last_name']),'correo'=>$u['email'],'sede'=>$u['service_site']??'','proyecto'=>$u['service_project']??''];
+            foreach ($st->fetchAll() as $u) $funcionariosPublicos[] = ['id'=>(int)$u['staff_id'],'userId'=>(int)$u['id'],'nombre'=>trim($u['first_name'].' '.$u['last_name']),'correo'=>$u['email'],'sede'=>$u['service_site']??'','proyecto'=>$u['service_project']??''];
             respond([
                 'ok' => true,
                 'users' => $users,
-                'profesores' => $profesores,
+                'profesores' => $funcionariosPublicos,
                 'records' => get_records(),
                 'requests' => array_merge(pending_requests('estudiante'), pending_requests('profesor')),
                 'adminRequests' => pending_requests('administrador')
             ]);
 
         case 'validate_request':
-            require_roles(['administrador']);
+            require_roles(['administrador','superadmin']);
             $d = json_input();
             $id = (int)($d['id'] ?? 0);
             $status = (string)($d['estado'] ?? '');
@@ -1806,6 +2120,7 @@ try {
             ensure_student_application_table($pdo);
             ensure_optional_columns($pdo);
             ensure_email_verification_table($pdo);
+            ensure_sigho_configuration($pdo);
             $approvedIdentity = null;
             $pdo->beginTransaction();
             try {
@@ -1820,7 +2135,9 @@ try {
                     $st->execute([$r['identification'],$r['first_name'],$r['last_name'],$r['email'],$r['password_hash'],$roleId]);
                     $userId = (int)$pdo->lastInsertId();
                     if ($r['role_code'] === 'estudiante') {
-                        $target = $r['modality'] === 'tecnico' ? 100 : 120;
+                        $technicalTarget = (int)sigho_setting($pdo, 'technical_hours_target', '100');
+                        $academicTarget = (int)sigho_setting($pdo, 'academic_hours_target', '120');
+                        $target = $r['modality'] === 'tecnico' ? $technicalTarget : $academicTarget;
                         $st = $pdo->prepare('INSERT INTO students (user_id, student_code, grade, modality, technical_program, target_hours) VALUES (?,?,?,?,?,?)');
                         $st->execute([$userId,$r['identification'],$r['grade'],$r['modality'],$r['technical_program'],$target]);
                         $studentId = (int)$pdo->lastInsertId();
@@ -1847,37 +2164,193 @@ try {
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) $pdo->rollBack(); throw $e;
             }
-            if ($approvedIdentity !== null) {
-                try {
-                    send_identity_email(
-                        $approvedIdentity['email'],
-                        $approvedIdentity['name'],
-                        $approvedIdentity['role'],
-                        $approvedIdentity['code']
-                    );
-                    respond([
-                        'ok' => true,
-                        'emailSent' => true,
-                        'message' => 'Solicitud aprobada. Enviamos al usuario un correo de bienvenida con el código de verificación.',
-                    ]);
-                } catch (Throwable $e) {
-                    error_log('SIGHO welcome email failed: ' . $e->getMessage());
-                    respond([
-                        'ok' => true,
-                        'emailSent' => false,
-                        'message' => 'La solicitud fue aprobada, pero no se pudo enviar el correo. Verifica SMTP; el usuario puede solicitar un nuevo código.',
-                    ]);
-                }
-            }
-            respond(['ok'=>true,'message'=>'Solicitud rechazada.']);
+            respond(['ok'=>true,'message'=>$status === 'aceptada' ? 'Solicitud aprobada. El correo ya fue verificado durante el registro.' : 'Solicitud rechazada.']);
+
 
         case 'superadmin_data':
             require_roles(['superadmin']);
             $pdo = db();
             $requests = pending_requests('administrador');
             $totalUsers = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE status='activo'")->fetchColumn();
-            $totalAdmins = (int)$pdo->query("SELECT COUNT(*) FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code='administrador'")->fetchColumn();
-            respond(['ok'=>true,'requests'=>$requests,'totalUsuarios'=>$totalUsers,'totalAdministradores'=>$totalAdmins]);
+            $userData = superadmin_user_data($pdo);
+            $permissionData = sigho_permissions_data($pdo);
+            respond([
+                'ok' => true,
+                'requests' => $requests,
+                'counts' => $userData['counts'],
+                'users' => $userData['users'],
+                'roles' => $permissionData['roles'],
+                'permissions' => $permissionData['permissions'],
+                'matrix' => $permissionData['matrix'],
+                'settings' => sigho_settings_data($pdo),
+                'totalUsuarios' => $totalUsers,
+                'totalAdministradores' => $userData['counts']['administradores'],
+            ]);
+
+        case 'superadmin_user_save':
+            require_roles(['superadmin']);
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') fail('Método no permitido.', 405);
+            $d = json_input();
+            $id = (int)($d['id'] ?? 0);
+            $identificacion = trim((string)($d['identificacion'] ?? ''));
+            $nombres = trim((string)($d['nombres'] ?? ''));
+            $apellidos = trim((string)($d['apellidos'] ?? ''));
+            $correo = strtolower(trim((string)($d['correo'] ?? '')));
+            $estado = (string)($d['estado'] ?? 'activo');
+            $clave = (string)($d['clave'] ?? '');
+
+            if ($id < 1) fail('Desde esta sección solo se pueden editar cuentas de Administrador existentes.');
+            if (mb_strlen($identificacion, 'UTF-8') < 3 || mb_strlen($identificacion, 'UTF-8') > 50) {
+                fail('La identificación debe tener entre 3 y 50 caracteres.');
+            }
+            if (mb_strlen($nombres, 'UTF-8') < 2 || mb_strlen($nombres, 'UTF-8') > 80) {
+                fail('Los nombres deben tener entre 2 y 80 caracteres.');
+            }
+            if (mb_strlen($apellidos, 'UTF-8') < 2 || mb_strlen($apellidos, 'UTF-8') > 100) {
+                fail('Los apellidos deben tener entre 2 y 100 caracteres.');
+            }
+            if (!filter_var($correo, FILTER_VALIDATE_EMAIL) || strlen($correo) > 150) {
+                fail('Escribe un correo electrónico válido.');
+            }
+            if (!is_institutional_email($correo)) {
+                fail('Los administradores deben usar el correo institucional @' . institutional_domain() . '.');
+            }
+            if (!in_array($estado, ['activo', 'inactivo'], true)) {
+                fail('El estado de la cuenta no es válido.');
+            }
+            if ($id === 0 && (strlen($clave) < 8 || strlen($clave) > 72)) {
+                fail('La contraseña debe tener entre 8 y 72 bytes.');
+            }
+            if ($id > 0 && $clave !== '' && (strlen($clave) < 8 || strlen($clave) > 72)) {
+                fail('La nueva contraseña debe tener entre 8 y 72 bytes.');
+            }
+
+            $pdo = db();
+            ensure_optional_columns($pdo);
+            $st = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (LOWER(email)=LOWER(?) OR identification=?) AND id<>?");
+            $st->execute([$correo, $identificacion, $id]);
+            if ((int)$st->fetchColumn() > 0) fail('Ya existe una cuenta con ese correo o identificación.');
+
+            $pdo->beginTransaction();
+            try {
+                $st = $pdo->prepare("SELECT u.id FROM users u JOIN roles r ON r.id=u.role_id WHERE u.id=? AND r.code='administrador' FOR UPDATE");
+                $st->execute([$id]);
+                if (!$st->fetchColumn()) fail('No se encontró la cuenta de administrador.');
+                $sql = 'UPDATE users SET identification=?, first_name=?, last_name=?, email=?, status=?';
+                $params = [$identificacion, $nombres, $apellidos, $correo, $estado];
+                if ($clave !== '') {
+                    $sql .= ', password_hash=?';
+                    $params[] = password_hash($clave, PASSWORD_DEFAULT);
+                }
+                $sql .= ' WHERE id=?';
+                $params[] = $id;
+                $st = $pdo->prepare($sql);
+                $st->execute($params);
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
+            }
+            respond(['ok' => true, 'data' => superadmin_user_data($pdo), 'message' => 'Cuenta de administrador actualizada correctamente.']);
+
+        case 'superadmin_user_status':
+            require_roles(['superadmin']);
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') fail('Método no permitido.', 405);
+            $d = json_input();
+            $id = (int)($d['id'] ?? 0);
+            $estado = (string)($d['estado'] ?? '');
+            if ($id < 1 || !in_array($estado, ['activo', 'inactivo'], true)) fail('Solicitud inválida.');
+            $pdo = db();
+            $st = $pdo->prepare("UPDATE users u JOIN roles r ON r.id=u.role_id SET u.status=? WHERE u.id=? AND r.code IN ('estudiante','profesor','administrador')");
+            $st->execute([$estado, $id]);
+            if ($st->rowCount() < 1) {
+                $st = $pdo->prepare("SELECT COUNT(*) FROM users u JOIN roles r ON r.id=u.role_id WHERE u.id=? AND r.code IN ('estudiante','profesor','administrador') AND u.status=?");
+                $st->execute([$id, $estado]);
+                if (!(int)$st->fetchColumn()) fail('No se encontró la cuenta de usuario.');
+            }
+            respond(['ok' => true, 'data' => superadmin_user_data($pdo), 'message' => $estado === 'activo' ? 'Cuenta activada.' : 'Cuenta desactivada.']);
+
+        case 'superadmin_permissions_save':
+            require_roles(['superadmin']);
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') fail('Método no permitido.', 405);
+            $d = json_input();
+            $roleId = (int)($d['roleId'] ?? 0);
+            $permissionKeys = $d['permissions'] ?? null;
+            if ($roleId < 1 || !is_array($permissionKeys)) fail('Selecciona un rol y permisos válidos.');
+            $pdo = db();
+            ensure_sigho_configuration($pdo);
+            $st = $pdo->prepare('SELECT code FROM roles WHERE id = ?');
+            $st->execute([$roleId]);
+            $roleCode = (string)($st->fetchColumn() ?: '');
+            if ($roleCode === '' || $roleCode === 'superadmin') fail('No se pueden modificar los permisos de ese rol.');
+
+            $catalog = sigho_permission_catalog();
+            $permissionKeys = array_values(array_unique(array_map('strval', $permissionKeys)));
+            foreach ($permissionKeys as $key) {
+                if (!isset($catalog[$key]) || !in_array($roleCode, $catalog[$key]['roles'], true)) {
+                    fail('La selección contiene un permiso no válido para el rol.');
+                }
+            }
+
+            $selectedPermissions = array_fill_keys($permissionKeys, true);
+            $pdo->beginTransaction();
+            try {
+                $st = $pdo->prepare('INSERT INTO sigho_role_permissions (role_id, permission_key, enabled) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE enabled = VALUES(enabled)');
+                foreach ($catalog as $key => $permission) {
+                    $enabled = in_array($roleCode, $permission['roles'], true) && isset($selectedPermissions[$key]);
+                    $st->execute([$roleId, $key, $enabled ? 1 : 0]);
+                }
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
+            }
+            respond(['ok' => true, 'data' => sigho_permissions_data($pdo)]);
+
+        case 'superadmin_settings_save':
+            require_roles(['superadmin']);
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') fail('Método no permitido.', 405);
+            $d = json_input();
+            $settings = $d['settings'] ?? null;
+            if (!is_array($settings)) fail('La configuración enviada no es válida.');
+            $domain = strtolower(trim((string)($settings['institutional_domain'] ?? '')));
+            $academicHours = filter_var($settings['academic_hours_target'] ?? null, FILTER_VALIDATE_INT);
+            $technicalHours = filter_var($settings['technical_hours_target'] ?? null, FILTER_VALIDATE_INT);
+            if (!preg_match('/^(?=.{3,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$/', $domain)) {
+                fail('El dominio institucional debe ser válido y escribirse sin @.');
+            }
+            if ($academicHours === false || $academicHours < 1 || $academicHours > 500 ||
+                $technicalHours === false || $technicalHours < 1 || $technicalHours > 500) {
+                fail('Las metas de horas deben ser números enteros entre 1 y 500.');
+            }
+            $pdo = db();
+            ensure_sigho_configuration($pdo);
+            $values = [
+                'institutional_domain' => $domain,
+                'academic_hours_target' => (string)$academicHours,
+                'technical_hours_target' => (string)$technicalHours,
+            ];
+            $pdo->beginTransaction();
+            try {
+                $st = $pdo->prepare('INSERT INTO sigho_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)');
+                foreach ($values as $key => $value) $st->execute([$key, $value]);
+                $st = $pdo->prepare("UPDATE students SET target_hours = CASE WHEN modality = 'tecnico' THEN ? ELSE ? END");
+                $st->execute([$technicalHours, $academicHours]);
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
+            }
+            $userData = superadmin_user_data($pdo);
+            $permissionData = sigho_permissions_data($pdo);
+            respond(['ok' => true, 'data' => [
+                'users' => $userData['users'],
+                'counts' => $userData['counts'],
+                'roles' => $permissionData['roles'],
+                'permissions' => $permissionData['permissions'],
+                'matrix' => $permissionData['matrix'],
+                'settings' => sigho_settings_data($pdo),
+            ], 'message' => 'La configuración se guardó y las metas de los estudiantes fueron actualizadas.']);
 
         case 'validate_admin_request':
             require_roles(['superadmin']);
@@ -1906,7 +2379,7 @@ try {
             respond(['ok'=>true]);
 
         case 'reset_records':
-            require_roles(['administrador']);
+            require_roles(['administrador','superadmin']);
             $pdo=db();
             $pdo->exec('DELETE FROM hour_records');
             respond(['ok'=>true]);
@@ -1914,7 +2387,7 @@ try {
         case 'evidence':
             handle_evidence((int)($_GET['id'] ?? 0));
 case 'pending_requests':
-    require_roles(['administrador']);
+    require_roles(['administrador','superadmin']);
 
     $requests = pending_requests('estudiante');
 
