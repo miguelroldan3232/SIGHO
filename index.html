@@ -1503,14 +1503,31 @@
         .sigho-alert-message { padding: 22px 24px; color: #354b60; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
         .sigho-alert-actions { display: flex; justify-content: flex-end; padding: 0 24px 22px; }
         .identity-verification-card { width: min(520px, 100%); }
-        .identity-verification-body { padding: 22px 24px; color: #52646a; line-height: 1.6; }
-        .identity-verification-body label { display: block; margin: 16px 0 6px; color: #0d3f70; font-weight: 700; }
-        .identity-verification-body input { width: 100%; text-align: center; letter-spacing: .35em; font-size: 22px; }
-        .identity-verification-actions { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 24px 24px; }
-        .identity-verification-actions button { flex: 1 1 150px; }
-        .identity-verification-actions .identity-reject { background: #a33242; }
-        .identity-verification-status { min-height: 22px; margin: 8px 0 0; color: #a33242; font-size: 13px; }
-        .identity-verification-resend { margin: 8px 0 0; padding: 0; border: 0; background: none; color: #1769aa; text-decoration: underline; cursor: pointer; }
+        .identity-verification-card form { margin: 0; }
+        .identity-verification-body { padding: 24px 24px 12px; color: #52646a; line-height: 1.65; }
+        .identity-verification-body > p:first-child { font-size: 14px; }
+        .identity-verification-body label { display: block; margin: 18px 0 7px; color: #0d3f70; font-weight: 700; }
+        .identity-verification-body input { width: 100%; text-align: center; letter-spacing: .28em; font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .identity-verification-body input:focus { border-color: #1769aa; box-shadow: 0 0 0 4px rgba(23,105,170,.12); }
+        .identity-verification-hint { margin-top: 8px; font-size: 12px; color: #71818a; }
+        .identity-verification-actions { display: flex; flex-wrap: wrap; gap: 10px; padding: 8px 24px 24px; }
+        .identity-verification-actions button { flex: 1 1 150px; margin-top: 0; }
+        .identity-verification-actions .identity-logout { min-height: 46px; }
+        .identity-verification-actions button:disabled, .identity-verification-resend:disabled { opacity: .6; cursor: wait; }
+        .identity-verification-status { min-height: 22px; margin: 8px 0 0; color: #a33242; font-size: 13px; overflow-wrap: anywhere; }
+        .identity-verification-status.success { color: #247044; }
+        .identity-verification-resend { margin: 10px 0 0; padding: 0; border: 0; background: none; color: #1769aa; text-decoration: underline; cursor: pointer; }
+        @media (max-width: 520px) {
+            .identity-verification-body { padding: 20px 18px 10px; }
+            .identity-verification-actions { padding: 8px 18px 20px; }
+            .identity-verification-body input { font-size: 21px; letter-spacing: .2em; }
+        }
+        html.dark-mode .identity-verification-body, body.dark-mode .identity-verification-body { color: #cbd5e1; }
+        html.dark-mode .identity-verification-body label, body.dark-mode .identity-verification-body label { color: #bfdbfe; }
+        html.dark-mode .identity-verification-hint, body.dark-mode .identity-verification-hint { color: #94a3b8; }
+        html.dark-mode .identity-verification-body input, body.dark-mode .identity-verification-body input { background: #172334; color: #f8fafc; border-color: #475569; }
+        html.dark-mode .identity-verification-status.success, body.dark-mode .identity-verification-status.success { color: #86efac; }
+
 
         .modal-close {
             margin-top: 16px;
@@ -2372,6 +2389,16 @@
 .ai-help-launcher:hover { transform:translateY(-2px) scale(1.04); }
 @media (max-width:760px) { .ai-help-launcher { right:14px; bottom:16px; } .role-help-chat { right:14px; bottom:78px; width:calc(100vw - 28px); } }
 @keyframes superadminReveal { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+.superadmin-help-chat { max-height:min(680px,82vh); }
+.superadmin-help-chat .ai-conversation { flex:1; min-height:110px; max-height:36vh; overflow-y:auto; padding:8px; border:1px solid #dce8ef; border-radius:10px; background:#f7fafc; }
+.superadmin-help-chat .ai-message { white-space:pre-wrap; overflow-wrap:anywhere; }
+.superadmin-help-chat .ai-message-status { align-self:flex-start; color:#718492; font-style:italic; }
+.superadmin-help-chat .ai-faq-toggle { align-self:flex-start; width:auto; min-height:34px; padding:6px 10px; background:#eef5f8; color:#36566b; border:1px solid #d6e5ed; }
+.superadmin-help-chat .ai-quick-questions[hidden] { display:none; }
+.superadmin-help-chat .superadmin-help-chat-form { display:flex; gap:8px; margin:0; }
+.superadmin-help-chat .superadmin-help-chat-form input { min-width:0; flex:1; }
+.superadmin-help-chat .superadmin-help-chat-form button { width:auto; min-width:88px; }
+.superadmin-user-create-actions { display:flex; flex-wrap:wrap; gap:8px; }
 @media (max-width:760px) { .superadmin-shell { grid-template-columns:1fr; } .superadmin-nav { padding:14px; } .superadmin-brand { padding-bottom:14px; } .superadmin-tab { display:inline-block; width:calc(50% - 5px); } .superadmin-tab-help { margin-top:0; } .superadmin-logout { margin-top:10px; width:100%; } .superadmin-main { padding:22px 14px; } .superadmin-main .dashboard-header { margin:0 0 20px; padding:18px; } .superadmin-form { grid-template-columns:1fr; } .superadmin-form .wide { grid-column:auto; } .superadmin-user-tools { align-items:stretch; flex-direction:column; } .superadmin-user-count { margin-left:0; padding:0; } .superadmin-help-grid { grid-template-columns:1fr; } .superadmin-help-chat,.role-help-chat { flex-direction:column; } .superadmin-help-chat button,.role-help-chat button { min-height:42px; } .superadmin-home-quick { align-items:flex-start; flex-direction:column; } .superadmin-home-quick button { width:100%; } .ai-message { max-width:100%; } }
 
 
@@ -10783,10 +10810,10 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="superadmin-home-quick"><div><span class="quick-icon">📊</span><div><strong>Validaciones de administradores</strong><p>Revisa las solicitudes pendientes y mantén el acceso institucional bajo control.</p></div></div><button onclick="mostrarSeccionSuperAdmin('usuarios')" type="button">Gestionar usuarios →</button></div>
 <div class="section admin-section"><h3>Validaciones de administradores</h3><p class="section-description">Solo el Super Admin puede aceptar o rechazar solicitudes para crear cuentas de administrador.</p><div id="tablaValidacionesSuperAdmin"></div></div>
 </section>
-<section class="superadmin-panel" hidden="" id="superadminPanelUsuarios"><div class="superadmin-section-head"><div><h3>Administradores</h3><p>Crea, edita, activa o desactiva cuentas de Administrador.</p></div><button class="main-button superadmin-action" onclick="abrirFormularioUsuario()">+ Crear administrador</button></div><div class="superadmin-user-tools"><div class="form-group"><label for="superadminUserSearch">Buscar administrador</label><input id="superadminUserSearch" oninput="filtrarUsuariosSuperAdmin()" placeholder="Nombre, correo o identificación" type="search"/></div><div class="form-group"><label for="superadminUserRoleFilter">Rol</label><select id="superadminUserRoleFilter" onchange="filtrarUsuariosSuperAdmin()"><option value="administrador">Administradores</option></select></div><span class="superadmin-user-count" id="superadminUserCount"></span></div><div id="superadminUserForm"></div><div id="superadminUsersTable"></div></section>
-<section class="superadmin-panel" hidden="" id="superadminPanelPermisos"><div class="superadmin-section-head"><div><h3>Roles y permisos</h3><p>Asigna permisos a cada rol del sistema.</p></div><select id="superadminRoleSelect" onchange="mostrarMatrizPermisos()"></select></div><div id="superadminPermissionsTable"></div><button class="main-button superadmin-action" onclick="guardarPermisosSuperAdmin()">Guardar permisos</button></section>
-<section class="superadmin-panel" hidden="" id="superadminPanelConfiguracion"><div class="superadmin-section-head"><div><h3>Configuración general</h3><p>Valores generales usados por SIGHO.</p></div></div><div id="superadminSettingsForm"></div><button class="main-button superadmin-action" onclick="guardarConfiguracionSuperAdmin()">Guardar configuración</button></section>
-<section class="superadmin-panel" hidden="" id="superadminPanelAyuda"><div class="superadmin-section-head"><div><h3>Ayuda de SIGHO</h3><p>Consulta la ayuda y abre la IA cuando tengas una duda.</p></div></div><div class="security-box"><strong>Centro de ayuda</strong><br/>Encuentra respuestas rápidas o conversa con la IA de SIGHO.</div><button aria-controls="chatAyudaSuperadmin" aria-expanded="false" class="ai-help-launcher" onclick="alternarChatAyuda('superadmin')" type="button"><span class="ai-help-launcher-icon">🤖</span><span class="ai-help-launcher-text"><strong>IA SIGHO</strong><small>Resolver dudas</small></span></button><div class="role-help-chat" id="chatAyudaSuperadmin"><button class="ai-help-close" onclick="alternarChatAyuda('superadmin')" type="button">Cerrar</button><span class="ai-quick-title">Preguntas frecuentes</span><div class="ai-quick-questions"><button onclick="preguntaRapidaSuperAdmin('¿Cómo administro usuarios?')" type="button">Usuarios</button><button onclick="preguntaRapidaSuperAdmin('¿Cómo asigno permisos?')" type="button">Permisos</button><button onclick="preguntaRapidaSuperAdmin('¿Qué puedo configurar?')" type="button">Configuración</button></div><input id="superadminHelpQuestion" onkeydown="if(event.key==='Enter') consultarAyudaSuperAdmin()" placeholder="Escribe tu duda para la IA..." type="text"/><button onclick="consultarAyudaSuperAdmin()" type="button">Preguntar</button><div class="superadmin-help-answer" id="superadminHelpAnswer">Selecciona una pregunta para ver la orientación.</div></div><div class="superadmin-help-grid"><button onclick="mostrarAyudaSuperAdmin('usuarios')" type="button">¿Cómo administro usuarios?</button><button onclick="mostrarAyudaSuperAdmin('permisos')" type="button">¿Cómo asigno permisos?</button><button onclick="mostrarAyudaSuperAdmin('configuracion')" type="button">¿Qué puedo configurar?</button><button onclick="mostrarAyudaSuperAdmin('volver')" type="button">¿Cómo regreso?</button></div></section>
+<section class="superadmin-panel" hidden="" id="superadminPanelUsuarios"><div class="superadmin-section-head"><div><h3>Usuarios</h3><p>Consulta y administra el estado de estudiantes, funcionarios públicos y administradores.</p></div></div><div class="superadmin-user-tools"><div class="form-group"><label for="superadminUserSearch">Buscar usuario</label><input id="superadminUserSearch" oninput="filtrarUsuariosSuperAdmin()" placeholder="Nombre, correo o identificación" type="search"/></div><div class="form-group"><label for="superadminUserRoleFilter">Rol</label><select id="superadminUserRoleFilter" onchange="filtrarUsuariosSuperAdmin()"><option value="todos">Todos los roles</option></select></div><span class="superadmin-user-count" id="superadminUserCount"></span></div><div id="superadminUserForm"></div><div id="superadminUsersTable"></div></section>
+<section class="superadmin-panel" hidden="" id="superadminPanelPermisos"><div class="superadmin-section-head"><div><h3>Roles y permisos</h3><p>Los permisos disponibles y activos cambian según el rol seleccionado.</p></div><select id="superadminRoleSelect" onchange="mostrarMatrizPermisos()"></select></div><div id="superadminPermissionsTable"></div><button class="main-button superadmin-action" onclick="guardarPermisosSuperAdmin()" type="button">Guardar permisos</button></section>
+<section class="superadmin-panel" hidden="" id="superadminPanelConfiguracion"><div class="superadmin-section-head"><div><h3>Configuración general</h3><p>Administra el dominio institucional y las metas de horas. Los cambios se aplican al sistema y a los estudiantes registrados.</p></div></div><div id="superadminSettingsForm"></div><button class="main-button superadmin-action" onclick="guardarConfiguracionSuperAdmin()" type="button">Guardar configuración</button></section>
+<section class="superadmin-panel" hidden="" id="superadminPanelAyuda"><div class="superadmin-section-head"><div><h3>Ayuda de SIGHO</h3><p>Consulta la ayuda y abre la IA cuando tengas una duda.</p></div></div><div class="security-box"><strong>Centro de ayuda</strong><br/>Encuentra respuestas rápidas o conversa con la IA de SIGHO.</div><button aria-controls="chatAyudaSuperadmin" aria-expanded="false" class="ai-help-launcher" onclick="alternarChatAyuda('superadmin')" type="button"><span class="ai-help-launcher-icon">🤖</span><span class="ai-help-launcher-text"><strong>IA SIGHO</strong><small>Resolver dudas</small></span></button><div class="role-help-chat superadmin-help-chat" id="chatAyudaSuperadmin" aria-label="Chat de ayuda Super Admin"><button class="ai-help-close" onclick="alternarChatAyuda('superadmin')" type="button">Cerrar</button><button aria-expanded="true" class="ai-faq-toggle" id="superadminFaqToggle" onclick="alternarPreguntasFrecuentesSuperAdmin()" type="button">Ocultar preguntas frecuentes</button><div class="ai-quick-questions" id="superadminFaqQuestions"><button onclick="preguntaRapidaSuperAdmin('¿Cómo administro usuarios?')" type="button">Usuarios</button><button onclick="preguntaRapidaSuperAdmin('¿Cómo asigno permisos?')" type="button">Permisos</button><button onclick="preguntaRapidaSuperAdmin('¿Qué puedo configurar?')" type="button">Configuración</button></div><div aria-live="polite" aria-relevant="additions" class="ai-conversation" id="superadminAiMessages" role="log"><div class="ai-message ai-message-bot">¡Hola! Puedo orientarte sobre usuarios, roles, permisos y configuración. Puedes elegir una pregunta frecuente o escribir tu consulta.</div></div><form class="superadmin-help-chat-form" onsubmit="enviarMensajeAyudaSuperAdmin(event)"><input autocomplete="off" id="superadminAiQuestion" placeholder="Escribe tu pregunta..." type="text"/><button id="superadminAiSend" type="submit">Enviar</button></form></div></section>
 </main>
 </div>
 <!-- Legacy Super Admin markup removed; the console above owns this screen. -->
@@ -10941,21 +10968,23 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div aria-labelledby="identityVerificationTitle" aria-modal="true" class="sigho-modal" id="modalVerificacionCorreo" role="dialog">
 <article class="sigho-modal-card identity-verification-card">
 <header class="sigho-modal-head">
-<h3 id="identityVerificationTitle">Confirma tu correo</h3>
-<p>Un paso para proteger tu cuenta de SIGHO.</p>
+<h3 id="identityVerificationTitle">Verifica tu correo electrónico</h3>
+<p>Verificación de correo de la solicitud</p>
 </header>
+<form id="identityVerificationForm" autocomplete="off" onsubmit="event.preventDefault(); responderVerificacionCorreo('si');">
 <div class="identity-verification-body">
-<p id="identityVerificationIntro">Te enviamos un código al correo registrado. Escríbelo y confirma si reconoces esta solicitud.</p>
+<p id="identityVerificationIntro">Ingresa el código de 8 dígitos enviado al correo que registraste en tu solicitud.</p>
 <label for="identityVerificationCode">Código de verificación</label>
-<input autocomplete="one-time-code" id="identityVerificationCode" inputmode="numeric" maxlength="8" pattern="[0-9]{8}" placeholder="8 dígitos" type="text"/>
+<input aria-describedby="identityVerificationStatus" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" id="identityVerificationCode" name="codigo" inputmode="numeric" maxlength="8" minlength="8" pattern="[0-9]{8}" placeholder="Ingresa los 8 dígitos" type="text" required />
+<p class="identity-verification-hint">El código vence en 30 minutos. Si no lo encuentras, revisa la carpeta de spam o correo no deseado.</p>
 <button class="identity-verification-resend" id="identityVerificationResend" onclick="reenviarCodigoVerificacion()" type="button">Reenviar código</button>
-<p aria-live="polite" class="identity-verification-status" id="identityVerificationStatus"></p>
+<p aria-live="polite" role="status" class="identity-verification-status" id="identityVerificationStatus"></p>
 </div>
 <footer class="identity-verification-actions">
-<button class="main-button" onclick="responderVerificacionCorreo('si')" type="button">Sí, fui yo</button>
-<button class="main-button identity-reject" onclick="responderVerificacionCorreo('no')" type="button">No fui yo</button>
-<button class="identity-reject" onclick="salirDeVerificacionCorreo()" type="button">Cerrar sesión</button>
+<button class="main-button" id="identityVerificationSubmit" type="submit">Verificar código</button>
+<button class="secondary-button identity-logout" id="identityVerificationLogout" onclick="cerrarVerificacionSolicitud()" type="button">Volver a la solicitud</button>
 </footer>
+</form>
 </article>
 </div>
 <div class="sigho-modal" id="modalRegistroHoraExito">
@@ -10994,8 +11023,41 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
     ====================================================== */
 
     // Meta de horas según la modalidad del estudiante.
-    const HORAS_NORMAL = 120;
-    const HORAS_TECNICO = 100;
+    let HORAS_NORMAL = 120;
+    let HORAS_TECNICO = 100;
+    let DOMINIO_INSTITUCIONAL = "iejosejoaquinflorezhernandez.edu.co";
+
+    function actualizarConfiguracionLocal(settings = {}) {
+        const dominio = String(settings.institutional_domain || "").trim().toLowerCase();
+        if (dominio) DOMINIO_INSTITUCIONAL = dominio;
+        const horasAcademicas = Number(settings.academic_hours_target);
+        const horasTecnicas = Number(settings.technical_hours_target);
+        if (Number.isInteger(horasAcademicas) && horasAcademicas > 0) HORAS_NORMAL = horasAcademicas;
+        if (Number.isInteger(horasTecnicas) && horasTecnicas > 0) HORAS_TECNICO = horasTecnicas;
+
+        const correoSolicitud = document.getElementById("correoSolicitud");
+        const dominioEscapado = DOMINIO_INSTITUCIONAL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        if (correoSolicitud) {
+            correoSolicitud.pattern = `[^@\\s]+@${dominioEscapado}`;
+            correoSolicitud.placeholder = `funcionario@${DOMINIO_INSTITUCIONAL}`;
+        }
+        const ayudaCorreo = correoSolicitud?.closest(".form-group")?.querySelector(".field-help");
+        if (ayudaCorreo) ayudaCorreo.innerHTML = `Debe usar el dominio institucional <strong>@${escaparHTML(DOMINIO_INSTITUCIONAL)}</strong>. No se permiten espacios.`;
+        const correoProfesor = document.getElementById("profesorPerfilCorreo");
+        if (correoProfesor) {
+            correoProfesor.placeholder = `funcionario@${DOMINIO_INSTITUCIONAL}`;
+            correoProfesor.closest(".form-group")?.querySelector(".field-help")?.replaceChildren(
+                document.createTextNode(`Debe conservar el dominio institucional @${DOMINIO_INSTITUCIONAL}.`)
+            );
+        }
+        const opcionAcademica = document.querySelector('#modalidadSolicitud option[value="academico"]');
+        if (opcionAcademica) opcionAcademica.textContent = `Estudiante académico · ${HORAS_NORMAL} horas`;
+    }
+
+    function regexCorreoInstitucionalSIGHO() {
+        const dominio = DOMINIO_INSTITUCIONAL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        return new RegExp(`^[^\\s@]+@${dominio}$`, "i");
+    }
 
     // Los datos reales se cargan desde PHP + MySQL.
     let usuarios = [];
@@ -11016,6 +11078,10 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
     const API_URL = "api/api.php";
 
     async function api(action, options = {}) {
+        if (window.location.protocol === "file:") {
+            throw new Error("SIGHO se abrió como archivo y PHP no puede ejecutarse así. Inicia Apache y abre http://localhost/jjfh/ para usar el sistema.");
+        }
+
         const config = { credentials: "same-origin", ...options };
         config.headers = { ...(options.headers || {}) };
 
@@ -11030,12 +11096,20 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         } catch (_) {
             throw new Error("No se puede conectar con SIGHO. Abre el sistema desde http://localhost/jjfh/ y verifica que Apache y MySQL estén iniciados en XAMPP.");
         }
+        const contenido = await response.text();
         let data;
-
         try {
-            data = await response.json();
-        } catch (_) {
-            throw new Error("El servidor devolvió una respuesta no válida.");
+            data = JSON.parse(contenido);
+        } catch (error) {
+            const tipo = response.headers.get("content-type") || "desconocido";
+            const detalle = contenido.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 240);
+            console.error(`La API respondió con contenido no JSON para "${action}".`, {
+                status: response.status,
+                contentType: tipo,
+                body: contenido.slice(0, 1200),
+                error
+            });
+            throw new Error(`La API devolvió una respuesta que no es JSON (HTTP ${response.status}, ${tipo}). Abre SIGHO desde http://localhost/jjfh/ y revisa los registros de Apache/PHP.${detalle ? ` Detalle: ${detalle}` : ""}`);
         }
 
         if (!response.ok || data.ok === false) {
@@ -11103,75 +11177,80 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         };
     }
 
-    function mostrarVerificacionCorreo() {
-        mostrarLogin();
-        const modal = document.getElementById("modalVerificacionCorreo");
-        const codigo = document.getElementById("identityVerificationCode");
-        const estado = document.getElementById("identityVerificationStatus");
-        if (estado) estado.textContent = "";
-        if (codigo) codigo.value = "";
-        modal?.classList.add("show");
-        codigo?.focus();
+    let solicitudVerificacionActual = null;
+
+    function mostrarVerificacionSolicitud(data) {
+        solicitudVerificacionActual = { requestId: Number(data.requestId), correo: String(data.correo || '').trim().toLowerCase() };
+        const modal = document.getElementById('modalVerificacionCorreo');
+        const intro = document.getElementById('identityVerificationIntro');
+        const estado = document.getElementById('identityVerificationStatus');
+        const codigo = document.getElementById('identityVerificationCode');
+        const botonCerrar = document.getElementById('identityVerificationLogout');
+        if (intro) intro.textContent = `Hemos enviado un código de verificación de 8 dígitos a ${solicitudVerificacionActual.correo}. Verifica el correo para que el administrador pueda revisar tu solicitud.`;
+        if (estado) {
+            estado.classList.toggle('success', !!data.emailSent);
+            estado.textContent = data.message || '';
+        }
+        if (codigo) { codigo.value = ''; codigo.setCustomValidity(''); }
+        if (botonCerrar) botonCerrar.textContent = 'Volver a la solicitud';
+        modal?.classList.add('show');
+        window.setTimeout(() => codigo?.focus(), 60);
     }
 
     async function reenviarCodigoVerificacion() {
-        const estado = document.getElementById("identityVerificationStatus");
-        const boton = document.getElementById("identityVerificationResend");
-        if (boton) boton.disabled = true;
-        if (estado) estado.textContent = "";
-        try {
-            const data = await api("resend_identity_code", { method: "POST" });
-            if (estado) estado.textContent = data.message;
-        } catch (error) {
-            if (estado) estado.textContent = error.message;
-        } finally {
-            if (boton) boton.disabled = false;
-        }
-    }
-
-    async function responderVerificacionCorreo(decision) {
-        const estado = document.getElementById("identityVerificationStatus");
-        const codigo = document.getElementById("identityVerificationCode");
-        const valorCodigo = codigo?.value.trim() || "";
-        if (!/^\d{8}$/.test(valorCodigo)) {
-            if (estado) estado.textContent = "Escribe el código de 8 dígitos que recibiste por correo.";
-            codigo?.focus();
+        const estado = document.getElementById('identityVerificationStatus');
+        const boton = document.getElementById('identityVerificationResend');
+        if (!solicitudVerificacionActual) {
+            if (estado) estado.textContent = 'Primero envía la solicitud de registro.';
             return;
         }
-        const botones = document.querySelectorAll("#modalVerificacionCorreo button");
-        botones.forEach(boton => boton.disabled = true);
-        if (estado) estado.textContent = "Verificando...";
+        if (boton) boton.disabled = true;
+        if (estado) { estado.classList.remove('success'); estado.textContent = 'Enviando código...'; }
         try {
-            const data = await api("verify_identity", {
-                method: "POST",
-                body: { decision, codigo: valorCodigo }
-            });
-            if (decision === "no") {
-                document.getElementById("modalVerificacionCorreo")?.classList.remove("show");
-                usuarioActual = null;
-                try { limpiarSesionSigho(); } catch (_) {}
-                mostrarLogin();
-                window.alert(data.message);
-                return;
-            }
-            if (!usuarioActual) {
-                const session = await api("session");
-                if (!session.user) throw new Error("No hay una sesión activa para continuar.");
-                usuarioActual = normalizarUsuario(session.user);
-            }
-            usuarioActual.emailVerificada = true;
-            await completarInicioSesion(usuarioActual, false);
-            document.getElementById("modalVerificacionCorreo")?.classList.remove("show");
+            const data = await api('resend_request_email_code', { method: 'POST', body: solicitudVerificacionActual });
+            if (estado) { estado.classList.add('success'); estado.textContent = data.message || 'Enviamos un nuevo código.'; }
         } catch (error) {
-            if (estado) estado.textContent = error.message;
-        } finally {
-            botones.forEach(boton => boton.disabled = false);
-        }
+            if (estado) { estado.classList.remove('success'); estado.textContent = error.message || 'No fue posible reenviar el código.'; }
+        } finally { if (boton) boton.disabled = false; }
     }
 
-    async function salirDeVerificacionCorreo() {
-        document.getElementById("modalVerificacionCorreo")?.classList.remove("show");
-        await cerrarSesion();
+    async function responderVerificacionCorreo() {
+        const estado = document.getElementById('identityVerificationStatus');
+        const codigo = document.getElementById('identityVerificationCode');
+        const botonVerificar = document.getElementById('identityVerificationSubmit');
+        const botonReenviar = document.getElementById('identityVerificationResend');
+        const botonCerrar = document.getElementById('identityVerificationLogout');
+        const valorCodigo = (codigo?.value || '').replace(/\D/g, '').slice(0, 8);
+        if (codigo) codigo.value = valorCodigo;
+        if (!solicitudVerificacionActual) { if (estado) estado.textContent = 'No hay una solicitud por verificar. Vuelve a enviar el formulario.'; return; }
+        if (!/^\d{8}$/.test(valorCodigo)) {
+            if (estado) { estado.classList.remove('success'); estado.textContent = 'Escribe los 8 dígitos numéricos que recibiste por correo.'; }
+            codigo?.focus(); return;
+        }
+        [botonVerificar, botonReenviar, botonCerrar].forEach(b => { if (b) b.disabled = true; });
+        if (estado) { estado.classList.remove('success'); estado.textContent = 'Verificando correo...'; }
+        try {
+            const data = await api('verify_request_email', { method: 'POST', body: { ...solicitudVerificacionActual, codigo: valorCodigo } });
+            if (estado) { estado.classList.add('success'); estado.textContent = data.message || 'Correo verificado.'; }
+            document.getElementById('modalVerificacionCorreo')?.classList.remove('show');
+            solicitudVerificacionActual = null;
+            await mostrarConfirmacionSolicitud();
+            const mensaje = document.getElementById('mensajeSolicitud');
+            if (mensaje) { mensaje.style.display = 'block'; mensaje.innerText = data.message || 'Correo verificado. Tu solicitud está pendiente de revisión.'; }
+            window.alert(data.message || 'Correo verificado correctamente. Tu solicitud está pendiente de revisión por un administrador.');
+        } catch (error) {
+            if (estado) { estado.classList.remove('success'); estado.textContent = error.message || 'No se pudo verificar el código.'; }
+        } finally { [botonVerificar, botonReenviar, botonCerrar].forEach(b => { if (b) b.disabled = false; }); }
+    }
+
+    document.getElementById('identityVerificationCode')?.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 8);
+        this.setCustomValidity('');
+    });
+
+    function cerrarVerificacionSolicitud() {
+        document.getElementById('modalVerificacionCorreo')?.classList.remove('show');
+        solicitudVerificacionActual = null;
     }
 
     async function completarInicioSesion(usuario, reproducirSonido = true) {
@@ -11836,11 +11915,6 @@ async function iniciarSesion() {
 
     try {
         const data = await api("login", { method: "POST", body: { correo, clave } });
-        if (data.user.emailVerificada === false) {
-            usuarioActual = normalizarUsuario(data.user);
-            mostrarVerificacionCorreo();
-            return;
-        }
         await completarInicioSesion(data.user);
     } catch (error) {
         mensaje.style.display = "block";
@@ -12690,7 +12764,7 @@ async function enviarSolicitud() {
         const correo = document.getElementById("correoSolicitud").value.replace(/\s/g, "").trim().toLowerCase();
         const telefono = document.getElementById("telefonoProfesorSolicitud")?.value.replace(/\D/g, "").slice(0, 10) || "";
         const regexNombreProfesor = /^[\p{L}]+(?: [\p{L}]+)*$/u;
-        const regexCorreoInstitucional = /^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
+        const regexCorreoInstitucional = regexCorreoInstitucionalSIGHO();
         const validarNombreProfesor = (valor, etiqueta, id, obligatorio) => {
             if (!valor && !obligatorio) return true;
             if (valor.length < 2 || valor.length > 30 || !regexNombreProfesor.test(valor)) {
@@ -12720,7 +12794,7 @@ async function enviarSolicitud() {
             return;
         }
         if (!regexCorreoInstitucional.test(correo)) {
-            const texto="El correo del profesor debe ser institucional, sin espacios, y terminar en @iejosejoaquinflorezhernandez.edu.co.";
+            const texto=`El correo del funcionario debe ser institucional, sin espacios, y terminar en @${DOMINIO_INSTITUCIONAL}.`;
             marcarErrorCampoSolicitud("correoSolicitud",texto);
             mostrarErrorSolicitud(texto,"correoSolicitud");
             return;
@@ -12756,6 +12830,11 @@ async function enviarSolicitud() {
 
     try {
         const data = await api("request_access", { method: "POST", body });
+
+        if (data.requiresEmailVerification) {
+            mostrarVerificacionSolicitud(data);
+            return;
+        }
 
         mensaje.style.display = "block";
         mensaje.innerText = data.message;
@@ -12954,8 +13033,8 @@ function volverSeccionSuperAdmin() {
 
 function mostrarAyudaSuperAdmin(tema) {
     const respuestas = {
-        usuarios: "En Usuarios puedes crear, editar, activar o desactivar cuentas de Administrador. Para gestionar estudiantes y profesores, abre Operación de Administrador.",
-        permisos: "En Roles y permisos selecciona un rol y activa solo los permisos que necesita. Estudiante, Profesor y Administrador tienen permisos diferentes; el Super Admin conserva el control completo.",
+        usuarios: "En Usuarios puedes consultar y activar o desactivar cuentas existentes. Las solicitudes de acceso se realizan desde el formulario público de SIGHO.",
+        permisos: "En Roles y permisos selecciona un rol para ver y guardar únicamente los permisos disponibles para ese perfil. Super Admin mantiene sus permisos de control.",
         configuracion: "En Configuración puedes actualizar los valores generales que utiliza SIGHO, como el dominio institucional y las metas de horas.",
         volver: "Usa Volver al inicio en el menú de puntos o el botón Atrás del navegador. Las evidencias ahora se abren en la misma pestaña para que puedas regresar normalmente."
     };
@@ -13582,15 +13661,30 @@ async function actualizarAdministrador() {
 async function validarSolicitud(id, estado) {
     const solicitud = solicitudes.find(s => Number(s.id) === Number(id));
     if (!solicitud) return;
+
     const accion = estado === "aceptada" ? "aceptar" : "rechazar";
-    if (!confirm(`¿Confirmas que deseas ${accion} la solicitud de ${solicitud.nombre}?`)) return;
+    const nombre = solicitud.nombre || solicitud.correo || "esta persona";
+    const confirmado = await confirmarAccionSigho(`¿Confirmas que deseas ${accion} la solicitud de ${nombre}?`);
+    if (!confirmado) return;
+
     try {
-        const result = await api("validate_request", { method: "POST", body: { id, estado } });
+        const res = await api("validate_request", {
+            method: "POST",
+            body: { id: Number(id), estado }
+        });
+
+        // La respuesta de api() ya es el JSON; no se debe consultar una variable `meta`.
+        const mensaje = res?.message || (res?.success === false
+            ? "No se pudo procesar la solicitud."
+            : (estado === "aceptada" ? "Solicitud aceptada." : "Solicitud rechazada."));
+
         await actualizarAdministrador();
-        // Permanecer en el módulo actual y reconstruir inmediatamente la lista.
+        // Mantener el panel de solicitudes abierto después de procesar la acción.
         mostrarSeccionAdministrador("solicitudes-personal");
-        alert(result.message || (estado === "aceptada" ? "Solicitud aceptada." : "Solicitud rechazada."));
-    } catch (error) { alert(error.message); }
+        alert(mensaje);
+    } catch (error) {
+        alert(error?.message || "Ocurrió un error al procesar la solicitud.");
+    }
 }
 
 async function reiniciarBaseDatos() {
@@ -13623,8 +13717,8 @@ async function actualizarEstudiante() {
     if (!usuarioActual) return;
     try { const data = await api("my_records"); registros = (data.records || []).map(normalizarRegistro); actualizarNotificacionesEstudiante(); } catch (e) { alert(e.message); return; }
 
-    const meta = Number(usuarioActual.metaHoras || (usuarioActual.esTecnico ? 100 : 120));
-    const modalidad = usuarioActual.esTecnico ? "Técnica · Meta: 100 horas" : "Académico · Meta: 120 horas";
+    const meta = Number(usuarioActual.metaHoras || (usuarioActual.esTecnico ? HORAS_TECNICO : HORAS_NORMAL));
+    const modalidad = usuarioActual.esTecnico ? `Técnica · Meta: ${meta} horas` : `Académico · Meta: ${meta} horas`;
     const modalidadTexto = document.getElementById("modalidadEstudiante");
     if (modalidadTexto) modalidadTexto.innerText = `Modalidad ${modalidad}`;
 
@@ -14028,52 +14122,130 @@ function alternarChatAyuda(rol) {
     if (!abierto) chat.querySelector("input")?.focus();
 }
 
-function consultarAyudaSuperAdmin() {
-    const input = document.getElementById("superadminHelpQuestion");
-    const pregunta = (input?.value || "").trim().toLowerCase();
-    if (!pregunta) {
-        mostrarAyudaSuperAdmin("usuarios");
-        return;
+let superAdminChatBusy = false;
+let superAdminChatTopic = "";
+
+function alternarPreguntasFrecuentesSuperAdmin() {
+    const preguntas = document.getElementById("superadminFaqQuestions");
+    const toggle = document.getElementById("superadminFaqToggle");
+    if (!preguntas || !toggle) return;
+    const visibles = preguntas.hidden;
+    preguntas.hidden = !visibles;
+    toggle.setAttribute("aria-expanded", String(visibles));
+    toggle.textContent = visibles ? "Ocultar preguntas frecuentes" : "Preguntas frecuentes";
+}
+
+function agregarMensajeAyudaSuperAdmin(texto, tipo) {
+    const mensajes = document.getElementById("superadminAiMessages");
+    if (!mensajes) return null;
+    const mensaje = document.createElement("div");
+    mensaje.className = `ai-message ai-message-${tipo}`;
+    mensaje.textContent = texto;
+    mensajes.appendChild(mensaje);
+    mensajes.scrollTop = mensajes.scrollHeight;
+    return mensaje;
+}
+
+function temaAyudaSuperAdmin(pregunta) {
+    const texto = pregunta.toLocaleLowerCase("es");
+    if (/permiso|rol|acceso/.test(texto)) return "permisos";
+    if (/configur|meta|dominio/.test(texto)) return "configuracion";
+    if (/usuario|administrador|funcionario|estudiante|crear|solicitud|cuenta/.test(texto)) return "usuarios";
+    if (/volver|regresar|naveg|seccion|panel/.test(texto)) return "navegacion";
+    return superAdminChatTopic || "general";
+}
+
+function generarRespuestaAyudaSuperAdmin(pregunta) {
+    superAdminChatTopic = temaAyudaSuperAdmin(pregunta);
+    const respuestas = {
+        usuarios: "En Usuarios puedes crear administradores y consultar las cuentas activas o inactivas. Para estudiantes y funcionarios públicos, usa «Solicitar estudiante» o «Solicitar funcionario»: se abre el formulario completo y la solicitud sigue el flujo actual de validación y verificación de correo.",
+        permisos: "En Roles y permisos puedes seleccionar los roles que están registrados, incluido Super Admin. El panel de esta versión no recibe una matriz de permisos del servidor, así que no puede mostrar ni guardar permisos efectivos todavía.",
+        configuracion: "En Configuración puedes actualizar los valores generales de SIGHO, como el dominio institucional y las metas de horas.",
+        navegacion: "Usa las opciones de la barra lateral para cambiar de sección. Al cerrar el chat con el robot o con «Cerrar», la conversación permanece disponible cuando lo abras de nuevo.",
+        general: "Puedo orientarte sobre usuarios, roles, permisos, configuración y navegación. Escribe una consulta más específica o elige una pregunta frecuente."
+    };
+    return respuestas[superAdminChatTopic];
+}
+
+async function enviarPreguntaAyudaSuperAdmin(pregunta, agregarPregunta = true) {
+    const entrada = document.getElementById("superadminAiQuestion");
+    const enviar = document.getElementById("superadminAiSend");
+    const preguntasFrecuentes = document.getElementById("superadminFaqQuestions");
+    const togglePreguntas = document.getElementById("superadminFaqToggle");
+    const mensajes = document.getElementById("superadminAiMessages");
+    if (superAdminChatBusy || !mensajes || !pregunta) return;
+
+    superAdminChatBusy = true;
+    if (agregarPregunta) agregarMensajeAyudaSuperAdmin(pregunta, "user");
+    if (entrada) entrada.disabled = true;
+    if (enviar) enviar.disabled = true;
+    if (preguntasFrecuentes) preguntasFrecuentes.hidden = true;
+    if (togglePreguntas) {
+        togglePreguntas.textContent = "Preguntas frecuentes";
+        togglePreguntas.setAttribute("aria-expanded", "false");
     }
-    if (pregunta.includes("permiso") || pregunta.includes("rol")) mostrarAyudaSuperAdmin("permisos");
-    else if (pregunta.includes("config") || pregunta.includes("meta") || pregunta.includes("dominio")) mostrarAyudaSuperAdmin("configuracion");
-    else if (pregunta.includes("volver") || pregunta.includes("regresar") || pregunta.includes("atrás") || pregunta.includes("atras")) mostrarAyudaSuperAdmin("volver");
-    else mostrarAyudaSuperAdmin("usuarios");
+    const cargando = agregarMensajeAyudaSuperAdmin("Preparando respuesta...", "status");
+
+    try {
+        await new Promise(resolve => window.setTimeout(resolve, 120));
+        const respuesta = generarRespuestaAyudaSuperAdmin(pregunta);
+        cargando?.remove();
+        agregarMensajeAyudaSuperAdmin(respuesta, "bot");
+        if (entrada) entrada.value = "";
+    } catch (error) {
+        cargando?.remove();
+        const fallo = agregarMensajeAyudaSuperAdmin("No se pudo generar la respuesta. Puedes intentarlo de nuevo.", "bot");
+        if (fallo) {
+            const reintentar = document.createElement("button");
+            reintentar.type = "button";
+            reintentar.className = "secondary-button";
+            reintentar.textContent = "Reintentar";
+            reintentar.addEventListener("click", () => {
+                fallo.remove();
+                enviarPreguntaAyudaSuperAdmin(pregunta, false);
+            }, { once: true });
+            fallo.appendChild(document.createElement("br"));
+            fallo.appendChild(reintentar);
+        }
+        console.error("No se pudo responder la consulta de ayuda:", error);
+    } finally {
+        superAdminChatBusy = false;
+        if (entrada) entrada.disabled = false;
+        if (enviar) enviar.disabled = false;
+        entrada?.focus();
+    }
+}
+
+function enviarMensajeAyudaSuperAdmin(event) {
+    event.preventDefault();
+    const entrada = document.getElementById("superadminAiQuestion");
+    const pregunta = (entrada?.value || "").trim();
+    if (pregunta) enviarPreguntaAyudaSuperAdmin(pregunta);
+}
+
+function consultarAyudaSuperAdmin() {
+    enviarMensajeAyudaSuperAdmin({ preventDefault() {} });
 }
 
 function preguntaRapidaSuperAdmin(pregunta) {
-    const input = document.getElementById("superadminHelpQuestion");
-    if (input) input.value = pregunta;
-    consultarAyudaSuperAdmin();
+    enviarPreguntaAyudaSuperAdmin(pregunta);
 }
 
 function preguntarIaSuperAdmin() {
-    const input = document.getElementById("superadminAiQuestion");
-    const windowChat = document.getElementById("superadminAiMessages");
-    const pregunta = (input?.value || "").trim();
-    if (!pregunta || !windowChat) return;
-    const userMessage = document.createElement("div");
-    userMessage.className = "ai-message ai-message-user";
-    userMessage.textContent = pregunta;
-    windowChat.appendChild(userMessage);
-    const texto = pregunta.toLowerCase();
-    let respuesta = "Puedo ayudarte con usuarios, roles, permisos, configuración y navegación del panel Super Admin.";
-    if (texto.includes("usuario") || texto.includes("profesor") || texto.includes("funcionario") || texto.includes("estudiante") || texto.includes("admin")) respuesta = "En Usuarios puedes crear, editar, activar o desactivar cuentas de Administrador. Para gestionar estudiantes y funcionarios públicos, abre Operación de Administrador.";
-    else if (texto.includes("permiso") || texto.includes("rol")) respuesta = "En Roles y permisos selecciona el rol y activa solo los permisos que necesita. Cada rol tiene una configuración diferente.";
-    else if (texto.includes("config") || texto.includes("meta") || texto.includes("dominio")) respuesta = "En Configuración puedes modificar los valores generales de SIGHO, como dominio institucional y metas de horas.";
-    else if (texto.includes("volver") || texto.includes("regresar") || texto.includes("naveg")) respuesta = "Usa las opciones de la barra lateral para cambiar de sección. El botón Atrás del navegador también conserva la navegación de páginas abiertas.";
-    const botMessage = document.createElement("div");
-    botMessage.className = "ai-message ai-message-bot";
-    botMessage.textContent = respuesta;
-    windowChat.appendChild(botMessage);
-    input.value = "";
-    windowChat.scrollTop = windowChat.scrollHeight;
+    enviarMensajeAyudaSuperAdmin({ preventDefault() {} });
 }
 
 function llenarUsuariosSuperAdmin() {
     const cont = document.getElementById("superadminUsersTable"); if (!cont) return;
     const search = document.getElementById("superadminUserSearch");
     const role = document.getElementById("superadminUserRoleFilter");
+    if (role) {
+        const valorActual = role.value || "todos";
+        const nombresRol = { estudiante: "Estudiantes", profesor: "Funcionarios públicos", administrador: "Administradores" };
+        role.innerHTML = `<option value="todos">Todos los roles</option>${(superAdminData.roles || []).filter(item => Object.prototype.hasOwnProperty.call(nombresRol, item.code)).map(item => `<option value="${escaparHTML(item.code)}">${nombresRol[item.code]}</option>`).join("")}`;
+        role.value = valorActual;
+        if (role.value !== valorActual) role.value = "todos";
+    }
     if (search && search.dataset.configurado !== "1") {
         search.dataset.configurado = "1";
         search.addEventListener("input", filtrarUsuariosSuperAdmin);
@@ -14090,6 +14262,7 @@ function filtrarUsuariosSuperAdmin() {
     if (!cont) return;
     const texto = (document.getElementById("superadminUserSearch")?.value || "").trim().toLowerCase();
     const rol = document.getElementById("superadminUserRoleFilter")?.value || "todos";
+    const nombresRol = { estudiante: "Estudiante", profesor: "Funcionario público", administrador: "Administrador" };
     const users = (superAdminData.users || []).filter(user => {
         const coincideRol = rol === "todos" || user.rol === rol;
         const contenido = `${user.nombre} ${user.correo} ${user.identificacion}`.toLowerCase();
@@ -14097,13 +14270,13 @@ function filtrarUsuariosSuperAdmin() {
     });
     const count = document.getElementById("superadminUserCount");
     if (count) count.textContent = `${users.length} usuario${users.length === 1 ? "" : "s"}`;
-    cont.innerHTML = `<div class="table-container"><table class="superadmin-users-table"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.length ? users.map(user => `<tr><td>${escaparHTML(user.nombre)}</td><td>${escaparHTML(user.correo)}</td><td>Administrador</td><td><span class="status ${user.estado === "activo" ? "approved" : "rejected"}">${escaparHTML(user.estado)}</span></td><td><div class="actions"><button class="secondary-button" onclick="abrirFormularioUsuario(${user.id})">Editar</button><button class="${user.estado === "activo" ? "danger-button" : "success-button"}" onclick="eliminarUsuarioSuperAdmin(${user.id})">${user.estado === "activo" ? "Desactivar" : "Activar"}</button></div></td></tr>`).join("") : `<tr><td colspan="5">No hay administradores que coincidan con la búsqueda.</td></tr>`}</tbody></table></div>`;
+    cont.innerHTML = `<div class="table-container"><table class="superadmin-users-table"><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>${users.length ? users.map(user => `<tr><td>${escaparHTML(user.nombre)}</td><td>${escaparHTML(user.correo)}</td><td>${nombresRol[user.rol] || escaparHTML(user.rol)}</td><td><span class="status ${user.estado === "activo" ? "approved" : "rejected"}">${escaparHTML(user.estado)}</span></td><td><div class="actions">${user.rol === "administrador" ? `<button class="secondary-button" onclick="abrirFormularioUsuario(${user.id})">Editar</button>` : ""}<button class="${user.estado === "activo" ? "danger-button" : "success-button"}" onclick="eliminarUsuarioSuperAdmin(${user.id})">${user.estado === "activo" ? "Desactivar" : "Activar"}</button></div></td></tr>`).join("") : `<tr><td colspan="5">No hay usuarios que coincidan con la búsqueda.</td></tr>`}</tbody></table></div>`;
 }
 
 function abrirFormularioUsuario(id = 0) {
     const user = (superAdminData.users || []).find(item => Number(item.id) === Number(id)); const cont = document.getElementById("superadminUserForm"); if (!cont) return;
-    if (id && !user) return;
-    cont.innerHTML = `<button type="button" class="secondary-button superadmin-back-button" onclick="cancelarFormularioUsuarioSuperAdmin()">← Volver a Administradores</button><form class="superadmin-form" onsubmit="guardarUsuarioSuperAdmin(event)"><input type="hidden" id="superadminUserId" value="${user?.id || ""}"><div class="form-group"><label>Identificación</label><input id="superadminIdentificacion" required maxlength="50" value="${escaparHTML(user?.identificacion || "")}"></div><div class="form-group"><label>Nombres</label><input id="superadminNombres" required maxlength="80" value="${escaparHTML(user?.nombres || "")}"></div><div class="form-group"><label>Apellidos</label><input id="superadminApellidos" required maxlength="100" value="${escaparHTML(user?.apellidos || "")}"></div><div class="form-group"><label>Correo institucional</label><input id="superadminCorreo" type="email" required maxlength="150" value="${escaparHTML(user?.correo || "")}"></div><div class="form-group"><label>Rol</label><select id="superadminRol" disabled><option value="administrador">Administrador</option></select></div><div class="form-group"><label>Estado</label><select id="superadminEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div><div class="form-group wide"><label>${user ? "Nueva contraseña (opcional)" : "Contraseña"}</label><input id="superadminClave" type="password" ${user ? "" : "required"} minlength="8" maxlength="72"></div><div class="superadmin-form-actions"><button class="main-button superadmin-action" type="submit">Guardar administrador</button><button class="secondary-button" type="button" onclick="cancelarFormularioUsuarioSuperAdmin()">Cancelar</button></div></form>`;
+    if (!id || !user || user.rol !== "administrador") return;
+    cont.innerHTML = `<button type="button" class="secondary-button superadmin-back-button" onclick="cancelarFormularioUsuarioSuperAdmin()">← Volver a usuarios</button><form class="superadmin-form" onsubmit="guardarUsuarioSuperAdmin(event)"><input type="hidden" id="superadminUserId" value="${user.id}"><div class="form-group"><label>Identificación</label><input id="superadminIdentificacion" required maxlength="50" value="${escaparHTML(user.identificacion || "")}"></div><div class="form-group"><label>Nombres</label><input id="superadminNombres" required maxlength="80" value="${escaparHTML(user.nombres || "")}"></div><div class="form-group"><label>Apellidos</label><input id="superadminApellidos" required maxlength="100" value="${escaparHTML(user.apellidos || "")}"></div><div class="form-group"><label>Correo institucional</label><input id="superadminCorreo" type="email" required maxlength="150" value="${escaparHTML(user.correo || "")}"></div><div class="form-group"><label>Rol</label><select id="superadminRol" disabled><option value="administrador">Administrador</option></select></div><div class="form-group"><label>Estado</label><select id="superadminEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div><div class="form-group wide"><label>Nueva contraseña (opcional)</label><input id="superadminClave" type="password" minlength="8" maxlength="72"></div><div class="superadmin-form-actions"><button class="main-button superadmin-action" type="submit">Guardar cambios</button><button class="secondary-button" type="button" onclick="cancelarFormularioUsuarioSuperAdmin()">Cancelar</button></div></form>`;
     document.getElementById("superadminRol").value = "administrador"; document.getElementById("superadminEstado").value = user?.estado || "activo";
 }
 
@@ -14129,7 +14302,7 @@ async function eliminarUsuarioSuperAdmin(id) {
     if (!user) return;
     const estado = user.estado === "activo" ? "inactivo" : "activo";
     const accion = estado === "activo" ? "activar" : "desactivar";
-    if (!confirm(`¿Deseas ${accion} esta cuenta de Administrador?`)) return;
+    if (!confirm(`¿Deseas ${accion} la cuenta de ${user.nombre}?`)) return;
     try {
         const result = await api("superadmin_user_status", { method: "POST", body: { id, estado } });
         superAdminData.users = result.data.users;
@@ -14148,23 +14321,66 @@ function llenarRolesSuperAdmin() {
 function mostrarMatrizPermisos() {
     const roleId = Number(document.getElementById("superadminRoleSelect")?.value || 0); const role = (superAdminData.roles || []).find(item => Number(item.id) === roleId); const cont = document.getElementById("superadminPermissionsTable"); if (!cont || !role) return;
     const bloqueado = role.code === "superadmin";
-    cont.innerHTML = `<div class="table-container"><table class="superadmin-permission-table"><thead><tr><th>Permiso</th><th>Descripción</th><th>Activo</th></tr></thead><tbody>${(superAdminData.permissions || []).map(permission => `<tr><td>${escaparHTML(permission.name)}</td><td>${escaparHTML(permission.description || "")}</td><td><input type="checkbox" data-permission-id="${permission.id}" ${superAdminData.matrix?.[roleId]?.[permission.id] ? "checked" : ""} ${bloqueado ? "disabled checked" : ""}></td></tr>`).join("")}</tbody></table></div>`;
+    const permisos = superAdminData.permissions || [];
+    if (!permisos.length) {
+        cont.innerHTML = `<div class="empty">No se pudo cargar el catálogo de permisos. Recarga el panel y vuelve a intentarlo.</div>`;
+        document.querySelector('#superAdmin button[onclick="guardarPermisosSuperAdmin()"]')?.setAttribute("disabled", "");
+        return;
+    }
+    const aplicables = permisos.filter(permission => permission.roles?.includes(role.code));
+    if (!aplicables.length) {
+        cont.innerHTML = `<div class="empty">No hay permisos configurados para ${escaparHTML(role.name)}.</div>`;
+        document.querySelector('#superAdmin button[onclick="guardarPermisosSuperAdmin()"]')?.setAttribute("disabled", "");
+        return;
+    }
+    cont.innerHTML = `<div class="table-container"><table class="superadmin-permission-table"><thead><tr><th>Permiso</th><th>Descripción</th><th>Activo</th></tr></thead><tbody>${aplicables.map(permission => `<tr><td>${escaparHTML(permission.name)}</td><td>${escaparHTML(permission.description || "")}</td><td><input type="checkbox" data-permission-key="${escaparHTML(permission.key)}" ${superAdminData.matrix?.[roleId]?.[permission.key] ? "checked" : ""} ${bloqueado ? "disabled checked" : ""}></td></tr>`).join("")}</tbody></table></div>`;
     document.querySelector('#superAdmin button[onclick="guardarPermisosSuperAdmin()"]')?.toggleAttribute("disabled", bloqueado);
 }
 
 async function guardarPermisosSuperAdmin() {
-    const roleId = Number(document.getElementById("superadminRoleSelect").value); const permissions = Array.from(document.querySelectorAll("[data-permission-id]:checked")).map(input => Number(input.dataset.permissionId));
-    try { const result = await api("superadmin_permissions_save", { method: "POST", body: { roleId, permissions } }); superAdminData = result.data; mostrarMatrizPermisos(); alert("Permisos guardados correctamente."); } catch (e) { alert(e.message); }
+    const roleId = Number(document.getElementById("superadminRoleSelect").value);
+    const permissions = Array.from(document.querySelectorAll("[data-permission-key]:checked")).map(input => input.dataset.permissionKey);
+    try {
+        const result = await api("superadmin_permissions_save", { method: "POST", body: { roleId, permissions } });
+        superAdminData.roles = result.data.roles;
+        superAdminData.permissions = result.data.permissions;
+        superAdminData.matrix = result.data.matrix;
+        mostrarMatrizPermisos();
+        alert("Permisos guardados correctamente. Los cambios de acceso se aplican de inmediato.");
+    } catch (e) { alert(e.message); }
 }
 
 function llenarConfiguracionSuperAdmin() {
     const cont = document.getElementById("superadminSettingsForm"); if (!cont) return;
-    cont.innerHTML = `<div class="superadmin-form">${Object.entries(superAdminData.settings || {}).map(([key, item]) => `<div class="form-group wide"><label>${escaparHTML(item.descripcion || key)}</label><input data-setting-key="${escaparHTML(key)}" value="${escaparHTML(item.valor || "")}"></div>`).join("")}</div>`;
+    const definiciones = {
+        institutional_domain: { tipo: "text", patron: "dominio", placeholder: "institucion.edu.co" },
+        academic_hours_target: { tipo: "number", minimo: 1, maximo: 500 },
+        technical_hours_target: { tipo: "number", minimo: 1, maximo: 500 },
+    };
+    cont.innerHTML = `<div class="superadmin-form">${Object.entries(superAdminData.settings || {}).map(([key, item]) => {
+        const campo = definiciones[key];
+        if (!campo) return "";
+        const validacion = campo.tipo === "number" ? `type="number" min="${campo.minimo}" max="${campo.maximo}" step="1"` : `type="text" maxlength="253" pattern="(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,63}" placeholder="${campo.placeholder}"`;
+        return `<div class="form-group wide"><label for="setting-${escaparHTML(key)}">${escaparHTML(item.descripcion || key)}</label><input id="setting-${escaparHTML(key)}" data-setting-key="${escaparHTML(key)}" ${validacion} required value="${escaparHTML(item.valor || "")}"></div>`;
+    }).join("")}</div><p class="field-help">Las metas se guardan para los estudiantes registrados y se usarán en las nuevas cuentas.</p>`;
 }
 
 async function guardarConfiguracionSuperAdmin() {
-    const settings = {}; document.querySelectorAll("[data-setting-key]").forEach(input => { settings[input.dataset.settingKey] = input.value; });
-    try { const result = await api("superadmin_settings_save", { method: "POST", body: { settings } }); superAdminData = result.data; llenarConfiguracionSuperAdmin(); alert("Configuración guardada correctamente."); } catch (e) { alert(e.message); }
+    const inputs = Array.from(document.querySelectorAll("#superadminSettingsForm [data-setting-key]"));
+    if (!inputs.every(input => input.reportValidity())) return;
+    const settings = {};
+    inputs.forEach(input => { settings[input.dataset.settingKey] = input.value.trim(); });
+    try {
+        const result = await api("superadmin_settings_save", { method: "POST", body: { settings } });
+        superAdminData = { ...superAdminData, ...result.data };
+        actualizarConfiguracionLocal({
+            institutional_domain: settings.institutional_domain,
+            academic_hours_target: settings.academic_hours_target,
+            technical_hours_target: settings.technical_hours_target,
+        });
+        llenarConfiguracionSuperAdmin();
+        alert(result.message);
+    } catch (e) { alert(e.message); }
 }
 
 function mostrarValidacionesSuperAdmin() {
@@ -14178,12 +14394,12 @@ function mostrarValidacionesSuperAdmin() {
 }
 
 async function validarSolicitudSuper(id, estado) {
-    if (!confirm(estado === "aceptada" ? "¿Aceptar esta solicitud de administrador?" : "¿Rechazar esta solicitud de administrador?")) return;
+    if (!await confirmarAccionSigho(estado === "aceptada" ? "¿Aceptar esta solicitud de administrador?" : "¿Rechazar esta solicitud de administrador?")) return;
     try {
-        await api("validate_admin_request", { method: "POST", body: { id, estado } });
+        const res = await api("validate_admin_request", { method: "POST", body: { id, estado } });
         await abrirSuperAdmin();
-        alert(estado === "aceptada" ? "Administrador aprobado correctamente." : "Solicitud rechazada.");
-    } catch (e) { alert(e.message); }
+        alert(res?.message || (estado === "aceptada" ? "Administrador aprobado correctamente." : "Solicitud rechazada."));
+    } catch (e) { alert(e?.message || "No se pudo procesar la solicitud."); }
 }
 
 /* =====================================================
@@ -14529,7 +14745,7 @@ function abrirMisDatos() {
     const rolNombres = { estudiante: "Estudiante", profesor: "Funcionario público", administrador: "Administrador", superadmin: "Super Admin" };
     let datosExtra = "";
     if (usuarioActual.rol === "estudiante") {
-        datosExtra = `<strong>Grado</strong><span>${escaparHTML(usuarioActual.grado || "No registrado")}</span><strong>Modalidad</strong><span>${usuarioActual.esTecnico ? "Técnica · 100 horas" : "Académico · 120 horas"}</span>`;
+        datosExtra = `<strong>Grado</strong><span>${escaparHTML(usuarioActual.grado || "No registrado")}</span><strong>Modalidad</strong><span>${usuarioActual.esTecnico ? `Técnica · ${HORAS_TECNICO} horas` : `Académico · ${HORAS_NORMAL} horas`}</span>`;
     }
     contenido.innerHTML = `<div class="dato-usuario"><strong>Nombre</strong><span>${escaparHTML(usuarioActual.nombre)}</span><strong>Rol</strong><span>${escaparHTML(rolNombres[usuarioActual.rol] || usuarioActual.rol)}</span><strong>Correo</strong><span>${escaparHTML(usuarioActual.correo)}</span><strong>Identificación</strong><span>${escaparHTML(usuarioActual.identificacion || "No registrada")}</span>${datosExtra}</div><button class="modal-close" onclick="cerrarModales()">Cerrar</button>`;
     document.getElementById("modalUsuarioTitulo").innerText = "Mis datos";
@@ -14692,7 +14908,7 @@ function cancelarEdicionPerfilProfesor(){
 }
 function configurarEdicionPerfilProfesor(){
     const campos=["profesorPerfilCorreo","profesorPerfilTelefono"];
-    const regexCorreo=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
+    const regexCorreo=regexCorreoInstitucionalSIGHO();
     const secuenciasTelefono=["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
 
     function validarCampo(campo, mostrarVacio=false) {
@@ -14701,7 +14917,7 @@ function configurarEdicionPerfilProfesor(){
         let mensaje="";
         if(campo.id==="profesorPerfilCorreo") {
             valido=regexCorreo.test(campo.value.trim());
-            mensaje="Escribe un correo válido que termine en @iejosejoaquinflorezhernandez.edu.co.";
+            mensaje=`Escribe un correo válido que termine en @${DOMINIO_INSTITUCIONAL}.`;
         } else if(campo.id==="profesorPerfilTelefono") {
             const digitos=campo.value.replace(/\D/g,"");
             valido=/^3\d{9}$/.test(digitos) && !/^(\d)\1{9}$/.test(digitos) && !secuenciasTelefono.includes(digitos);
@@ -14765,12 +14981,12 @@ function actualizarEstadoPerfilProfesor() {
 async function guardarPerfilProfesor() {
     const datos=obtenerDatosPerfilProfesor();
     const estado=document.getElementById("estadoPerfilProfesor");
-    const regexCorreoInstitucional=/^[^\s@]+@iejosejoaquinflorezhernandez\.edu\.co$/i;
+    const regexCorreoInstitucional=regexCorreoInstitucionalSIGHO();
     const telefonoProfesor = datos.telefono.replace(/\D/g, "");
     const todosIgualesTelefono = /^(\d)\1{9}$/.test(telefonoProfesor);
     const secuenciasTelefono = ["0123456789","1234567890","9876543210","123456789","234567890","987654321","876543210"];
     const validaciones=[
-        ["profesorPerfilCorreo",regexCorreoInstitucional.test(datos.correo),"Escribe un correo válido que termine en @iejosejoaquinflorezhernandez.edu.co."],
+        ["profesorPerfilCorreo",regexCorreoInstitucional.test(datos.correo),`Escribe un correo válido que termine en @${DOMINIO_INSTITUCIONAL}.`],
         ["profesorPerfilTelefono",/^3\d{9}$/.test(telefonoProfesor) && !todosIgualesTelefono && !secuenciasTelefono.includes(telefonoProfesor),"El teléfono debe tener 10 dígitos, comenzar por 3 y no ser un número repetido o una secuencia consecutiva."]
     ];
     const errores=[];
@@ -15804,13 +16020,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     actualizarCamposLogin();
     try {
         const data = await api("session");
+        actualizarConfiguracionLocal(data?.settings);
         if (!data?.user) return;
 
         usuarioActual = normalizarUsuario(data.user);
-        if (!usuarioActual.emailVerificada) {
-            mostrarVerificacionCorreo();
-            return;
-        }
         try { guardarSesionSigho(usuarioActual); } catch (_) {}
         await cargarDatosPorRol();
 
@@ -16505,7 +16718,7 @@ function mostrarProgresoEstudiantes(estudiantes) {
         const metaHoras = estudiante.esTecnico ? HORAS_TECNICO : HORAS_NORMAL;
         const faltantes = Math.max(0, metaHoras - aprobadas);
         const porcentaje = Math.min(100, (aprobadas / metaHoras) * 100);
-        const modalidad = estudiante.esTecnico ? "Técnica · 100 horas" : "Académico · 120 horas";
+        const modalidad = estudiante.esTecnico ? `Técnica · ${metaHoras} horas` : `Académico · ${metaHoras} horas`;
 
         html += `
             <tr>
@@ -16640,7 +16853,7 @@ function mostrarValidacionesAdmin() {
 
     pendientes.forEach(s => {
         const modalidad = s.rol === "estudiante"
-            ? (s.esTecnico ? "Técnica · 100 horas" : "Académico · 120 horas")
+            ? (s.esTecnico ? `Técnica · ${s.metaHoras || HORAS_TECNICO} horas` : `Académico · ${s.metaHoras || HORAS_NORMAL} horas`)
             : "-";
 
         const ficha = s.rol === "estudiante"
@@ -16680,7 +16893,7 @@ function verDetalleSolicitud(id) {
         : (s.proyecto || "-");
     const nombre = [s.primerNombre, s.segundoNombre, s.primerApellido, s.segundoApellido]
         .filter(Boolean).join(" ") || s.nombre || "-";
-    const modalidad = s.esTecnico ? "Técnica · 100 horas" : "Académico · 120 horas";
+    const modalidad = s.esTecnico ? `Técnica · ${s.metaHoras || HORAS_TECNICO} horas` : `Académico · ${s.metaHoras || HORAS_NORMAL} horas`;
     const valor = dato => escapeHtml(dato || "-");
     const campo = (etiqueta, dato, clase = "") =>
         `<dl class="student-request-field ${clase}"><dt>${escapeHtml(etiqueta)}</dt><dd>${valor(dato)}</dd></dl>`;
@@ -17009,7 +17222,7 @@ async function aprobarSolicitudesSeleccionadasAdmin() {
     if (!seleccionadas.length || !boton) return;
 
     const nombres = seleccionadas.map(s => s.nombre || s.correo || `Solicitud ${s.id}`);
-    if (!confirm(`¿Aprobar ${seleccionadas.length} solicitud${seleccionadas.length === 1 ? "" : "es"} de estudiante?\n\n${nombres.join("\n")}`)) return;
+    if (!await confirmarAccionSigho(`¿Aprobar ${seleccionadas.length} solicitud${seleccionadas.length === 1 ? "" : "es"} de estudiante?\n\n${nombres.join("\n")}`)) return;
 
     const errores = [];
     const avisosCorreo = [];
@@ -17133,7 +17346,7 @@ function mostrarSolicitudesEstudiantesAdmin() {
                 </thead>
                 <tbody>`;
     pendientes.forEach(s => {
-        const modalidad = s.esTecnico ? "Técnica · 100 horas" : "Académico · 120 horas";
+        const modalidad = s.esTecnico ? `Técnica · ${s.metaHoras || HORAS_TECNICO} horas` : `Académico · ${s.metaHoras || HORAS_NORMAL} horas`;
         html += `
             <tr>
                 <td><input aria-label="Seleccionar solicitud de ${escapeHtml(s.nombre || s.correo || "")}" class="admin-selection-checkbox" data-solicitud-id="${Number(s.id)}" type="checkbox"></td>
