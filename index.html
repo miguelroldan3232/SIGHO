@@ -9082,6 +9082,161 @@ body.sigho-awaiting-terms #sigho-splash * {
 }
 </style>
 
+
+<style id="sigho-tutorial-interactivo-styles">
+    :root {
+        --sigho-tutorial-blue: #2563eb;
+        --sigho-tutorial-blue-dark: #1d4ed8;
+        --sigho-tutorial-ink: #eaf1fb;
+        --sigho-tutorial-muted: #a9b8cc;
+        --sigho-tutorial-panel: #111d2e;
+        --sigho-tutorial-border: rgba(148, 163, 184, .22);
+    }
+    #sighoTutorialHelpButton {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 100050;
+        display: none;
+        align-items: center;
+        gap: 9px;
+        border: 1px solid rgba(255,255,255,.22);
+        border-radius: 999px;
+        padding: 12px 17px 12px 12px;
+        color: #fff;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        box-shadow: 0 12px 32px rgba(37,99,235,.35);
+        font: 700 14px/1.1 "Segoe UI", Arial, sans-serif;
+        cursor: pointer;
+        transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    #sighoTutorialHelpButton.is-visible { display: inline-flex; }
+    #sighoTutorialHelpButton:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 38px rgba(37,99,235,.46);
+        filter: brightness(1.08);
+    }
+    #sighoTutorialHelpButton:focus-visible,
+    #sighoTutorialModal button:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 3px;
+    }
+    #sighoTutorialHelpButton .sigho-tutorial-help-icon {
+        width: 27px; height: 27px; display: inline-grid; place-items: center;
+        border-radius: 50%; background: rgba(255,255,255,.17);
+        font-size: 18px; font-weight: 800;
+    }
+    #sighoTutorialModal {
+        position: fixed; inset: 0; z-index: 100060;
+        display: none; align-items: center; justify-content: center;
+        padding: 22px;
+        background: rgba(3, 8, 18, .76);
+        -webkit-backdrop-filter: blur(9px);
+        backdrop-filter: blur(9px);
+        opacity: 0;
+        transition: opacity .24s ease;
+    }
+    #sighoTutorialModal.is-open { display: flex; }
+    #sighoTutorialModal.is-visible { opacity: 1; }
+    #sighoTutorialModal .sigho-tutorial-card {
+        position: relative; width: min(100%, 560px); overflow: hidden;
+        color: var(--sigho-tutorial-ink);
+        background: radial-gradient(circle at 50% 0%, rgba(37,99,235,.15), transparent 40%), #0b1220;
+        border: 1px solid var(--sigho-tutorial-border);
+        border-radius: 24px;
+        box-shadow: 0 28px 90px rgba(0,0,0,.5);
+        transform: translateY(16px) scale(.98);
+        transition: transform .28s cubic-bezier(.2,.8,.2,1);
+    }
+    #sighoTutorialModal.is-visible .sigho-tutorial-card { transform: translateY(0) scale(1); }
+    #sighoTutorialModal .sigho-tutorial-topline {
+        height: 5px; background: linear-gradient(90deg, #2563eb, #60a5fa, #22c55e);
+    }
+    #sighoTutorialModal .sigho-tutorial-header {
+        display: flex; align-items: flex-start; justify-content: space-between; gap: 18px;
+        padding: 23px 25px 0;
+    }
+    #sighoTutorialModal .sigho-tutorial-kicker {
+        margin: 0 0 7px; color: #93c5fd; font-size: 11px; font-weight: 800;
+        letter-spacing: 1.7px; text-transform: uppercase;
+    }
+    #sighoTutorialModal .sigho-tutorial-heading {
+        margin: 0; color: #f8fafc; font-size: clamp(20px, 4vw, 25px);
+        font-weight: 750; line-height: 1.25;
+    }
+    #sighoTutorialModal .sigho-tutorial-close {
+        flex: 0 0 36px; width: 36px; height: 36px; border-radius: 11px;
+        border: 1px solid var(--sigho-tutorial-border); background: rgba(148,163,184,.08);
+        color: #cbd5e1; font-size: 22px; line-height: 1; cursor: pointer;
+    }
+    #sighoTutorialModal .sigho-tutorial-close:hover { background: rgba(148,163,184,.18); color: #fff; }
+    #sighoTutorialModal .sigho-tutorial-body { padding: 23px 25px 19px; text-align: center; }
+    #sighoTutorialModal .sigho-tutorial-icon {
+        width: 82px; height: 82px; display: grid; place-items: center; margin: 0 auto 19px;
+        border: 1px solid rgba(96,165,250,.28); border-radius: 24px;
+        background: linear-gradient(145deg, rgba(37,99,235,.22), rgba(30,41,59,.68));
+        box-shadow: 0 12px 30px rgba(37,99,235,.13);
+        font-size: 38px;
+    }
+    #sighoTutorialModal .sigho-tutorial-step-title {
+        margin: 0 0 11px; color: #f8fafc; font-size: 21px; font-weight: 750; line-height: 1.3;
+    }
+    #sighoTutorialModal .sigho-tutorial-step-text {
+        max-width: 440px; min-height: 66px; margin: 0 auto;
+        color: var(--sigho-tutorial-muted); font-size: 14px; line-height: 1.75; white-space: pre-line;
+    }
+    #sighoTutorialModal .sigho-tutorial-dots {
+        display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 24px;
+    }
+    #sighoTutorialModal .sigho-tutorial-dot {
+        width: 8px; height: 8px; padding: 0; border: 0; border-radius: 99px;
+        background: #475569; cursor: pointer; transition: width .2s, background .2s;
+    }
+    #sighoTutorialModal .sigho-tutorial-dot[aria-current="step"] {
+        width: 24px; background: #60a5fa;
+    }
+    #sighoTutorialModal .sigho-tutorial-footer {
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        padding: 17px 25px 22px; border-top: 1px solid rgba(148,163,184,.14);
+    }
+    #sighoTutorialModal .sigho-tutorial-counter { color: #94a3b8; font-size: 12px; font-weight: 600; }
+    #sighoTutorialModal .sigho-tutorial-actions { display: flex; gap: 9px; }
+    #sighoTutorialModal .sigho-tutorial-btn {
+        min-height: 40px; padding: 10px 15px; border-radius: 11px;
+        font: 700 13px/1 "Segoe UI", Arial, sans-serif; cursor: pointer; transition: .18s ease;
+    }
+    #sighoTutorialModal .sigho-tutorial-prev {
+        color: #cbd5e1; background: rgba(148,163,184,.08); border: 1px solid var(--sigho-tutorial-border);
+    }
+    #sighoTutorialModal .sigho-tutorial-prev:hover:not(:disabled) { background: rgba(148,163,184,.16); }
+    #sighoTutorialModal .sigho-tutorial-prev:disabled { opacity: .38; cursor: not-allowed; }
+    #sighoTutorialModal .sigho-tutorial-next {
+        color: #fff; background: var(--sigho-tutorial-blue); border: 1px solid var(--sigho-tutorial-blue);
+        box-shadow: 0 6px 18px rgba(37,99,235,.2);
+    }
+    #sighoTutorialModal .sigho-tutorial-next:hover { background: var(--sigho-tutorial-blue-dark); transform: translateY(-1px); }
+    #sighoTutorialModal .sigho-tutorial-note {
+        padding: 0 25px 20px; color: #64748b; text-align: center; font-size: 11px; line-height: 1.5;
+    }
+    body.sigho-tutorial-lock { overflow: hidden !important; }
+    @media (max-width: 520px) {
+        #sighoTutorialHelpButton { right: 15px; bottom: 15px; padding: 11px; }
+        #sighoTutorialHelpButton .sigho-tutorial-help-label { display: none; }
+        #sighoTutorialModal { padding: 13px; }
+        #sighoTutorialModal .sigho-tutorial-header { padding: 19px 18px 0; }
+        #sighoTutorialModal .sigho-tutorial-body { padding: 20px 18px 17px; }
+        #sighoTutorialModal .sigho-tutorial-footer { padding: 15px 18px 18px; flex-wrap: wrap; }
+        #sighoTutorialModal .sigho-tutorial-note { padding: 0 18px 18px; }
+        #sighoTutorialModal .sigho-tutorial-icon { width: 70px; height: 70px; font-size: 32px; margin-bottom: 15px; }
+        #sighoTutorialModal .sigho-tutorial-step-title { font-size: 19px; }
+        #sighoTutorialModal .sigho-tutorial-step-text { font-size: 13px; min-height: 80px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        #sighoTutorialHelpButton, #sighoTutorialModal, #sighoTutorialModal .sigho-tutorial-card,
+        #sighoTutorialModal .sigho-tutorial-dot, #sighoTutorialModal .sigho-tutorial-btn { transition: none !important; }
+    }
+</style>
+
 </head>
 <body class="sigho-awaiting-terms">
 
@@ -11164,6 +11319,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
             nombre: u.nombre,
             correo: u.correo,
             rol: u.rol,
+            tutorialVisto: Number(u.tutorialVisto ?? 0),
             esTecnico: !!u.esTecnico,
             programaTecnico: u.programaTecnico || "",
             grado: String(u.grado ?? u.Grado ?? "").trim(),
@@ -11268,6 +11424,10 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         else if (usuarioActual.rol === "profesor") await abrirProfesor();
         else if (usuarioActual.rol === "administrador") await abrirAdministrador();
         else await abrirSuperAdmin();
+
+        if (typeof window.sighoTutorialUpdateAvailability === "function") {
+            window.sighoTutorialUpdateAvailability(usuarioActual);
+        }
 
         if (typeof window.__sighoTryShowXboxWelcome === "function" &&
             window.__sighoSplashFinished === true) {
@@ -11915,6 +12075,11 @@ async function iniciarSesion() {
 
     try {
         const data = await api("login", { method: "POST", body: { correo, clave } });
+        if (data.user.emailVerificada === false) {
+            usuarioActual = normalizarUsuario(data.user);
+            mostrarVerificacionCorreo();
+            return;
+        }
         await completarInicioSesion(data.user);
     } catch (error) {
         mensaje.style.display = "block";
@@ -14569,6 +14734,7 @@ function detenerActualizacionProfesorTiempoReal() {
 
 async function cerrarSesion() {
     try { limpiarSesionSigho(); } catch (_) {}
+    document.getElementById("sighoTutorialHelpButton")?.classList.remove("is-visible");
     // Invalidamos inmediatamente cualquier consulta pendiente de
     // "Mis estudiantes" antes de cerrar la sesión.
     profesorVistaToken++;
@@ -16024,6 +16190,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!data?.user) return;
 
         usuarioActual = normalizarUsuario(data.user);
+        if (!usuarioActual.emailVerificada) {
+            mostrarVerificacionCorreo();
+            return;
+        }
         try { guardarSesionSigho(usuarioActual); } catch (_) {}
         await cargarDatosPorRol();
 
@@ -16038,6 +16208,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             await abrirAdministrador();
         } else if (usuarioActual.rol === "superadmin") {
             await abrirSuperAdmin();
+        }
+        if (typeof window.sighoTutorialUpdateAvailability === "function") {
+            window.sighoTutorialUpdateAvailability(usuarioActual);
         }
     } catch (_) {}
 });
@@ -20622,5 +20795,243 @@ html, body {
     overscroll-behavior-y: none !important;
 }
 </style>
+
+<!-- SIGHO: botón permanente y tutorial interactivo por rol -->
+<button id="sighoTutorialHelpButton" type="button" aria-label="Abrir tutorial de ayuda" title="Volver a consultar la guía de SIGHO">
+    <span class="sigho-tutorial-help-icon" aria-hidden="true">?</span>
+    <span class="sigho-tutorial-help-label">Ayuda guiada</span>
+</button>
+
+<div id="sighoTutorialModal" role="dialog" aria-modal="true" aria-labelledby="sighoTutorialHeading" aria-describedby="sighoTutorialStepText">
+    <section class="sigho-tutorial-card">
+        <div class="sigho-tutorial-topline"></div>
+        <header class="sigho-tutorial-header">
+            <div>
+                <p class="sigho-tutorial-kicker" id="sighoTutorialKicker">Recorrido interactivo · SIGHO</p>
+                <h2 class="sigho-tutorial-heading" id="sighoTutorialHeading">Guía del sistema</h2>
+            </div>
+            <button class="sigho-tutorial-close" id="sighoTutorialClose" type="button" aria-label="Cerrar tutorial" title="Cerrar tutorial">×</button>
+        </header>
+        <div class="sigho-tutorial-body">
+            <div class="sigho-tutorial-icon" id="sighoTutorialIcon" aria-hidden="true">👋</div>
+            <h3 class="sigho-tutorial-step-title" id="sighoTutorialStepTitle">¡Bienvenido a SIGHO!</h3>
+            <p class="sigho-tutorial-step-text" id="sighoTutorialStepText">Conoce las herramientas principales de tu perfil.</p>
+            <div class="sigho-tutorial-dots" id="sighoTutorialDots" aria-label="Progreso del tutorial"></div>
+        </div>
+        <footer class="sigho-tutorial-footer">
+            <span class="sigho-tutorial-counter" id="sighoTutorialCounter" aria-live="polite">Paso 1 de 4</span>
+            <div class="sigho-tutorial-actions">
+                <button class="sigho-tutorial-btn sigho-tutorial-prev" id="sighoTutorialPrev" type="button" disabled>Anterior</button>
+                <button class="sigho-tutorial-btn sigho-tutorial-next" id="sighoTutorialNext" type="button">Siguiente</button>
+            </div>
+        </footer>
+        <p class="sigho-tutorial-note">Puedes volver a abrir esta guía en cualquier momento con el botón de ayuda.</p>
+    </section>
+</div>
+
+<script id="sigho-tutorial-interactivo-js">
+(function () {
+    "use strict";
+
+    const helpButton = document.getElementById("sighoTutorialHelpButton");
+    const modal = document.getElementById("sighoTutorialModal");
+    const closeButton = document.getElementById("sighoTutorialClose");
+    const prevButton = document.getElementById("sighoTutorialPrev");
+    const nextButton = document.getElementById("sighoTutorialNext");
+    const heading = document.getElementById("sighoTutorialHeading");
+    const kicker = document.getElementById("sighoTutorialKicker");
+    const icon = document.getElementById("sighoTutorialIcon");
+    const stepTitle = document.getElementById("sighoTutorialStepTitle");
+    const stepText = document.getElementById("sighoTutorialStepText");
+    const counter = document.getElementById("sighoTutorialCounter");
+    const dots = document.getElementById("sighoTutorialDots");
+
+    if (!helpButton || !modal || !prevButton || !nextButton) return;
+
+    const tutorials = {
+        estudiante: {
+            label: "Estudiante",
+            steps: [
+                { icon: "🏠", title: "¡Bienvenido a SIGHO!", text: "Este es tu panel principal. Desde aquí puedes consultar tu avance en el Servicio Social Obligatorio, revisar tus registros y comenzar el registro de una nueva jornada." },
+                { icon: "✅", title: "Horas aprobadas", text: "Este indicador muestra el total de horas que ya fueron revisadas y aprobadas por el responsable. Estas son las horas que cuentan para tu cumplimiento de la meta institucional." },
+                { icon: "⏳", title: "Horas pendientes", text: "Aquí puedes consultar las horas que has enviado y que todavía están en proceso de revisión. Mientras estén pendientes, no se suman al total de horas aprobadas." },
+                { icon: "⚠️", title: "Horas rechazadas", text: "Este indicador reúne las horas que no fueron aprobadas. Entra a Mis registros para consultar el estado y cualquier observación disponible; corrige la información o la evidencia antes de volver a presentar una jornada, si corresponde." },
+                { icon: "📊", title: "Progreso y meta de horas", text: "La barra de progreso representa cuánto has avanzado frente a la meta de horas de Servicio Social asignada a tu perfil. El avance depende de las horas aprobadas. Revisa cuánto llevas y cuántas horas te faltan para completar la meta." },
+                { icon: "➕", title: "Botón Registrar una jornada", text: "Este botón te lleva al formulario para reportar una actividad de Servicio Social que ya realizaste. Antes de enviarla, prepara la fecha, la cantidad de horas, la descripción de la actividad y la evidencia correspondiente." },
+                { icon: "📝", title: "Menú Registrar horas", text: "Completa la fecha de la jornada, indica el número de horas realizadas y describe claramente la actividad. Adjunta la evidencia solicitada en formato JPG o JPEG cuando el formulario lo requiera. Revisa todos los datos y el archivo antes de enviar el registro para revisión." },
+                { icon: "📚", title: "Menú Mis registros", text: "En esta sección puedes revisar las jornadas que has enviado y consultar su estado. Usa los filtros para encontrar la información: Todas muestra todos tus registros; Aprobadas muestra los validados; Pendientes muestra los que siguen en revisión; y Rechazadas muestra los que no fueron aprobados." },
+                { icon: "❔", title: "Botón permanente de Ayuda", text: "El botón de Ayuda permanece disponible mientras tienes la sesión iniciada. Selecciónalo cuando quieras volver a consultar esta guía y recordar cómo revisar tus horas o registrar una jornada." }
+            ]
+        },
+        profesor: {
+            label: "Profesor",
+            steps: [
+                { icon: "👨‍🏫", title: "Panel de Profesor", text: "Este panel reúne las herramientas docentes disponibles para acompañar el proceso de Servicio Social Obligatorio de los estudiantes asignados a tu responsabilidad." },
+                { icon: "👥", title: "Estudiantes asignados", text: "Utiliza el listado de estudiantes para localizar a los alumnos bajo tu seguimiento y consultar la información de sus registros y el avance de horas que el sistema muestre en tu panel." },
+                { icon: "📋", title: "Revisión de registros", text: "Revisa la fecha, la cantidad de horas, la descripción de la actividad y las evidencias adjuntas. Comprueba que la información corresponda a la actividad reportada antes de utilizar las acciones de aprobación o rechazo que tengas habilitadas." },
+                { icon: "🗒️", title: "Estados y observaciones", text: "Distingue los registros pendientes de revisión de los aprobados o rechazados. Si tu panel permite agregar observaciones, escribe instrucciones claras para que el estudiante sepa qué debe corregir." },
+                { icon: "❔", title: "Botón permanente de Ayuda", text: "Abre esta guía desde el botón de Ayuda cuando necesites repasar el funcionamiento general de tu panel." }
+            ]
+        },
+        administrador: {
+            label: "Administrador",
+            steps: [
+                { icon: "🛡️", title: "Panel de Administrador", text: "Desde este panel puedes acceder a las herramientas administrativas habilitadas para apoyar la gestión institucional del Servicio Social Obligatorio." },
+                { icon: "👤", title: "Gestión de usuarios", text: "Utiliza las secciones de gestión de cuentas para consultar y administrar los usuarios según los permisos de tu perfil. Verifica la información antes de guardar cambios." },
+                { icon: "🏫", title: "Asignaciones y seguimiento", text: "Revisa las asignaciones institucionales y la información de seguimiento disponible en tu panel. Mantén los datos de estudiantes, profesores y sedes coherentes con las indicaciones de la institución." },
+                { icon: "📈", title: "Solicitudes, registros y reportes", text: "Consulta los apartados disponibles para supervisar las solicitudes y los registros del Servicio Social. Utiliza los estados y reportes que ofrezca tu versión de SIGHO para hacer seguimiento a los procesos." },
+                { icon: "❔", title: "Botón permanente de Ayuda", text: "Puedes volver a abrir esta guía desde el botón de Ayuda para recordar las funciones generales del panel." }
+            ]
+        },
+        superadmin: {
+            label: "Superadministrador",
+            steps: [
+                { icon: "🔐", title: "Panel de Superadministrador", text: "Este perfil dispone de herramientas administrativas avanzadas para supervisar la configuración y operación general de SIGHO." },
+                { icon: "👥", title: "Usuarios y roles", text: "Utiliza las opciones habilitadas para consultar cuentas y administrar roles o permisos. Realiza cambios solo cuando estén autorizados y comprueba el rol asignado antes de confirmar." },
+                { icon: "⚙️", title: "Configuración y supervisión", text: "Revisa las herramientas de configuración y las secciones de supervisión disponibles en tu panel. Las opciones concretas dependen de los permisos y módulos habilitados en la instalación." },
+                { icon: "❔", title: "Botón permanente de Ayuda", text: "Selecciona el botón de Ayuda para volver a abrir esta guía siempre que necesites consultar el recorrido." }
+            ]
+        }
+    };
+
+    let currentSteps = [];
+    let currentIndex = 0;
+    let activeUser = null;
+    let previousFocus = null;
+    let closePromise = null;
+
+    function normalizeRole(role) {
+        const value = String(role || "").toLowerCase().trim();
+        if (["superadmin", "super_admin", "super administrador", "superadministrador"].includes(value)) return "superadmin";
+        if (["admin", "administrador"].includes(value)) return "administrador";
+        if (value === "profesor" || value === "funcionario") return "profesor";
+        return "estudiante";
+    }
+
+    function getTutorial(user) {
+        const key = normalizeRole(user && user.rol);
+        return tutorials[key] || tutorials.estudiante;
+    }
+
+    function renderStep() {
+        const step = currentSteps[currentIndex];
+        if (!step) return;
+        icon.textContent = step.icon;
+        stepTitle.textContent = step.title;
+        stepText.textContent = step.text;
+        counter.textContent = `Paso ${currentIndex + 1} de ${currentSteps.length}`;
+        prevButton.disabled = currentIndex === 0;
+        nextButton.textContent = currentIndex === currentSteps.length - 1 ? "Finalizar" : "Siguiente";
+        dots.replaceChildren();
+        currentSteps.forEach((item, index) => {
+            const dot = document.createElement("button");
+            dot.type = "button";
+            dot.className = "sigho-tutorial-dot";
+            dot.setAttribute("aria-label", `Ir al paso ${index + 1}`);
+            if (index === currentIndex) dot.setAttribute("aria-current", "step");
+            dot.addEventListener("click", () => {
+                currentIndex = index;
+                renderStep();
+            });
+            dots.appendChild(dot);
+        });
+    }
+
+    function openTutorial(user) {
+        const currentUser = user || (typeof usuarioActual !== "undefined" ? usuarioActual : null);
+        if (!currentUser || !currentUser.rol) return;
+        activeUser = currentUser;
+        const tutorial = getTutorial(currentUser);
+        currentSteps = tutorial.steps;
+        currentIndex = 0;
+        previousFocus = document.activeElement;
+        heading.textContent = `Guía de SIGHO · ${tutorial.label}`;
+        kicker.textContent = "Recorrido interactivo · SIGHO";
+        renderStep();
+        helpButton.classList.add("is-visible");
+        modal.classList.add("is-open");
+        document.body.classList.add("sigho-tutorial-lock");
+        requestAnimationFrame(() => {
+            modal.classList.add("is-visible");
+            closeButton.focus();
+        });
+    }
+
+    // Solo habilita el botón al existir una sesión; nunca abre el modal automáticamente.
+    window.sighoTutorialUpdateAvailability = function (user) {
+        if (user && user.id && user.rol) {
+            helpButton.classList.add("is-visible");
+        } else {
+            helpButton.classList.remove("is-visible");
+        }
+    };
+
+    function closeTutorial() {
+        if (!modal.classList.contains("is-open")) return;
+        if (closePromise) return closePromise;
+        closePromise = new Promise(resolve => {
+            modal.classList.remove("is-visible");
+            document.body.classList.remove("sigho-tutorial-lock");
+            window.setTimeout(() => {
+                modal.classList.remove("is-open");
+                closePromise = null;
+                if (previousFocus && typeof previousFocus.focus === "function") previousFocus.focus();
+                previousFocus = null;
+                resolve();
+            }, 240);
+        });
+        return closePromise;
+    }
+
+    helpButton.addEventListener("click", () => {
+        const user = typeof usuarioActual !== "undefined" ? usuarioActual : activeUser;
+        openTutorial(user);
+    });
+    closeButton.addEventListener("click", closeTutorial);
+    prevButton.addEventListener("click", () => {
+        if (currentIndex > 0) { currentIndex--; renderStep(); }
+    });
+    nextButton.addEventListener("click", () => {
+        if (currentIndex < currentSteps.length - 1) {
+            currentIndex++;
+            renderStep();
+        } else {
+            closeTutorial();
+        }
+    });
+    modal.addEventListener("click", event => {
+        if (event.target === modal) closeTutorial();
+    });
+    document.addEventListener("keydown", event => {
+        if (!modal.classList.contains("is-open")) return;
+        if (event.key === "Escape") {
+            event.preventDefault();
+            closeTutorial();
+        } else if (event.key === "ArrowRight" && currentIndex < currentSteps.length - 1) {
+            currentIndex++;
+            renderStep();
+        } else if (event.key === "ArrowLeft" && currentIndex > 0) {
+            currentIndex--;
+            renderStep();
+        } else if (event.key === "Tab") {
+            const focusable = [closeButton, ...dots.querySelectorAll("button"), prevButton, nextButton]
+                .filter(el => !el.disabled && el.offsetParent !== null);
+            if (!focusable.length) return;
+            const first = focusable[0], last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault(); last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault(); first.focus();
+            }
+        }
+    });
+
+    // La ayuda solo se muestra cuando hay una sesión activa. No se abre sola.
+    if (typeof usuarioActual !== "undefined" && usuarioActual) {
+        window.sighoTutorialUpdateAvailability(usuarioActual);
+    }
+})();
+</script>
+
 </body>
 </html>
