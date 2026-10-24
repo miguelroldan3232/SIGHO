@@ -2170,6 +2170,13 @@ try {
                         $st = $pdo->prepare('UPDATE staff SET service_site = NULL, service_project = NULL WHERE user_id = ?');
                         $st->execute([$userId]);
                     }
+                    $verificationCode = create_email_verification($pdo, $userId);
+                    $approvedIdentity = [
+                        'email' => (string)$r['email'],
+                        'name' => trim((string)$r['first_name'] . ' ' . (string)$r['last_name']),
+                        'role' => (string)$r['role_code'],
+                        'code' => $verificationCode,
+                    ];
                 }
                 $st = $pdo->prepare('UPDATE access_requests SET status=?, validated_by=?, validated_at=NOW() WHERE id=?');
                 $st->execute([$status, (int)require_login()['id'], $id]);
