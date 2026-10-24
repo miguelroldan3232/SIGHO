@@ -16,7 +16,7 @@ Las contraseñas de prueba:
 
 Estudiante: ESTUDIANTE123
 Profesor: PROFESOR123
-Administrador: ADMIN123
+Administrador: [ADMIN123]
 Super Admin: ADMINDELOSADMIN1223
 Juan: juan123
 Carlos: Profesor123

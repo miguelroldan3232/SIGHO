@@ -30,6 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `access_requests` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `identification` varchar(50) NOT NULL,
+  `document_type` varchar(50) DEFAULT NULL,
   `first_name` varchar(80) NOT NULL,
   `last_name` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,
@@ -97,6 +98,24 @@ CREATE TABLE `hour_records` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `hour_record_evidence`
+--
+
+CREATE TABLE `hour_record_evidence` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `record_id` bigint(20) UNSIGNED NOT NULL,
+  `original_name` varchar(255) NOT NULL,
+  `evidence_path` varchar(500) NOT NULL,
+  `evidence_mime` varchar(100) NOT NULL,
+  `file_size` int(10) UNSIGNED NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_hour_record_evidence_record` (`record_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `hour_records`
@@ -536,6 +555,13 @@ ALTER TABLE `access_requests`
 ALTER TABLE `hour_records`
   ADD CONSTRAINT `fk_hours_reviewer` FOREIGN KEY (`reviewed_by`) REFERENCES `staff` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `fk_hours_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `hour_record_evidence`
+--
+ALTER TABLE `hour_record_evidence`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  ADD CONSTRAINT `fk_hour_record_evidence_record` FOREIGN KEY (`record_id`) REFERENCES `hour_records` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `review_history`
