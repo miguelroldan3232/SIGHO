@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>SIGHO | Servicio Social · I.E. José Joaquín Flórez Hernández</title>
-<link rel="icon" type="image/jpeg" href="escudo_jjfh.jpg">
+<link rel="icon" type="image/png" href="escudo_jjfh.png">
 <style>
 
         * {
@@ -9141,7 +9141,7 @@ body.sigho-awaiting-terms #sigho-splash * {
             <span class="sigho-splash-ring" aria-hidden="true"></span>
             <img
                 class="sigho-splash-crest"
-                src="escudo_jjfh.jpg"
+                src="escudo_jjfh.png"
                 alt="Escudo de la Institución Educativa José Joaquín Flórez Hernández"
             />
         </div>
@@ -9318,6 +9318,9 @@ body.sigho-awaiting-terms #sigho-splash * {
     const USER_KEY = "sigho_user";
     const TOKEN_KEY = "sigho_token";
 
+    // Fail closed: ningún dato local autentica al usuario. Solo api.php puede hacerlo.
+    window.__sighoServerSessionValidated = false;
+
     function guardarSesionSigho(usuario, token) {
         if (!usuario) return;
         try {
@@ -9344,40 +9347,37 @@ body.sigho-awaiting-terms #sigho-splash * {
         } catch (_) {}
     }
 
+    function limpiarEstadoNoValidado() {
+        // Borrar claves de autenticación, conservando preferencias como el tema.
+        limpiarSesionSigho();
+        try {
+            ["justLoggedIn", "sigho_user", "sigho_token", "usuarioActual", "usuario", "sessionUser"]
+                .forEach(clave => sessionStorage.removeItem(clave));
+        } catch (_) {}
+        try {
+            const banner = document.getElementById("xbox-toast");
+            if (banner) {
+                banner.classList.remove("show");
+                banner.style.animation = "none";
+                banner.style.opacity = "0";
+                banner.style.visibility = "hidden";
+                banner.style.pointerEvents = "none";
+            }
+        } catch (_) {}
+    }
+
+    window.__sighoClearUnvalidatedSession = limpiarEstadoNoValidado;
+
     // API pequeña para que el código existente pueda persistir/limpiar sesión.
     window.guardarSesionSigho = guardarSesionSigho;
     window.recuperarSesionSigho = recuperarSesionSigho;
     window.limpiarSesionSigho = limpiarSesionSigho;
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const usuario = recuperarSesionSigho();
-        if (!usuario) return;
-
-        // Si el código actual ya dejó una sesión válida, no interferir.
-        if (typeof usuarioActual !== "undefined" && usuarioActual) return;
-
-        // Intentar reutilizar el flujo de navegación existente por rol.
-        try {
-            if (typeof window.usuarioActual !== "undefined") {
-                window.usuarioActual = usuario;
-try { guardarSesionSigho(usuarioActual); } catch (_) {}
-            }
-
-            const rol = String(usuario.rol || "").toLowerCase();
-            if (rol === "estudiante" && typeof window.abrirEstudiante === "function") {
-                window.abrirEstudiante();
-            } else if (rol === "profesor" && typeof window.abrirProfesor === "function") {
-                window.abrirProfesor();
-            } else if (rol === "administrador" && typeof window.abrirAdministrador === "function") {
-                window.abrirAdministrador();
-            } else if (typeof window.abrirSuperAdmin === "function") {
-                window.abrirSuperAdmin();
-            }
-        } catch (_) {
-            // Si la sesión guardada no es compatible con la versión actual,
-            // se conserva el login normal en lugar de romper la aplicación.
-        }
-    });
+    // No restaurar la interfaz protegida únicamente desde localStorage.
+    // El panel solo se abre después de que api.php confirme la sesión del servidor.
+    // Así se evitan falsos errores al abrir la página o después de reiniciar XAMPP.
+    // La sesión real se comprueba en el arranque mediante api("session").
+    // No restaurar paneles, notificaciones ni audio desde la caché local.
 
     // Intercepta la limpieza explícita de sesión solo cuando el código existente
     // llama a una función de cierre conocida, sin tocar peticiones ni navegación.
@@ -9407,7 +9407,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div class="hero-glow hero-glow-two"></div>
 <div class="hero-brand">
 <div class="crest-wrap">
-<img alt="Escudo de la Institución Educativa José Joaquín Flórez Hernández" class="crest" src="escudo_jjfh.jpg"/>
+<img alt="Escudo de la Institución Educativa José Joaquín Flórez Hernández" class="crest" src="escudo_jjfh.png"/>
 </div>
 <div class="brand-copy">
 <span class="brand-kicker">INSTITUCIÓN EDUCATIVA</span>
@@ -9508,7 +9508,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 </div>
 <div class="sigho-school-note">
-<img alt="" class="note-crest" src="escudo_jjfh.jpg"/>
+<img alt="" class="note-crest" src="escudo_jjfh.png"/>
 <div>
 <strong>Institución Educativa José Joaquín Flórez Hernández</strong>
 <p>
@@ -9528,7 +9528,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <section class="screen auth-screen" id="solicitud">
 <div class="options auth-card auth-card-request" style="width:100%; margin:0;">
 <div class="auth-hero">
-<div class="auth-hero-crest"><img alt="Escudo de la Institución Educativa José Joaquín Flórez Hernández" src="escudo_jjfh.jpg"/></div>
+<div class="auth-hero-crest"><img alt="Escudo de la Institución Educativa José Joaquín Flórez Hernández" src="escudo_jjfh.png"/></div>
 <div>
 <span class="auth-kicker">SIGHO · JJFH</span>
 <h1>Solicita tu acceso</h1>
@@ -9903,7 +9903,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <section class="screen auth-screen" id="login">
 <div class="options auth-card auth-card-login" style="width:100%; margin:0;">
 <div class="auth-hero">
-<div class="auth-hero-crest"><img alt="Escudo de la Institución Educativa José Joaquín Flórez Hernández" src="escudo_jjfh.jpg"/></div>
+<div class="auth-hero-crest"><img alt="Escudo de la Institución Educativa José Joaquín Flórez Hernández" src="escudo_jjfh.png"/></div>
 <div>
 <span class="auth-kicker">SIGHO · JJFH</span>
 <h1>Bienvenido de nuevo</h1>
@@ -9957,7 +9957,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div aria-hidden="true" class="mobile-sidebar-backdrop" onclick="closeMobileSidebar('estudiante')"></div>
 <aside aria-label="Menú principal del estudiante" class="role-sidebar">
 <div class="sidebar-brand">
-<img alt="Escudo JJFH" src="escudo_jjfh.jpg"/>
+<img alt="Escudo JJFH" src="escudo_jjfh.png"/>
 <div>
 <strong>SIGHO</strong>
 <span>JJFH</span>
@@ -10246,7 +10246,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div aria-hidden="true" class="mobile-sidebar-backdrop" onclick="closeMobileSidebar('profesor')"></div>
 <aside aria-label="Menú principal del profesor" class="role-sidebar">
 <div class="sidebar-brand">
-<img alt="Escudo JJFH" src="escudo_jjfh.jpg"/>
+<img alt="Escudo JJFH" src="escudo_jjfh.png"/>
 <div>
 <strong>SIGHO</strong>
 <span>JJFH</span>
@@ -10254,7 +10254,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="sidebar-role">Funcionario público</div>
 <nav class="sidebar-nav">
-<button hidden="" id="sidebarVolverSuperAdminProfesor" onclick="abrirSuperAdmin()" type="button">
+<button hidden="" id="sidebarVolverSuperAdminProfesor" onclick="volverAlSuperAdminDesdeVista('profesor')" type="button">
 <span class="sidebar-icon">🛡️</span><span>Volver al Super Admin</span>
 </button>
 <button id="sidebarInicioProfesor" onclick="mostrarSeccionProfesor('inicio')">
@@ -10560,7 +10560,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 <div aria-hidden="true" class="mobile-sidebar-backdrop" onclick="closeMobileSidebar('administrador')"></div>
 <aside aria-label="Menú principal del administrador" class="role-sidebar">
 <div class="sidebar-brand">
-<img alt="Escudo JJFH" src="escudo_jjfh.jpg"/>
+<img alt="Escudo JJFH" src="escudo_jjfh.png"/>
 <div>
 <strong>SIGHO</strong>
 <span>JJFH</span>
@@ -10568,7 +10568,7 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 </div>
 <div class="sidebar-role">Administrador</div>
 <nav aria-label="Navegación del administrador" class="sidebar-nav">
-<button hidden="" id="sidebarVolverSuperAdminAdministrador" onclick="abrirSuperAdmin()" type="button">
+<button hidden="" id="sidebarVolverSuperAdminAdministrador" onclick="volverAlSuperAdminDesdeVista('administrador')" type="button">
 <span class="sidebar-icon">🛡️</span><span>Volver al Super Admin</span>
 </button>
 <button data-admin-seccion="inicio" id="sidebarInicioAdministrador" type="button">
@@ -11233,10 +11233,18 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
             const data = await api('verify_request_email', { method: 'POST', body: { ...solicitudVerificacionActual, codigo: valorCodigo } });
             if (estado) { estado.classList.add('success'); estado.textContent = data.message || 'Correo verificado.'; }
             document.getElementById('modalVerificacionCorreo')?.classList.remove('show');
+            document.getElementById('identityVerificationForm')?.reset();
             solicitudVerificacionActual = null;
-            await mostrarConfirmacionSolicitud();
+
+            // La verificación fue exitosa: dejar en blanco el formulario completo inmediatamente.
+            limpiarFormularioSolicitudCompleto();
             const mensaje = document.getElementById('mensajeSolicitud');
-            if (mensaje) { mensaje.style.display = 'block'; mensaje.innerText = data.message || 'Correo verificado. Tu solicitud está pendiente de revisión.'; }
+            if (mensaje) {
+                mensaje.style.display = 'block';
+                mensaje.className = 'message';
+                mensaje.textContent = data.message || 'Correo verificado. Tu solicitud está pendiente de revisión.';
+            }
+            await mostrarConfirmacionSolicitud();
             window.alert(data.message || 'Correo verificado correctamente. Tu solicitud está pendiente de revisión por un administrador.');
         } catch (error) {
             if (estado) { estado.classList.remove('success'); estado.textContent = error.message || 'No se pudo verificar el código.'; }
@@ -11255,6 +11263,8 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 
     async function completarInicioSesion(usuario, reproducirSonido = true) {
         usuarioActual = normalizarUsuario(usuario);
+        // Se invoca solo después de que el endpoint de login respondió correctamente.
+        window.__sighoServerSessionValidated = true;
         try { guardarSesionSigho(usuarioActual); } catch (_) {}
         try { sessionStorage.setItem("justLoggedIn", "1"); } catch (_) {}
         const mensaje = document.getElementById("mensajeLogin");
@@ -12841,35 +12851,7 @@ async function enviarSolicitud() {
 
         await mostrarConfirmacionSolicitud();
 
-        document.querySelectorAll("#solicitud input, #solicitud select").forEach(el => {
-            if (el.type === "checkbox") el.checked = false;
-            else el.value = "";
-        });
-
-        const estudiante = document.getElementById("camposSolicitudEstudiante");
-        const personal = document.getElementById("camposSolicitudPersonal");
-        if (estudiante) estudiante.style.display = "none";
-        if (personal) personal.style.display = "none";
-        const claveEst = document.getElementById("claveSolicitud");
-        const claveProf = document.getElementById("claveSolicitudProfesor");
-        if (claveEst) claveEst.value = "";
-        if (claveProf) claveProf.value = "";
-        const epsOtroSolicitud = document.getElementById("epsOtroSolicitud");
-        const grupoEpsOtroSolicitud = document.getElementById("grupoEpsOtroSolicitud");
-        const epsSolicitud = document.getElementById("epsSolicitud");
-        if (epsSolicitud) epsSolicitud.value = "";
-        if (epsOtroSolicitud) { epsOtroSolicitud.value = ""; epsOtroSolicitud.disabled = true; epsOtroSolicitud.required = false; }
-        if (grupoEpsOtroSolicitud) grupoEpsOtroSolicitud.style.display = "none";
-
-        const comunes = document.getElementById("camposSolicitudComunes");
-        if (comunes) comunes.style.display = "none";
-        const rolSelect = document.getElementById("rolSolicitud");
-        if (rolSelect) rolSelect.value = "";
-        llenarAniosServicio();
-        configurarJornadaPorGrado();
-        configurarSelectorEvidencia();
-    configurarValidacionCamposOtro();
-        configurarSelectoresEPS();
+        limpiarFormularioSolicitudCompleto();
     } catch (error) {
         // api() ya convierte la respuesta del backend en Error usando data.message.
         // Por eso aquí se muestra exactamente el mensaje SQL que devuelva PHP.
@@ -12976,6 +12958,14 @@ function configurarRestriccionesRegistroHoras(gradoForzado = "") {
 }
 
 async function abrirSuperAdmin() {
+    // Nunca enviar a login a un rol estándar por una llamada accidental a esta vista.
+    if (usuarioActual?.rol !== "superadmin") {
+        sincronizarBotonesVolverSuperAdmin();
+        return;
+    }
+    // Al regresar a la consola, ya no se está en modo de vista previa.
+    modoVistaSuperAdmin = null;
+    sincronizarBotonesVolverSuperAdmin();
     try {
         const data = await api("superadmin_data");
         solicitudes = data.requests || [];
@@ -13679,8 +13669,11 @@ async function validarSolicitud(id, estado) {
             : (estado === "aceptada" ? "Solicitud aceptada." : "Solicitud rechazada."));
 
         await actualizarAdministrador();
-        // Mantener el panel de solicitudes abierto después de procesar la acción.
-        mostrarSeccionAdministrador("solicitudes-personal");
+        // Mantener el flujo de trabajo según el tipo de solicitud procesada.
+        const seccionDestino = solicitud.rol === "estudiante"
+            ? "solicitudes-estudiantes"
+            : "solicitudes-personal";
+        mostrarSeccionAdministrador(seccionDestino);
         alert(mensaje);
     } catch (error) {
         alert(error?.message || "Ocurrió un error al procesar la solicitud.");
@@ -13970,9 +13963,36 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
     }
 }
 
+function sincronizarBotonesVolverSuperAdmin() {
+    const esSuperAdminReal = usuarioActual?.rol === "superadmin";
+    const mostrarProfesor = esSuperAdminReal && modoVistaSuperAdmin === "profesor";
+    const mostrarAdministrador = esSuperAdminReal && modoVistaSuperAdmin === "administrador";
+
+    [
+        ["sidebarVolverSuperAdminProfesor", mostrarProfesor],
+        ["sidebarVolverSuperAdminAdministrador", mostrarAdministrador]
+    ].forEach(([id, visible]) => {
+        const boton = document.getElementById(id);
+        if (!boton) return;
+        boton.hidden = !visible;
+        boton.setAttribute("aria-hidden", String(!visible));
+        if (visible) boton.style.removeProperty("display");
+        else boton.style.setProperty("display", "none", "important");
+    });
+}
+
+function volverAlSuperAdminDesdeVista(vista) {
+    // Solo una cuenta Super Admin real que esté en la vista previa puede regresar.
+    if (usuarioActual?.rol !== "superadmin" || modoVistaSuperAdmin !== vista) {
+        sincronizarBotonesVolverSuperAdmin();
+        return;
+    }
+    abrirSuperAdmin();
+}
+
 async function abrirProfesor() {
     modoVistaSuperAdmin = usuarioActual?.rol === "superadmin" ? "profesor" : null;
-    document.getElementById("sidebarVolverSuperAdminProfesor")?.toggleAttribute("hidden", usuarioActual?.rol !== "superadmin");
+    sincronizarBotonesVolverSuperAdmin();
     document.getElementById("menuDatosProfesor")?.toggleAttribute("hidden", usuarioActual?.rol === "superadmin");
     document.querySelector("#profesor .profesor-admin-request-card")?.toggleAttribute("hidden", usuarioActual?.rol === "superadmin");
     ocultarPantallas();
@@ -13984,7 +14004,7 @@ async function abrirProfesor() {
 
 async function abrirAdministrador() {
     modoVistaSuperAdmin = usuarioActual?.rol === "superadmin" ? "administrador" : null;
-    document.getElementById("sidebarVolverSuperAdminAdministrador")?.toggleAttribute("hidden", usuarioActual?.rol !== "superadmin");
+    sincronizarBotonesVolverSuperAdmin();
     ocultarPantallas();
     document.getElementById("administrador").classList.add("active");
 
@@ -13997,8 +14017,14 @@ async function abrirAdministrador() {
 }
 
 async function abrirSuperAdmin() {
+    // Bloqueo adicional: una cuenta estándar nunca debe terminar en login por una llamada accidental.
+    if (usuarioActual?.rol !== "superadmin") {
+        sincronizarBotonesVolverSuperAdmin();
+        return;
+    }
+    modoVistaSuperAdmin = null;
+    sincronizarBotonesVolverSuperAdmin();
     try {
-        modoVistaSuperAdmin = null;
         const data = await api("superadmin_data");
         solicitudes = data.requests || [];
         superAdminData = data;
@@ -14623,6 +14649,54 @@ document.addEventListener("click", (evento) => {
 });
 
 let resolverSolicitudExito = null;
+
+function limpiarFormularioSolicitudCompleto() {
+    const contenedor = document.getElementById("solicitud");
+    if (!contenedor) return;
+
+    contenedor.querySelectorAll("input, select, textarea").forEach(campo => {
+        if (campo.type === "checkbox" || campo.type === "radio") {
+            campo.checked = false;
+        } else if (campo.tagName === "SELECT") {
+            campo.selectedIndex = 0;
+        } else if (!["button", "submit", "reset"].includes(campo.type)) {
+            campo.value = "";
+        }
+        campo.setCustomValidity?.("");
+        campo.classList.remove("campo-error");
+        campo.removeAttribute("aria-invalid");
+    });
+
+    const rolSolicitud = document.getElementById("rolSolicitud");
+    if (rolSolicitud) rolSolicitud.value = "";
+
+    const estudiante = document.getElementById("camposSolicitudEstudiante");
+    const personal = document.getElementById("camposSolicitudPersonal");
+    const comunes = document.getElementById("camposSolicitudComunes");
+    if (estudiante) estudiante.style.display = "none";
+    if (personal) personal.style.display = "none";
+    if (comunes) comunes.style.display = "none";
+
+    // Reaplicar los estados iniciales de jornada, teléfono, seguridad social y campos condicionales.
+    if (typeof actualizarCamposSolicitud === "function") actualizarCamposSolicitud();
+    if (typeof reiniciarSelectorEvidencia === "function") reiniciarSelectorEvidencia();
+
+    const mensaje = document.getElementById("mensajeSolicitud");
+    if (mensaje) {
+        mensaje.classList.remove("error-message", "auth-error-message");
+        mensaje.classList.add("message");
+        mensaje.style.display = "none";
+        mensaje.textContent = "";
+    }
+
+    // Restablecer campos condicionales y valores asignados automáticamente.
+    llenarAniosServicio();
+    configurarJornadaPorGrado();
+    configurarSelectorEvidencia();
+    configurarValidacionCamposOtro();
+    configurarSelectoresEPS();
+    limpiarErroresFormulario(contenedor);
+}
 
 function mostrarConfirmacionSolicitud() {
     return new Promise(resolve => {
@@ -16019,11 +16093,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     configurarJornadaPorGrado();
     actualizarCamposLogin();
     try {
+        // Validación obligatoria contra PHP antes de restaurar cualquier panel.
         const data = await api("session");
         actualizarConfiguracionLocal(data?.settings);
-        if (!data?.user) return;
+
+        if (data?.authenticated !== true || !data?.user) {
+            usuarioActual = null;
+            window.__sighoServerSessionValidated = false;
+            if (typeof window.__sighoClearUnvalidatedSession === "function") window.__sighoClearUnvalidatedSession();
+            return; // Sin sesión: permanecer silenciosamente en la pantalla pública.
+        }
 
         usuarioActual = normalizarUsuario(data.user);
+        if (!usuarioActual || !usuarioActual.rol) {
+            usuarioActual = null;
+            window.__sighoServerSessionValidated = false;
+            if (typeof window.__sighoClearUnvalidatedSession === "function") window.__sighoClearUnvalidatedSession();
+            return;
+        }
+
+        // A partir de aquí el usuario fue confirmado por la sesión PHP.
+        window.__sighoServerSessionValidated = true;
         try { guardarSesionSigho(usuarioActual); } catch (_) {}
         await cargarDatosPorRol();
 
@@ -16039,7 +16129,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else if (usuarioActual.rol === "superadmin") {
             await abrirSuperAdmin();
         }
-    } catch (_) {}
+
+        // Si el Splash ya terminó, bienvenida solo después de confirmar PHP.
+        if (window.__sighoSplashFinished === true && typeof window.__sighoTryShowXboxWelcome === "function") {
+            window.__sighoTryShowXboxWelcome();
+        }
+    } catch (_) {
+        // Fallos de conexión o sesión al arrancar: silenciosos y sin falso login.
+        usuarioActual = null;
+        window.__sighoServerSessionValidated = false;
+        if (typeof window.__sighoClearUnvalidatedSession === "function") window.__sighoClearUnvalidatedSession();
+    }
 });
 
 
@@ -16937,6 +17037,11 @@ function verDetalleSolicitud(id) {
             campo("Días seleccionados", dias, "full")
         ])
     ].join("");
+
+    // La ficha es una ventana modal; la vista de fondo debe seguir siendo Solicitudes de estudiantes.
+    if (document.getElementById("administrador")?.classList.contains("active")) {
+        mostrarSeccionAdministrador("solicitudes-estudiantes");
+    }
 
     const modal = document.getElementById("modalFichaSolicitud");
     if (!modal.dataset.tecladoConfigurado) {
@@ -19922,12 +20027,15 @@ body.dark-mode textarea[disabled].campo-error {
             if (typeof usuarioActual !== "undefined" && usuarioActual) return usuarioActual;
         } catch (_) {}
 
-        try {
-            if (typeof window.recuperarSesionSigho === "function") {
-                const usuario = window.recuperarSesionSigho();
-                if (usuario) return usuario;
-            }
-        } catch (_) {}
+        // La caché local solo puede usarse como dato auxiliar tras validar PHP.
+        if (window.__sighoServerSessionValidated === true) {
+            try {
+                if (typeof window.recuperarSesionSigho === "function") {
+                    const usuario = window.recuperarSesionSigho();
+                    if (usuario) return usuario;
+                }
+            } catch (_) {}
+        }
 
         return null;
     }
@@ -20513,6 +20621,7 @@ body.dark-mode textarea[disabled].campo-error {
     }
 
     function mostrarAnimacionXbox(nombreUsuario) {
+        if (window.__sighoServerSessionValidated !== true) return;
         const banner = document.getElementById("xbox-toast");
         if (!banner) return;
 
@@ -20597,13 +20706,15 @@ body.dark-mode textarea[disabled].campo-error {
      * como al refrescar la página dentro de cualquier panel protegido.
      */
     window.__sighoTryShowXboxWelcome = function () {
+        // La caché local nunca basta: se exige confirmación de sesión por servidor.
+        if (window.__sighoServerSessionValidated !== true) return;
         if (window.__sighoSplashFinished !== true) return;
         if (typeof window.mostrarAnimacionXbox !== "function") return;
 
         const usuario = obtenerUsuarioGuardado();
-        if (!usuario || typeof usuario !== "object") return;
+        if (!usuario || typeof usuario !== "object" || !usuario.rol) return;
 
-        /* mostrarAnimacionXbox() obtiene por sí misma nombre y rol dinámicos. */
+        /* El almacenamiento solo se consulta después de validar la sesión con el servidor. */
         window.mostrarAnimacionXbox();
     };
 
@@ -20620,6 +20731,14 @@ body.dark-mode textarea[disabled].campo-error {
 /* Bloquea el overscroll en el borde, sin intervenir en el desplazamiento normal. */
 html, body {
     overscroll-behavior-y: none !important;
+}
+
+/* El botón de regreso al Super Admin debe permanecer oculto aunque otras reglas den display:flex. */
+#sidebarVolverSuperAdminProfesor[hidden],
+#sidebarVolverSuperAdminAdministrador[hidden] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 </style>
 </body>

@@ -211,8 +211,8 @@ function send_identity_email(string $email, string $name, string $role, string $
     $mailer->AltBody = "Hola {$name}, tu solicitud de acceso a SIGHO fue aprobada como {$role}. "
         . "Inicia sesión y escribe este código para confirmar tu correo: {$code}. "
         . "El código vence en 30 minutos. Si tú no solicitaste la cuenta, elige “No fui yo” para eliminarla.";
-    $logo = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'escudo_jjfh.jpg';
-    if (is_file($logo)) $mailer->addEmbeddedImage($logo, 'sigho-logo', 'escudo_jjfh.jpg');
+    $logo = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'escudo_jjfh.png';
+    if (is_file($logo)) $mailer->addEmbeddedImage($logo, 'sigho-logo', 'escudo_jjfh.png');
     $mailer->send();
 }
 
@@ -411,7 +411,26 @@ function role_name(int $roleId): string {
 }
 
 function current_user(): ?array {
-    return $_SESSION['user'] ?? null;
+    $user = $_SESSION['user'] ?? null;
+    if (!is_array($user) || !$user) return null;
+
+    // Expiración real por inactividad: 30 minutos sin peticiones autenticadas.
+    // Las sesiones antiguas sin marca de actividad reciben una inicialización
+    // segura para evitar cierres falsos tras actualizar el código.
+    $now = time();
+    $lastActivity = isset($_SESSION['last_activity']) ? (int)$_SESSION['last_activity'] : $now;
+    if ($now - $lastActivity > 1800) {
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', $now - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+        }
+        session_destroy();
+        return null;
+    }
+
+    $_SESSION['last_activity'] = $now;
+    return $user;
 }
 
 function require_login(): array {
@@ -844,7 +863,7 @@ try {
             }
             $pdo = db();
             $settings = sigho_settings_data($pdo);
-            respond(['ok' => true, 'user' => $user, 'settings' => [
+            respond(['ok' => true, 'authenticated' => (bool)$user, 'user' => $user, 'settings' => [
                 'institutional_domain' => $settings['institutional_domain']['valor'],
                 'academic_hours_target' => (int)$settings['academic_hours_target']['valor'],
                 'technical_hours_target' => (int)$settings['technical_hours_target']['valor'],
@@ -882,6 +901,7 @@ try {
             $payload = user_payload($u);
             $payload['emailVerificada'] = email_verified((int)$u['id']);
             $_SESSION['user'] = $payload;
+            $_SESSION['last_activity'] = time();
             session_regenerate_id(true);
             respond(['ok' => true, 'user' => $payload]);
 
