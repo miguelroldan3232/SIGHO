@@ -4,6 +4,17 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script id="sigho-direct-login-prepaint">
+(function(){try{if(new URLSearchParams(window.location.search).get("abrirLogin")==="1"){document.documentElement.classList.add("sigho-direct-login");}}catch(_){}})();
+</script>
+<style id="sigho-direct-login-prepaint-css">
+html.sigho-direct-login #sigho-terms-gate,
+html.sigho-direct-login #sigho-splash,
+html.sigho-direct-login .xbox-welcome,
+html.sigho-direct-login #xbox-welcome,
+html.sigho-direct-login .sigho-xbox-welcome {display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;animation:none!important;transition:none!important;}
+html.sigho-direct-login body {opacity:1!important;}
+</style>
 <title>SIGHO | Servicio Social · I.E. José Joaquín Flórez Hernández</title>
 <link rel="icon" type="image/png" href="escudo_jjfh.png">
 <style>
@@ -801,7 +812,6 @@
         #profesor .profesor-historial-table th:nth-child(10),
         #profesor .profesor-historial-table td:nth-child(10) { width: 11%; }
 
-
         /* =========================
            SECCIONES
         ========================= */
@@ -1027,7 +1037,6 @@
             color: white;
             border-color: #8da9ae;
         }
-
 
         .back {
             border: 1px solid #b8c9cc;
@@ -1528,7 +1537,6 @@
         html.dark-mode .identity-verification-body input, body.dark-mode .identity-verification-body input { background: #172334; color: #f8fafc; border-color: #475569; }
         html.dark-mode .identity-verification-status.success, body.dark-mode .identity-verification-status.success { color: #86efac; }
 
-
         .modal-close {
             margin-top: 16px;
             border: 1px solid #cbdde5;
@@ -1539,7 +1547,6 @@
             cursor: pointer;
             font-weight: 700;
         }
-
 
         .field-help {
             display: block;
@@ -2209,7 +2216,6 @@
 .request-admin-actions { display:flex; gap:8px; flex-wrap:wrap; }
 @media(max-width:700px){ .admin-progress-toolbar{justify-content:stretch;} .admin-progress-toolbar .form-group{width:100%;} }
 
-
 /* Validación en tiempo real para campos "Otro" */
 .input-validacion-texto {
     ime-mode: active;
@@ -2395,7 +2401,6 @@
 .superadmin-help-chat .superadmin-help-chat-form button { width:auto; min-width:88px; }
 .superadmin-user-create-actions { display:flex; flex-wrap:wrap; gap:8px; }
 @media (max-width:760px) { .superadmin-shell { grid-template-columns:1fr; } .superadmin-nav { padding:14px; } .superadmin-brand { padding-bottom:14px; } .superadmin-tab { display:inline-block; width:calc(50% - 5px); } .superadmin-tab-help { margin-top:0; } .superadmin-logout { margin-top:10px; width:100%; } .superadmin-main { padding:22px 14px; } .superadmin-main .dashboard-header { margin:0 0 20px; padding:18px; } .superadmin-form { grid-template-columns:1fr; } .superadmin-form .wide { grid-column:auto; } .superadmin-user-tools { align-items:stretch; flex-direction:column; } .superadmin-user-count { margin-left:0; padding:0; } .superadmin-help-grid { grid-template-columns:1fr; } .superadmin-help-chat,.role-help-chat { flex-direction:column; } .superadmin-help-chat button,.role-help-chat button { min-height:42px; } .superadmin-home-quick { align-items:flex-start; flex-direction:column; } .superadmin-home-quick button { width:100%; } .ai-message { max-width:100%; } }
-
 
 /* =========================================================
    MEJORAS MÓVILES SIGHO — EXCLUSIVAS HASTA 900px
@@ -3053,11 +3058,6 @@ body:has(.dashboard-screen.active) .container {
     font-size: 11px;
 }
 
-.profile-chevron {
-    color: #7890a0;
-    font-size: 15px;
-}
-
 .user-dropdown {
     right: 0;
     top: calc(100% + 8px);
@@ -3264,8 +3264,6 @@ td {
     }
 }
 
-
-
 .table-secondary-text {
     display: block;
     margin-top: 3px;
@@ -3297,8 +3295,6 @@ td {
     color: #718492;
     font-size: 11px;
 }
-
-
 
 /* =====================================================
    SCROLL PÚBLICO: LA LANDING DEBE DESPLAZARSE DESDE EL PRINCIPIO
@@ -3486,7 +3482,6 @@ body:has(.dashboard-screen.active) .container {
     #profesor .profesor-historial-table th,
     #profesor .profesor-historial-table td { font-size: 13px; padding: 10px 7px; }
 }
-
 
 #profesor .professor-page-title { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; margin-bottom:18px; }
 #profesor .page-eyebrow { display:inline-block; color:#1769aa; font-size:10px; font-weight:800; letter-spacing:1.5px; margin-bottom:4px; }
@@ -3746,7 +3741,6 @@ body:has(.dashboard-screen.active) .container {
     #estudiante .student-record-filters { width:100%; }
     #estudiante .student-filter-button { flex:1 1 calc(50% - 8px); }
 }
-
 
 /* =========================================================
    PANEL ADMINISTRADOR — MISMA ARQUITECTURA QUE PROFESOR
@@ -4381,13 +4375,10 @@ body:has(.dashboard-screen.active) .container {
     }
     #estudiante .profile-user-name,
     #estudiante .profile-role,
-    #estudiante .profile-chevron,
     #profesor .profile-user-name,
     #profesor .profile-role,
-    #profesor .profile-chevron,
     #administrador .profile-user-name,
-    #administrador .profile-role,
-    #administrador .profile-chevron{
+    #administrador .profile-role{
         display:none!important;
     }
     #estudiante .profile-button,
@@ -4915,6 +4906,9 @@ body:has(.dashboard-screen.active) .container {
     z-index: 260;
     padding: 24px;
     background: rgba(8, 26, 45, .58);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     }
 
     .student-request-card {
@@ -4984,8 +4978,13 @@ body:has(.dashboard-screen.active) .container {
 
     .student-request-content {
     display: grid;
+    flex: 1 1 auto;
+    min-height: 0;
     gap: 18px;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     padding: 24px 30px;
     }
 
@@ -7766,7 +7765,6 @@ html.dark-mode .password-universal-toggle:focus-visible {
     }
 }
 
-
 /* =========================================================
    HISTORIAL DE REGISTROS — STATUS BADGES EN MODO OSCURO
    Evita fondos claros, texto ilegible y saltos de línea.
@@ -8763,7 +8761,6 @@ html.sigho-fouc-pending #sigho-splash {
     }
 }
 
-
 /* =========================================================
    SIGHO — AVISO DE USO INSTITUCIONAL / PRE-ARRANQUE
    ========================================================= */
@@ -8912,7 +8909,6 @@ body.sigho-awaiting-terms #sigho-splash * {
 }
 
 </style>
-
 
 <style id="sigho-xbox-welcome-banner-refresh-v1">
 /* ============================================================
@@ -9063,7 +9059,6 @@ body.sigho-awaiting-terms #sigho-splash * {
 }
 </style>
 
-
 <style id="sigho-xbox-toast-zindex-v3">
 /* El toast debe quedar por encima del Splash, sin bloquear clics. */
 #xbox-toast {
@@ -9071,8 +9066,6 @@ body.sigho-awaiting-terms #sigho-splash * {
     pointer-events: none !important;
 }
 </style>
-
-
 
 <style id="sigho-tutorial-interactivo-styles">
     :root {
@@ -9227,6 +9220,30 @@ body.sigho-awaiting-terms #sigho-splash * {
         #sighoTutorialModal .sigho-tutorial-dot, #sighoTutorialModal .sigho-tutorial-btn { transition: none !important; }
     }
 </style>
+
+<style id="sigho-meta-certificado-recuperacion-v1">
+.sigho-completion-banner[hidden],
+#formularioRegistroHoras[hidden],
+#avisoRegistroMetaCompletada[hidden],
+#botonRegistrarJornadaInicio[hidden],
+#sidebarRegistrarEstudiante[hidden] { display:none !important; }
+.sigho-completion-banner { display:flex; align-items:center; gap:16px; margin:0 0 22px; padding:18px 20px; border:1px solid #b7e2c8; border-radius:18px; background:linear-gradient(120deg,#edf9f0,#f7fcf8); color:#194d31; box-shadow:0 8px 22px rgba(24,110,58,.08); }
+.sigho-completion-icon { flex:0 0 46px; width:46px; height:46px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:#24854b; color:#fff; font-size:26px; font-weight:900; }
+.sigho-completion-copy { flex:1; min-width:0; }
+.sigho-completion-copy h3 { margin:0 0 5px; color:#176438; font-size:17px; }
+.sigho-completion-copy p { margin:0; color:#37684a; line-height:1.5; font-size:13px; }
+.sigho-certificate-button { flex:0 0 auto; border:0; border-radius:10px; padding:12px 16px; background:#1769aa; color:#fff; font-weight:800; cursor:pointer; box-shadow:0 5px 12px rgba(23,105,170,.16); }
+.sigho-certificate-button:hover { background:#0d3f70; }
+.service-completed-note { margin:8px 0 18px; padding:18px; border:1px solid #b7e2c8; border-left:5px solid #24854b; border-radius:12px; background:#f0faf3; color:#245e39; line-height:1.6; }
+.service-completed-note strong { display:block; margin-bottom:5px; font-size:16px; }
+.service-completed-note p { margin:0; }
+@media(max-width:720px) { .sigho-completion-banner { align-items:flex-start; flex-wrap:wrap; padding:15px; } .sigho-completion-copy { flex:1 1 calc(100% - 64px); } .sigho-certificate-button { width:100%; margin-left:0; } }
+html.dark-mode .sigho-completion-banner, body.dark-mode .sigho-completion-banner { background:#133323; border-color:#285e40; color:#d5f5df; }
+html.dark-mode .sigho-completion-copy h3, body.dark-mode .sigho-completion-copy h3 { color:#bbf7d0; }
+html.dark-mode .sigho-completion-copy p, body.dark-mode .sigho-completion-copy p { color:#a8dbb8; }
+html.dark-mode .service-completed-note, body.dark-mode .service-completed-note { background:#133323; border-color:#285e40; color:#c3ebce; }
+</style>
+
 </head>
 <body class="sigho-awaiting-terms">
 
@@ -9245,7 +9262,6 @@ body.sigho-awaiting-terms #sigho-splash * {
         <p class="sigho-terms-note">Al continuar se habilitan los sonidos y la experiencia de arranque de SIGHO.</p>
     </div>
 </div>
-
 
 <!-- =========================================================
      SIGHO — XBOX WELCOME TOAST
@@ -10090,6 +10106,7 @@ body.sigho-awaiting-terms #sigho-splash * {
                     Iniciar sesión
 
                 </button>
+<div style="text-align:center;margin-top:14px;margin-bottom:4px;"><a href="recuperar.php" id="enlaceRecuperarClave" style="color:#1769aa;font-size:14px;font-weight:600;text-decoration:underline;">¿Olvidaste tu contraseña?</a></div>
 <div class="message auth-error-message" id="mensajeLogin"></div>
 </div>
 </div>
@@ -10144,7 +10161,7 @@ body.sigho-awaiting-terms #sigho-splash * {
 <span class="profile-avatar">👤</span>
 <span class="profile-user-name" id="nombrePerfilEstudianteHeader">Estudiante</span>
 <span class="profile-role">Estudiante</span>
-<span class="profile-chevron">⌄</span>
+
 </button>
 <div class="more-menu-dropdown user-dropdown">
 <button onclick="mostrarSeccionEstudiante('datos'); cerrarMenuUsuarioEstudiante();">👤 Mis datos</button>
@@ -10152,6 +10169,14 @@ body.sigho-awaiting-terms #sigho-splash * {
 </div>
 </div>
 </header>
+<div class="sigho-completion-banner" id="bannerServicioCompletado" hidden role="status" aria-live="polite">
+  <div class="sigho-completion-icon" aria-hidden="true">✓</div>
+  <div class="sigho-completion-copy">
+    <h3>¡Felicitaciones! Has culminado tu servicio social</h3>
+    <p id="textoServicioCompletado">Has alcanzado la meta de horas aprobadas de tu modalidad.</p>
+  </div>
+  <button class="sigho-certificate-button" id="botonCertificadoPazYSalvo" onclick="descargarCertificadoPazYSalvo()" type="button">Descargar certificado</button>
+</div>
 <section class="role-home-section" id="panelInicioEstudiante">
 <div class="role-kpis student-role-kpis">
 <div class="role-kpi">
@@ -10181,7 +10206,7 @@ body.sigho-awaiting-terms #sigho-splash * {
 </div>
 <div class="student-progress-footer">
 <span id="porcentajeProgresoEstudiante">0%</span>
-<button onclick="mostrarSeccionEstudiante('registrar')" type="button">Registrar una jornada →</button>
+<button id="botonRegistrarJornadaInicio" onclick="mostrarSeccionEstudiante('registrar')" type="button">Registrar una jornada →</button>
 </div>
 </div>
 </section>
@@ -10192,6 +10217,11 @@ body.sigho-awaiting-terms #sigho-splash * {
 <p class="section-description">Registra una jornada realizada, agrega su evidencia y, si deseas, describe la actividad.</p>
 </div>
 </div>
+<div class="service-completed-note" id="avisoRegistroMetaCompletada" hidden>
+  <strong>Servicio social completado</strong>
+  <p>Ya alcanzaste la meta de horas aprobadas. El formulario de nuevas jornadas está bloqueado. Tu certificado está disponible en la parte superior del panel.</p>
+</div>
+<div id="formularioRegistroHoras">
 <div class="security-box">
                         El registro quedará <strong>Pendiente</strong> hasta que un profesor lo revise.
                     </div>
@@ -10224,6 +10254,7 @@ body.sigho-awaiting-terms #sigho-splash * {
 </div>
 <button class="main-button" id="registrarHorasBtn" onclick="registrarHoras()" type="button">Registrar Jornada</button>
 <div class="message" id="mensajeHoras"></div>
+</div>
 </section>
 <section class="section student-role-section" id="seccionRegistros" style="display:none;">
 <div class="professor-section-header">
@@ -10322,7 +10353,6 @@ body.sigho-awaiting-terms #sigho-splash * {
 <input autocomplete="off" id="buscadorAyudaEstudiante" placeholder="Escribe una palabra o pregunta..." type="search"/>
 </div>
 </div>
-
 
 <div class="help-category student-help-category" data-help-category="">
 <h4 class="help-category-title"><span>📝</span>Registro de horas</h4>
@@ -10442,7 +10472,7 @@ body.sigho-awaiting-terms #sigho-splash * {
 <span class="profile-avatar">👤</span>
 <span class="profile-user-name" id="nombrePerfilProfesorHeader">Funcionario público</span>
 <span class="profile-role">Funcionario público</span>
-<span class="profile-chevron">⌄</span>
+
 </button>
 <div class="more-menu-dropdown user-dropdown">
 <button id="menuDatosProfesor" onclick="mostrarSeccionProfesor('datos'); cerrarMenuUsuarioProfesor();">👤 Mis datos</button>
@@ -10607,7 +10637,6 @@ body.sigho-awaiting-terms #sigho-splash * {
 </div>
 </div>
 
-
 <div class="help-category" data-help-category="">
 <h4 class="help-category-title"><span>📋</span>Gestión de registros</h4>
 <div class="faq-list two-columns">
@@ -10748,7 +10777,7 @@ body.sigho-awaiting-terms #sigho-splash * {
 <span class="profile-avatar">👤</span>
 <span class="profile-user-name" id="nombrePerfilAdministradorHeader">Administrador</span>
 <span class="profile-role">Administrador</span>
-<span class="profile-chevron">⌄</span>
+
 </button>
 <div class="more-menu-dropdown user-dropdown">
 <button onclick="mostrarSeccionAdministrador('validaciones'); cerrarMenuUsuarioAdministrador();">🛠️ Sistema</button>
@@ -10901,11 +10930,39 @@ body.sigho-awaiting-terms #sigho-splash * {
 </section>
 <section class="section admin-section" id="seccionAyudaAdministrador" style="display:none;">
 <div class="admin-page-title">
-<div><span class="page-eyebrow">CENTRO DE AYUDA</span><h3>Ayuda del Administrador</h3><p class="section-description">Escribe una pregunta y recibe orientación sobre la gestión del sistema.</p></div>
+<div><span class="page-eyebrow">CENTRO DE AYUDA</span><h3>Ayuda del Administrador</h3><p class="section-description">Busca una pregunta y despliega la respuesta para consultar cómo gestionar SIGHO.</p></div>
 </div>
-
-
-<div class="help-admin-intro"><strong>También puedes consultar las secciones del panel:</strong><br/>gestión de funcionarios públicos, progreso de estudiantes, solicitudes, historial y sistema.</div>
+<div class="help-search-card">
+<label class="help-search-label" for="buscadorAyudaAdministrador">Buscar una duda</label>
+<div class="help-search-wrap"><span aria-hidden="true">🔎</span><input autocomplete="off" id="buscadorAyudaAdministrador" placeholder="Escribe una palabra o pregunta..." type="search" /></div>
+</div>
+<div class="help-category" data-help-category>
+<h4 class="help-category-title"><span>👥</span>Gestión de funcionarios públicos</h4>
+<div class="faq-list two-columns">
+<details class="faq-card" data-faq><summary>¿Cómo asigno una sede o un proyecto a un funcionario?</summary><div class="faq-answer"><p>Entra en <strong>Gestión de funcionarios públicos</strong>, localiza al funcionario, selecciona la sede y el proyecto que le corresponden y guarda los cambios. La asignación define el grupo de estudiantes que puede revisar.</p></div></details>
+<details class="faq-card" data-faq><summary>¿Qué hago si un funcionario no ve a sus estudiantes?</summary><div class="faq-answer"><p>Verifica que su sede y proyecto estén correctamente asignados. Si los datos son correctos y el problema continúa, revisa la información de la cuenta y sus permisos.</p></div></details>
+</div></div>
+<div class="help-category" data-help-category>
+<h4 class="help-category-title"><span>🎓</span>Solicitudes y cuentas</h4>
+<div class="faq-list two-columns">
+<details class="faq-card" data-faq><summary>¿Cómo valido una solicitud de estudiante?</summary><div class="faq-answer"><p>Abre <strong>Solicitudes de estudiantes</strong>, revisa los datos de la solicitud y acepta o rechaza según corresponda. Antes de decidir, comprueba que la información esté completa y sea coherente.</p></div></details>
+<details class="faq-card" data-faq><summary>¿Dónde reviso las solicitudes de funcionarios públicos?</summary><div class="faq-answer"><p>Entra en <strong>Solicitudes de funcionarios públicos / Administrador</strong>. Allí puedes revisar nuevos registros de funcionarios y solicitudes de permisos de administrador.</p></div></details>
+<details class="faq-card" data-faq><summary>¿Qué hago si alguien no puede entrar a su cuenta?</summary><div class="faq-answer"><p>Comprueba que la cuenta esté registrada y que el usuario utilice el correo correcto. Si olvidó su contraseña, debe usar la opción de recuperación disponible en la pantalla de inicio de sesión.</p></div></details>
+</div></div>
+<div class="help-category" data-help-category>
+<h4 class="help-category-title"><span>📊</span>Progreso e historial</h4>
+<div class="faq-list two-columns">
+<details class="faq-card" data-faq><summary>¿Cómo consulto el progreso de un estudiante?</summary><div class="faq-answer"><p>Abre <strong>Progreso de estudiantes</strong> para revisar las horas aprobadas, las horas faltantes y el porcentaje de avance. Puedes usar la búsqueda y el filtro por grado.</p></div></details>
+<details class="faq-card" data-faq><summary>¿Para qué sirve el Historial de revisiones?</summary><div class="faq-answer"><p>Permite consultar registros que ya fueron revisados por los funcionarios públicos. Puedes buscar por estudiante o funcionario y filtrar los registros aceptados, rechazados o todos.</p></div></details>
+<details class="faq-card" data-faq><summary>¿Las horas pendientes cuentan en el progreso?</summary><div class="faq-answer"><p>No. Solo las jornadas aprobadas se suman al total de horas cumplidas. Las pendientes esperan revisión y las rechazadas no se contabilizan como horas aprobadas.</p></div></details>
+</div></div>
+<div class="help-category" data-help-category>
+<h4 class="help-category-title"><span>🔒</span>Seguridad y administración</h4>
+<div class="faq-list two-columns">
+<details class="faq-card" data-faq><summary>¿Qué debo revisar antes de aceptar una solicitud?</summary><div class="faq-answer"><p>Comprueba los datos personales, académicos y de contacto, así como el rol solicitado. Si detectas información incompleta o inconsistente, no la apruebes hasta aclararla.</p></div></details>
+<details class="faq-card" data-faq><summary>¿Debo usar «Reiniciar registros» con frecuencia?</summary><div class="faq-answer"><p>No. Es una acción delicada que puede eliminar datos de operación. Úsala únicamente si está autorizada y después de verificar que exista una copia de seguridad adecuada.</p></div></details>
+</div></div>
+<div class="faq-empty" id="faqVacioAdministrador">No encontramos preguntas que coincidan con tu búsqueda.</div>
 </section>
 </main>
 </div>
@@ -11100,7 +11157,7 @@ body.sigho-awaiting-terms #sigho-splash * {
 <p id="identityVerificationIntro">Ingresa el código de 8 dígitos enviado al correo que registraste en tu solicitud.</p>
 <label for="identityVerificationCode">Código de verificación</label>
 <input aria-describedby="identityVerificationStatus" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" id="identityVerificationCode" name="codigo" inputmode="numeric" maxlength="8" minlength="8" pattern="[0-9]{8}" placeholder="Ingresa los 8 dígitos" type="text" required />
-<p class="identity-verification-hint">El código vence en 30 minutos. Si no lo encuentras, revisa la carpeta de spam o correo no deseado.</p>
+<p class="identity-verification-hint">El código vence en 30 minutos. El correo puede tardar unos minutos en llegar. Si no lo encuentras en Recibidos, revisa también Spam o Correo no deseado.</p>
 <button class="identity-verification-resend" id="identityVerificationResend" onclick="reenviarCodigoVerificacion()" type="button">Reenviar código</button>
 <p aria-live="polite" role="status" class="identity-verification-status" id="identityVerificationStatus"></p>
 </div>
@@ -11310,7 +11367,9 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         const estado = document.getElementById('identityVerificationStatus');
         const codigo = document.getElementById('identityVerificationCode');
         const botonCerrar = document.getElementById('identityVerificationLogout');
-        if (intro) intro.textContent = `Hemos enviado un código de verificación de 8 dígitos a ${solicitudVerificacionActual.correo}. Verifica el correo para que el administrador pueda revisar tu solicitud.`;
+        if (intro) intro.textContent = data.emailSent
+            ? `Hemos enviado un código de verificación de 8 dígitos a ${solicitudVerificacionActual.correo}. Verifica el correo para que el administrador pueda revisar tu solicitud.`
+            : `La solicitud quedó guardada, pero el correo no se pudo enviar a ${solicitudVerificacionActual.correo}. Revisa la configuración SMTP y pulsa “Reenviar código” cuando esté corregida.`;
         if (estado) {
             estado.classList.toggle('success', !!data.emailSent);
             estado.textContent = data.message || '';
@@ -11444,8 +11503,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         };
     }
 
-
-
     // Carga los datos que corresponden al rol que acaba de iniciar sesión.
     // Cada rol consulta únicamente la información que necesita.
     async function cargarDatosPorRol() {
@@ -11494,7 +11551,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 
     }
 
-
     function mostrarSolicitud() {
         restablecerFormulariosAcceso();
         cerrarModales();
@@ -11513,7 +11569,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         actualizarCamposLogin();
         actualizarIndicadoresObligatorios(document.getElementById("login"));
     }
-
 
     function restablecerFormulariosAcceso() {
         const solicitud = document.getElementById("solicitud");
@@ -11561,7 +11616,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
         ocultarPantallas();
         document.getElementById("home")?.classList.add("active");
     }
-
 
     /* =====================================================
        SOLICITUD
@@ -12056,7 +12110,6 @@ async function iniciarSesion() {
         mensaje.innerText = error.message;
     }
 }
-
 
     /* =====================================================
        SOLICITUD
@@ -13157,9 +13210,6 @@ function mostrarAyudaSuperAdmin(tema) {
     if (answer) answer.textContent = respuestas[tema] || "Selecciona una pregunta.";
 }
 
-
-
-
 function configurarSelectorEvidencia() {
     const input = document.getElementById("evidenciaHora");
     const nombre = document.getElementById("nombreEvidenciaHora");
@@ -13441,6 +13491,12 @@ document.addEventListener("keydown", event => {
 });
 
 async function registrarHoras() {
+    const progresoAntesDeEnviar = obtenerProgresoHorasActual();
+    if (progresoAntesDeEnviar.completo) {
+        actualizarEstadoMetaServicioSocial(progresoAntesDeEnviar.aprobadas, progresoAntesDeEnviar.meta);
+        alert(`Ya completaste la meta de ${formatearHoras(progresoAntesDeEnviar.meta)} horas aprobadas. No puedes registrar nuevas jornadas.`);
+        return;
+    }
     const fechaEl = document.getElementById("fechaHora");
     const horasEl = document.getElementById("horasRealizadas");
     const descripcionEl = document.getElementById("descripcionHora");
@@ -13486,7 +13542,16 @@ async function registrarHoras() {
         reiniciarSelectorEvidencia();
         if(mensaje){mensaje.style.display="block";mensaje.innerText="Jornada registrada correctamente.";}
     }catch(error){alert(error.message||"No fue posible registrar la jornada.");}
-    finally{if(boton){boton.disabled=false;boton.textContent="Registrar Jornada";}configurarRestriccionesRegistroHoras(usuarioActual?.grado||"");}
+    finally {
+        const progresoFinal = obtenerProgresoHorasActual();
+        actualizarEstadoMetaServicioSocial(progresoFinal.aprobadas, progresoFinal.meta);
+        if (boton) {
+            boton.disabled = progresoFinal.completo;
+            boton.textContent = "Registrar Jornada";
+            boton.hidden = progresoFinal.completo;
+        }
+        configurarRestriccionesRegistroHoras(usuarioActual?.grado || "");
+    }
 }
 
 let resolverRegistroHoraExito=null;
@@ -13780,11 +13845,12 @@ async function abrirEstudiante() {
     configurarRestriccionesRegistroHoras(usuarioActual?.grado || "");
     mostrarSeccionEstudiante("inicio");
     configurarAyudaEstudiante();
+    iniciarActualizacionEstudianteTiempoReal();
 }
 
-async function actualizarEstudiante() {
+async function actualizarEstudiante(silencioso = false) {
     if (!usuarioActual) return;
-    try { const data = await api("my_records"); registros = (data.records || []).map(normalizarRegistro); actualizarNotificacionesEstudiante(); } catch (e) { alert(e.message); return; }
+    try { const data = await api("my_records"); registros = (data.records || []).map(normalizarRegistro); actualizarNotificacionesEstudiante(); } catch (e) { if (!silencioso) alert(e.message); return; }
 
     const meta = Number(usuarioActual.metaHoras || (usuarioActual.esTecnico ? HORAS_TECNICO : HORAS_NORMAL));
     const modalidad = usuarioActual.esTecnico ? `Técnica · Meta: ${meta} horas` : `Académico · Meta: ${meta} horas`;
@@ -13803,6 +13869,7 @@ async function actualizarEstudiante() {
     document.getElementById("textoProgresoEstudiante").innerText = `${formatearHoras(aprobadas)} de ${formatearHoras(meta)} horas aprobadas.`;
     document.getElementById("barraProgresoEstudiante").style.width = `${porcentaje}%`;
     document.getElementById("porcentajeProgresoEstudiante").innerText = `${porcentaje.toFixed(1)}%`;
+    actualizarEstadoMetaServicioSocial(aprobadas, meta);
 
     mostrarRegistrosEstudiante(registros);
 }
@@ -14171,9 +14238,6 @@ function mostrarAyudaSuperAdmin(tema) {
     if (answer) answer.textContent = respuestas[tema] || "Selecciona una pregunta.";
 }
 
-
-
-
 /*
  * Tras validar la sesión y pintar el panel, saca el disparador y el chat
  * del apartado Ayuda (que empieza oculto) y los monta directamente en la
@@ -14490,6 +14554,25 @@ function abrirNotificacionEstudiante(id){guardarIdsNotificacionesEstudianteLeida
 ====================================================== */
 
 let temporizadorProfesor = null;
+let temporizadorEstudianteProgreso = null;
+let estudianteActualizacionEnCurso = false;
+
+function iniciarActualizacionEstudianteTiempoReal() {
+    detenerActualizacionEstudianteTiempoReal();
+    temporizadorEstudianteProgreso = setInterval(async () => {
+        if (usuarioActual?.rol !== "estudiante" || !document.getElementById("estudiante")?.classList.contains("active") || estudianteActualizacionEnCurso) return;
+        estudianteActualizacionEnCurso = true;
+        try { await actualizarEstudiante(true); } finally { estudianteActualizacionEnCurso = false; }
+    }, 30000);
+}
+
+function detenerActualizacionEstudianteTiempoReal() {
+    if (temporizadorEstudianteProgreso) {
+        clearInterval(temporizadorEstudianteProgreso);
+        temporizadorEstudianteProgreso = null;
+    }
+    estudianteActualizacionEnCurso = false;
+}
 let profesorVistaToken = 0;
 
 function obtenerIdsNotificacionesLeidas() {
@@ -14635,6 +14718,7 @@ async function cerrarSesion() {
     // "Mis estudiantes" antes de cerrar la sesión.
     profesorVistaToken++;
     detenerActualizacionProfesorTiempoReal();
+    detenerActualizacionEstudianteTiempoReal();
 
     try {
         await api("logout", { method: "POST" });
@@ -14652,7 +14736,6 @@ try { guardarSesionSigho(usuarioActual); } catch (_) {}
 
     volverInicio();
 }
-
 
 /* =====================================================
    ATAJOS DE TECLADO Y MENÚ DE USUARIO
@@ -16179,7 +16262,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-
 async function abrirEstudiantesAsignados(token = profesorVistaToken) {
     if (!usuarioActual || usuarioActual.rol !== "profesor") return;
 
@@ -16409,12 +16491,12 @@ function mostrarRegistrosPendientesProfesor() {
     pendientes.forEach(r => {
         html += `
             <tr>
-                <td>${escapeHtml(r.estudiante)}</td>
+                <td data-label="Estudiante">${escapeHtml(r.estudiante)}</td>
                 <td>${escapeHtml(r.grado || "")}</td>
-                <td>${escapeHtml(r.fecha)}</td>
-                <td>${escapeHtml(r.entrada)} - ${escapeHtml(r.salida)}</td>
-                <td>${formatearHoras(r.horas)}</td>
-                <td>${escapeHtml(r.descripcion)}</td>
+                <td data-label="Fecha">${escapeHtml(r.fecha)}</td>
+                <td data-label="Horario">${escapeHtml(r.entrada)} - ${escapeHtml(r.salida)}</td>
+                <td data-label="Horas">${formatearHoras(r.horas)}</td>
+                <td data-label="Actividad">${escapeHtml(r.descripcion)}</td>
                 <td>${renderizarEvidencia(r)}</td>
                 <td>
                     <div class="actions">
@@ -16643,6 +16725,11 @@ function mostrarSeccionEstudiante(seccion) {
 
     activarSidebarEstudiante(seccion);
 
+    if (seccion === "registrar") {
+        const progreso = obtenerProgresoHorasActual();
+        actualizarEstadoMetaServicioSocial(progreso.aprobadas, progreso.meta);
+    }
+
     if (secciones[seccion]) {
         secciones[seccion].style.display = "block";
     }
@@ -16713,6 +16800,128 @@ function calcularHoras(entrada, salida) {
 function obtenerMetaHorasEstudiante(estudiante = usuarioActual) {
     if (!estudiante || estudiante.rol !== "estudiante") return HORAS_NORMAL;
     return estudiante.esTecnico ? HORAS_TECNICO : HORAS_NORMAL;
+}
+
+function obtenerProgresoHorasActual() {
+    if (!usuarioActual || usuarioActual.rol !== "estudiante") return { aprobadas: 0, meta: 0, completo: false };
+    const meta = Number(usuarioActual.metaHoras || (usuarioActual.esTecnico ? HORAS_TECNICO : HORAS_NORMAL));
+    const aprobadas = registros.filter(r => r.estado === "aprobada").reduce((total, r) => total + Number(r.horas || 0), 0);
+    return { aprobadas, meta, completo: meta > 0 && aprobadas >= meta };
+}
+
+function actualizarEstadoMetaServicioSocial(aprobadas, meta) {
+    const completo = Number(meta) > 0 && Number(aprobadas) >= Number(meta);
+    const banner = document.getElementById("bannerServicioCompletado");
+    if (banner) banner.hidden = !completo;
+    const texto = document.getElementById("textoServicioCompletado");
+    if (texto) texto.textContent = `Tienes ${formatearHoras(aprobadas)} de ${formatearHoras(meta)} horas aprobadas. Ya cumpliste la meta de tu modalidad y puedes consultar tu certificado.`;
+
+    const botonInicio = document.getElementById("botonRegistrarJornadaInicio");
+    if (botonInicio) botonInicio.hidden = completo;
+    const botonMenu = document.getElementById("sidebarRegistrarEstudiante");
+    if (botonMenu) {
+        botonMenu.hidden = completo;
+        botonMenu.disabled = completo;
+        botonMenu.setAttribute("aria-hidden", completo ? "true" : "false");
+    }
+    const formulario = document.getElementById("formularioRegistroHoras");
+    if (formulario) formulario.hidden = completo;
+    const aviso = document.getElementById("avisoRegistroMetaCompletada");
+    if (aviso) aviso.hidden = !completo;
+    const botonRegistrar = document.getElementById("registrarHorasBtn");
+    if (botonRegistrar) botonRegistrar.disabled = completo;
+    return completo;
+}
+
+async function descargarCertificadoPazYSalvo() {
+    // Abrir la ventana de forma síncrona para evitar que el navegador bloquee el certificado.
+    const ventana = window.open("about:blank", "_blank");
+    if (!ventana) {
+        alert("El navegador bloqueó la ventana del certificado. Permite las ventanas emergentes para SIGHO e inténtalo de nuevo.");
+        return;
+    }
+    ventana.document.write("<!doctype html><title>Generando certificado...</title><p style='font-family:Arial;padding:30px'>Consultando las horas aprobadas...</p>");
+    try {
+        const response = await api("certificate_data");
+        const c = response.certificate || {};
+        const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+        const logo = new URL("escudo_jjfh.png", window.location.href).href;
+        const modalidad = c.modalidad === "tecnico" ? "Técnica" : "Académica";
+        const gradoRaw = String(c.grado || "No registrado").trim();
+        const grado = /^grado\b/i.test(gradoRaw) ? gradoRaw : `grado ${gradoRaw}`;
+        const meta = Number(c.metaHoras || 0);
+        const horas = Number(c.horasAprobadas || 0);
+        const fecha = esc(c.fechaEmision || new Date().toLocaleDateString("es-CO"));
+        const anio = esc(c.anioServicio || new Date().getFullYear());
+        const nombre = esc(c.nombre || usuarioActual?.nombre || "");
+        const identificacion = esc(c.identificacion || usuarioActual?.identificacion || "");
+        const certificadoHtml = `<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Paz y Salvo - ${nombre}</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
+<style>
+@page{size:letter landscape;margin:12mm}*{box-sizing:border-box}body{margin:0;background:#edf2f7;color:#18314f;font-family:Arial,Helvetica,sans-serif}.toolbar{display:flex;justify-content:center;gap:10px;padding:16px}.toolbar button{border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;background:#1769aa;color:#fff}.toolbar .back{background:#e2e8f0;color:#243b53}.certificate{position:relative;width:100%;max-width:1100px;min-height:650px;margin:0 auto 24px;padding:28px 36px;border:2px solid #1769aa;background:#fff;box-shadow:0 12px 36px rgba(20,50,80,.12)}.top{display:grid;grid-template-columns:125px 1fr;align-items:center;border:1px solid #7f9bb2;min-height:118px}.crest{display:flex;align-items:center;justify-content:center;height:100%;padding:14px;border-right:1px solid #7f9bb2}.crest img{width:90px;height:90px;object-fit:contain}.legal{text-align:center;padding:12px 18px;font-size:12px;line-height:1.7;font-weight:600;color:#294967}.legal .service-title{display:block;margin-top:4px;font-size:14px;letter-spacing:1px}.title{text-align:center;margin:20px 0 24px;font-size:22px;letter-spacing:2px;color:#0d3f70}.date{text-align:right;margin-bottom:18px;font-size:14px}.statement{font-size:16px;line-height:2.05;text-align:justify;color:#243b53}.student-name{font-size:17px;font-weight:800;text-decoration:none!important;border:0!important;border-bottom:0!important;box-shadow:none!important;background-image:none!important}.data-line{display:inline-block;border-bottom:1px solid #52718d;min-width:145px;padding:0 4px;font-weight:700}.footer{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-top:42px}.signature{width:340px;text-align:center;font-size:13px;line-height:1.6}.signature-line{height:34px;border-bottom:1px solid #18314f;margin-bottom:8px}.signature strong{display:block;font-size:14px}.signature span{display:block}.note{max-width:380px;text-align:right;font-size:10px;line-height:1.5;color:#64748b}.note strong{color:#334e68}@media(max-width:700px){.certificate{min-height:0;padding:16px}.top{grid-template-columns:85px 1fr}.crest img{width:62px;height:62px}.legal{font-size:9px;padding:8px}.legal .service-title{font-size:11px}.title{font-size:18px}.statement{font-size:14px;line-height:1.8}.footer{flex-direction:column;align-items:center;margin-top:28px}.signature{max-width:100%}.note{text-align:center}}@media print{body{background:#fff}.toolbar{display:none}.certificate{max-width:none;min-height:0;margin:0;padding:20px 30px;box-shadow:none;border:1.5px solid #1769aa;break-inside:avoid}.title{margin:16px 0 20px}.footer{margin-top:34px}.note{color:#526779}}
+</style></head><body>
+<div class="toolbar"><button onclick="window.print()" type="button">Imprimir</button><button onclick="descargarPDFPazYSalvo()" type="button">Descargar PDF</button><button class="back" onclick="window.close()" type="button">Cerrar</button></div>
+<article class="certificate">
+<header class="top"><div class="crest"><img src="${esc(logo)}" alt="Escudo institucional"></div><div class="legal">Aprobado por Resolución número 1700-01723 del 6 de agosto de 2024<br>Registro Educativo No. 131148 &nbsp; · &nbsp; NIT: 809005293-9<br>Registro DANE 173001010508<br>Ciudadela Las Américas · Teléfono 2697051<br>Ibagué – Tolima<span class="service-title">SERVICIO SOCIAL OBLIGATORIO</span></div></header>
+<h1 class="title">PAZ Y SALVO</h1><div class="date">Ibagué, ${fecha}</div>
+<p class="statement">La Institución Educativa José Joaquín Flórez Hernández hace constar que el/la estudiante <span class="student-name">${nombre}</span>, identificado(a) con T.I. / documento No. <span class="data-line">${identificacion}</span>, de ${esc(grado)}, ha cumplido satisfactoriamente con la meta de prestación del servicio social obligatorio correspondiente al año <strong>${anio}</strong>, con una intensidad exigida de <strong>${esc(meta)} horas</strong> en modalidad <strong>${esc(modalidad)}</strong>. Según los registros de SIGHO, cuenta con <strong>${esc(horas)} horas aprobadas</strong> y ha alcanzado el total requerido.</p>
+<div class="footer"><div class="signature"><div class="signature-line"></div><strong>CLAUDIA MARCELA ROJAS RIVERA</strong><span>Docente Coordinadora del Servicio Social</span></div><div class="note"><strong>Generado electrónicamente por SIGHO</strong><br>Este documento se construye a partir de las horas aprobadas en el sistema. La institución debe aplicar la firma o validación oficial que corresponda antes de usarlo como documento oficial.</div></div>
+</article><script>
+async function descargarPDFPazYSalvo(){
+  const boton = [...document.querySelectorAll(".toolbar button")].find(b => /Descargar PDF/i.test(b.textContent));
+  const elemento = document.querySelector(".certificate");
+  if (boton) { boton.disabled = true; boton.textContent = "Generando PDF…"; }
+  try {
+    if (!elemento) throw new Error("No se encontró el contenido del certificado.");
+    if (typeof window.html2pdf !== "function") {
+      throw new Error("No se pudo cargar el generador de PDF. Verifica tu conexión a Internet e inténtalo de nuevo.");
+    }
+    const opciones = {
+      margin: 10,
+      filename: "Paz_y_Salvo_Servicio_Social.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff", logging: false },
+      jsPDF: { unit: "mm", format: "letter", orientation: "landscape" },
+      pagebreak: { mode: ["css", "legacy"] }
+    };
+    // Exporta únicamente el certificado; la barra de acciones queda fuera del PDF.
+    await window.html2pdf().set(opciones).from(elemento).save();
+  } catch (error) {
+    alert(error.message || "No fue posible descargar el certificado PDF.");
+  } finally {
+    if (boton) { boton.disabled = false; boton.textContent = "Descargar PDF"; }
+  }
+}
+<\/script>
+
+
+<style id="sigho-final-admin-history-and-theme-fix">
+@media (max-width: 767px) {
+  #administrador #seccionHistorialAdmin { padding-bottom: 0 !important; margin-bottom: 8px !important; }
+  #administrador #seccionHistorialAdmin .admin-history-controls {
+    min-height: 0 !important; height: auto !important; padding: 12px !important;
+    margin-bottom: 10px !important; gap: 10px !important; align-content: start !important;
+  }
+  #administrador #seccionHistorialAdmin .admin-history-controls > *,
+  #administrador #seccionHistorialAdmin .admin-history-controls .form-group,
+  #administrador #seccionHistorialAdmin .admin-history-controls .history-filter {
+    min-height: 0 !important; margin-bottom: 0 !important;
+  }
+  #administrador #seccionHistorialAdmin .history-filter { padding: 4px !important; }
+  #administrador #seccionHistorialAdmin #tablaHistorialAdmin { margin-top: 0 !important; }
+}
+</style>
+
+</body></html>`;
+        ventana.document.open();
+        ventana.document.write(certificadoHtml);
+        ventana.document.close();
+        window.setTimeout(() => { try { ventana.focus(); } catch (_) {} }, 200);
+    } catch (error) {
+        try { ventana.close(); } catch (_) {}
+        alert(error.message || "No fue posible generar el certificado.");
+    }
 }
 
 function obtenerEstudiantes() {
@@ -16939,14 +17148,14 @@ function mostrarHistorialAdmin() {
         const aprobado = r.estado === "aprobada";
         html += `
             <tr>
-                <td>${escapeHtml(r.revisadoPorNombre || r.revisadoPor || "Funcionario público no identificado")}</td>
-                <td>${escapeHtml(r.estudiante)}</td>
-                <td>${escapeHtml(r.fecha)}</td>
-                <td>${escapeHtml(r.entrada)} - ${escapeHtml(r.salida)}</td>
-                <td>${formatearHoras(r.horas)}</td>
-                <td>${escapeHtml(r.descripcion)}</td>
-                <td><span class="status ${aprobado ? "approved" : "rejected"}">${aprobado ? "Aceptada" : "Rechazada"}</span></td>
-                <td>${escapeHtml(r.observacion || r.motivoRechazo || "-")}</td>
+                <td data-label="Funcionario público">${escapeHtml(r.revisadoPorNombre || r.revisadoPor || "Funcionario público no identificado")}</td>
+                <td data-label="Estudiante">${escapeHtml(r.estudiante)}</td>
+                <td data-label="Fecha">${escapeHtml(r.fecha)}</td>
+                <td data-label="Horario">${escapeHtml(r.entrada)} - ${escapeHtml(r.salida)}</td>
+                <td data-label="Horas">${formatearHoras(r.horas)}</td>
+                <td data-label="Actividad">${escapeHtml(r.descripcion)}</td>
+                <td data-label="Estado"><span class="status ${aprobado ? "approved" : "rejected"}">${aprobado ? "Aceptada" : "Rechazada"}</span></td>
+                <td data-label="Observación">${escapeHtml(r.observacion || r.motivoRechazo || "-")}</td>
             </tr>`;
     });
 
@@ -17108,7 +17317,12 @@ function cerrarFichaSolicitud() {
     const modal = document.getElementById("modalFichaSolicitud");
     if (!modal?.classList.contains("show")) return;
     modal.classList.remove("show");
-    document.body.style.overflow = overflowAnteriorFichaSolicitud;
+    // No restaures un "hidden" antiguo que pudo quedar de notificaciones/sidebar.
+    // Mantén el bloqueo solo si todavía hay otra capa abierta que lo necesite.
+    const otraCapaBloqueante = !!document.querySelector(
+        '.sigho-modal.show, #sighoTutorialModal.is-open, .notification-panel.show, .notification-backdrop.show, .dashboard.has-role-sidebar.mobile-sidebar-open'
+    );
+    document.body.style.overflow = otraCapaBloqueante ? "hidden" : "";
     focoAnteriorFichaSolicitud?.focus?.();
     focoAnteriorFichaSolicitud = null;
     overflowAnteriorFichaSolicitud = "";
@@ -17405,6 +17619,34 @@ async function aprobarSolicitudesSeleccionadasAdmin() {
     }
 }
 
+function configurarAyudaAdministrador() {
+    const buscador = document.getElementById("buscadorAyudaAdministrador");
+    if (!buscador || buscador.dataset.configurado === "1") return;
+    buscador.dataset.configurado = "1";
+    const raiz = document.getElementById("seccionAyudaAdministrador");
+    const faqs = Array.from(raiz.querySelectorAll("[data-faq]"));
+    const categorias = Array.from(raiz.querySelectorAll("[data-help-category]"));
+    const vacio = document.getElementById("faqVacioAdministrador");
+    faqs.forEach(faq => faq.addEventListener("toggle", () => {
+        if (faq.open) faqs.forEach(otra => { if (otra !== faq) otra.open = false; });
+    }));
+    buscador.addEventListener("input", () => {
+        const termino = buscador.value.trim().toLowerCase();
+        let visibles = 0;
+        faqs.forEach(faq => {
+            const coincide = !termino || faq.textContent.toLowerCase().includes(termino);
+            faq.style.display = coincide ? "block" : "none";
+            if (!coincide) faq.open = false;
+            else if (termino) faq.open = true;
+            if (coincide) visibles++;
+        });
+        categorias.forEach(categoria => {
+            categoria.style.display = Array.from(categoria.querySelectorAll("[data-faq]")).some(faq => faq.style.display !== "none") ? "block" : "none";
+        });
+        vacio?.classList.toggle("show", termino !== "" && visibles === 0);
+    });
+}
+
 function mostrarSeccionAdministrador(nombre) {
     const mapa = {
         inicio: "panelInicioAdministrador",
@@ -17454,6 +17696,8 @@ function mostrarSeccionAdministrador(nombre) {
     } else if (nombre === "solicitudes-personal") {
         mostrarSolicitudesPersonalAdmin();
     }
+
+    if (nombre === "ayuda") configurarAyudaAdministrador();
 
     const main = document.querySelector("#administrador .role-main");
     if (main) main.scrollTo({ top: 0, behavior: "smooth" });
@@ -17898,7 +18142,6 @@ window.addEventListener('resize',function(){
 
     }, { passive: true });
 
-
     /* Bottom bar: intenta reutilizar la navegación existente sin reemplazarla. */
     document.querySelectorAll("[data-mobile-nav]").forEach(function (button) {
         button.addEventListener("click", function () {
@@ -18007,6 +18250,20 @@ window.addEventListener('resize',function(){
     toggle.addEventListener("click", function () {
         applyTheme(isDark() ? "light" : "dark", true);
     });
+
+    function syncPublicThemeButton() {
+        const publicIds = ["home", "solicitud", "login"];
+        const publicVisible = publicIds.some(id => {
+            const screen = document.getElementById(id);
+            return screen && screen.classList.contains("active");
+        });
+        toggle.classList.toggle("sigho-public-theme-toggle", publicVisible);
+        toggle.tabIndex = publicVisible ? 0 : -1;
+        toggle.setAttribute("aria-hidden", publicVisible ? "false" : "true");
+    }
+    syncPublicThemeButton();
+    const screenObserver = new MutationObserver(syncPublicThemeButton);
+    document.querySelectorAll(".screen").forEach(screen => screenObserver.observe(screen, { attributes: true, attributeFilter: ["class"] }));
 })();
 </script>
 <script id="sigho-fouc-finalize">
@@ -18578,7 +18835,6 @@ body.dark-mode .auth-card strong {
 }
 </style>
 <style id="sigho-comprobante-dark-v13">
-<style id="sigho-comprobante-dark-v13">
 /* =========================================================
    COMPROBANTES / RESÚMENES DE SOLICITUD EN MODO OSCURO
    Cubre los modales existentes y bloques que puedan ser
@@ -18603,7 +18859,6 @@ body.dark-mode .solicitud-comprobante {
     border: 1px solid #334155;
     box-shadow: 0 18px 50px rgba(0,0,0,.45);
 }
-
 
 /* Cabeceras y cuerpos internos */
 html.dark-mode .sigho-modal-head,
@@ -19290,7 +19545,6 @@ input[type="text"].password-universal-visible {
 }
 </style>
 
-
 <style id="sigho-password-eye-definitive-v50">
 /* =========================================================
    OJO DE CONTRASEÑA — CONTROL DEFINITIVO V50
@@ -19575,7 +19829,6 @@ body[data-theme="dark"] select::placeholder {
     opacity: 1 !important;
 }
 </style>
-
 
 <style id="sigho-validation-help-separation-v45">
 /* =========================================================
@@ -19945,7 +20198,6 @@ body.dark-mode textarea[disabled].campo-error {
     }
 })();
 </script>
-
 
 <script id="sigho-global-login-audio">
 (function () {
@@ -20767,7 +21019,6 @@ body.dark-mode textarea[disabled].campo-error {
 })();
 </script>
 
-
 <style id="sigho-mobile-stop-native-pull-to-refresh-v40">
 /* Bloquea el overscroll en el borde, sin intervenir en el desplazamiento normal. */
 html, body {
@@ -20833,6 +21084,45 @@ html, body {
     const dots = document.getElementById("sighoTutorialDots");
 
     if (!helpButton || !modal || !prevButton || !nextButton) return;
+
+    // El botón flotante abre un mini menú con Modo de color y Ayuda guiada.
+    const quickMenu = document.createElement("div");
+    quickMenu.id = "sighoQuickMenu";
+    quickMenu.setAttribute("role", "menu");
+    quickMenu.setAttribute("aria-label", "Accesos rápidos de SIGHO");
+    quickMenu.innerHTML = `
+        <button type="button" class="sigho-quick-menu-item" role="menuitem" data-sigho-quick-action="theme">
+            <span aria-hidden="true">◐</span><span>Cambiar modo oscuro / claro</span>
+        </button>
+        <button type="button" class="sigho-quick-menu-item" role="menuitem" data-sigho-quick-action="help">
+            <span aria-hidden="true">?</span><span>Abrir Guía / Ayuda rápida</span>
+        </button>`;
+    helpButton.insertAdjacentElement("afterend", quickMenu);
+    helpButton.setAttribute("aria-haspopup", "menu");
+    helpButton.setAttribute("aria-expanded", "false");
+
+    const cerrarMenuRapido = () => {
+        quickMenu.classList.remove("is-open");
+        helpButton.setAttribute("aria-expanded", "false");
+    };
+
+    quickMenu.addEventListener("click", event => {
+        event.stopPropagation();
+        const item = event.target.closest("[data-sigho-quick-action]");
+        if (!item) return;
+        const accion = item.dataset.sighoQuickAction;
+        cerrarMenuRapido();
+        if (accion === "theme") {
+            document.getElementById("themeToggle")?.click();
+        } else if (accion === "help") {
+            const currentUser = (typeof usuarioActual !== "undefined" ? usuarioActual : null) || activeUser;
+            openTutorial(currentUser);
+        }
+    });
+    document.addEventListener("click", event => {
+        if (!quickMenu.contains(event.target) && !helpButton.contains(event.target)) cerrarMenuRapido();
+    });
+    document.addEventListener("keydown", event => { if (event.key === "Escape") cerrarMenuRapido(); });
 
     const tutorials = {
         estudiante: {
@@ -20927,6 +21217,7 @@ html, body {
         const currentUser = user || (typeof usuarioActual !== "undefined" ? usuarioActual : null);
         if (!currentUser || !currentUser.rol) return;
         activeUser = currentUser;
+        cerrarMenuRapido();
         const tutorial = getTutorial(currentUser);
         currentSteps = tutorial.steps;
         currentIndex = 0;
@@ -20949,6 +21240,7 @@ html, body {
             helpButton.classList.add("is-visible");
         } else {
             helpButton.classList.remove("is-visible");
+            cerrarMenuRapido();
         }
     };
 
@@ -20969,9 +21261,14 @@ html, body {
         return closePromise;
     }
 
-    helpButton.addEventListener("click", () => {
-        const user = typeof usuarioActual !== "undefined" ? usuarioActual : activeUser;
-        openTutorial(user);
+    helpButton.addEventListener("click", event => {
+        event.stopPropagation();
+        const user = (typeof usuarioActual !== "undefined" ? usuarioActual : null) || activeUser;
+        if (!user || !user.rol) return;
+        const abrir = !quickMenu.classList.contains("is-open");
+        quickMenu.classList.toggle("is-open", abrir);
+        helpButton.setAttribute("aria-expanded", abrir ? "true" : "false");
+        if (abrir) quickMenu.querySelector("button")?.focus();
     });
     closeButton.addEventListener("click", closeTutorial);
     prevButton.addEventListener("click", () => {
@@ -21018,5 +21315,461 @@ html, body {
     }
 })();
 </script>
+<script id="sigho-direct-login-from-recovery">
+(() => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("abrirLogin") !== "1") return;
+  // Evita el fotograma intermedio: oculta aviso, splash y bienvenida antes de mostrar el login.
+  document.documentElement.classList.add("sigho-direct-login");
+  document.body.classList.remove("sigho-awaiting-terms");
+  ["sigho-terms-gate", "sigho-splash"].forEach(id => document.getElementById(id)?.remove());
+  document.querySelectorAll(".xbox-welcome, #xbox-welcome, .sigho-xbox-welcome").forEach(el => el.remove());
+  if (typeof window.mostrarLogin === "function") window.mostrarLogin();
+  else {
+    const login = document.getElementById("login");
+    if (login) {
+      document.querySelectorAll(".screen").forEach(el => { el.classList.remove("active"); el.style.display = "none"; });
+      login.classList.add("active"); login.style.display = "block";
+    }
+  }
+  history.replaceState(null, "", window.location.pathname);
+})();
+</script>
+<style id="sigho-mobile-final-fixes-v50">
+/* Evita el desbordamiento horizontal que produce la franja blanca a la derecha. */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip !important;
+}
+.container, .screen, .dashboard, .role-main, .role-sidebar,
+#tablaHistorialAdmin, #seccionHistorialAdmin {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* El nombre del alumno no lleva ninguna línea atravesándolo ni subrayado. */
+.student-name {
+  text-decoration: none !important;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+/* Ficha de solicitud: el contenido puede desplazarse sin dejar la página bloqueada al cerrar. */
+.student-request-modal {
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.student-request-card {
+  min-height: 0;
+  max-height: min(88dvh, 900px) !important;
+}
+.student-request-head, .student-request-footer { flex: 0 0 auto; }
+.student-request-content {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* Ayuda del administrador: texto y tarjetas no generan anchos mínimos en móviles. */
+.help-admin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.help-admin-card, .help-admin-intro,
+.help-admin-card p, .help-admin-card li, .help-admin-card h4 {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.help-admin-card { line-height: 1.55; }
+.help-admin-card p, .help-admin-card ul { font-size: 14px; }
+
+/* Menú compacto agrupando tema y guía en una única esquina. */
+#sighoQuickMenu {
+  position: fixed;
+  right: 16px;
+  bottom: 84px;
+  z-index: 100051;
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  width: min(285px, calc(100vw - 32px));
+  padding: 8px;
+  border: 1px solid #d4e2ed;
+  border-radius: 15px;
+  background: #fff;
+  color: #18314f;
+  box-shadow: 0 14px 40px rgba(8,43,76,.25);
+}
+#sighoQuickMenu.is-open { display: flex; }
+#sighoQuickMenu .sigho-quick-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 45px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: 600 13px/1.35 "Segoe UI", Arial, sans-serif;
+  cursor: pointer;
+}
+#sighoQuickMenu .sigho-quick-menu-item:hover,
+#sighoQuickMenu .sigho-quick-menu-item:focus-visible { background: #edf6fb; outline: none; }
+#sighoQuickMenu .sigho-quick-menu-item > span:first-child {
+  display: inline-grid;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e7f0fa;
+  color: #1769aa;
+  font-weight: 900;
+}
+body.dark-mode #sighoQuickMenu { background: #172334; color: #f1f5f9; border-color: #334155; }
+body.dark-mode #sighoQuickMenu .sigho-quick-menu-item:hover,
+body.dark-mode #sighoQuickMenu .sigho-quick-menu-item:focus-visible { background: #263449; }
+body.dark-mode #sighoQuickMenu .sigho-quick-menu-item > span:first-child { background: #253c56; color: #93c5fd; }
+/* En pantallas públicas se muestra el control de tema; en paneles autenticados
+   queda integrado en el menú rápido de ayuda para evitar superposiciones. */
+#themeToggle { display: none; }
+#themeToggle.sigho-public-theme-toggle { display: flex !important; position: fixed !important; top: 16px !important; right: 16px !important; bottom: auto !important; left: auto !important; z-index: 100100 !important; }
+@media (max-width: 767px) {
+  #themeToggle.sigho-public-theme-toggle { top: auto !important; right: 16px !important; bottom: max(16px, env(safe-area-inset-bottom)) !important; left: auto !important; }
+}
+#sighoTutorialHelpButton { right: 16px !important; bottom: 16px !important; z-index: 100052 !important; }
+
+@media (max-width: 767px) {
+  html, body { padding-left: 0 !important; padding-right: 0 !important; }
+  body { padding-top: 0 !important; margin: 0 !important; }
+  .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; }
+  .screen, .dashboard-screen { width: 100% !important; max-width: 100% !important; }
+  .role-main { width: 100% !important; max-width: 100vw !important; }
+
+  /* Notification panel fits the screen for all roles. */
+  #estudiante .notification-panel,
+  #profesor .notification-panel,
+  #administrador .notification-panel {
+    position: fixed !important;
+    top: max(64px, env(safe-area-inset-top)) !important;
+    left: 5vw !important;
+    right: 5vw !important;
+    width: 90vw !important;
+    max-width: 90vw !important;
+    max-height: min(72dvh, 560px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    z-index: 1201 !important;
+    border-radius: 14px !important;
+  }
+  #estudiante .notification-list,
+  #profesor .notification-list,
+  #administrador .notification-list { max-height: min(58dvh, 420px) !important; overflow-y: auto !important; }
+
+  /* Historial de revisiones: transforma cada fila en una ficha para no dejar huecos horizontales. */
+  #tablaHistorialAdmin .table-container { overflow: visible !important; border: 0 !important; background: transparent !important; }
+  #tablaHistorialAdmin table { display: block !important; width: 100% !important; min-width: 0 !important; table-layout: auto !important; border: 0 !important; }
+  #tablaHistorialAdmin thead { display: none !important; }
+  #tablaHistorialAdmin tbody { display: grid !important; grid-template-columns: minmax(0,1fr) !important; gap: 12px !important; width: 100% !important; }
+  #tablaHistorialAdmin tr { display: block !important; min-width: 0 !important; width: 100% !important; padding: 8px 12px !important; border: 1px solid #dce7eb !important; border-radius: 13px !important; background: #fff !important; box-shadow: 0 4px 12px rgba(8,43,76,.05) !important; }
+  #tablaHistorialAdmin td { display: grid !important; grid-template-columns: minmax(98px, 34%) minmax(0,1fr) !important; gap: 8px !important; width: 100% !important; min-width: 0 !important; padding: 9px 0 !important; border: 0 !important; border-bottom: 1px solid #edf1f4 !important; font-size: 12px !important; overflow-wrap: anywhere !important; }
+  #tablaHistorialAdmin td:last-child { border-bottom: 0 !important; }
+  #tablaHistorialAdmin td::before { content: attr(data-label); color: #627789; font-weight: 800; font-size: 11px; }
+  body.dark-mode #tablaHistorialAdmin tr { background: #172334 !important; border-color: #334155 !important; }
+  body.dark-mode #tablaHistorialAdmin td { border-color: #334155 !important; }
+  body.dark-mode #tablaHistorialAdmin td::before { color: #9eb4c7; }
+
+  .help-admin-grid { grid-template-columns: minmax(0,1fr) !important; gap: 10px !important; }
+  .help-admin-card { padding: 14px !important; border-radius: 12px !important; }
+  .help-admin-card h4 { font-size: 15px !important; }
+  .help-admin-card p, .help-admin-card ul, .help-admin-intro { font-size: 13px !important; }
+  #sighoTutorialHelpButton { right: 16px !important; bottom: max(16px, env(safe-area-inset-bottom)) !important; padding: 11px !important; }
+  #sighoTutorialHelpButton .sigho-tutorial-help-label { display: none !important; }
+  #sighoQuickMenu { right: 16px; bottom: calc(max(16px, env(safe-area-inset-bottom)) + 66px); }
+  .student-request-modal { align-items: flex-start !important; padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)) !important; }
+  .student-request-card { width: 100% !important; max-height: calc(100dvh - 16px) !important; border-radius: 16px !important; }
+  .student-request-content { padding: 14px !important; }
+}
+@media (max-width: 380px) {
+  #tablaHistorialAdmin td { grid-template-columns: minmax(82px, 32%) minmax(0,1fr) !important; gap: 6px !important; }
+  #sighoQuickMenu { width: calc(100vw - 24px); right: 12px; }
+}
+</style>
+
+
+<style id="sigho-final-admin-faq-and-history-spacing-v51">
+/* =========================================================
+   SIGHO — HOMOLOGACIÓN DE AYUDA DEL ADMINISTRADOR
+   Reutiliza el mismo lenguaje visual que las FAQ del estudiante:
+   tarjetas <details>, botón circular +/− y despliegue animado.
+   ========================================================= */
+#administrador #seccionAyudaAdministrador .help-search-card {
+    background:#fff;
+    border:1px solid #dfe8ef;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 5px 18px rgba(8,43,76,.045);
+    margin-bottom:20px;
+}
+#administrador #seccionAyudaAdministrador .help-search-label {
+    display:block;
+    color:#173f5f;
+    font-size:13px;
+    font-weight:800;
+    margin-bottom:8px;
+}
+#administrador #seccionAyudaAdministrador .help-search-wrap { position:relative; }
+#administrador #seccionAyudaAdministrador .help-search-wrap > span {
+    position:absolute;
+    left:13px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:15px;
+    color:#81919c;
+    pointer-events:none;
+}
+#administrador #buscadorAyudaAdministrador {
+    width:100%;
+    box-sizing:border-box;
+    padding-left:38px;
+    min-height:44px;
+    background:#fbfdfe;
+}
+#administrador #seccionAyudaAdministrador .help-category { margin-bottom:24px; }
+#administrador #seccionAyudaAdministrador .help-category-title {
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin:0 0 11px;
+    color:#173f5f;
+    font-size:15px;
+}
+#administrador #seccionAyudaAdministrador .help-category-title > span {
+    width:30px;
+    height:30px;
+    flex:0 0 30px;
+    display:grid;
+    place-items:center;
+    border-radius:9px;
+    background:#edf6fb;
+    font-size:15px;
+}
+#administrador #seccionAyudaAdministrador .faq-list {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+}
+#administrador #seccionAyudaAdministrador .faq-card {
+    display:block;
+    min-width:0;
+    background:#fff;
+    border:1px solid #dfe8ef;
+    border-radius:13px;
+    box-shadow:0 3px 12px rgba(8,43,76,.035);
+    overflow:hidden;
+    transition:border-color .2s ease, box-shadow .2s ease;
+}
+#administrador #seccionAyudaAdministrador .faq-card:hover {
+    border-color:#c7dbe7;
+    box-shadow:0 5px 16px rgba(8,43,76,.055);
+}
+#administrador #seccionAyudaAdministrador .faq-card summary {
+    cursor:pointer;
+    color:#284d67;
+    font-weight:700;
+    font-size:13px;
+    line-height:1.45;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    min-height:56px;
+    box-sizing:border-box;
+    padding:15px 16px;
+}
+#administrador #seccionAyudaAdministrador .faq-card summary::-webkit-details-marker { display:none; }
+#administrador #seccionAyudaAdministrador .faq-card summary::after {
+    content:'+';
+    width:25px;
+    height:25px;
+    flex:0 0 25px;
+    display:grid;
+    place-items:center;
+    border-radius:50%;
+    background:#eef6fb;
+    color:#1769aa;
+    font-size:17px;
+    line-height:1;
+    transition:transform .2s ease, background .2s ease;
+}
+#administrador #seccionAyudaAdministrador .faq-card[open] summary { color:#0d3f70; }
+#administrador #seccionAyudaAdministrador .faq-card[open] summary::after {
+    content:'−';
+    background:#e5f2f9;
+    transform:rotate(180deg);
+}
+#administrador #seccionAyudaAdministrador .faq-answer {
+    max-height:0;
+    opacity:0;
+    overflow:hidden;
+    padding:0 16px;
+    color:#718492;
+    font-size:12px;
+    line-height:1.6;
+    transition:max-height .28s ease, opacity .22s ease, padding .28s ease;
+}
+#administrador #seccionAyudaAdministrador .faq-card[open] .faq-answer {
+    max-height:420px;
+    opacity:1;
+    padding:0 16px 15px;
+}
+#administrador #seccionAyudaAdministrador .faq-answer p { margin:0; }
+#administrador #seccionAyudaAdministrador .faq-answer ol,
+#administrador #seccionAyudaAdministrador .faq-answer ul { margin:0; padding-left:18px; }
+#administrador #seccionAyudaAdministrador .faq-empty {
+    display:none;
+    margin-top:8px;
+    padding:18px;
+    text-align:center;
+    color:#81919c;
+    background:#fff;
+    border:1px dashed #cfdde5;
+    border-radius:13px;
+    font-size:12px;
+}
+#administrador #seccionAyudaAdministrador .faq-empty.show { display:block; }
+
+/* Modo oscuro: conserva el contraste de las tarjetas de preguntas. */
+html.dark-mode #administrador #seccionAyudaAdministrador .help-search-card,
+body.dark-mode #administrador #seccionAyudaAdministrador .help-search-card,
+html.dark-mode #administrador #seccionAyudaAdministrador .faq-card,
+body.dark-mode #administrador #seccionAyudaAdministrador .faq-card,
+html.dark-mode #administrador #seccionAyudaAdministrador .faq-empty,
+body.dark-mode #administrador #seccionAyudaAdministrador .faq-empty {
+    background:#172334 !important;
+    background-color:#172334 !important;
+    border-color:#334155 !important;
+    color:#cbd5e1 !important;
+    box-shadow:none !important;
+}
+html.dark-mode #administrador #seccionAyudaAdministrador .help-search-label,
+body.dark-mode #administrador #seccionAyudaAdministrador .help-search-label,
+html.dark-mode #administrador #seccionAyudaAdministrador .help-category-title,
+body.dark-mode #administrador #seccionAyudaAdministrador .help-category-title,
+html.dark-mode #administrador #seccionAyudaAdministrador .faq-card summary,
+body.dark-mode #administrador #seccionAyudaAdministrador .faq-card summary { color:#e2e8f0 !important; }
+html.dark-mode #administrador #buscadorAyudaAdministrador,
+body.dark-mode #administrador #buscadorAyudaAdministrador {
+    background:#0f1b2a !important;
+    color:#e5eef6 !important;
+    border-color:#38516a !important;
+}
+html.dark-mode #administrador #seccionAyudaAdministrador .help-category-title > span,
+body.dark-mode #administrador #seccionAyudaAdministrador .help-category-title > span,
+html.dark-mode #administrador #seccionAyudaAdministrador .faq-card summary::after,
+body.dark-mode #administrador #seccionAyudaAdministrador .faq-card summary::after {
+    background:#253c56 !important;
+    color:#93c5fd !important;
+}
+html.dark-mode #administrador #seccionAyudaAdministrador .faq-answer,
+body.dark-mode #administrador #seccionAyudaAdministrador .faq-answer { color:#cbd5e1 !important; }
+
+/* =========================================================
+   HISTORIAL DE REVISIONES — elimina el hueco entre buscador,
+   selector de funcionario y filtros en la vista móvil.
+   La causa era mantener reglas flex-grow en una columna.
+   ========================================================= */
+@media (max-width: 900px) {
+    #administrador #seccionHistorialAdmin .admin-history-controls {
+        display:grid !important;
+        grid-template-columns:minmax(0,1fr) !important;
+        grid-auto-rows:max-content !important;
+        align-content:start !important;
+        align-items:start !important;
+        justify-content:stretch !important;
+        gap:10px !important;
+        height:auto !important;
+        min-height:0 !important;
+        padding:12px !important;
+        margin-bottom:12px !important;
+    }
+    #administrador #seccionHistorialAdmin .admin-history-controls > .admin-table-search,
+    #administrador #seccionHistorialAdmin .admin-history-controls > .admin-professor-select,
+    #administrador #seccionHistorialAdmin .admin-history-controls > .history-filter {
+        display:block;
+        box-sizing:border-box;
+        width:100% !important;
+        max-width:none !important;
+        min-width:0 !important;
+        min-height:0 !important;
+        height:auto !important;
+        flex:none !important;
+        align-self:stretch !important;
+        margin:0 !important;
+    }
+    #administrador #seccionHistorialAdmin .admin-history-controls .form-group {
+        min-height:0 !important;
+        height:auto !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+    #administrador #seccionHistorialAdmin .admin-history-controls label {
+        display:block;
+        margin:0 0 7px !important;
+    }
+    #administrador #seccionHistorialAdmin .admin-history-controls input,
+    #administrador #seccionHistorialAdmin .admin-history-controls select {
+        display:block;
+        width:100% !important;
+        height:44px !important;
+        min-height:44px !important;
+        margin:0 !important;
+    }
+    #administrador #seccionHistorialAdmin .admin-history-controls .history-filter {
+        display:flex !important;
+        flex-flow:row wrap !important;
+        align-items:center !important;
+        justify-content:flex-start !important;
+        gap:7px !important;
+        padding:4px 0 0 !important;
+    }
+    #administrador #seccionHistorialAdmin #tablaHistorialAdmin { margin-top:0 !important; }
+    #administrador #seccionHistorialAdmin { padding-bottom:0 !important; margin-bottom:8px !important; }
+}
+@media (max-width: 600px) {
+    #administrador #seccionAyudaAdministrador .faq-list,
+    #administrador #seccionAyudaAdministrador .faq-list.two-columns { grid-template-columns:minmax(0,1fr) !important; }
+    #administrador #seccionAyudaAdministrador .help-search-card { padding:14px !important; margin-bottom:16px !important; }
+    #administrador #seccionAyudaAdministrador .faq-card summary { padding:14px !important; }
+}
+
+/* Pie de página institucional y créditos del equipo SIGHO */
+.sigho-site-footer{margin:28px auto 0;padding:24px 20px 28px;width:min(1180px,calc(100% - 32px));border-top:1px solid #d7e3ec;color:#526779;text-align:center;font-size:13px;line-height:1.65}
+.sigho-site-footer .copyright{font-weight:800;color:#0d3f70;margin-bottom:7px}
+.sigho-site-footer .team-title{font-weight:700;color:#274b62;margin:8px 0 4px}
+.sigho-site-footer .team-names{max-width:1000px;margin:0 auto;color:#526779}
+body.dark-mode .sigho-site-footer,html.dark-mode .sigho-site-footer{border-color:#334155;color:#cbd5e1}
+body.dark-mode .sigho-site-footer .copyright,html.dark-mode .sigho-site-footer .copyright,body.dark-mode .sigho-site-footer .team-title,html.dark-mode .sigho-site-footer .team-title{color:#e2e8f0}
+@media(max-width:600px){.sigho-site-footer{width:calc(100% - 24px);padding:20px 8px 24px;font-size:12px;margin-top:20px}}
+</style>
+
+<footer class="sigho-site-footer" aria-label="Derechos de autor e integrantes del proyecto">
+  <div class="copyright">© 2026 SIGHO · Sistema de Gestión de Horas de Servicio Social. Todos los derechos reservados.</div>
+  <div>Proyecto académico de la Institución Educativa José Joaquín Flórez Hernández.</div>
+  <div class="team-title">Integrantes del equipo</div>
+  <div class="team-names">Miguel Angel Roldan Devia · Juan Jose Padilla Muñoz · Frederick Julian Rozo Montero · Jose Lisandro Cardenas Capera · Keli Alexandra Barrera Forero · Sara Sofia Sanchez Ospina</div>
+</footer>
+
 </body>
 </html>

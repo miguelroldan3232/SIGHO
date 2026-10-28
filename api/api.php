@@ -2,27 +2,43 @@
 session_start();
 require_once __DIR__ . '/config.php';
 
-// Carga variables SMTP desde .env sin depender de que Apache las exporte globalmente.
+// Carga .env directamente en un arreglo para no depender de getenv() en el hosting.
+$GLOBALS['SIGHO_ENV_VALUES'] = [];
 (function (): void {
     foreach ([dirname(__DIR__) . DIRECTORY_SEPARATOR . '.env', __DIR__ . DIRECTORY_SEPARATOR . '.env'] as $envFile) {
         if (!is_file($envFile) || !is_readable($envFile)) continue;
         $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         if (!is_array($lines)) continue;
         foreach ($lines as $line) {
+            $line = preg_replace('/^\xEF\xBB\xBF/', '', $line) ?? $line;
             $line = trim($line);
             if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) continue;
             [$key, $value] = explode('=', $line, 2);
             $key = trim($key);
             $value = trim($value);
-            if ($key === '' || getenv($key) !== false) continue;
+            $key = preg_replace('/^export\s+/', '', $key) ?? $key;
+            if ($key === '') continue;
             if (strlen($value) >= 2 && (($value[0] === '"' && substr($value, -1) === '"') || ($value[0] === "'" && substr($value, -1) === "'"))) {
                 $value = substr($value, 1, -1);
             }
-            putenv($key . '=' . $value);
-            $_ENV[$key] = $value;
+            // El archivo .env de la raíz tiene prioridad sobre el de api/.
+            if (!array_key_exists($key, $GLOBALS['SIGHO_ENV_VALUES'])) {
+                $GLOBALS['SIGHO_ENV_VALUES'][$key] = $value;
+            }
+            $_ENV[$key] = $GLOBALS['SIGHO_ENV_VALUES'][$key];
+            $_SERVER[$key] = $GLOBALS['SIGHO_ENV_VALUES'][$key];
         }
     }
 })();
+
+function sigho_env(string $key, string $default = ''): string {
+    if (array_key_exists($key, $GLOBALS['SIGHO_ENV_VALUES'] ?? [])) {
+        $value = (string)$GLOBALS['SIGHO_ENV_VALUES'][$key];
+        return $value !== '' ? $value : $default;
+    }
+    $value = getenv($key);
+    return ($value === false || $value === '') ? $default : (string)$value;
+}
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -149,27 +165,32 @@ function configured_mailer(): \PHPMailer\PHPMailer\PHPMailer {
     }
     require_once $autoload;
 
-    $host = trim((string)getenv('SIGHO_SMTP_HOST'));
-    $from = trim((string)getenv('SIGHO_MAIL_FROM'));
+    $host = trim((string)sigho_env('SIGHO_SMTP_HOST'));
+    $from = trim((string)sigho_env('SIGHO_MAIL_FROM'));
     if ($host === '' || $from === '') {
-        throw new RuntimeException('El envío de correo no está configurado: define SIGHO_SMTP_HOST y SIGHO_MAIL_FROM.');
+        $faltan = [];
+        if ($host === '') $faltan[] = 'SIGHO_SMTP_HOST';
+        if ($from === '') $faltan[] = 'SIGHO_MAIL_FROM';
+        throw new RuntimeException('Faltan estas variables de correo en la configuración .env: ' . implode(', ', $faltan) . '. Revisa la ruta real de api.php y que el .env publicado sea el mismo que comprobaste.');
     }
     if (!filter_var($from, FILTER_VALIDATE_EMAIL)) {
         throw new RuntimeException('SIGHO_MAIL_FROM debe contener una dirección de correo válida.');
     }
-    $portValue = (string)(getenv('SIGHO_SMTP_PORT') ?: '587');
+    $portValue = (string)(sigho_env('SIGHO_SMTP_PORT', '587'));
     $port = filter_var($portValue, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 65535]]);
     if ($port === false) {
         throw new RuntimeException('SIGHO_SMTP_PORT debe ser un número entre 1 y 65535.');
     }
-    $username = (string)getenv('SIGHO_SMTP_USERNAME');
-    $password = (string)getenv('SIGHO_SMTP_PASSWORD');
+    $username = (string)sigho_env('SIGHO_SMTP_USERNAME');
+    $password = preg_replace('/\s+/', '', (string)sigho_env('SIGHO_SMTP_PASSWORD')) ?? '';
     if (($username === '') !== ($password === '')) {
         throw new RuntimeException('Configura SIGHO_SMTP_USERNAME y SIGHO_SMTP_PASSWORD juntos, o deja ambos vacíos.');
     }
 
     $mailer = new \PHPMailer\PHPMailer\PHPMailer(true);
     $mailer->isSMTP();
+    $mailer->SMTPDebug = 0; // No mostrar detalles SMTP al navegador.
+    $mailer->Timeout = 20;
     $mailer->Host = $host;
     $mailer->Port = $port;
     $mailer->SMTPAuth = $username !== '';
@@ -177,7 +198,7 @@ function configured_mailer(): \PHPMailer\PHPMailer\PHPMailer {
         $mailer->Username = $username;
         $mailer->Password = $password;
     }
-    $encryption = strtolower(trim((string)(getenv('SIGHO_SMTP_ENCRYPTION') ?: 'tls')));
+    $encryption = strtolower(trim((string)(sigho_env('SIGHO_SMTP_ENCRYPTION', 'tls'))));
     if ($encryption === 'tls') {
         $mailer->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
     } elseif ($encryption === 'ssl') {
@@ -185,7 +206,7 @@ function configured_mailer(): \PHPMailer\PHPMailer\PHPMailer {
     } elseif ($encryption !== 'none') {
         throw new RuntimeException('SIGHO_SMTP_ENCRYPTION debe ser tls, ssl o none.');
     }
-    $fromName = trim((string)(getenv('SIGHO_MAIL_FROM_NAME') ?: 'SIGHO'));
+    $fromName = trim((string)(sigho_env('SIGHO_MAIL_FROM_NAME', 'SIGHO')));
     $mailer->setFrom($from, $fromName);
     $mailer->CharSet = 'UTF-8';
     return $mailer;
@@ -216,6 +237,96 @@ function send_identity_email(string $email, string $name, string $role, string $
     $mailer->send();
 }
 
+function ensure_password_reset_table(PDO $pdo): void {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT UNSIGNED NOT NULL,
+        token_hash CHAR(64) NOT NULL UNIQUE,
+        expires_at DATETIME NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        used_at DATETIME NULL,
+        request_ip VARCHAR(45) NULL,
+        INDEX idx_password_reset_user_created (user_id, created_at),
+        INDEX idx_password_reset_expiry (expires_at),
+        CONSTRAINT fk_password_reset_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function sigho_app_base_url(): string {
+    // En producción se recomienda definir SIGHO_APP_URL=https://sigho.wuaze.com en el .env.
+    $configured = trim((string)(sigho_env('SIGHO_APP_URL')));
+    if ($configured !== '' && filter_var($configured, FILTER_VALIDATE_URL)) {
+        return rtrim($configured, '/');
+    }
+
+    $host = trim((string)($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
+    // No permitir que un Host arbitrario controle los enlaces enviados por correo.
+    if ($host === '' || !preg_match('/^[A-Za-z0-9.-]+(?::[0-9]{1,5})?$/', $host)) {
+        throw new RuntimeException('No se pudo determinar el dominio público de SIGHO. Configura SIGHO_APP_URL en el archivo .env.');
+    }
+    $hostName = strtolower(preg_replace('/:\d+$/', '', $host) ?? $host);
+    $forwardedProto = strtolower(trim(explode(',', (string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''))[0] ?? ''));
+    $https = (!empty($_SERVER['HTTPS']) && strtolower((string)$_SERVER['HTTPS']) !== 'off')
+        || $forwardedProto === 'https'
+        || strtolower((string)($_SERVER['REQUEST_SCHEME'] ?? '')) === 'https'
+        || str_ends_with($hostName, '.wuaze.com');
+    $scheme = $https ? 'https' : 'http';
+
+    $script = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? '/api/api.php'));
+    $root = dirname(dirname($script));
+    if ($root === '.' || $root === DIRECTORY_SEPARATOR) $root = '';
+    $root = '/' . trim(str_replace('\\', '/', $root), '/');
+    if ($root === '/') $root = '';
+    return $scheme . '://' . $host . $root;
+}
+
+function send_password_reset_email(string $email, string $name, string $token): void {
+    $mailer = configured_mailer();
+    $mailer->addAddress($email, $name);
+    $mailer->isHTML(true);
+    $mailer->Subject = 'SIGHO - recuperación de contraseña';
+    $link = sigho_app_base_url() . '/recuperar.php?token=' . rawurlencode($token);
+    $safeName = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $safeLink = htmlspecialchars($link, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $mailer->Body = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;color:#18314f">'
+        . '<h2 style="color:#1259a7">Recuperar contraseña de SIGHO</h2>'
+        . '<p>Hola ' . $safeName . '. Recibimos una solicitud para cambiar la contraseña de tu cuenta.</p>'
+        . '<p>Abre el siguiente enlace para crear una contraseña nueva. El enlace vence en 30 minutos y solo se puede utilizar una vez.</p>'
+        . '<p style="margin:24px 0"><a href="' . $safeLink . '" style="display:inline-block;padding:12px 18px;border-radius:9px;background:#1769aa;color:#fff;text-decoration:none;font-weight:bold">Restablecer contraseña</a></p>'
+        . '<p>Si no solicitaste este cambio, ignora este mensaje; tu contraseña no cambiará.</p>'
+        . '<p style="font-size:12px;color:#6b7d8f">Mensaje automático de SIGHO.</p></div>';
+    $mailer->AltBody = "Hola {$name}. Para recuperar tu contraseña de SIGHO abre este enlace (vence en 30 minutos y se usa una sola vez): {$link}. Si no lo solicitaste, ignora este mensaje.";
+    $mailer->send();
+}
+
+/** Devuelve el progreso real consultado en MySQL; no confía en horas enviadas por el navegador. */
+function student_hours_progress(PDO $pdo, int $studentId, int $userId): array {
+    $st = $pdo->prepare('SELECT id, target_hours, modality, grade, technical_program FROM students WHERE id = ? AND user_id = ? LIMIT 1');
+    $st->execute([$studentId, $userId]);
+    $student = $st->fetch();
+    if (!$student) fail('No se encontró el perfil de estudiante asociado a esta sesión.', 403);
+
+    $modality = strtolower(trim((string)($student['modality'] ?? 'academico')));
+    $target = (float)($student['target_hours'] ?? 0);
+    if ($target <= 0) {
+        $target = (float)sigho_setting(
+            $pdo,
+            $modality === 'tecnico' ? 'technical_hours_target' : 'academic_hours_target',
+            $modality === 'tecnico' ? '100' : '120'
+        );
+    }
+    $st = $pdo->prepare("SELECT COALESCE(SUM(hours), 0) FROM hour_records WHERE student_id = ? AND status = 'aprobada'");
+    $st->execute([$studentId]);
+    $approved = (float)$st->fetchColumn();
+    return [
+        'student' => $student,
+        'modalidad' => $modality === 'tecnico' ? 'tecnico' : 'academico',
+        'meta' => max(1, $target),
+        'aprobadas' => $approved,
+        'completo' => $approved >= max(1, $target),
+    ];
+}
+
 function notify_admins_of_unrecognized_account(PDO $pdo, string $name, string $email, string $role): bool {
     $recipients = [];
     $st = $pdo->query("SELECT u.email, u.first_name, u.last_name FROM users u JOIN roles r ON r.id=u.role_id WHERE u.status='activo' AND r.code IN ('administrador','superadmin')");
@@ -224,7 +335,7 @@ function notify_admins_of_unrecognized_account(PDO $pdo, string $name, string $e
             $recipients[] = [$admin['email'], trim($admin['first_name'] . ' ' . $admin['last_name'])];
         }
     }
-    $extraRecipients = array_filter(array_map('trim', explode(',', (string)getenv('SIGHO_MAIL_ADMIN_CC'))));
+    $extraRecipients = array_filter(array_map('trim', explode(',', (string)sigho_env('SIGHO_MAIL_ADMIN_CC'))));
     foreach ($extraRecipients as $recipient) {
         if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) $recipients[] = [$recipient, 'Administrador SIGHO'];
     }
@@ -855,6 +966,74 @@ $action = $_GET['action'] ?? '';
 
 try {
     switch ($action) {
+        case 'request_password_reset': {
+            $d = json_input();
+            $email = strtolower(trim((string)($d['correo'] ?? '')));
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) fail('Escribe un correo electrónico válido.');
+
+            $pdo = db();
+            ensure_password_reset_table($pdo);
+            // Respuesta genérica en todos los casos para no revelar qué cuentas existen.
+            $genericMessage = 'Si el correo corresponde a una cuenta activa de SIGHO, recibirás instrucciones para recuperar la contraseña.';
+            $st = $pdo->prepare("SELECT id, email, first_name, last_name FROM users WHERE LOWER(email) = ? AND status = 'activo' LIMIT 1");
+            $st->execute([$email]);
+            $account = $st->fetch();
+            if (!$account) respond(['ok' => true, 'message' => $genericMessage]);
+
+            // Límite de envío: no más de una solicitud por cuenta cada 60 segundos.
+            $st = $pdo->prepare('SELECT id FROM password_reset_tokens WHERE user_id = ? AND created_at > DATE_SUB(NOW(), INTERVAL 60 SECOND) ORDER BY created_at DESC LIMIT 1');
+            $st->execute([(int)$account['id']]);
+            if ($st->fetchColumn()) respond(['ok' => true, 'message' => $genericMessage]);
+
+            $token = bin2hex(random_bytes(32));
+            $tokenHash = hash('sha256', $token);
+            $pdo->prepare('UPDATE password_reset_tokens SET used_at = NOW() WHERE user_id = ? AND used_at IS NULL')->execute([(int)$account['id']]);
+            $st = $pdo->prepare('INSERT INTO password_reset_tokens (user_id, token_hash, expires_at, request_ip) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 MINUTE), ?)');
+            $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+            $st->execute([(int)$account['id'], $tokenHash, $ip !== '' ? substr($ip, 0, 45) : null]);
+            try {
+                send_password_reset_email((string)$account['email'], trim((string)$account['first_name'] . ' ' . (string)$account['last_name']), $token);
+            } catch (Throwable $e) {
+                // Invalida el token si SMTP falla para que no quede un enlace activo que nunca se entregó.
+                $pdo->prepare('UPDATE password_reset_tokens SET used_at = NOW() WHERE token_hash = ?')->execute([$tokenHash]);
+                error_log('SIGHO password reset email failed: ' . $e->getMessage());
+            }
+            respond(['ok' => true, 'message' => $genericMessage]);
+        }
+
+        case 'reset_password': {
+            $d = json_input();
+            $token = trim((string)($d['token'] ?? ''));
+            $password = (string)($d['nuevaClave'] ?? '');
+            $confirm = (string)($d['confirmarClave'] ?? '');
+            if (!preg_match('/^[a-f0-9]{64}$/', $token)) fail('El enlace de recuperación no es válido o ya venció.', 400);
+            if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)\S{8,}$/', $password)) {
+                fail('La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula y un número, sin espacios.');
+            }
+            if ($password !== $confirm) fail('La confirmación de la contraseña no coincide.');
+
+            $pdo = db();
+            ensure_password_reset_table($pdo);
+            $pdo->beginTransaction();
+            try {
+                $st = $pdo->prepare("SELECT pr.id, pr.user_id FROM password_reset_tokens pr JOIN users u ON u.id = pr.user_id WHERE pr.token_hash = ? AND pr.used_at IS NULL AND pr.expires_at > NOW() AND u.status = 'activo' LIMIT 1 FOR UPDATE");
+                $st->execute([hash('sha256', $token)]);
+                $reset = $st->fetch();
+                if (!$reset) {
+                    $pdo->rollBack();
+                    fail('El enlace de recuperación no es válido, ya fue utilizado o venció. Solicita uno nuevo.', 400);
+                }
+                $newHash = password_hash($password, PASSWORD_DEFAULT);
+                $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([$newHash, (int)$reset['user_id']]);
+                $pdo->prepare('UPDATE password_reset_tokens SET used_at = NOW() WHERE user_id = ? AND used_at IS NULL')->execute([(int)$reset['user_id']]);
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
+            }
+            respond(['ok' => true, 'message' => 'Contraseña actualizada correctamente. Ya puedes iniciar sesión con tu nueva contraseña.']);
+        }
+
         case 'session':
             $user = current_user();
             if ($user) {
@@ -1051,13 +1230,17 @@ try {
             $elapsed = $st->fetchColumn();
             if ($elapsed !== false && $elapsed !== null && (int)$elapsed < 60) fail('Espera un minuto antes de solicitar otro código.');
             $code = (string)random_int(10000000, 99999999);
-            $st = $pdo->prepare('INSERT INTO access_request_email_verifications (request_id, code_hash, expires_at, attempts, last_sent_at, verified_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 MINUTE), 0, NOW(), NULL) ON DUPLICATE KEY UPDATE code_hash=VALUES(code_hash), expires_at=VALUES(expires_at), attempts=0, last_sent_at=NOW(), verified_at=NULL');
-            $st->execute([$requestId, password_hash($code, PASSWORD_DEFAULT)]);
             try {
+                // Mantener el código anterior si SMTP falla: la persona podrá volver a intentarlo.
+                $pdo->beginTransaction();
+                $st = $pdo->prepare('INSERT INTO access_request_email_verifications (request_id, code_hash, expires_at, attempts, last_sent_at, verified_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 MINUTE), 0, NOW(), NULL) ON DUPLICATE KEY UPDATE code_hash=VALUES(code_hash), expires_at=VALUES(expires_at), attempts=0, last_sent_at=NOW(), verified_at=NULL');
+                $st->execute([$requestId, password_hash($code, PASSWORD_DEFAULT)]);
                 send_request_verification_email($req['email'], trim($req['first_name'].' '.$req['last_name']), $req['role_code'] === 'profesor' ? 'Funcionario público' : 'Estudiante', $code);
+                $pdo->commit();
             } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
                 error_log('SIGHO request verification email failed: '.$e->getMessage());
-                fail('No se pudo enviar el correo. Verifica la configuración SMTP e inténtalo más tarde.', 503);
+                fail('No se pudo enviar el correo. Inténtalo de nuevo más tarde.', 503);
             }
             respond(['ok'=>true, 'message'=>'Enviamos un nuevo código de verificación a tu correo.']);
 
@@ -1571,11 +1754,13 @@ try {
             $st = $pdo->prepare('INSERT INTO access_request_email_verifications (request_id, code_hash, expires_at, attempts, last_sent_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 30 MINUTE), 0, NOW())');
             $st->execute([$accessRequestId, password_hash($requestEmailCode, PASSWORD_DEFAULT)]);
             $emailSent = false;
+            $emailError = '';
             try {
                 send_request_verification_email($correo, trim($nombre . ' ' . $apellido), $rol === 'profesor' ? 'Funcionario público' : 'Estudiante', $requestEmailCode);
                 $emailSent = true;
             } catch (Throwable $e) {
-                error_log('SIGHO request verification email failed: ' . $e->getMessage());
+                $emailError = $e->getMessage();
+                error_log('SIGHO request verification email failed: ' . $emailError);
             }
             respond([
                 'ok' => true,
@@ -1585,7 +1770,7 @@ try {
                 'emailSent' => $emailSent,
                 'message' => $emailSent
                     ? 'Enviamos un código de 8 dígitos a tu correo. Ingrésalo para verificar la dirección y dejar la solicitud lista para revisión.'
-                    : 'La solicitud se guardó, pero no pudimos enviar el correo. Verifica la configuración SMTP y usa “Reenviar código”.'
+                    : 'La solicitud se guardó, pero no pudimos enviar el correo. Verifica la configuración SMTP y pulsa “Reenviar código” cuando esté corregida.'
             ]);
 
         case 'professor_profile':
@@ -1677,7 +1862,18 @@ try {
             $user = require_roles(['estudiante']);
             $pdo = db();
             ensure_student_application_table($pdo);
-            $st = $pdo->prepare('SELECT u.email, u.first_name, u.last_name, u.identification, s.id AS student_id, s.grade AS student_grade, s.modality, s.target_hours, sa.grade AS application_grade, sa.service_shift AS application_shift, sa.phone, sa.residence_address, sa.eps, sa.guardian_name, sa.guardian_phone, sa.guardian_phone_type FROM users u LEFT JOIN students s ON s.user_id = u.id LEFT JOIN student_applications sa ON sa.id = (SELECT MAX(sa2.id) FROM student_applications sa2 WHERE sa2.student_id = s.id OR sa2.user_id = u.id) WHERE u.id = ? LIMIT 1');
+            $st = $pdo->prepare("SELECT u.email, u.first_name, u.last_name,
+                COALESCE(NULLIF((SELECT sa_doc.document_number FROM student_applications sa_doc
+                    WHERE (sa_doc.student_id = s.id OR sa_doc.user_id = u.id)
+                      AND sa_doc.document_number IS NOT NULL AND TRIM(sa_doc.document_number) <> ''
+                    ORDER BY sa_doc.id DESC LIMIT 1), ''), u.identification) AS profile_identification,
+                u.identification, s.id AS student_id, s.grade AS student_grade, s.modality, s.target_hours,
+                sa.grade AS application_grade, sa.service_shift AS application_shift, sa.phone,
+                sa.residence_address, sa.eps, sa.guardian_name, sa.guardian_phone, sa.guardian_phone_type
+            FROM users u
+            LEFT JOIN students s ON s.user_id = u.id
+            LEFT JOIN student_applications sa ON sa.id = (SELECT MAX(sa2.id) FROM student_applications sa2 WHERE sa2.student_id = s.id OR sa2.user_id = u.id)
+            WHERE u.id = ? LIMIT 1");
             $st->execute([(int)$user['id']]);
             $p = $st->fetch() ?: [];
             $gradoPerfil = trim((string)($p['student_grade'] ?? ''));
@@ -1690,7 +1886,7 @@ try {
             respond(['ok'=>true,'profile'=>[
                 'correo'=>$p['email'] ?? $user['correo'],
                 'nombre'=>trim(($p['first_name'] ?? '') . ' ' . ($p['last_name'] ?? '')),
-                'identificacion'=>$p['identification'] ?? $user['identificacion'],
+                'identificacion'=>$p['profile_identification'] ?? $p['identification'] ?? $user['identificacion'],
                 'grado'=>$gradoPerfil,
                 'Grado'=>$gradoPerfil,
                 'jornada'=>$p['application_shift'] ?? '',
@@ -1802,6 +1998,39 @@ try {
             $user = require_roles(['estudiante']);
             respond(['ok' => true, 'records' => get_records((int)$user['studentId'])]);
 
+        case 'certificate_data': {
+            $user = require_roles(['estudiante']);
+            $studentId = (int)($user['studentId'] ?? 0);
+            if ($studentId <= 0) fail('No se encontró el perfil del estudiante.', 403);
+            $pdo = db();
+            ensure_student_application_table($pdo);
+            $progress = student_hours_progress($pdo, $studentId, (int)$user['id']);
+            if (!$progress['completo']) {
+                fail('El certificado se habilita cuando todas las horas necesarias estén aprobadas.', 403);
+            }
+            $st = $pdo->prepare("SELECT u.first_name, u.last_name,
+                COALESCE(NULLIF((SELECT sa.document_number FROM student_applications sa WHERE sa.student_id = s.id AND sa.document_number IS NOT NULL AND TRIM(sa.document_number) <> '' ORDER BY sa.id DESC LIMIT 1), ''), u.identification) AS certificate_identification,
+                s.grade, s.modality, s.technical_program,
+                (SELECT sa.grade FROM student_applications sa WHERE sa.student_id = s.id AND sa.grade IS NOT NULL AND TRIM(sa.grade) <> '' ORDER BY sa.id DESC LIMIT 1) AS application_grade
+                FROM students s JOIN users u ON u.id = s.user_id WHERE s.id = ? AND s.user_id = ? LIMIT 1");
+            $st->execute([$studentId, (int)$user['id']]);
+            $data = $st->fetch();
+            if (!$data) fail('No se encontraron los datos para generar el certificado.', 404);
+            $grade = trim((string)($data['grade'] ?? '')) ?: trim((string)($data['application_grade'] ?? '')) ?: trim((string)($user['grado'] ?? ''));
+            $modality = strtolower(trim((string)($data['modality'] ?? 'academico'))) === 'tecnico' ? 'tecnico' : 'academico';
+            respond(['ok' => true, 'certificate' => [
+                'nombre' => trim((string)$data['first_name'] . ' ' . (string)$data['last_name']),
+                'identificacion' => (string)$data['certificate_identification'],
+                'grado' => $grade,
+                'modalidad' => $modality,
+                'programaTecnico' => (string)($data['technical_program'] ?? ''),
+                'metaHoras' => $progress['meta'],
+                'horasAprobadas' => $progress['aprobadas'],
+                'fechaEmision' => date('d/m/Y'),
+                'anioServicio' => date('Y'),
+            ]]);
+        }
+
         case 'teacher_data':
             $user = require_roles(['profesor','administrador','superadmin']);
             if ($user['rol'] === 'profesor') {
@@ -1850,6 +2079,13 @@ try {
             // Solo una cuenta de estudiante aceptada y autenticada puede registrar horas.
             $studentId = (int)($user['studentId'] ?? 0);
             if ($studentId <= 0) fail('La cuenta de estudiante no está habilitada para registrar horas.', 403);
+
+            // La meta y las horas aprobadas se consultan en MySQL antes de aceptar evidencias.
+            $pdo = db();
+            $progresoServicio = student_hours_progress($pdo, $studentId, (int)$user['id']);
+            if ($progresoServicio['completo']) {
+                fail('Ya completaste tu meta de ' . number_format($progresoServicio['meta'], 0, ',', '.') . ' horas aprobadas. No puedes registrar nuevas jornadas.', 409);
+            }
 
             $fecha = trim((string)($_POST['fecha'] ?? ''));
             $horas = trim((string)($_POST['horas'] ?? ''));
@@ -1978,6 +2214,14 @@ try {
             } catch (Throwable $e) { /* si ya son NULL o el motor no requiere el cambio, continuamos */ }
             try {
                 $pdo->beginTransaction();
+                // Serializa envíos de una misma cuenta y vuelve a consultar la meta antes de insertar.
+                $pdo->prepare('SELECT id FROM students WHERE id = ? AND user_id = ? FOR UPDATE')->execute([$studentId, (int)$user['id']]);
+                $progresoAntesDeGuardar = student_hours_progress($pdo, $studentId, (int)$user['id']);
+                if ($progresoAntesDeGuardar['completo']) {
+                    $pdo->rollBack();
+                    foreach ($archivosGuardados as $saved) @unlink($saved['target']);
+                    fail('Ya completaste tu meta de ' . number_format($progresoAntesDeGuardar['meta'], 0, ',', '.') . ' horas aprobadas. No puedes registrar nuevas jornadas.', 409);
+                }
                 $primeraEvidencia = $archivosGuardados[0];
                 $st = $pdo->prepare('INSERT INTO hour_records (student_id, record_date, entry_time, exit_time, hours, activity_description, evidence_original_name, evidence_path, evidence_mime) VALUES (?,?,?,?,?,?,?,?,?)');
                 $st->execute([
