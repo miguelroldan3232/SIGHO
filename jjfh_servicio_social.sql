@@ -516,18 +516,17 @@ CREATE TABLE `v_student_progress` (
 --
 -- Estructura para la vista `v_review_history`
 --
-DROP TABLE IF EXISTS `v_review_history`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_review_history`  AS SELECT `hr`.`id` AS `hour_record_id`, concat(`su`.`first_name`,' ',`su`.`last_name`) AS `student_name`, `su`.`email` AS `student_email`, concat(`pu`.`first_name`,' ',`pu`.`last_name`) AS `reviewer_name`, `pu`.`email` AS `reviewer_email`, `st`.`staff_code` AS `staff_code`, `hr`.`record_date` AS `record_date`, `hr`.`entry_time` AS `entry_time`, `hr`.`exit_time` AS `exit_time`, `hr`.`hours` AS `hours`, `hr`.`activity_description` AS `activity_description`, `hr`.`evidence_original_name` AS `evidence_original_name`, `hr`.`evidence_path` AS `evidence_path`, `hr`.`evidence_mime` AS `evidence_mime`, `hr`.`status` AS `status`, `hr`.`observation` AS `observation`, `hr`.`rejection_reason` AS `rejection_reason`, `hr`.`reviewed_at` AS `reviewed_at` FROM ((((`hour_records` `hr` join `students` `s` on(`s`.`id` = `hr`.`student_id`)) join `users` `su` on(`su`.`id` = `s`.`user_id`)) left join `staff` `st` on(`st`.`id` = `hr`.`reviewed_by`)) left join `users` `pu` on(`pu`.`id` = `st`.`user_id`)) WHERE `hr`.`status` <> 'pendiente' ;
+
 
 -- --------------------------------------------------------
 
 --
 -- Estructura para la vista `v_student_progress`
 --
-DROP TABLE IF EXISTS `v_student_progress`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_student_progress`  AS SELECT `s`.`id` AS `student_id`, `u`.`identification` AS `identification`, `s`.`student_code` AS `student_code`, concat(`u`.`first_name`,' ',`u`.`last_name`) AS `student_name`, `u`.`email` AS `email`, `s`.`grade` AS `grade`, `s`.`modality` AS `modality`, `s`.`technical_program` AS `technical_program`, `s`.`target_hours` AS `target_hours`, coalesce(sum(case when `hr`.`status` = 'aprobada' then `hr`.`hours` else 0 end),0) AS `approved_hours`, greatest(`s`.`target_hours` - coalesce(sum(case when `hr`.`status` = 'aprobada' then `hr`.`hours` else 0 end),0),0) AS `remaining_hours`, least(100,coalesce(sum(case when `hr`.`status` = 'aprobada' then `hr`.`hours` else 0 end),0) / `s`.`target_hours` * 100) AS `progress_percent` FROM ((`students` `s` join `users` `u` on(`u`.`id` = `s`.`user_id`)) left join `hour_records` `hr` on(`hr`.`student_id` = `s`.`id`)) GROUP BY `s`.`id`, `u`.`identification`, `s`.`student_code`, `u`.`first_name`, `u`.`last_name`, `u`.`email`, `s`.`grade`, `s`.`modality`, `s`.`technical_program`, `s`.`target_hours` ;
+
+
 
 --
 -- Índices para tablas volcadas
