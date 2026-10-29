@@ -21762,14 +21762,33 @@ body.dark-mode #administrador #seccionAyudaAdministrador .faq-answer { color:#cb
 body.dark-mode .sigho-site-footer,html.dark-mode .sigho-site-footer{border-color:#334155;color:#cbd5e1}
 body.dark-mode .sigho-site-footer .copyright,html.dark-mode .sigho-site-footer .copyright,body.dark-mode .sigho-site-footer .team-title,html.dark-mode .sigho-site-footer .team-title{color:#e2e8f0}
 @media(max-width:600px){.sigho-site-footer{width:calc(100% - 24px);padding:20px 8px 24px;font-size:12px;margin-top:20px}}
+.sigho-site-footer[hidden]{display:none!important}
 </style>
 
-<footer class="sigho-site-footer" aria-label="Derechos de autor e integrantes del proyecto">
+<footer class="sigho-site-footer" id="sighoPublicFooter" aria-label="Derechos de autor e integrantes del proyecto" hidden>
   <div class="copyright">© 2026 SIGHO · Sistema de Gestión de Horas de Servicio Social. Todos los derechos reservados.</div>
   <div>Proyecto académico de la Institución Educativa José Joaquín Flórez Hernández.</div>
   <div class="team-title">Integrantes del equipo</div>
   <div class="team-names">Miguel Angel Roldan Devia · Juan Jose Padilla Muñoz · Frederick Julian Rozo Montero · Jose Lisandro Cardenas Capera · Keli Alexandra Barrera Forero · Sara Sofia Sanchez Ospina</div>
 </footer>
+<script id="sigho-public-footer-visibility">
+(function () {
+    const footer = document.getElementById('sighoPublicFooter');
+    if (!footer) return;
+    const publicScreens = new Set(['home', 'login', 'solicitud']);
+    function updatePublicFooter() {
+        const activeScreen = document.querySelector('.screen.active');
+        footer.hidden = !(activeScreen && publicScreens.has(activeScreen.id));
+    }
+    document.querySelectorAll('.screen').forEach(function (screen) {
+        new MutationObserver(updatePublicFooter).observe(screen, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+    });
+    updatePublicFooter();
+})();
+</script>
 
 </body>
 </html>
