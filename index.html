@@ -21020,12 +21020,7 @@ body.dark-mode textarea[disabled].campo-error {
 </script>
 
 <style id="sigho-mobile-stop-native-pull-to-refresh-v40">
-/* Bloquea el overscroll en el borde, sin intervenir en el desplazamiento normal. */
-html, body {
-    overscroll-behavior-y: none !important;
-}
-
-/* El botón de regreso al Super Admin debe permanecer oculto aunque otras reglas den display:flex. */
+/* Oculta el botón de regreso al Super Admin cuando no corresponde; no bloquea el scroll. */
 #sidebarVolverSuperAdminProfesor[hidden],
 #sidebarVolverSuperAdminAdministrador[hidden] {
     display: none !important;
@@ -21777,8 +21772,13 @@ body.dark-mode .sigho-site-footer .copyright,html.dark-mode .sigho-site-footer .
     if (!footer) return;
     const publicScreens = new Set(['home', 'login', 'solicitud']);
     function updatePublicFooter() {
-        const activeScreen = document.querySelector('.screen.active');
-        footer.hidden = !(activeScreen && publicScreens.has(activeScreen.id));
+        const activeScreens = Array.from(document.querySelectorAll('.screen.active'));
+        const showFooter = activeScreens.some(function (screen) {
+            return publicScreens.has(screen.id);
+        }) && !activeScreens.some(function (screen) {
+            return screen.classList.contains('dashboard-screen');
+        });
+        footer.hidden = !showFooter;
     }
     document.querySelectorAll('.screen').forEach(function (screen) {
         new MutationObserver(updatePublicFooter).observe(screen, {
@@ -21786,7 +21786,228 @@ body.dark-mode .sigho-site-footer .copyright,html.dark-mode .sigho-site-footer .
             attributeFilter: ['class']
         });
     });
+    document.addEventListener('DOMContentLoaded', updatePublicFooter, { once: true });
+    window.addEventListener('pageshow', updatePublicFooter);
     updatePublicFooter();
+})();
+</script>
+
+
+<style id="sigho-mobile-natural-scroll-and-public-footer-v41">
+/*
+ * SIGHO mobile stability patch.
+ * On narrow screens, use one native document scroll instead of nested 100vh panels.
+ * This intentionally allows normal browser overscroll; suppressing it previously
+ * caused scrolling to become stuck on some mobile browsers.
+ */
+@media (max-width: 767px) {
+    html {
+        height: auto !important;
+        min-height: 100% !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        overscroll-behavior-y: auto !important;
+        scroll-behavior: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body,
+    body:has(.dashboard-screen.active) {
+        display: block !important;
+        height: auto !important;
+        min-height: 100% !important;
+        max-height: none !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        overscroll-behavior-y: auto !important;
+        scroll-behavior: auto !important;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y pinch-zoom;
+        padding: 0 0 20px !important;
+        margin: 0 !important;
+    }
+
+    .container,
+    body:has(.dashboard-screen.active) .container {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        padding-bottom: 0 !important;
+        margin: 0 auto !important;
+        border-radius: 0 !important;
+    }
+
+    .screen,
+    .screen.active,
+    .auth-screen,
+    .sigho-home {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .sigho-hero {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+    }
+
+    .auth-screen {
+        padding: 14px 10px 22px !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .auth-card,
+    .auth-card-request,
+    .auth-card-login {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* Reset fixed-height dashboard shells at mobile widths for every role. */
+    #estudiante.dashboard-screen,
+    #profesor.dashboard-screen,
+    #administrador.dashboard-screen,
+    #superAdmin.dashboard-screen,
+    .dashboard-screen {
+        display: none;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    #estudiante.dashboard-screen.active,
+    #profesor.dashboard-screen.active,
+    #administrador.dashboard-screen.active,
+    #superAdmin.dashboard-screen.active,
+    .dashboard-screen.active {
+        display: block !important;
+    }
+
+    .dashboard.has-role-sidebar,
+    #estudiante .dashboard.has-role-sidebar,
+    #profesor .dashboard.has-role-sidebar,
+    #administrador .dashboard.has-role-sidebar,
+    #superAdmin .dashboard.has-role-sidebar {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: auto !important;
+        overflow: visible !important;
+        padding: 0 !important;
+    }
+
+    .role-main,
+    #estudiante .role-main,
+    #profesor .role-main,
+    #administrador .role-main,
+    #superAdmin .role-main {
+        grid-column: auto !important;
+        grid-row: auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        overscroll-behavior: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scroll-behavior: auto !important;
+        scrollbar-gutter: auto !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 12px 12px 32px !important;
+        touch-action: pan-y pinch-zoom;
+    }
+
+    /* Keep sideways table movement available without creating a second vertical scroll. */
+    .table-container,
+    #estudiante .student-records-table,
+    #profesor .profesor-historial-container,
+    #administrador .table-container,
+    #superAdmin .table-container {
+        max-width: 100%;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        overscroll-behavior-y: auto;
+    }
+
+    /* Credits remain in normal document flow and wrap cleanly on small phones. */
+    .sigho-site-footer {
+        position: static !important;
+        display: block;
+        clear: both;
+        box-sizing: border-box;
+        width: calc(100% - 20px) !important;
+        max-width: 100% !important;
+        margin: 18px auto 24px !important;
+        padding: 20px 12px 26px !important;
+        font-size: 12px !important;
+        line-height: 1.65 !important;
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+
+    .sigho-site-footer .copyright,
+    .sigho-site-footer .team-title,
+    .sigho-site-footer .team-names {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+
+    .sigho-site-footer .team-names {
+        line-height: 1.8;
+    }
+
+    .sigho-site-footer[hidden] {
+        display: none !important;
+    }
+}
+
+/* Never trap page scrolling on phones; keep desktop behavior unchanged. */
+@media (max-width: 767px) {
+    html, body {
+        overscroll-behavior-y: auto !important;
+    }
+}
+</style>
+
+
+<script id="sigho-mobile-scroll-lock-recovery-v41">
+(function () {
+    function recoverStaleScrollLock() {
+        if (window.innerWidth > 767 || !document.body) return;
+        const activeLock = document.querySelector(
+            '.sigho-modal.show, #sighoTutorialModal.is-open, ' +
+            '.notification-panel.show, .notification-backdrop.show, ' +
+            '.dashboard.has-role-sidebar.mobile-sidebar-open, ' +
+            '#modalVerificacionCorreo.show, #modalSighoAlert.show'
+        );
+        if (!activeLock) {
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('overflow-y');
+        }
+    }
+    window.addEventListener('pageshow', recoverStaleScrollLock);
+    window.addEventListener('resize', recoverStaleScrollLock, { passive: true });
+    document.addEventListener('visibilitychange', recoverStaleScrollLock);
+    document.querySelectorAll('.screen').forEach(function (screen) {
+        new MutationObserver(recoverStaleScrollLock).observe(screen, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+    });
+    recoverStaleScrollLock();
 })();
 </script>
 
